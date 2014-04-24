@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,9 @@ import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
 
 /**
- *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * MoveDown - Context Aware Action for use with node menus
+ * 
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @SaveNodeAction
 public final class NodeMoveDownAction extends AbstractAction implements ContextAwareAction {

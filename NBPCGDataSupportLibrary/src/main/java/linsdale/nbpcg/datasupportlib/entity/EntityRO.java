@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,23 +32,40 @@ import linsdale.nbpcg.supportlib.Log;
 import linsdale.nbpcg.supportlib.LogicException;
 
 /**
+ * The Basic Read-Only (uneditable) Entity Abstract Class.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("linsdale.nbpcg.datasupportlib")
 public abstract class EntityRO extends Entity {
-    
+
     private final Listening<EntityStateChangeListenerParams> stateListening;
     private final Listening<FieldChangeListenerParams> fieldListening;
     private IntWithDescription state = EntityStateChangeListenerParams.INIT;
     private int id;
     private final DBFieldsRO dbfields;
     private final DataAccessRO dataAccess;
-    
+
+    /**
+     * Constructor.
+     *
+     * @param entityname the entity name
+     * @param id the entity Id
+     * @param em the entity manager for this entity class
+     * @param dbfields the entity fields
+     */
     public EntityRO(String entityname, int id, EntityManagerRO em, DBFieldsRO dbfields) {
         this(entityname, id, em.getDataAccess(), dbfields);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param entityname the entity name
+     * @param id the entity Id
+     * @param dataAccess the Data Access object for this entity class
+     * @param dbfields the entity fields
+     */
     protected EntityRO(String entityname, int id, DataAccessRO dataAccess, DBFieldsRO dbfields) {
         super(entityname);
         this.id = id;
@@ -60,7 +77,7 @@ public abstract class EntityRO extends Entity {
         state = EntityStateChangeListenerParams.NEW;
         fireStateChange(EntityStateChangeListenerParams.CREATE, oldState, state);
     }
-    
+
     final void setState(IntWithDescription state) {
         this.state = state;
     }
@@ -69,40 +86,83 @@ public abstract class EntityRO extends Entity {
         return state;
     }
 
+    /**
+     * Add a State Listener to this entity.
+     *
+     * @param listener the listener
+     */
     public final void addStateListener(Listener<EntityStateChangeListenerParams> listener) {
         stateListening.addListener(listener);
     }
 
+    /**
+     * Remove a State listener from this entity.
+     *
+     * @param listener the listener
+     */
     public final void removeStateListener(Listener<EntityStateChangeListenerParams> listener) {
         stateListening.removeListener(listener);
     }
 
+    /**
+     * Add a Field Listener to this entity.
+     *
+     * @param listener the listener
+     */
     public final void addFieldListener(Listener<FieldChangeListenerParams> listener) {
         fieldListening.addListener(listener);
     }
 
+    /**
+     * Remove a Field Listener from this entity.
+     *
+     * @param listener the listener
+     */
     public final void removeFieldListener(Listener<FieldChangeListenerParams> listener) {
         fieldListening.removeListener(listener);
     }
 
+    /**
+     * Fire actions on all field change listeners.
+     *
+     * @param field the field Id
+     */
     protected final void fireFieldChange(IntWithDescription field) {
         fireFieldChange(field, true);
     }
 
+    /**
+     * Fire actions on all field change listeners.
+     *
+     * @param field the field Id
+     * @param formatOK true if the field is formatted correctly
+     */
     protected final void fireFieldChange(IntWithDescription field, boolean formatOK) {
         updateEntityRegistration();
         fieldListening.fire(new FieldChangeListenerParams(field, formatOK));
     }
 
+    /**
+     * Fire actions on all StateChange listeners.
+     *
+     * @param transition state transition Id
+     * @param oldState the previous state
+     * @param newState the new state
+     */
     protected final void fireStateChange(IntWithDescription transition, IntWithDescription oldState, IntWithDescription newState) {
         stateListening.fire(new EntityStateChangeListenerParams(transition, oldState, newState));
     }
-    
+
+    /**
+     * Fire actions on Field Change listeners at load.
+     *
+     * @param field the field Id
+     */
     protected final void fireFieldChangeAtLoad(IntWithDescription field) {
         updateEntityRegistrationAtLoad();
         fieldListening.fire(new FieldChangeListenerParams(field, true));
     }
-    
+
     /**
      * Get the entity Id.
      *
@@ -112,23 +172,32 @@ public abstract class EntityRO extends Entity {
         return id;
     }
 
-    /**
-     * Set the entity Id. (used internally when loading data)
-     *
-     * @param id the id to set
-     */
     final void setId(int id) {
         this.id = id;
     }
 
+    /**
+     * Test if state is New.
+     *
+     * @return true if new
+     */
     public final boolean isNew() {
         return state == EntityStateChangeListenerParams.NEW || state == EntityStateChangeListenerParams.NEWEDITING;
     }
 
+    /**
+     * Test if state is Editing (newediting or dbentityediting).
+     *
+     * @return true if editing
+     */
     public final boolean isEditing() {
         return state == EntityStateChangeListenerParams.NEWEDITING || state == EntityStateChangeListenerParams.DBENTITYEDITING;
     }
 
+    /**
+     * Switch into an editing state, updating state and firing the necessary
+     * statechange listeners. If already in state then this does nothing.
+     */
     protected final void ensureEditing() {
         if (state == EntityStateChangeListenerParams.NEWEDITING || state == EntityStateChangeListenerParams.DBENTITYEDITING) {
             return;
@@ -150,9 +219,13 @@ public abstract class EntityRO extends Entity {
         }
         throw new LogicException("Should not be trying to edit an entity in " + state + " state");
     }
-    
+
+    /**
+     * Locally save the state of this entity (so that entity can be
+     * reset/cancelled).
+     */
     abstract protected void _saveState();
-    
+
     @Override
     public final void cancelEdit() {
         IntWithDescription oldState = state;
@@ -173,6 +246,12 @@ public abstract class EntityRO extends Entity {
         }
     }
 
+    /**
+     * Load Data from entity storage into this entity and fire the field change
+     * at load listeners.
+     *
+     * @param id the entity Id
+     */
     protected void load(int id) {
         dataAccess.load(id, new EntityROLoader());
         fireFieldChangeAtLoad(FieldChangeListenerParams.ALLFIELDS);
@@ -199,5 +278,11 @@ public abstract class EntityRO extends Entity {
         }
     }
 
+    /**
+     * Load a resultset into the entity fields.
+     *
+     * @param rs the resultset
+     * @throws SQLException if problems
+     */
     abstract protected void _load(ResultSet rs) throws SQLException;
 }

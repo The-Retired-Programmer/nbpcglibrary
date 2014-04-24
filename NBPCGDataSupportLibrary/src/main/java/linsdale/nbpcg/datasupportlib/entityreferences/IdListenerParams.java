@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,10 @@ package linsdale.nbpcg.datasupportlib.entityreferences;
 import linsdale.nbpcg.supportlib.ListenerParams;
 
 /**
+ * The Listener Parameter Object - used to transfer state when listener is
+ * fired.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class IdListenerParams implements ListenerParams {
 

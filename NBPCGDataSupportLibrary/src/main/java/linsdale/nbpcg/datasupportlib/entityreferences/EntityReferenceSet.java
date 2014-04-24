@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,23 +31,44 @@ import linsdale.nbpcg.supportlib.Rule;
 import org.openide.util.Lookup;
 
 /**
- * Manages the list of child Entities. The list of Entities is lazy loaded when
+ * Manages the list of Entities. The list of Entities is lazy loaded when
  * required.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class
  */
 public class EntityReferenceSet<E extends EntityRO> {
 
+    /**
+     * The Entity Manager associated with the entities
+     */
     protected final EntityManagerRO<E> em;
     private final DataAccessRO dataAccess;
+
+    /**
+     * The list of Entity References (referring to the entities)
+     */
     protected List<EntityReference<E>> childList;
     private final String columnname;
     private final int columnvalue;
+
+    /**
+     * The name of the Set (for reporting purposes)
+     */
     protected final String name;
     private final Listening<SetChangeListenerParams> setListening;
     private final IntWithDescription field;
 
+    /**
+     * Constructor.
+     *
+     * @param name the set name (for reporting)
+     * @param field the Id for this set
+     * @param columnname the column name for use in selection equality filter
+     * @param columnvalue the column value for use in the selection equality
+     * filter
+     * @param emclass the associated entity manager class
+     */
     public EntityReferenceSet(String name, IntWithDescription field, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
         this(emclass, name, field, columnname, columnvalue);
         if (columnvalue > 0) {
@@ -57,11 +78,18 @@ public class EntityReferenceSet<E extends EntityRO> {
         }
     }
 
+    /**
+     * Constructor.
+     *
+     * @param name the set name (for reporting)
+     * @param field the Id for this set
+     * @param emclass the associated entity manager class
+     */
     public EntityReferenceSet(String name, IntWithDescription field, Class<? extends EntityManagerRO> emclass) {
         this(emclass, name, field, null, 0);
         createChildList(em, dataAccess.find());
     }
-    
+
     private EntityReferenceSet(Class<? extends EntityManagerRO> emclass, String name, IntWithDescription field, String columnname, int columnvalue) {
         this.name = name;
         this.field = field;
@@ -74,65 +102,97 @@ public class EntityReferenceSet<E extends EntityRO> {
 
     private void createChildList(EntityManagerRO<E> em, List<Integer> refs) {
         childList = new ArrayList<>();
-        for (int id : refs) {
+        refs.stream().forEach((id) -> {
             childList.add(new EntityReference<>(name, id, em));
-        }
+        });
     }
-    
+
+    /**
+     * Add a listener to observe changes to set membership. The listener will
+     * fire on the event queue.
+     *
+     * @param listener the listener
+     */
     public final void addSetListener(Listener<SetChangeListenerParams> listener) {
         setListening.addListener(listener);
     }
-    
+
+    /**
+     * Add a listener to observe changes to set membership. The listener will
+     * fire on the current thread or on the event queue / with priority or not,
+     * depending on the flags set.
+     *
+     * @param listener the listener
+     * @param flags the listener flags
+     */
     public final void addSetListener(Listener<SetChangeListenerParams> listener, int flags) {
         setListening.addListener(listener, flags);
     }
 
+    /**
+     * Remove the set listener.
+     *
+     * @param listener the listener
+     */
     public final void removeSetListener(Listener<SetChangeListenerParams> listener) {
         setListening.removeListener(listener);
     }
-    
+
+    /**
+     * Fire all set change listeners.
+     */
     protected void fireSetChange() {
         setListening.fire(new SetChangeListenerParams(field));
     }
 
+    /**
+     * Restore state (to the entity storage state).
+     */
     public void restoreState() {
         // TODO - we are not removing any new entities which are not cached - so we might have a leak here.
         createChildList(em, columnname == null ? dataAccess.find() : dataAccess.find(columnname, columnvalue));
     }
 
     /**
-     * Get the count of child entities.
+     * Get the count of entities in the set.
      *
-     * return the count of child entities
-     * @return 
+     * return the count of entities
+     *
+     * @return the count
      */
     public final int count() {
         return childList.size();
     }
 
     /**
-     * Get the list of Child Entities
+     * Get the list of Entities
      *
-     * @return List of child entities
+     * @return the list of entities
      */
     public List<E> get() {
         List<E> el = new ArrayList<>();
-        for (EntityReference<E> ref : childList) {
+        childList.stream().forEach((ref) -> {
             el.add(ref.get());
-        }
+        });
         return el;
     }
 
     /**
-     * Add a child entity to the child entity list
+     * Add a new entity to the entity set
      *
-     * @param e the Child Entity
+     * @param e the new entity
      */
     public void add(E e) {
         childList.add(new EntityReference<>(name, e, em));
         fireSetChange();
     }
 
+    /**
+     * Add a new entity to the entity set at a defined position.
+     *
+     * @param index the position to insert the new entity
+     * @param e the new entity
+     */
     protected final void add(int index, E e) {
         childList.add(index, new EntityReference<>(name, e, em));
         fireSetChange();
@@ -142,7 +202,7 @@ public class EntityReferenceSet<E extends EntityRO> {
      * Remove an entity from the child entity List
      *
      * @param e the Child Entity
-     * @return 
+     * @return true if entity removed
      */
     public boolean remove(E e) {
         return removeById(e.getId());
@@ -159,11 +219,23 @@ public class EntityReferenceSet<E extends EntityRO> {
         }
         return false;
     }
-    
+
+    /**
+     * Get a new rule checking that set size does not exceed an upper limit.
+     *
+     * @param max the upper limit
+     * @return the rule
+     */
     public Rule getMaxRule(int max) {
         return new MaxRule(max);
     }
 
+    /**
+     * Get a new rule checking that the set size is not less than a lower limit.
+     *
+     * @param min the lower limit
+     * @return the rule
+     */
     public Rule addMinRule(int min) {
         return new MinRule(min);
     }

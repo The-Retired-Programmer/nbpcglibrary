@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,16 +25,29 @@ import linsdale.nbpcg.supportlib.Settings;
 import linsdale.nbpcg.supportlib.Timestamp;
 
 /**
+ * Handles Read-Only entity field management, for a entity which includes a Id and
+ * standardised timestamp (created and updated).
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class DBFieldsROIdandstamp implements DBFieldsRO {
 
     private String createdby;
     private final Timestamp createdon;
+
+    /**
+     * Field - updated by
+     */
     protected String updatedby;
+
+    /**
+     * Field - updated on
+     */
     protected Timestamp updatedon;
 
+    /**
+     * Constructor.
+     */
     public DBFieldsROIdandstamp() {
         String usercode = Settings.get("Usercode", "????");
         createdon = new Timestamp();

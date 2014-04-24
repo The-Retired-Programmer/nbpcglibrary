@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,21 @@
 package linsdale.nbpcg.supportlib;
 
 /**
+ * A Set of Static methods which extends String processing functionality.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class StringX {
 
+    /**
+     * Pad a string to the given length with a defined padding char inserted to
+     * the left of the string.
+     *
+     * @param s the original string
+     * @param requiredLength the target length
+     * @param padchar the padding character
+     * @return the padded string
+     */
     public static String padLeft(String s, int requiredLength, char padchar) {
         int l = s.length();
         if (l >= requiredLength) {
@@ -37,6 +47,16 @@ public class StringX {
         return sb.toString();
     }
 
+    /**
+     * Pad a string to the given length with a defined padding char inserted to
+     * the left of the string, if the original string is an integer, otherwise
+     * return the original string.
+     *
+     * @param s the original string
+     * @param requiredLength the target length
+     * @param padchar the padding character
+     * @return the padded string
+     */
     public static String padLeftIfInt(String s, int requiredLength, char padchar) {
         try {
             Integer.parseInt(s);
@@ -46,6 +66,14 @@ public class StringX {
         return padLeft(s, requiredLength, padchar);
     }
 
+    /**
+     * Split a string on breaks defined by a regular expression and trim the
+     * resulting strings.
+     *
+     * @param s the original string
+     * @param regex the regular expression used to define the splits
+     * @return the array of strings representing the extracted component strings
+     */
     public static String[] splitAndTrim(String s, String regex) {
         String[] split = s.split(regex);
         for (int i = 0; i < split.length; i++) {
@@ -54,6 +82,18 @@ public class StringX {
         return split;
     }
 
+    /**
+     * Split a string on breaks defined by a regular expression and trim the
+     * resulting strings. The method will extracts a defined number of strings,
+     * if there are not enough string extracted from the regular expression
+     * split, then the first string will be used to complete the required number
+     * of strings.
+     *
+     * @param s the original string
+     * @param regex the regular expression used to define the splits
+     * @param l the number of string to be extracted
+     * @return the array of strings representing the extracted component strings
+     */
     public static String[] splitAndTrim(String s, String regex, int l) {
         String[] res = new String[l];
         String[] split = splitAndTrim(s, regex);
@@ -64,6 +104,19 @@ public class StringX {
         return res;
     }
 
+    /**
+     * Split a string on breaks defined by a regular expression and trim the
+     * resulting strings. The method will extracts a defined number of strings,
+     * if there are not enough string extracted from the regular expression
+     * split, then the defined missing string will be used to complete the
+     * required number of strings.
+     *
+     * @param s the original string
+     * @param regex the regular expression used to define the splits
+     * @param l the number of string to be extracted
+     * @param missing the string to be substituted for any undefined strings
+     * @return the array of strings representing the extracted component strings
+     */
     public static String[] splitAndTrim(String s, String regex, int l, String missing) {
         String[] res = new String[l];
         if ("".equals(s.trim())) {
@@ -79,14 +132,41 @@ public class StringX {
         return res;
     }
 
+    /**
+     * Split a string at "," delimiters and trim the resulting strings.
+     *
+     * @param s the original string
+     * @return the array of strings representing the extracted component strings
+     */
     public static String[] splitAndTrim(String s) {
         return splitAndTrim(s, ",");
     }
 
+    /**
+     * Split a string at "," delimiters and trim the resulting strings. The
+     * method will extracts a defined number of strings, if there are not enough
+     * string extracted from the regular expression split, then the first string
+     * will be used to complete the required number of strings.
+     *
+     * @param s the original string
+     * @param l the number of string to be extracted
+     * @return the array of strings representing the extracted component strings
+     */
     public static String[] splitAndTrim(String s, int l) {
         return splitAndTrim(s, ",", l);
     }
 
+    /**
+     * Split a string at "," delimiters and trim the resulting strings. The
+     * method will extracts a defined number of strings, if there are not enough
+     * string extracted from the regular expression split, then the defined
+     * missing string will be used to complete the required number of strings.
+     *
+     * @param s the original string
+     * @param l the number of string to be extracted
+     * @param missing the string to be substituted for any undefined strings
+     * @return the array of strings representing the extracted component strings
+     */
     public static String[] splitAndTrim(String s, int l, String missing) {
         return splitAndTrim(s, ",", l, missing);
     }

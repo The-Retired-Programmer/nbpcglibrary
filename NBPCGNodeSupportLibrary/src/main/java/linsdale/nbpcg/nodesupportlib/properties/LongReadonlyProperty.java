@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,13 +18,12 @@
  */
 package linsdale.nbpcg.nodesupportlib.properties;
 
-import java.lang.reflect.InvocationTargetException;
 import org.openide.nodes.PropertySupport;
 
 /**
  * Long Readonly Property item
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class LongReadonlyProperty extends PropertySupport.ReadOnly<String> {
 
@@ -54,19 +53,17 @@ public class LongReadonlyProperty extends PropertySupport.ReadOnly<String> {
         update(val);
     }
     
+    /**
+     * Update the value
+     *
+     * @param val the value used to update
+     */
     public final void update(long val) {
         this.val = Long.toString(val);
     }
 
-    /**
-     * Get the Property Value
-     *
-     * @return the property value
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
     @Override
-    public String getValue() throws IllegalAccessException, InvocationTargetException {
+    public String getValue() {
         return val;
     }
 }

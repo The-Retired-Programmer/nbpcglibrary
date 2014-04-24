@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,41 +25,48 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.Listener;
 
 /**
+ * Choice Field - taking values from enum.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public abstract class EnumChoiceField extends ChoiceField {
 
-    private List<String> choices; 
+    private List<String> choices;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param field
+     * @param field the field Id
      * @param label the field label
      * @param choices the list of possible values
      */
     public EnumChoiceField(IntWithDescription field, String label, List<String> choices) {
         this(field, label, choices, null);
     }
-    
+
     /**
      * Constructor
      *
-     * @param field
+     * @param field the field Id
      * @param label the field label
      * @param choices the list of possible values
-     * @param listener
+     * @param listener change listener
      */
     public EnumChoiceField(IntWithDescription field, String label, List<String> choices, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label, listener);
         this.choices = choices;
     }
 
+    /**
+     * initialise the choices text
+     */
     public void initChoices() {
         setChoices(choices);
     }
-    
+
+    /**
+     * finish managing the choices text
+     */
     public void closeChoices() {
     }
 }

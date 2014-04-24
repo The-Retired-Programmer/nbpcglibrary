@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,16 @@
 package linsdale.nbpcg.supportlib;
 
 /**
- *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * A Unique Rule (abstract class)
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public abstract class UniqueRule extends Rule {
     
+    /**
+     * Constructor
+     * 
+     * @param failuremessage the failure message to present when the rule fails.
+     */
     public UniqueRule(String failuremessage) {
         super(failuremessage);
     }

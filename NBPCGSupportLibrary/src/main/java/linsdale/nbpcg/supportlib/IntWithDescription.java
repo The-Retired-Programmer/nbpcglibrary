@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,16 +19,28 @@
 package linsdale.nbpcg.supportlib;
 
 /**
+ * An Integer with an associated text field - used for providing textual context
+ * to indices.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class IntWithDescription {
-    
+
+    /**
+     * A shared NULL IntWithDescription
+     */
     public final static IntWithDescription NULL = new IntWithDescription(-1, "NULL");
 
     private final int val;
     private final String description;
 
+    /**
+     * Constructor
+     *
+     * @param val the integer key
+     * @param description the associated descriptive string - used for error /
+     * log message generation.
+     */
     public IntWithDescription(int val, String description) {
         this.val = val;
         this.description = description;
@@ -56,6 +68,12 @@ public class IntWithDescription {
         return this.val == other.val;
     }
 
+    /**
+     * Test if this object's key equals a given int.
+     *
+     * @param i the given value
+     * @return true if equal
+     */
     public boolean equals(int i) {
         return val == i;
     }

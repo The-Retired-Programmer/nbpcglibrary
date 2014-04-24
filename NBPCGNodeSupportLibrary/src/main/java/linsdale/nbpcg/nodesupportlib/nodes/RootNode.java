@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,26 +44,34 @@ import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
 /**
- * class providing extended Node support
+ * Root Node Abstract Class
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class
  */
 @RegisterLog("linsdale.nbpcg.nodesupportlib")
 public abstract class RootNode<E extends Entity> extends AbstractNode {
 
     private E e;
+
+    /**
+     * The icon name for this node
+     */
     protected String iconname;
+
+    /**
+     * the local lookup
+     */
     protected InstanceContent content;
     private DataFlavorAndAction[] allowedPaste;
 
     /**
      * Constructor
      *
-     * @param iconname
-     * @param e
-     * @param cf
-     * @param allowedPaste
+     * @param iconname the iconname
+     * @param e the entity
+     * @param cf the childfactory
+     * @param allowedPaste allowed paste actions
      */
     protected RootNode(String iconname, E e,
             RootChildFactory<E> cf, DataFlavorAndAction[] allowedPaste) {
@@ -84,6 +92,12 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
         }
     }
 
+    /**
+     * Constructor.
+     *
+     * @param iconname the iconname
+     * @param e the entity
+     */
     protected RootNode(String iconname, E e) {
         this(iconname, new InstanceContent(), e);
     }
@@ -97,81 +111,85 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
         content.add(this);
     }
 
+    /**
+     * Get the Root entity.
+     *
+     * @return the entity
+     */
     public E getEntity() {
         return e;
     }
 
+    /**
+     * Set no entity
+     */
     public void setNoEntity() {
         e = null;
     }
 
-    /**
-     * Get the node display name
-     *
-     * @return the display name
-     */
     @Override
     public String getHtmlDisplayName() {
         return "<i>" + getDisplayName();
     }
 
-    /**
-     * Get the node icon
-     *
-     * @param type
-     * @return the node icon
-     */
     @Override
     public Image getIcon(int type) {
         return _getIcon();
     }
 
+    /**
+     * Get the node icon.
+     *
+     * @return the icon image
+     */
     protected java.awt.Image _getIcon() {
         return Icons.get(iconname);
     }
 
-    /**
-     * Get the Icon to display when node is "open"
-     *
-     * @param type icon type
-     * @return the icon
-     */
     @Override
     public Image getOpenedIcon(int type) {
         return getIcon(type);
     }
-      
+
+    /**
+     * Find the registered actions for this node.
+     *
+     * @param classname the node classname
+     * @return the array of actions
+     */
+    @SuppressWarnings("SuspiciousToArrayCall")
     protected Action[] findActions(String classname) {
-        List<? extends Action> myActions = Utilities.actionsForPath("nbpcg/node/"+classname+"/actions/all");
+        List<? extends Action> myActions = Utilities.actionsForPath("nbpcg/node/" + classname + "/actions/all");
         return myActions.toArray(new Action[myActions.size()]);
     }
-    
+
+    /**
+     * Find the registered default action for this node.
+     *
+     * @param classname the node classname
+     * @return the default action or null
+     */
     protected Action findDefaultAction(String classname) {
-        List<? extends Action> myActions = Utilities.actionsForPath("nbpcg/node/"+classname+"/actions/default");
-        return myActions.isEmpty()? null : myActions.get(0);
+        List<? extends Action> myActions = Utilities.actionsForPath("nbpcg/node/" + classname + "/actions/default");
+        return myActions.isEmpty() ? null : myActions.get(0);
     }
-    
+
     /**
      * Get the list of property items to be displayed in the properties sheet.
      *
-     * @param props
+     * @param props the list of properties
      * @return the array of property items
      */
     protected abstract List<PropertySupport.ReadOnly<?>> createPropertyItems(List<PropertySupport.ReadOnly<?>> props);
 
-    /**
-     * Create the property sheet.
-     *
-     * @return the property sheet
-     */
     @Override
     protected Sheet createSheet() {
         Sheet result = Sheet.createDefault();
         Sheet.Set set = Sheet.createPropertiesSet();
         List<PropertySupport.ReadOnly<?>> props = new ArrayList<>();
-        for (PropertySupport.ReadOnly<?> psro : createPropertyItems(props)) {
+        createPropertyItems(props).stream().forEach((psro) -> {
             set.put(psro);
-        }
+        });
         result.put(set);
         return result;
     }
@@ -258,16 +276,42 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
             }
         }
     }
-    // CUT and PASTE methods to be implemented
 
+    // CUT and PASTE methods to be implemented
+    /**
+     * Move action - add child entity.
+     *
+     * @param child the entity
+     */
     abstract protected void _moveAddChild(Entity child);
 
+    /**
+     * Cut action - add child entity.
+     *
+     * @param child the entity
+     */
     abstract protected void _cutAddChild(Entity child);
 
+    /**
+     * Copy Action - add child entity.
+     *
+     * @param child the entity
+     */
     abstract protected void _copyAddChild(Entity child);
 
+    /**
+     * Reorder Action - move child entity.
+     *
+     * @param df teh data flavour
+     * @param perm the sort indicator
+     */
     abstract protected void _moveReorderChildByFlavor(DataFlavor df, int[] perm);
 
+    /**
+     * Get the DataFlavour.
+     *
+     * @return the data flavour
+     */
     abstract protected DataFlavor _getDataFlavor();
 
     private class ChildIndex extends Index.Support {
@@ -296,6 +340,4 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
             }
         }
     }
-
-    
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,9 +19,8 @@
 package linsdale.nbpcg.supportlib;
 
 /**
- *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * Interface marker - for any listener parameter class to use. 
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public interface ListenerParams {
-    
 }

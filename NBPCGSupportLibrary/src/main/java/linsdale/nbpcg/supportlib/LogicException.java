@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ package linsdale.nbpcg.supportlib;
  * LogicException Class, a general exception class for use when throwing logic
  * errors.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class LogicException extends RuntimeException {
 
@@ -34,8 +34,14 @@ public class LogicException extends RuntimeException {
     public LogicException(String msg) {
         super(msg);
     }
-    
-    public LogicException(String msg, Exception ex){
+
+    /**
+     * Constructor
+     *
+     * @param msg the exception message
+     * @param ex the causal exception
+     */
+    public LogicException(String msg, Exception ex) {
         super(msg, ex);
     }
 }

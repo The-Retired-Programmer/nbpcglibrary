@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,26 +23,49 @@ import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
 /**
+ * A registry of entity states which are centrally collated. The current use
+ * case includes entities in error and entities which have been modified and
+ * need saving.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public final class EntityRegistry {
+
     private static final InstanceContent IC = new InstanceContent();
     private static final Lookup LOOKUP = new AbstractLookup(IC);
-    
+
+    /**
+     * Get the Registry.
+     * 
+     * @return the Registry (a Lookup)
+     */
     public static Lookup getRegistry() {
         return LOOKUP;
     }
-    
+
+    /**
+     * Test if there are any entity errors recorded in the registry.
+     * 
+     * @return true if 1 or more errors recorded
+     */
     public static boolean hasErrors() {
-        return LOOKUP.lookup(EntityInError.class)!= null;
+        return LOOKUP.lookup(EntityInError.class) != null;
     }
-    
-    public static void register(EntityRegistration er){
-       IC.add(er);
+
+    /**
+     * Add an entity registration to the registry.
+     * 
+     * @param er the entity registration
+     */
+    public static void register(EntityRegistration er) {
+        IC.add(er);
     }
-    
-    public static void unregister(EntityRegistration er){
+
+    /**
+     * Remove an entity registration from the registry.
+     * @param er the entity registration
+     */
+    public static void unregister(EntityRegistration er) {
         IC.remove(er);
     }
 }

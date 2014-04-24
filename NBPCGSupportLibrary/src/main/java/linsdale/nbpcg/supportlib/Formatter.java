@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,20 @@
 package linsdale.nbpcg.supportlib;
 
 /**
- *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * A Text formatter - substitutes values into string.
+ * like String.format - so should be replaced 
+ * @deprecated 
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class Formatter {
 
+    /**
+     * Format a string using the pattern and a set in insert values to be used in subsitutions.
+     * 
+     * @param pattern the pattern string defining text and insert points
+     * @param inserts the set of insert strings
+     * @return the formatted string
+     */
     public String format(String pattern, String[] inserts) {
         StringBuilder sb = new StringBuilder();
         int p = 0;

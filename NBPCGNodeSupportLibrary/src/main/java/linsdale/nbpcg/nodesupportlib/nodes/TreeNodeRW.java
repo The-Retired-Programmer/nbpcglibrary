@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,10 +38,10 @@ import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
 
 /**
- * class providing extended Node support
+ * Read-Only Tree Node Abstract Class
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class
  */
 public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
@@ -54,26 +54,35 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
     private boolean isCutDestroyEnabled;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param nodename
-     * @param iconname
-     * @param e
-     * @param cf
-     * @param emclass
-     * @param allowedPaste
-     * @param isCutDestroyEnabled
+     * @param nodename the node name
+     * @param iconname the iconname
+     * @param e the entity
+     * @param cf the childfactory
+     * @param emclass the entity manager class
+     * @param allowedPaste allowed paste actions
+     * @param isCutDestroyEnabled true if delete/cut is allowed
      */
     protected TreeNodeRW(String nodename, String iconname, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
         super(nodename, iconname, e, cf, emclass, allowedPaste);
         commonConstructor(nodename, e, isCutDestroyEnabled);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param nodename the node name
+     * @param iconname the iconname
+     * @param e the entity
+     * @param emclass the entity manager class
+     * @param isCutDestroyEnabled true if delete/cut is allowed
+     */
     protected TreeNodeRW(String nodename, String iconname, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
         super(nodename, iconname, e, emclass);
         commonConstructor(nodename, e, isCutDestroyEnabled);
     }
-    
+
     private void commonConstructor(String nodename, E e, boolean isCutDestroyEnabled) {
         this.isCutDestroyEnabled = isCutDestroyEnabled;
         nameListening = new Listening<>(nodename + "/name");
@@ -83,14 +92,24 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
         e.addStateListener(stateListener = new EntityStateChangeListener(nodename + "/state"));
         e.addFieldListener(fieldListener = new EntityFieldChangeListener(nodename + "/field"));
         if (e.isEditing()) {
-                nodeSavable.enable(e);
+            nodeSavable.enable(e);
         }
     }
-    
+
+    /**
+     * Add a Name listener.
+     *
+     * @param listener the listener
+     */
     public final void addNameListener(Listener<NameChangeListenerParams> listener) {
         nameListening.addListener(listener);
     }
 
+    /**
+     * Remove a Name listener.
+     *
+     * @param listener the listener
+     */
     public final void removeNameListener(Listener<NameChangeListenerParams> listener) {
         nameListening.removeListener(listener);
     }
@@ -98,11 +117,21 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
     final void nameListenerFire() {
         nameListening.fire(new NameChangeListenerParams(getDisplayName()));
     }
-    
+
+    /**
+     * Add a Title listener.
+     *
+     * @param listener the listener
+     */
     public final void addTitleListener(Listener<NameChangeListenerParams> listener) {
         titleListening.addListener(listener);
     }
 
+    /**
+     * Remove a Title listener.
+     *
+     * @param listener the listener
+     */
     public final void removeTitleListener(Listener<NameChangeListenerParams> listener) {
         titleListening.removeListener(listener);
     }
@@ -110,7 +139,13 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
     final void titleListenerFire() {
         titleListening.fire(new NameChangeListenerParams(getDisplayTitle()));
     }
-    
+
+    /**
+     * Set a save handler for this node. If the save Handler is null then the
+     * default savehandler will be used (which does an entity save()).
+     *
+     * @param saveHandler the required savehandler or null
+     */
     public void setSaveHandler(SaveHandler saveHandler) {
         this.saveHandler = saveHandler == null ? nodeSavable.getDefaultSaveHandler() : saveHandler;
     }
@@ -141,12 +176,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
             }
         }
     }
-    
-    /**
-     * Get the node display name
-     *
-     * @return the display name
-     */
+
     @Override
     public String getHtmlDisplayName() {
         E entity = getEntity();
@@ -166,46 +196,65 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
             iconChange(); // temporary - do always (just in case!)
         }
     }
-    
+
+    /**
+     * Process field changes.
+     *
+     * @param field the field Id
+     */
     protected abstract void _processFieldChange(IntWithDescription field);
-    
-    protected void propertyChange(String name){
+
+    /**
+     * Fire the Property Change.
+     *
+     * @param name the property name
+     */
+    protected void propertyChange(String name) {
         firePropertyChange(name, "old", "new");
     }
-    
-    protected void propertyChange(){
+
+    /**
+     * Fire the property Change, for all properties.
+     */
+    protected void propertyChange() {
         firePropertyChange(null, "old", "new");
     }
-    
+
+    /**
+     * Fire the Name Change.
+     */
     protected void nameChange() {
         fireDisplayNameChange("old", "new");
         nameListenerFire();
     }
-    
+
+    /**
+     * Fire the Title Change.
+     */
     protected void titleChange() {
         titleListenerFire();
     }
-    
+
     private void iconChange() {
         fireIconChange();
         fireOpenedIconChange();
     }
-    
+
     private class NodeSavable<Z extends EntityRW> extends AbstractSavable implements Icon {
 
         private final String nodename;
         private Icon nodeicon;
         private Z e;
         private final SaveHandler defaultsavehandler = new DefaultSaveHandler();
-        
+
         public NodeSavable(String nodename) {
             this.nodename = nodename;
         }
-        
+
         public SaveHandler getDefaultSaveHandler() {
             return defaultsavehandler;
         }
-        
+
         private class DefaultSaveHandler implements SaveHandler {
 
             @Override
@@ -218,11 +267,11 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
             this.e = e;
             content.add(this);
             register();
-            Log.get("linsdale.nbpcg.nodesupportlib").log(Level.FINEST,"NodeSavable:enable() for node {0}", nodename);
+            Log.get("linsdale.nbpcg.nodesupportlib").log(Level.FINEST, "NodeSavable:enable() for node {0}", nodename);
         }
 
         public void disable() {
-            Log.get("linsdale.nbpcg.nodesupportlib").log(Level.FINEST,"NodeSavable:disable() for node {0}", nodename);
+            Log.get("linsdale.nbpcg.nodesupportlib").log(Level.FINEST, "NodeSavable:disable() for node {0}", nodename);
             content.remove(this);
             unregister();
             e = null;
@@ -230,7 +279,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
         @Override
         protected void handleSave() throws IOException {
-            Log.get("linsdale.nbpcg.nodesupportlib").log(Level.FINE,"NodeSavable:handleSave() for node {0}", nodename);
+            Log.get("linsdale.nbpcg.nodesupportlib").log(Level.FINE, "NodeSavable:handleSave() for node {0}", nodename);
             saveHandler.handleSave();
         }
 
@@ -242,7 +291,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof NodeSavable) {
-                if (e == null ||((NodeSavable) obj).e == null) {
+                if (e == null || ((NodeSavable) obj).e == null) {
                     return false;
                 }
                 return e.getId() == ((NodeSavable) obj).e.getId();
@@ -325,9 +374,14 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
             return getEntity();
         }
     }
-    
+
+    /**
+     * Cut and Paste - removal of Node action.
+     */
     abstract protected void _cutAndPasteRemove();
 
+    /**
+     * Delete - removal of Node action.
+     */
     abstract protected void _deleteRemove();
-
 }

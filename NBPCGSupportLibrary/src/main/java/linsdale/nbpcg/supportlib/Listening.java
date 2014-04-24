@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,20 +28,46 @@ import java.util.logging.Level;
  * A class to implement Listening. Allowing listeners to register and actions to
  * fire
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <P> the listener parameter class
  */
 public class Listening<P extends ListenerParams> {
 
+    /**
+     * Flag - indicates the event should fire immediately on the observer's
+     * thread.
+     */
     public static final int IMMEDIATE = 1;
+
+    /**
+     * Flag - indicates the event should fire as soon as possible on the Event
+     * queue thread.
+     */
     public static final int EVENTQUEUE = 0;
     private static final int QUEUEMASK = 1;
+
+    /**
+     * Flag - indicates the event should be given priority. Priority events in
+     * any one class (immediate or eventqueue) will always fire prior to those
+     * with normal priority.
+     */
     public static final int PRIORITY = 2;
+
+    /**
+     * Flag - indicates the event has normal priority.
+     */
     public static final int NORMAL = 0;
     private static final int PRIORITYMASK = 2;
     private final ListenerStore<P> listenersImmediate = new ListenerStore<>("Immediate");
     private final ListenerStore<P> listenersEventQueue = new ListenerStore<>("EventQueue");
     private final String description;
 
+    /**
+     * Constructor
+     *
+     * @param description the listening's descriptive name - for use in error
+     * /log reporting
+     */
     public Listening(String description) {
         Log.get("linsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listening {0}: created", description);
         this.description = description;
@@ -61,9 +87,8 @@ public class Listening<P extends ListenerParams> {
      * depending on parameter setting.
      *
      * @param listener the listener
-     * @param fireimmediately true if action can fire on immediately on the
-     * "firing" thread, false will cause the action to be handled later on the
-     * EventQueue.
+     * @param flags flags indicating priority v. normal and immediate v event
+     * queue
      */
     public void addListener(Listener<P> listener, int flags) {
         if (listener != null) {
@@ -86,6 +111,11 @@ public class Listening<P extends ListenerParams> {
         listenersEventQueue.remove(listener); // remove a listener from either queue
     }
 
+    /**
+     * Test if there are listeners registered with this listening.
+     *
+     * @return true if listeners are registered
+     */
     public boolean hasListener() {
         return listenersImmediate.hasListener() || listenersEventQueue.hasListener();
     }
@@ -94,7 +124,7 @@ public class Listening<P extends ListenerParams> {
      * Fire all listeners registered - event will fire immediately on the
      * calling thread or later on the EventQueue.
      *
-     * @param lp the listener parameters object
+     * @param p the listener parameters object
      */
     public void fire(P p) {
         Log.get("linsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listening {0}:  fire {1}; {2} immediate & {3} on eventqueue",
@@ -116,45 +146,43 @@ public class Listening<P extends ListenerParams> {
             this.queuetype = queuetype;
         }
 
-        private void removeEmptyReferences(){
-            while (removeEmptyReference()){}
+        private void removeEmptyReferences() {
+            while (removeEmptyReference()) {
+            }
         }
-            
+
         private boolean removeEmptyReference() {
             int idx = 0;
             for (WeakReference<Listener<P>> weaklistener : listeners) {
                 Listener<P> listener = weaklistener.get();
                 if (listener == null) {
                     listeners.remove(idx);
-                    return true; 
+                    return true;
                 }
                 idx++;
             }
             return false;
         }
-                
+
         private List<Listener<P>> allListeners() {
             removeEmptyReferences();
             List<Listener<P>> copy = new ArrayList<>();
-            for (WeakReference<Listener<P>> weaklistener : listeners) {
-                Listener<P> listener = weaklistener.get();
-                if (listener != null) {
-                    copy.add(listener);
-                }
-            }
+            listeners.stream().map((weaklistener) -> weaklistener.get()).filter((listener) -> (listener != null)).forEach((listener) -> {
+                copy.add(listener);
+            });
             return copy;
         }
 
         public final synchronized void fire(P p) {
-            for (Listener<P> listener : allListeners()) {
+            allListeners().stream().forEach((listener) -> {
                 listener.actionPerformed(p);
-            }
+            });
         }
 
         public final synchronized void fireLaterOnEventQueue(P p) {
-            for (Listener<P> listener : allListeners()) {
+            allListeners().stream().forEach((listener) -> {
                 EventQueue.invokeLater(new FireEventQueueListener<>(listener, p));
-            }
+            });
         }
 
         public final synchronized void add(Listener<P> listener, boolean priority) {
@@ -196,8 +224,8 @@ public class Listening<P extends ListenerParams> {
 
     private class FireEventQueueListener<P extends ListenerParams> implements Runnable {
 
-        private P p;
-        private Listener<P> al;
+        private final P p;
+        private final Listener<P> al;
 
         public FireEventQueueListener(Listener<P> al, P p) {
             this.al = al;

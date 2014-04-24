@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import linsdale.nbpcg.supportlib.Rule;
  * A General purpose Field for displaying and editing a value which is a simple
  * textual string.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class TextField extends EditableField {
 
@@ -45,72 +45,226 @@ public class TextField extends EditableField {
     private int max;
     private FindAction<String> findOthers;
 
-    // set of factory methods to create TextFields
     /**
-     * @param field
-     * @param label
-     * @return
+     * Factory method to create a text field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @return the created text field
      */
     public static TextField create(IntWithDescription field, String label) {
         return new TextField(field, label, 20, null);
     }
 
+    /**
+     * Factory method to create a text field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @return the created text field
+     */
     public static TextField create(IntWithDescription field, String label, int size) {
         return new TextField(field, label, size, null);
     }
 
+    /**
+     * Factory method to create a text field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
+     * @return the created text field
+     */
     public static TextField create(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         return new TextField(field, label, 20, listener);
     }
 
+    /**
+     * Factory method to create a text field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param listener the listener for changes to field value
+     * @return the created text field
+     */
     public static TextField create(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
         return new TextField(field, label, size, listener);
     }
 
+    /**
+     * Factory method to create a text field.
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @return the created text field
+     */
     public static TextField createWithMinMaxRules(IntWithDescription field, String label, int min, int max) {
         return new TextField(field, label, 20, null, min, max);
     }
 
+    /**
+     * Factory method to create a text field.
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @return the created text field
+     */
     public static TextField createWithMinMaxRules(IntWithDescription field, String label, int size, int min, int max) {
         return new TextField(field, label, size, null, min, max);
     }
 
+    /**
+     * Factory method to create a text field.
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @return the created text field
+     */
     public static TextField createWithMinMaxRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
         return new TextField(field, label, 20, listener, min, max);
     }
 
+    /**
+     * Factory method to create a text field.
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param listener the listener for changes to field value
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @return the created text field
+     */
     public static TextField createWithMinMaxRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
         return new TextField(field, label, size, listener, min, max);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, int min, int max, FindAction<String> findOthers) {
         return new TextField(field, label, 20, null, min, max, findOthers);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, int size, int min, int max, FindAction<String> findOthers) {
         return new TextField(field, label, size, null, min, max, findOthers);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener, int min, int max, FindAction<String> findOthers) {
         return new TextField(field, label, 20, listener, min, max, findOthers);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param listener the listener for changes to field value
+     * @param min minimum number of characters to enter
+     * @param max maximum number of characters to enter
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max, FindAction<String> findOthers) {
         return new TextField(field, label, size, listener, min, max, findOthers);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithUnqiueRule(IntWithDescription field, String label, FindAction<String> findOthers) {
         return new TextField(field, label, 20, null, findOthers);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithUnqiueRule(IntWithDescription field, String label, int size, FindAction<String> findOthers) {
         return new TextField(field, label, size, null, findOthers);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithUnqiueRule(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener, FindAction<String> findOthers) {
         return new TextField(field, label, 20, listener, findOthers);
     }
 
+    /**
+     * Factory method to create a text field. The text field must be unique (ie
+     * it must not exist in a set of given values).
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param listener the listener for changes to field value
+     * @param findOthers the object used to find the set of given values
+     * @return the created text field
+     */
     public static TextField createWithUnqiueRule(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, FindAction<String> findOthers) {
         return new TextField(field, label, size, listener, findOthers);
     }
@@ -118,10 +272,10 @@ public class TextField extends EditableField {
     /**
      * Constructor
      *
-     * @param field
+     * @param field the field Id
      * @param label field label
      * @param size size of the value display
-     * @param listener
+     * @param listener the listener for changes to field value
      */
     protected TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label);
@@ -132,43 +286,27 @@ public class TextField extends EditableField {
         textfield.addFocusListener(textFocusListener);
     }
 
-    /**
-     * Constructor
-     *
-     * @param id the unique id for this field on the form
-     * @param label field label
-     * @param size size of the value display
-     */
     private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
         this(field, label, size, listener);
         addMinRule(min);
         addMaxRule(max);
     }
 
-    /**
-     * Constructor
-     *
-     * @param id the unique id for this field on the form
-     * @param label field label
-     * @param size size of the value display
-     */
     private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max, FindAction<String> findOthers) {
         this(field, label, size, listener, min, max);
         addUniqueRule(findOthers);
     }
 
-    /**
-     * Constructor
-     *
-     * @param id the unique id for this field on the form
-     * @param label field label
-     * @param size size of the value display
-     */
     private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, FindAction<String> findOthers) {
         this(field, label, size, listener);
         addUniqueRule(findOthers);
     }
 
+    /**
+     * Add a minimum entry length rule to this field
+     *
+     * @param len minimum number of characters to enter
+     */
     public final void addMinRule(int len) {
         min = len;
         addRule(new StringMinRule());
@@ -186,6 +324,11 @@ public class TextField extends EditableField {
         }
     }
 
+    /**
+     * Add a maximum entry length rule to this field
+     *
+     * @param len maximum number of characters to enter
+     */
     public final void addMaxRule(int len) {
         max = len;
         addRule(new StringMaxRule());
@@ -203,6 +346,11 @@ public class TextField extends EditableField {
         }
     }
 
+    /**
+     * Add a Unique rule to this field
+     *
+     * @param findOthers the object used to find the set of given values
+     */
     public final void addUniqueRule(FindAction<String> findOthers) {
         this.findOthers = findOthers;
         addRule(new UniqueRule());
@@ -220,12 +368,7 @@ public class TextField extends EditableField {
         }
 
         private boolean uniqueTest(String val) {
-            for (String s : findOthers.find()) {
-                if (s.equals(val)) {
-                    return false;
-                }
-            }
-            return true;
+            return findOthers.find().stream().noneMatch((s) -> (s.equals(val)));
         }
     }
 
@@ -255,7 +398,7 @@ public class TextField extends EditableField {
     }
 
     /**
-     * Get the value of this field
+     * Get the value of this field.
      *
      * @return the field value
      */
@@ -264,7 +407,7 @@ public class TextField extends EditableField {
     }
 
     /**
-     * Set the value of the field
+     * Set the value of the field.
      *
      * @param value the value
      */
@@ -277,6 +420,12 @@ public class TextField extends EditableField {
         textfield.addFocusListener(textFocusListener);
     }
 
+    /**
+     * Update the value of the field, firing the listener action if the value
+     * changes.
+     *
+     * @param newvalue the new value
+     */
     protected final void update(String newvalue) {
         boolean fire = false;
         if (!newvalue.equals(value)) {

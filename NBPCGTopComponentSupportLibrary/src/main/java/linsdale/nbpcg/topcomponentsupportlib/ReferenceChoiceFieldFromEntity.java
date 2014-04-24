@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,10 +29,12 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.Listener;
 
 /**
+ * Choice Field - taking values from all entities in a parent entities
+ * collection.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
- * @param <R>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
+ * @param <R> the parent class
  */
 public abstract class ReferenceChoiceFieldFromEntity<E extends EntityRO, R extends Entity> extends ReferenceChoiceField<E> {
 
@@ -46,15 +48,24 @@ public abstract class ReferenceChoiceFieldFromEntity<E extends EntityRO, R exten
     /**
      * Constructor
      *
-     * @param field
+     * @param field the field Id
      * @param label the field label
-     * @param parententity
-     * @param collectionFieldId
+     * @param parententity the parent entity
+     * @param collectionFieldId the collection field Id
      */
     public ReferenceChoiceFieldFromEntity(IntWithDescription field, String label, R parententity, IntWithDescription collectionFieldId) {
         this(field, label, parententity, collectionFieldId, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param field the field Id
+     * @param label the field label
+     * @param parententity the parent entity
+     * @param collectionFieldId the collection field Id
+     * @param listener the change listener
+     */
     public ReferenceChoiceFieldFromEntity(IntWithDescription field, String label, R parententity, IntWithDescription collectionFieldId, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label, listener);
         choicesfieldListener = new ChoicesFieldListener(label + "/choices");
@@ -97,12 +108,28 @@ public abstract class ReferenceChoiceFieldFromEntity<E extends EntityRO, R exten
         return choiceText;
     }
 
+    /**
+     * Get the parent entity.
+     *
+     * @return the parent entity
+     */
     protected R getParentEntity() {
         return parententity;
     }
 
+    /**
+     * Get the set of entities.
+     *
+     * @return the set of entities
+     */
     protected abstract List<E> getChoicesEntities();
 
+    /**
+     * Get the Choice text from an entity.
+     *
+     * @param e the entity
+     * @return the choice text
+     */
     protected abstract String convertEntitytoText(E e);
 
     @Override

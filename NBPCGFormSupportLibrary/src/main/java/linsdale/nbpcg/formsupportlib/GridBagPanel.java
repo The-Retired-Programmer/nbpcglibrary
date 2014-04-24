@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,23 +26,23 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 /**
- * A basic GridBag based panel for display.
+ * A basic GridBag based panel for displaying forms or tables.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class GridBagPanel extends JPanel {
 
     private int row = 0;
     private int columns;
 
-  /**
+    /**
      * Constructor
      *
      */
     public GridBagPanel() {
         this(null, 4);
     }
-    
+
     /**
      * Constructor
      *
@@ -51,7 +51,7 @@ public class GridBagPanel extends JPanel {
     public GridBagPanel(int columns) {
         this(null, columns);
     }
-    
+
     /**
      * Constructor
      *
@@ -100,16 +100,16 @@ public class GridBagPanel extends JPanel {
     public void addSpannedRow(JComponent component) {
         add(component, makeconstraints(row));
     }
-    
+
     /**
      * Add a JComponent to a row (spanning columns)
      *
      * @param component the component
-     * @param bg
+     * @param bg the background colour
      */
     public void addSpannedRow(JComponent component, Color bg) {
         addSpannedRow(component);
-        component.setBackground(Color.LIGHT_GRAY);
+        component.setBackground(bg);
     }
 
     private GridBagConstraints makeconstraints(int row, int col) {

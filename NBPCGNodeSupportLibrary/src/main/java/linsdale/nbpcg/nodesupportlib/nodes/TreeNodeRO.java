@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,30 +26,38 @@ import linsdale.nbpcg.datasupportlib.entityreferences.EntityReference;
 import org.openide.util.ImageUtilities;
 
 /**
- * class providing extended Node support
+ * Read-Only Tree Node Abstract Class
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class
  */
 public abstract class TreeNodeRO<E extends EntityRO> extends RootNode<E> {
 
     private final EntityReference<E> eref;
 
     /**
-     * Constructor
+     * Constructor.
      *
-     * @param nodename
-     * @param iconname
-     * @param e
-     * @param cf
-     * @param emclass
-     * @param allowedPaste
+     * @param  nodename the node name
+     * @param iconname the iconname
+     * @param e the entity
+     * @param cf the childfactory
+     * @param emclass the entity manager class
+     * @param allowedPaste allowed paste actions
      */
     protected TreeNodeRO(String nodename, String iconname, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRO> emclass, DataFlavorAndAction[] allowedPaste) {
         super(iconname, null, cf, allowedPaste);
         eref = new EntityReference<>(nodename, e, emclass);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param nodename the node name
+     * @param iconname the iconname
+     * @param e the entity
+     * @param emclass the entity manager class
+     */
     protected TreeNodeRO(String nodename, String iconname, E e, Class<? extends EntityManagerRO> emclass) {
         super(iconname, null);
         eref = new EntityReference<>(nodename, e, emclass);
@@ -65,23 +73,33 @@ public abstract class TreeNodeRO<E extends EntityRO> extends RootNode<E> {
         eref.set();
     }
 
+    /**
+     * Get the display title for this node.
+     * 
+     * @return the title
+     */
     public abstract String getDisplayTitle();
 
-    /**
-     * Get the node icon
-     *
-     * @param type
-     * @return the node icon
-     */
     @Override
     public Image getIcon(int type) {
         return getEntity().checkRules() ? _getIcon() : _getIconWithError();
     }
 
+    /**
+     * Get the node icon combined with an error marker.
+     * 
+     * @return the image
+     */
     protected Image _getIconWithError() {
         return _addErrorToIcon(_getIcon());
     }
 
+    /**
+     * Create the node icon combined with an error marker.
+     * 
+     * @param icon the node icon image
+     * @return the node icon image combined with error marker
+     */
     protected Image _addErrorToIcon(Image icon) {
         return ImageUtilities.mergeImages(icon, SpecialIcons.get("errormarker"), 0, 6);
     }

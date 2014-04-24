@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,25 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.ListenerParams;
 
 /**
+ * The Parameter Object passed when a Transaction Listener action is fired.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class TransactionListenerParams implements ListenerParams {
 
+    /**
+     * Id for Begin Transaction
+     */
     public static final IntWithDescription BEGIN = new IntWithDescription(1, "Begin");
+
+    /**
+     * Id for Commit Transaction
+     */
     public static final IntWithDescription COMMIT = new IntWithDescription(2, "Commit");
+
+    /**
+     * Id for Rollback Transaction
+     */
     public static final IntWithDescription ROLLBACK = new IntWithDescription(3, "Rollback");
     static final TransactionListenerParams BEGINListenerParams = new TransactionListenerParams(BEGIN);
     static final TransactionListenerParams COMMITListenerParams = new TransactionListenerParams(COMMIT);
@@ -36,19 +48,29 @@ public class TransactionListenerParams implements ListenerParams {
     //
     private final IntWithDescription type;
 
+    /**
+     * Constructor.
+     *
+     * @param type the transaction type
+     */
     public TransactionListenerParams(IntWithDescription type) {
         this.type = type;
     }
-    
+
+    /**
+     * Get the Transaction Type.
+     *
+     * @return the transaction type
+     */
     public IntWithDescription get() {
         return type;
     }
-    
+
     @Override
     public int hashCode() {
         return type.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

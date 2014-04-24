@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,8 +26,8 @@ import linsdale.nbpcg.supportlib.Log;
 /**
  * Simple implementation of an LRU cache
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> The entity Class being managed
  */
 public class LRUCache<E> extends LinkedHashMap<Integer, E> {
 

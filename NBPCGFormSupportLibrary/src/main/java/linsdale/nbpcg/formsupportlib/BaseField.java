@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,10 +24,13 @@ import javax.swing.JLabel;
 /**
  * Abstract Class representing a Field on a Form
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public abstract class BaseField {
 
+    /**
+     * the label text associated with this field
+     */
     protected final String label;
 
     /**
@@ -39,21 +42,26 @@ public abstract class BaseField {
         this.label = label;
     }
 
+    /**
+     * Get the label text for this field
+     *
+     * @return the label text
+     */
     public String getLabel() {
         return label;
     }
 
     /**
-     * Get the Label JComponent
+     * Get the Label Component
      *
      * @return the label component
      */
     public final JComponent getLabelComponent() {
-        return new JLabel("".equals(label)?" ":label + ":");
+        return new JLabel("".equals(label) ? " " : label + ":");
     }
 
     /**
-     * Get the JComponent
+     * Get the Field Component
      *
      * @return the working component in which the value is displayed
      */
@@ -62,7 +70,7 @@ public abstract class BaseField {
     }
 
     /**
-     * Get the optional additional JComponent which is displayed to the right of
+     * Get the optional additional Jomponent which is displayed to the right of
      * the value field. This can take the form of a button or other component.
      *
      * @return the additional component (or null)
@@ -72,16 +80,16 @@ public abstract class BaseField {
     }
 
     /**
-     * Get an array of JComponents which make up the Field. The array will be in
+     * Get an array of Components which make up the Field. The array will be in
      * left to right display order.
      *
      * @return an array of components
      */
     public JComponent[] getComponents() {
         return new JComponent[]{
-                    getLabelComponent(),
-                    getComponent(),
-                    getAdditionalComponent()
-                };
+            getLabelComponent(),
+            getComponent(),
+            getAdditionalComponent()
+        };
     }
 }

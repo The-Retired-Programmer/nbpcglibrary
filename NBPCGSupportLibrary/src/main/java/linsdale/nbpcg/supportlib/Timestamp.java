@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import java.util.Date;
 /**
  * A simple Timestamp Class
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class Timestamp {
 
@@ -46,6 +46,7 @@ public class Timestamp {
      *
      * @param datestring the initial value of the timestamp (formatted in
      * display format ("dd-MMM-yyyy-HH:mm:ss"))
+     * @throws linsdale.nbpcg.supportlib.BadFormatException when datestring is badly formatted
      */
     public Timestamp(String datestring) throws BadFormatException {
         userformat.setLenient(true);
@@ -89,15 +90,23 @@ public class Timestamp {
         return userformat.format(date);
     }
 
+    /**
+     * Compare this timestamp to the current time.
+     * 
+     * @return +1 / 0 / -1 as a result of the compare
+     */
     public int compareTo() {
         return compareTo(new Timestamp());
     }
 
     /**
-     * compare
+     * Compare
      *
      * returns 1 if this date is greater that the target date; 0 if they are the
      * same and -1 if less that the target date
+     * 
+     * @param target the target Timestamp
+     * @return +1 / 0 / -1 as a result of the compare
      */
     public int compareTo(Timestamp target) {
         return toSQLString().compareTo(target.toSQLString());

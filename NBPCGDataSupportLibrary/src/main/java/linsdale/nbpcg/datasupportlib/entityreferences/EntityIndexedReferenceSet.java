@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,18 +26,34 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.LogicException;
 
 /**
- * Manages the list of child Entities - extends referencedsortableentityset to
- * implement reorderable child entity lists
+ * Manages the list of Entities - implements a re-orderable entity lists
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class
  */
 public class EntityIndexedReferenceSet<E extends EntityRWIndexed> extends EntityReferenceSet<E> {
 
+    /**
+     * Constructor.
+     *
+     * @param name the set name (for reporting)
+     * @param field the IF for this set
+     * @param columnname the column name for use in selection equality filter
+     * @param columnvalue the column value for use in the selection equality
+     * filter
+     * @param emclass the associated entity manager class
+     */
     public EntityIndexedReferenceSet(String name, IntWithDescription field, String columnname, int columnvalue, Class<? extends EntityManagerRW> emclass) {
         super(name, field, columnname, columnvalue, emclass);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param name the set name (for reporting)
+     * @param field the Id for this set
+     * @param emclass the associated entity manager class
+     */
     public EntityIndexedReferenceSet(String name, IntWithDescription field, Class<? extends EntityManagerRW> emclass) {
         super(name, field, emclass);
     }
@@ -46,19 +62,19 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed> extends Entity
      * Reorder the list of child entities
      *
      * @param perm the reordered index information
-     * @param offsetMin
-     * @param offsetMax
+     * @param offsetMin the lower limit of the reordering
+     * @param offsetMax the upper limit of the reordering
      */
     public void reorder(int[] perm, int offsetMin, int offsetMax) {
         int clsize = count();
-        if ((offsetMax - offsetMin +1)!= clsize) {
+        if ((offsetMax - offsetMin + 1) != clsize) {
             throw new LogicException("EntityIndexedReferenceSet - mismatch between offset range and childList.size()");
         }
         int[] permextract = new int[clsize];
         int permin = 0;
         for (int i = 0; i < perm.length; i++) {
             int pi = perm[i];
-            if ( pi >= offsetMin && pi <= offsetMax) {
+            if (pi >= offsetMin && pi <= offsetMax) {
                 permextract[permin] = pi - offsetMin;
                 permin++;
             }
@@ -75,6 +91,9 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed> extends Entity
         fireSetChange();
     }
 
+    /**
+     * Persist the reordering.
+     */
     public void persistReorder() {
         List<E> el = get();
         for (int i = 0; i < el.size(); i++) {

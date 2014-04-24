@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,8 +24,11 @@ import linsdale.nbpcg.datasupportlib.entity.EntityRW;
 import linsdale.nbpcg.supportlib.Timestamp;
 
 /**
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * Handles Read-Write entity field management, for a entity which includes a Id and
+ * standardised timestamp (created and updated).
+ * 
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
 public class DBFieldsRWIdandstamp<E extends EntityRW> extends DBFieldsROIdandstamp implements DBFieldsRW<E> {
 
@@ -38,11 +41,6 @@ public class DBFieldsRWIdandstamp<E extends EntityRW> extends DBFieldsROIdandsta
         }
     }
 
-    /**
-     * Update a map with all values in the standard db fields.
-     *
-     * @param map
-     */
     @Override
     public void values(Map<String, Object> map) {
         updatedon.setDateUsingSQLString(new Timestamp().toSQLString());

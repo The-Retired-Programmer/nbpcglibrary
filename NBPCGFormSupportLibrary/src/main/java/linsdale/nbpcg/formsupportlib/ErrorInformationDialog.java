@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,19 +33,26 @@ import org.openide.NotifyDescriptor;
 /**
  * A Standard Error Information Dialog Display
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class ErrorInformationDialog {
 
     private final DialogDescriptor dd;
     private final Listening<SimpleListenerParams> listening = new Listening<>("ErrorInformationDialog");
     private static ErrorInformationDialog instance;
-    
+
+    /**
+     * Display the error information dialog.
+     *
+     * @param title the dialog title
+     * @param message the dialog message
+     * @param l a listener which will be fired when the dialog is closed
+     */
     public static void show(String title, String message, Listener<SimpleListenerParams> l) {
-        instance = new ErrorInformationDialog(title, message,l);
+        instance = new ErrorInformationDialog(title, message, l);
     }
-    
-    private ErrorInformationDialog(String title, String message, Listener<SimpleListenerParams> l){
+
+    private ErrorInformationDialog(String title, String message, Listener<SimpleListenerParams> l) {
         listening.addListener(l);
         dd = new DialogDescriptor(
                 message,

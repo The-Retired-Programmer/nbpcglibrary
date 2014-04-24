@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import linsdale.nbpcg.supportlib.Listener;
  * A General purpose Field for displaying and editing a value which is a simple
  * boolean using a checkbox.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class CheckboxField extends EditableField {
 
@@ -40,20 +40,29 @@ public class CheckboxField extends EditableField {
     private final CheckboxActionListener checkboxActionListener = new CheckboxActionListener();
     private final CheckboxFocusListener checkboxFocusListener = new CheckboxFocusListener();
 
+    /**
+     * Factory method to create a checkbox field
+     * 
+     * @param field the field id
+     * @param label the label text for the field
+     * @return the created checkbox field
+     */
     public static CheckboxField create(IntWithDescription field, String label) {
         return new CheckboxField(field, label, null);
     }
 
+    /**
+     * Factory method to create a checkbox field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
+     * @return the created checkbox field
+     */
     public static CheckboxField create(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         return new CheckboxField(field, label, listener);
     }
 
-    /**
-     * Constructor
-     *
-     * @param id the unique id for this field on the form
-     * @param label field label
-     */
     private CheckboxField(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label);
         checkbox = new JCheckBox("", false);
@@ -110,6 +119,12 @@ public class CheckboxField extends EditableField {
         checkbox.addFocusListener(checkboxFocusListener);
     }
 
+    /**
+     * Update the value of the field, firing the listener action if the value
+     * changes.
+     * 
+     * @param newvalue the new value
+     */
     public final void update(boolean newvalue) {
         if (newvalue != value) {
             set(newvalue);

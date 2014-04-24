@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,10 +36,10 @@ import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 
 /**
- * class providing extended Node support
+ * Read-Write Icon Node Abstract Class
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class
  */
 public abstract class IconNodeRW<E extends EntityRW> extends TreeNodeRW<E> {
 
@@ -49,13 +49,13 @@ public abstract class IconNodeRW<E extends EntityRW> extends TreeNodeRW<E> {
     /**
      * Constructor
      *
-     * @param nodename
-     * @param iconname
-     * @param e
-     * @param cf
-     * @param emclass
-     * @param allowedPaste
-     * @param isCutDestroyEnabled
+     * @param nodename the node name
+     * @param iconname the iconname
+     * @param e the entity
+     * @param cf the childfactory
+     * @param emclass the entity manager class
+     * @param allowedPaste allowed paste actions
+     * @param isCutDestroyEnabled true if delete/cut is allowed
      */
     public IconNodeRW(String nodename, String iconname, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
         super(nodename, iconname, e, cf, emclass, allowedPaste, isCutDestroyEnabled);
@@ -63,6 +63,15 @@ public abstract class IconNodeRW<E extends EntityRW> extends TreeNodeRW<E> {
         imagefilefinder = getImageFileFinder(nodename);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param nodename the node name
+     * @param iconname the iconname
+     * @param e the entity
+     * @param emclass the entity manager class
+     * @param isCutDestroyEnabled true if delete/cut is allowed
+     */
     protected IconNodeRW(String nodename, String iconname, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
         super(nodename, iconname, e, emclass, isCutDestroyEnabled);
         this.nodename = nodename;
@@ -100,22 +109,11 @@ public abstract class IconNodeRW<E extends EntityRW> extends TreeNodeRW<E> {
         }
     }
 
-    /**
-     * Get the node display name
-     *
-     * @return the display name
-     */
     @Override
     public String getHtmlDisplayName() {
         return null;
     }
 
-    /**
-     * Get the node icon
-     *
-     * @param type
-     * @return the node icon
-     */
     @Override
     public Image getIcon(int type) {
         Logger log = Log.get("linsdale.nbpcg.nodesupportlib");

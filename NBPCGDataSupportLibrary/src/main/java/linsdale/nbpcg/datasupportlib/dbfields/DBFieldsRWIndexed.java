@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,12 +21,25 @@ package linsdale.nbpcg.datasupportlib.dbfields;
 import linsdale.nbpcg.datasupportlib.entity.EntityRW;
 
 /**
+ * Interface for handling entity field states for a read-write entity which uses
+ * a index field (integer) for ordering entities.
  *
- * @author richard
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
 public interface DBFieldsRWIndexed<E extends EntityRW> extends DBFieldsRW<E> {
 
+    /**
+     * Get the index value.
+     *
+     * @return the index value
+     */
     public int getIndex();
 
+    /**
+     * Set the index value.
+     *
+     * @param idx the index value
+     */
     public void setIndex(int idx);
 }

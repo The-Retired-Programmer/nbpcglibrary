@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,18 @@ import java.awt.Image;
 import org.openide.util.ImageUtilities;
 
 /**
+ * Standard Icon Management.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class Icons {
 
+    /**
+     * Get a Icon Image. Selected from silkicons set.
+     *
+     * @param name the icon name
+     * @return the image
+     */
     public static Image get(String name) {
         return ImageUtilities.loadImage("com/famfamfam/www/silkicons/" + name + ".png");
     }

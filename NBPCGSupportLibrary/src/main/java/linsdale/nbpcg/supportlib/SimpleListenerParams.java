@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,16 +19,21 @@
 package linsdale.nbpcg.supportlib;
 
 /**
+ * The simplest implementation of listener parameters - an empty set; so a
+ * shared static singleton is used.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class SimpleListenerParams implements ListenerParams {
-    
+
+    /**
+     * An Empty Listener parameters - static sharable readonly listener parameters
+     */
     public static final SimpleListenerParams EMPTY = new SimpleListenerParams();
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return "Simple(Empty)";
     }
-    
+
 }

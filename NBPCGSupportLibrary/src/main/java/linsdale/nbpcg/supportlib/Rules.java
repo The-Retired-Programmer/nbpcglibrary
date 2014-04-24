@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,23 +22,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Manages a set of rules - usually associated with a field. Allows the rules to
+ * be tested and error messages combined.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class Rules {
 
-    private List<Rule> rules = new ArrayList<Rule>();
+    private final List<Rule> rules = new ArrayList<>();
 
+    /**
+     * Add a rule to this Rule Set.
+     *
+     * @param r the rule to add
+     */
     public final void addRule(Rule r) {
         rules.add(r);
     }
 
+    /**
+     * Add failure messages to the StringBuilder for each rule in this rule set
+     * which is failing.
+     *
+     * @param sb the StringBuilder collecting failure messages
+     */
     public final void addFailureMessages(StringBuilder sb) {
-        for (Rule r : rules) {
+        rules.stream().forEach((r) -> {
             r.addFailureMessage(sb);
-        }
+        });
     }
-    
+
+    /**
+     * Check if all rules in the set are valid.
+     *
+     * @return true if all rules are valid
+     */
     public final boolean checkRules() {
         boolean valid = true;
         for (Rule r : rules) {
@@ -47,7 +65,12 @@ public class Rules {
         }
         return valid;
     }
-    
+
+    /**
+     * Check if all rules (except those marked as unique) in the set are valid.
+     *
+     * @return true if all rules (except unique) are valid
+     */
     public final boolean checkRulesAtLoad() {
         boolean valid = true;
         for (Rule r : rules) {

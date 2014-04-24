@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,14 +24,23 @@ import org.openide.windows.InputOutput;
 import org.openide.windows.OutputWriter;
 
 /**
+ * Provides convenience implementation for writing messages and errors to the
+ * output window.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class OutputReporter {
 
     private final OutputWriter msg;
     private final OutputWriter err;
 
+    /**
+     * Constructor
+     *
+     * @param tabtitle the title to be inserted into the tab (within the output
+     * window)
+     * @param initialmessage the initial message to be inserted into the window
+     */
     public OutputReporter(String tabtitle, String initialmessage) {
         InputOutput io = IOProvider.getDefault().getIO(tabtitle, false);
         io.select();
@@ -40,29 +49,48 @@ public class OutputReporter {
         try {
             msg.reset();
         } catch (IOException ex) {
-           throw new LogicException("IO Exception when resetting Output", ex);
+            throw new LogicException("IO Exception when resetting Output", ex);
         }
         if (initialmessage != null) {
             msg.println(initialmessage);
         }
     }
 
+    /**
+     * Write a message to the output window (a newline is added to the output)
+     * 
+     * @param message the message
+     */
     public void writeMsg(String message) {
         msg.println(message);
     }
 
+    /**
+     * Write a newline to the output window
+     */
     public void writeMsg() {
         msg.println();
     }
 
+    /**
+     * Write a message to the output window
+     * @param message the message
+     */
     public void writeMsgText(String message) {
         msg.print(message);
     }
 
+    /**
+     * Write a error message to the output window (a newline is added to the output)
+     * @param message the error message
+     */
     public void writeErr(String message) {
         err.println(message);
     }
 
+    /**
+     * the close the output window
+     */
     public void close() {
         err.close();
         msg.close();

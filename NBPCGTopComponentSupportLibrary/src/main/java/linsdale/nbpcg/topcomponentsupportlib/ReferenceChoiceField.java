@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,52 +26,91 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.Listener;
 
 /**
+ * Abstract Choice Field - taking values from entity set.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
 public abstract class ReferenceChoiceField<E extends EntityRO> extends ChoiceField {
 
     /**
      * Constructor
      *
-     * @param field
+     * @param field The field Id
      * @param label the field label
      */
     public ReferenceChoiceField(IntWithDescription field, String label) {
         super(field, label, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param field The field Id
+     * @param label the field label
+     * @param listener the change listener
+     */
     public ReferenceChoiceField(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label, listener);
     }
 
+    /**
+     * initialise the choices text
+     */
     public void initChoices() {
         setChoices(getChoicesText());
         addChoicesListeners();
         addCollectionListeners();
     }
 
+    /**
+     * finish managing the choices text
+     */
     public void closeChoices() {
         removeCollectionListeners();
         removeChoicesListeners();
     }
 
+    /**
+     * Update the choices text
+     */
     protected void updateChoicesText() {
         removeChoicesListeners();
         setChoices(getChoicesText());
         addChoicesListeners();
     }
 
+    /**
+     * Add collection listeners
+     */
     protected abstract void addCollectionListeners();
 
+    /**
+     * Remove collection listeners
+     */
     protected abstract void removeCollectionListeners();
 
+    /**
+     * Add choices listeners
+     */
     protected abstract void addChoicesListeners();
 
+    /**
+     * Remove choices listeners
+     */
     protected abstract void removeChoicesListeners();
 
+    /**
+     * Get Choices Text.
+     *
+     * @return the set of choices
+     */
     protected abstract List<String> getChoicesText();
 
+    /**
+     * Get the selected entity, based on the choice.
+     *
+     * @return the selected entity
+     */
     public abstract E findSelectedEntity();
 }

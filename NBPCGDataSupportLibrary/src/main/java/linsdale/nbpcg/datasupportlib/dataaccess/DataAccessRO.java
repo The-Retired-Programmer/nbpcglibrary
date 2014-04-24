@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,19 +22,53 @@ import java.util.List;
 import linsdale.nbpcg.datasupportlib.dataservice.ResultSetLoader;
 
 /**
+ * Data Access Interface - for a Read-Only Entity.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public interface DataAccessRO {
 
+    /**
+     * Get the set of entity Ids for all stored entities.
+     *
+     * @return the set of entity Ids
+     */
     public List<Integer> find();
 
+    /**
+     * Get the set of entity Ids for all stored entities, where an equality
+     * filter is applied.
+     *
+     * @param parametername the filter column name
+     * @param parametervalue the filter value
+     * @return the set of entity Ids
+     */
     public List<Integer> find(String parametername, Object parametervalue);
 
+    /**
+     * Get an entity Id for a single entity selected by an equality filter.
+     *
+     * @param parametername the filter column name
+     * @param parametervalue the filter value
+     * @return the entity Id
+     */
     public int findOne(String parametername, Object parametervalue);
 
+    /**
+     * Get the next index value for entities which have an explicit ordering
+     * column defined.
+     *
+     * @return the next index value
+     */
     public int getNextIdx();
 
+    /**
+     * Find a required entity based on its Id and use the loader to insert data
+     * into entity.
+     *
+     * @param id the entity Id
+     * @param loader the loader which provides the data values
+     */
     public void load(int id, ResultSetLoader loader);
 
 }

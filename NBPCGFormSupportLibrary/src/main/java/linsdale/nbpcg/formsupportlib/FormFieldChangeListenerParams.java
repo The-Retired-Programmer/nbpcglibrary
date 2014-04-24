@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,17 +22,29 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.ListenerParams;
 
 /**
+ * The listener parameters which are passed when the listener is fired for a
+ * Form Field Change.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class FormFieldChangeListenerParams implements ListenerParams {
 
     private final IntWithDescription field;
 
+    /**
+     * Constructor
+     *
+     * @param field the Field ID
+     */
     public FormFieldChangeListenerParams(IntWithDescription field) {
         this.field = field;
     }
 
+    /**
+     * Get the field Id
+     *
+     * @return the field Id
+     */
     public IntWithDescription get() {
         return field;
     }
@@ -41,7 +53,7 @@ public class FormFieldChangeListenerParams implements ListenerParams {
     public int hashCode() {
         return field.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -55,7 +67,6 @@ public class FormFieldChangeListenerParams implements ListenerParams {
         }
         return false;
     }
-    
 
     @Override
     public String toString() {

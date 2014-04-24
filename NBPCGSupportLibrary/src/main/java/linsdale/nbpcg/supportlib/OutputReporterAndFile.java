@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,13 +24,23 @@ import java.io.PrintWriter;
 import org.openide.filesystems.FileObject;
 
 /**
- *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * Provides convenience implementation for writing messages and errors to the
+ * output window, and also to a recording file.
+ * 
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class OutputReporterAndFile extends OutputReporter {
 
     private PrintWriter logwriter;
 
+    /**
+     * Constructor
+     * 
+     * @param tabtitle the title to be inserted into the tab (within the output
+     * window) 
+     * @param folder the folder into which the reporting file is to be written
+     * @param logfilebasename the base filename for the reporting file
+     */
     public OutputReporterAndFile(String tabtitle, FileObject folder, String logfilebasename) {
         super(tabtitle, null);
         FileObject logfo;
@@ -78,6 +88,11 @@ public class OutputReporterAndFile extends OutputReporter {
         }
     }
 
+    /**
+     * Write a message to the output window ONLY (a newline is added to the output)
+     * 
+     * @param message the message
+     */
     public void writeMsgToDisplayOnly(String message) {
         super.writeMsg(message);
     }

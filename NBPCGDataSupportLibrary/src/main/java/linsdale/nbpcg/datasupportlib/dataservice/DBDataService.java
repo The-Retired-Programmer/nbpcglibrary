@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,9 +34,9 @@ import linsdale.nbpcg.supportlib.Log;
 import linsdale.nbpcg.supportlib.LogicException;
 
 /**
- * Abstract Class implements the standard JDBC DB access.
+ * Abstract Class implementing Database access using JDBC.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("linsdale.nbpcg.db")
 public abstract class DBDataService implements DataService {
@@ -45,10 +45,20 @@ public abstract class DBDataService implements DataService {
     private final Listening<TransactionListenerParams> transactionListening;
     private boolean inTransaction = false;
 
+    /**
+     * Constructor.
+     *
+     * @param name the dataservice name
+     */
     public DBDataService(String name) {
         transactionListening = new Listening<>(name + " transactions");
     }
 
+    /**
+     * Set the JDBC connection to be used for this dataservice.
+     *
+     * @param conn the JDBC connection
+     */
     protected final void setConnection(Connection conn) {
         this.conn = conn;
     }
@@ -74,11 +84,10 @@ public abstract class DBDataService implements DataService {
 
     /**
      * Add a listener for Transaction events (Begin, Commit and Rollback).
-     * Depending on the value of fireimmediately, the listener will be called on
-     * the same thread as the fire method, or will be called on the EventQueue.
      *
      * @param l the listener
-     * @param flags
+     * @param flags the listener control flags (fire or event queue or
+     * immediately; priority)
      */
     public void addListener(Listener<TransactionListenerParams> l, int flags) {
         transactionListening.addListener(l, flags);
@@ -162,7 +171,7 @@ public abstract class DBDataService implements DataService {
     }
 
     /**
-     * Execute a Select query on the database to extract the list of Entity ids
+     * Execute a Select query on the database to extract the list of Entity Ids
      * which meet selection criteria.
      *
      * The SQL template includes {P} and this will be substituted by the
@@ -190,8 +199,7 @@ public abstract class DBDataService implements DataService {
     }
 
     /**
-     * Execute a Select query on the database to extract the list of Entity ids
-     * which meet selection criteria.
+     * Execute a Select query on the database to extract the list of Entity ids.
      *
      * @param sql the SQL for the query
      * @return list of ids
@@ -236,11 +244,11 @@ public abstract class DBDataService implements DataService {
     }
 
     /**
-     * Execute a select query and extract the int value from the defined column
-     * of the first row returned.
+     * Execute a select query and insert the values from the first row returned
+     * into an entity, using the provided loader.
      *
      * @param sql the SQL for the query
-     * @param rsl
+     * @param rsl the loader to be used
      */
     public synchronized void simpleQuery(String sql, ResultSetLoader rsl) {
         try {

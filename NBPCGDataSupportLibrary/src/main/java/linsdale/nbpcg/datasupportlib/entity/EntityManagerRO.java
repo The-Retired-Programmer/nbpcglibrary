@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -40,36 +40,47 @@ import linsdale.nbpcg.supportlib.LogicException;
  * shared entity (and not each holding their own unique copy.)
  *
  * 2) a small LRU cache is implemented in parallel to reduce possible database
- * reads by holding references to these recently touched objects.
+ * reads by holding references to those recently touched objects.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> The Entity Class being managed
  */
 @RegisterLog("linsdale.nbpcg.entitymanager")
 abstract public class EntityManagerRO<E extends EntityRO> {
 
     private static final int MAXLRUCACHE = 10;
+
+    /**
+     * The entity name.
+     */
     protected final String name;
+
+    /**
+     * The entity cache.
+     */
     protected final Map<Integer, SoftReference<E>> cache;
     private final ReferenceQueue<E> refqueue;
+
+    /**
+     * The LRU cache.
+     */
     protected final LRUCache<E> lrucache;
     private DataAccessRO dataAccess;
 
     /**
-     * Constructor - defines cache name (for reporting) has default max cache
-     * size
+     * Constructor.
      *
-     * @param name
+     * @param name the entity name
      */
     public EntityManagerRO(String name) {
         this(name, MAXLRUCACHE);
     }
 
     /**
-     * Constructor - defines cache name (for reporting) and max LRU cache size
+     * Constructor.
      *
-     * @param name
-     * @param maxLRUcache
+     * @param name the entity name
+     * @param maxLRUcache the max size of the LRU cache (entities)
      */
     public EntityManagerRO(String name, int maxLRUcache) {
         super();
@@ -79,6 +90,13 @@ abstract public class EntityManagerRO<E extends EntityRO> {
         refqueue = new ReferenceQueue<>();
     }
 
+    /**
+     * Get an Entity. Lookup caches and if not present then create a new entity
+     * and load it using data obtained from entity storage.
+     *
+     * @param id the entity Id
+     * @return the entity
+     */
     public final synchronized E get(int id) {
         if (id <= 0) {
             throw new LogicException("Cache Get() Failure (class=" + name + ";id=" + id + ")");
@@ -109,7 +127,13 @@ abstract public class EntityManagerRO<E extends EntityRO> {
         insertIntoCache(id, e);
         return e;
     }
-    
+
+    /**
+     * Create a new Entity. Does not load entity data into the entity.
+     *
+     * @param id the entity id
+     * @return the created entity
+     */
     abstract protected E _createNewEntity(int id);
 
     private void freeReleasedEntries() {
@@ -120,25 +144,40 @@ abstract public class EntityManagerRO<E extends EntityRO> {
             Log.get("linsdale.nbpcg.entitymanager").log(Level.FINER, "Cache Free {0}({1}): SoftReference cache", new Object[]{name, id});
         }
     }
-    
+
+    /**
+     * Insert an entity into the caches.
+     *
+     * @param id the entity Id
+     * @param e the entity
+     */
     protected void insertIntoCache(int id, E e) {
         lrucache.put(id, e);
         cache.put(id, new SoftReference<>(e));
     }
-    
+
+    /**
+     * Remove an entity from the caches.
+     *
+     * @param e the entity
+     */
     protected synchronized void removeFromCache(E e) {
         int id = e.getId();
-        if (id > 0 ) {
+        if (id > 0) {
             lrucache.remove(id);
             cache.remove(id);
             Log.get("linsdale.nbpcg.entitymanager").log(Level.FINEST, "Cache Remove {0}({1})", new Object[]{name, id});
             return;
         }
-        throw new LogicException("Remove from Cache Failure (class=" + name + ";id=" + id +")");
+        throw new LogicException("Remove from Cache Failure (class=" + name + ";id=" + id + ")");
     }
-    
+
     // and the service function to provide access to the data access object for the entity class
-    
+    /**
+     * Get the DataAccess Object for this Entity Class.
+     *
+     * @return the DataAccess object
+     */
     public DataAccessRO getDataAccess() {
         if (dataAccess == null) {
             dataAccess = _createDataAccess();
@@ -146,5 +185,10 @@ abstract public class EntityManagerRO<E extends EntityRO> {
         return dataAccess;
     }
 
+    /**
+     * Create the DataAccess Object for this Entity Class.
+     *
+     * @return the DataAccess object
+     */
     abstract protected DataAccessRO _createDataAccess();
 }

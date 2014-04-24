@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,23 +22,64 @@ import java.awt.datatransfer.DataFlavor;
 import org.openide.nodes.NodeTransfer;
 
 /**
+ * A DataStructure recording DataFlavour and NodeTransfer type (Action).
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class DataFlavorAndAction {
-    
+
+    /**
+     * COPY = NodeTransfer.CLIPBOARD_COPY
+     */
     public static final int COPY = NodeTransfer.CLIPBOARD_COPY;
+
+    /**
+     * CUT = NodeTransfer.CLIPBOARD_CUT
+     */
     public static final int CUT = NodeTransfer.CLIPBOARD_CUT;
+
+    /**
+     * MOVE = NodeTransfer.DND_MOVE
+     */
     public static final int MOVE = NodeTransfer.DND_MOVE;
+
+    /**
+     * COPYCUT = COPY | CUT
+     */
     public static final int COPYCUT = COPY | CUT;
+
+    /**
+     * COPYMOVE = COPY | MOVE
+     */
     public static final int COPYMOVE = COPY | MOVE;
+
+    /**
+     * CUTMOVE = CUT | MOVE
+     */
     public static final int CUTMOVE = CUT | MOVE;
+
+    /**
+     * COPYCUTMOVE = COPY | CUT | MOVE
+     */
     public static final int COPYCUTMOVE = COPY | CUT | MOVE;
-    
+
+    /**
+     * The Data Flavour
+     */
     public final DataFlavor dataflavor;
+
+    /**
+     * The Node transfer type (action)
+     */
     public final int action;
-    
-    public DataFlavorAndAction(DataFlavor dataflavor, int action){
+
+    /**
+     * Constructor.
+     *
+     * @param dataflavor the data flavour
+     * @param action the Node transfer type
+     */
+    public DataFlavorAndAction(DataFlavor dataflavor, int action) {
         this.dataflavor = dataflavor;
         this.action = action;
     }

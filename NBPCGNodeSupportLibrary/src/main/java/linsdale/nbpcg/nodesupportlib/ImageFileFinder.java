@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,18 @@ import java.io.File;
 import linsdale.nbpcg.datasupportlib.entity.EntityRW;
 
 /**
+ * Interface for a Image FileFinder.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> The entity class
  */
 public interface ImageFileFinder<E extends EntityRW> {
 
+    /**
+     * Get the image associated with this entity.
+     *
+     * @param e the entity
+     * @return the image File
+     */
     public File getFile(E e);
 }

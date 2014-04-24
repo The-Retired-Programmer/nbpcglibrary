@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,21 +32,39 @@ import linsdale.nbpcg.supportlib.Listener;
  * A Field to select a string value from a set of values (implemented as a
  * ComboBox)
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class ChoiceField extends EditableField {
 
-    public final static String undefined = "...";
+    /**
+     * The undefined text as displayed in a choice field
+     */
+    public final static String UNDEFINED = "...";
     private List<String> choices;
     private final JComboBox combobox;
-    private String value = undefined;
-    private final ComboActionListener comboactionlistener= new ComboActionListener();
-    private final ComboFocusListener combofocuslistener= new ComboFocusListener();
+    private String value = UNDEFINED;
+    private final ComboActionListener comboactionlistener = new ComboActionListener();
+    private final ComboFocusListener combofocuslistener = new ComboFocusListener();
 
+    /**
+     * Factory method to create a choice field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @return the created choice field
+     */
     public static ChoiceField create(IntWithDescription field, String label) {
         return new ChoiceField(field, label, null);
     }
 
+    /**
+     * Factory method to create a choice field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
+     * @return the created choice field
+     */
     public static ChoiceField create(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         return new ChoiceField(field, label, listener);
     }
@@ -54,9 +72,9 @@ public class ChoiceField extends EditableField {
     /**
      * Constructor
      *
-     * @param field
-     * @param label the field label
-     * @param listener
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
      */
     protected ChoiceField(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label);
@@ -90,27 +108,48 @@ public class ChoiceField extends EditableField {
         return combobox;
     }
 
+    /**
+     * Get the value of this field
+     *
+     * @return the field value
+     */
     public final String get() {
         return (String) combobox.getSelectedItem();
     }
 
+    /**
+     * Set the value of the field
+     *
+     * @param value the value
+     */
     public final void set(String value) {
         this.value = value;
         setupCombobox();
     }
 
     private void update(String newvalue) {
-        if ((newvalue != null) && (!newvalue.equals(value)) && (!newvalue.equals(undefined))) {
+        if ((newvalue != null) && (!newvalue.equals(value)) && (!newvalue.equals(UNDEFINED))) {
             value = newvalue;
             fireChanged();
         }
     }
 
+    /**
+     * Set the set of possible choices for this field
+     *
+     * @param choices the set of choices
+     */
     public final void setChoices(List<String> choices) {
         this.choices = choices;
         setupCombobox();
     }
 
+    /**
+     * Set the value and the set of possible choices for this field
+     *
+     * @param value the field value
+     * @param choices the set of choices
+     */
     public final void setValueAndChoices(String value, List<String> choices) {
         this.value = value;
         this.choices = choices;
@@ -132,9 +171,9 @@ public class ChoiceField extends EditableField {
             }
         }
         if (!selected) {
-            combobox.insertItemAt(undefined, 0);
-            combobox.setSelectedItem(undefined);
-            value = undefined;
+            combobox.insertItemAt(UNDEFINED, 0);
+            combobox.setSelectedItem(UNDEFINED);
+            value = UNDEFINED;
         }
         combobox.addActionListener(comboactionlistener);
         combobox.addFocusListener(combofocuslistener);

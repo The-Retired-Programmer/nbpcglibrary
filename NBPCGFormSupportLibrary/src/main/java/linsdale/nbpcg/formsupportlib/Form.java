@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,9 @@ import linsdale.nbpcg.annotations.RegisterLog;
 import linsdale.nbpcg.supportlib.*;
 
 /**
+ * A Form object which can be displayed in a dialog box.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("linsdale.nbpcg.formsupportlib")
 public class Form extends GridBagPanel {
@@ -42,57 +43,92 @@ public class Form extends GridBagPanel {
     private final FormFieldChangeListener formfieldchangelistener = new FormFieldChangeListener();
     private Rules additionalRules;
 
+    /**
+     * Constructor
+     *
+     * @param formname the form's name
+     */
     public Form(String formname) {
         Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: create", formname);
         fieldsdefs = new ArrayList<>();
         this.formname = formname;
     }
 
+    /**
+     * Constructor
+     *
+     * @param formname the form's name
+     * @param fieldsdef the collection of fields to be displayed in this form
+     */
     public Form(String formname, FieldsDef fieldsdef) {
         this(formname);
         addFieldsdef(fieldsdef);
         finaliseForm();
     }
 
+    /**
+     * Add a collection of fields for display on this form
+     *
+     * @param fieldsdef the collection of fields
+     */
     public final void addFieldsdef(FieldsDef fieldsdef) {
         if (fieldsdef != null) {
             Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: add {0} fields", new Object[]{fieldsdef.getName(), formname});
             fieldsdefs.add(fieldsdef);
-            for (BaseField field : fieldsdef.getFields()) {
+            fieldsdef.getFields().stream().map((field) -> {
                 addRow(field.getComponents());
-                if (field instanceof EditableField) {
-                    EditableField editablefield = (EditableField) field;
-                    if (!editablefield.hasListener()) {
-                        editablefield.addListener(formfieldchangelistener);
-                    }
-                }   
-            }
+                return field;
+            }).filter((field) -> (field instanceof EditableField)).map((field) -> (EditableField) field).filter((editablefield) -> (!editablefield.hasListener())).forEach((editablefield) -> {
+                editablefield.addListener(formfieldchangelistener);
+            });
         }
     }
 
+    /**
+     * Set additional form level rules.
+     *
+     * @param additionalRules the additional rule set for this form
+     */
     public void setAdditionalRules(Rules additionalRules) {
         this.additionalRules = additionalRules;
     }
 
+    /**
+     * Finalise the construction of the form.
+     */
     public final void finaliseForm() {
         finaliseForm(50);
     }
 
+    /**
+     * Finalise the construction of the form.
+     *
+     * @param msgwidth the width of the failure message areas (used to display
+     * any failure messages due to rule set failures)
+     */
     public final void finaliseForm(int msgwidth) {
         Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: finalise", formname);
         failuremessages = new JTextArea(3, msgwidth);
         failuremessages.setForeground(Color.red);
         failuremessages.setEditable(false);
         failuremessages.setFocusable(false);
-        addSpannedRow(failuremessages, null);
-    }
-    
-    public void presave() {
-        for (FieldsDef f : fieldsdefs) {
-            f.presave();
-        }
+        addSpannedRow(failuremessages, Color.LIGHT_GRAY);
     }
 
+    /**
+     * First phase of the saving of values of fields in the form.
+     */
+    public void presave() {
+        fieldsdefs.stream().forEach((f) -> {
+            f.presave();
+        });
+    }
+
+    /**
+     * Second phase of the saving of values of fields in the form.
+     *
+     * @return true if save was successful
+     */
     public int save() {
         presave();
         if (checkRules()) {
@@ -111,22 +147,35 @@ public class Form extends GridBagPanel {
         }
     }
 
+    /**
+     * Reset values of fields in the form to their previously checkpointed
+     * values.
+     */
     public void reset() {
         Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: reset fields", formname);
         failuremessages.setText("");
-        for (FieldsDef f : fieldsdefs) {
+        fieldsdefs.stream().forEach((f) -> {
             f.reset();
-        }
+        });
     }
 
+    /**
+     * Set the values of fields in the collection.
+     */
     public void set() {
         Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: set fields", formname);
         failuremessages.setText("");
-        for (FieldsDef f : fieldsdefs) {
+        fieldsdefs.stream().forEach((f) -> {
             f.set();
-        }
+        });
     }
 
+    /**
+     * Check if all rules in the form (at form, fieldsdef and field levels) are
+     * valid.
+     *
+     * @return true if all rules are valid
+     */
     public boolean checkRules() {
         boolean valid = true;
         for (FieldsDef f : fieldsdefs) {
@@ -139,10 +188,15 @@ public class Form extends GridBagPanel {
                 valid = false;
             }
         }
-        Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: check rules {0}", new Object[] {valid ? "valid" : "invalid", formname});
+        Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: check rules {0}", new Object[]{valid ? "valid" : "invalid", formname});
         return valid;
     }
 
+    /**
+     * Collect all failures messages from any failing rule (at form, fieldsdef
+     * and field levels), and display the resulting message in the failure
+     * message area of the form.
+     */
     public void writeAllFailureMessages() {
         StringBuilder sb = new StringBuilder();
         addFailureMessages(sb);
@@ -150,14 +204,14 @@ public class Form extends GridBagPanel {
             additionalRules.addFailureMessages(sb);
         }
         String t = sb.toString();
-        Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: write all failure messages: \"{0}\"", new Object[] {t.replace("\n", "; "), formname});
+        Log.get("linsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: write all failure messages: \"{0}\"", new Object[]{t.replace("\n", "; "), formname});
         failuremessages.setText(t);
     }
 
     private void addFailureMessages(StringBuilder msg) {
-        for (FieldsDef f : fieldsdefs) {
+        fieldsdefs.stream().forEach((f) -> {
             f.addFailureMessages(msg);
-        }
+        });
     }
 
     private class FormFieldChangeListener extends Listener<FormFieldChangeListenerParams> {

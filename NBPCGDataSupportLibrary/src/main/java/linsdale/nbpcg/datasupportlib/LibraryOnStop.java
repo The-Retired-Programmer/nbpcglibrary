@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,8 +24,10 @@ import linsdale.nbpcg.formsupportlib.ConfirmationDialog;
 import org.openide.modules.OnStop;
 
 /**
+ * The Standard On Stop action - tests if forms have error entries and dialogs
+ * with user to check if close is to continue.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @OnStop
 public class LibraryOnStop implements Callable<Boolean> {

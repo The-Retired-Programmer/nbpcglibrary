@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import org.openide.filesystems.FileUtil;
 /**
  * Logging implementation Class
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class Log {
 
@@ -54,12 +54,6 @@ public class Log {
         }
     }
 
-    /**
-     * Register a Logger
-     *
-     * @param name the name of the log
-     * @param level the level for the log
-     */
     private void registerLog(String name) {
         Logger l = Logger.getLogger(name);
         Level lev = getLevelfromLevelText(Settings.get("LOG-" + name, defaultleveltext));
@@ -68,6 +62,11 @@ public class Log {
         loggers.put(name, l);
     }
 
+    /**
+     * Get the set of descriptions associated with logging levels
+     *
+     * @return the set of descriptions texts
+     */
     public static String[] getLevelTexts() {
         return choiceofLevelText;
     }
@@ -86,25 +85,47 @@ public class Log {
         return l;
     }
 
+    /**
+     * Get the set of registered logger names.
+     *
+     * @return the set of registered logger names
+     */
     public static List<String> getLoggerNames() {
         List<String> res = new ArrayList<>();
-        for (Map.Entry<String, Logger> e : loggers.entrySet()) {
+        loggers.entrySet().stream().forEach((e) -> {
             res.add(e.getKey());
-        }
+        });
         return res;
     }
 
+    /**
+     * Set all loggers to a common level.
+     *
+     * @param level the common logging level
+     */
     public static void setAllLevel(Level level) {
         for (Map.Entry<String, Logger> e : loggers.entrySet()) {
             e.getValue().setLevel(level);
         }
     }
 
+    /**
+     * Set a logger's level based on standard descriptions for levels.
+     *
+     * @param name the logger name
+     * @param val the level description
+     */
     public static void setLevelfromText(String name, String val) {
         get(name).setLevel(getLevelfromLevelText(val));
         Settings.set("LOG-" + name, val);
     }
 
+    /**
+     * Get the description for the current level associated with a logger.
+     *
+     * @param name the logger name
+     * @return the level description
+     */
     public static String getLevelTextfromName(String name) {
         Level level = Log.get(name).getLevel();
         if (level == Level.ALL || level == Level.FINEST) {
@@ -118,6 +139,12 @@ public class Log {
         }
     }
 
+    /**
+     * Get a level value from standard description level text.
+     *
+     * @param val from standard description level text
+     * @return the level value
+     */
     public static Level getLevelfromLevelText(String val) {
         if (val.equals(choiceofLevelText[0])) {
             return Level.ALL;

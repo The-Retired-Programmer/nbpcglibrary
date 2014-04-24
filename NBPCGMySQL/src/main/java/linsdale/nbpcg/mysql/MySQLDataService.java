@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import linsdale.nbpcg.supportlib.Timestamp;
 /**
  * The implementation of the DB class for MySql Database connections.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("linsdale.mysql")
 public class MySQLDataService extends DBDataService {
@@ -40,6 +40,11 @@ public class MySQLDataService extends DBDataService {
     private boolean operational = false;
     private final DbConnectionParameters p;
 
+    /**
+     * Constructor
+     * 
+     * @param p the db connection parameters
+     */
     public MySQLDataService(DbConnectionParameters p) {
         super(p.key+"_DBService");
         this.p = p;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,30 +23,36 @@ import javax.swing.JComponent;
 import javax.swing.JTextField;
 
 /**
- * A General purpose Field for displaying and editing a value which is a simple
- * textual string.
+ * A General purpose Field for displaying a value which is a simple textual
+ * string.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class TextReadonlyField extends BaseField {
 
     private final JTextField textfield;
-    
+
+    /**
+     * Factory method to create a read-only text field.
+     *
+     * @param label the label text for the field
+     * @return the created read-only text field
+     */
     public static TextReadonlyField create(String label) {
         return new TextReadonlyField(label, 20);
     }
 
+    /**
+     * Factory method to create a read-only text field.
+     *
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @return the created read-only text field
+     */
     public static TextReadonlyField create(String label, int size) {
         return new TextReadonlyField(label, size);
     }
 
-    /**
-     * Constructor
-     *
-     * @param id the unique id for this field on the form
-     * @param label field label
-     * @param size size of the value display
-     */
     private TextReadonlyField(String label, int size) {
         super(label);
         textfield = new JTextField();

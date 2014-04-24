@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,21 +21,19 @@ package linsdale.nbpcg.formsupportlib;
 /**
  * A Field which creates a blank empty row in the form.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class Filler extends BaseField {
-    
+
+    /**
+     * Factory method to create a filler field
+     *
+     * @return the created filler field
+     */
     public static Filler create() {
         return new Filler();
     }
 
-    /**
-     * Constructor
-     *
-     * @param id the unique id for this field on the form
-     * @param label field label
-     * @param size size of the value display
-     */
     private Filler() {
         super("");
     }

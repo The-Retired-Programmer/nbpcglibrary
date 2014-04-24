@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import java.util.Date;
 /**
  * Simple Date Only Class
  *
- * Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class DateOnly {
 
@@ -46,6 +46,8 @@ public class DateOnly {
      *
      * @param datestring the initial value of the timestamp (formatted in
      * display format ("dd-MMM-yyyy"))
+     * @throws linsdale.nbpcg.supportlib.BadFormatException if datastring is
+     * badly formatted
      */
     public DateOnly(String datestring) throws BadFormatException {
         userformat.setLenient(true);
@@ -71,7 +73,7 @@ public class DateOnly {
     }
 
     /**
-     * Get the SQl formated date ('yyyyMMdd')
+     * Get the SQl formated date (yyyyMMdd)
      *
      * @return the formatted date
      */
@@ -89,6 +91,11 @@ public class DateOnly {
         return userformat.format(date);
     }
 
+    /**
+     * Compare this date to the current date.
+     * 
+     * @return +1 / 0 / -1 depending on result of compare
+     */
     public int compareTo() {
         return compareTo(new DateOnly());
     }
@@ -96,8 +103,11 @@ public class DateOnly {
     /**
      * compare
      *
-     * returns > 0 if this date is greater that the target date; 0 if they are
-     * the same and < 0 if less that the target date
+     * returns 1 if this date is greater that the target date; 0 if they are the
+     * same and -1 if less that the target date
+     *
+     * @param target the target date
+     * @return +1 / 0 / -1 depending on result of compare
      */
     public int compareTo(DateOnly target) {
         return toSQLString().compareTo(target.toSQLString());

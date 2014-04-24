@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,27 +22,46 @@ import java.util.logging.Level;
 import linsdale.nbpcg.annotations.RegisterLog;
 
 /**
+ * A Standard Listener - defined with a generic class for use as parameters
+ * passed on action.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <P> the Class of the listener parameter
  */
 @RegisterLog("linsdale.nbpcg.supportlib.listener")
 public abstract class Listener<P extends ListenerParams> {
-    
+
     private final String description;
-    
-    public Listener(String description){
+
+    /**
+     * Constructor
+     *
+     * @param description the listener's descriptive name - for use in error
+     * /log reporting
+     */
+    public Listener(String description) {
         this.description = description;
     }
 
+    /**
+     * Fired on Action.
+     *
+     * @param p the listener parameters
+     */
     public void actionPerformed(P p) {
-        Log.get("linsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listener {0}: action {1}", new Object[] {description, p});
+        Log.get("linsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listener {0}: action {1}", new Object[]{description, p});
         action(p);
     }
-    
+
     @Override
     public String toString() {
         return description;
     }
-    public abstract void action(P p) ;
-    
+
+    /**
+     * The action processing method.
+     *
+     * @param p the listener parameters
+     */
+    public abstract void action(P p);
 }

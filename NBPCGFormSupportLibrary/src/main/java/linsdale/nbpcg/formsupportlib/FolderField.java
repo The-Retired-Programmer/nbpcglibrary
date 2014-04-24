@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,40 +32,60 @@ import linsdale.nbpcg.supportlib.Rule;
 /**
  * A field class to get folder path information.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class FolderField extends TextField {
 
     private JButton folderButton;
 
-    // set of factory methods to create FolderFields
     /**
-     * @param field
-     * @param label
-     * @return
+     * Factory method to create a Folder field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @return the created Folder field
      */
     public static FolderField createWithRules(IntWithDescription field, String label) {
         return new FolderField(field, label, 20, null);
     }
 
+    /**
+     * Factory method to create a Folder field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @return the created Folder field
+     */
     public static FolderField createWithRules(IntWithDescription field, String label, int size) {
         return new FolderField(field, label, size, null);
     }
 
+    /**
+     * Factory method to create a Folder field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param listener the listener for changes to field value
+     * @return the created Folder field
+     */
     public static FolderField createWithRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         return new FolderField(field, label, 20, listener);
     }
 
+    /**
+     * Factory method to create a Folder field
+     *
+     * @param field the field id
+     * @param label the label text for the field
+     * @param size the display size of the field
+     * @param listener the listener for changes to field value
+     * @return the created Folder field
+     */
     public static FolderField createWithRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
         return new FolderField(field, label, size, listener);
     }
 
-    /**
-     * Constructor
-     *
-     * @param label the label for the field
-     * @param size the size of the field to display the folder path
-     */
     private FolderField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label, size, listener);
         addMinRule(1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,23 +23,40 @@ import java.util.logging.Level;
 import linsdale.nbpcg.annotations.RegisterLog;
 
 /**
+ * An Abstract Class used to find a set of values.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <C> The class of the values found
  */
 @RegisterLog("linsdale.nbpcg.supportlib.finder")
 public abstract class FindAction<C> {
 
     private final String name;
 
+    /**
+     * Constructor
+     *
+     * @param name the action's name
+     */
     public FindAction(String name) {
         this.name = name;
     }
 
+    /**
+     * Get the set of values returned by this action.
+     *
+     * @return the set of values
+     */
     public List<C> find() {
         List<C> res = findValues();
         Log.get("linsdale.nbpcg.supportlib.finder").log(Level.FINE, "Find: {0} called - returning {1} values", new Object[]{name, res.size()});
         return res;
     }
 
+    /**
+     * Get the set of values returned by this action.
+     *
+     * @return the set of values
+     */
     public abstract List<C> findValues();
 }

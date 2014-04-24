@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,11 +21,22 @@ package linsdale.nbpcg.datasupportlib.dataservice;
 /**
  * Interface - defines the core functions of a data service.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public interface DataService {
 
+    /**
+     * Test if DataService is operational - ie available and able to access
+     * data.
+     *
+     * @return true if operational
+     */
     public boolean isOperational();
 
+    /**
+     * Get the name given to this DataService.
+     *
+     * @return the name
+     */
     public String getName();
 }

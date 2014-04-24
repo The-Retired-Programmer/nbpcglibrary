@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,9 @@ import linsdale.nbpcg.supportlib.Listening;
 import linsdale.nbpcg.supportlib.Rules;
 
 /**
+ * Abstract Entity Class - delivering all basic entity functionality.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public abstract class Entity extends Rules {
 
@@ -32,6 +33,11 @@ public abstract class Entity extends Rules {
     private final EntityError entityerror;
     private final EntitySave entitysave;
 
+    /**
+     * Constructor.
+     *
+     * @param entityname the name of the entity class (for reporting purposes)
+     */
     public Entity(String entityname) {
         super();
         entityerror = new EntityError(entityname);
@@ -40,23 +46,46 @@ public abstract class Entity extends Rules {
         updateEntityRegistration();
     }
 
+    /**
+     * Add a listener to the SetChange listeners.
+     *
+     * @param listener the listener to add
+     */
     public final void addSetChangeListener(Listener<SetChangeListenerParams> listener) {
         setListening.addListener(listener);
     }
 
+    /**
+     * Remove a listener from the SetChange listeners.
+     *
+     * @param listener the listener to remove
+     */
     public final void removeSetChangeListener(Listener<SetChangeListenerParams> listener) {
         setListening.removeListener(listener);
     }
 
+    /**
+     * Fire the SetChange listeners.
+     *
+     * @param p the setchange parameters
+     */
     protected final void fireSetChange(SetChangeListenerParams p) {
         setListening.fire(p);
     }
-    
+
+    /**
+     * Cancel any changes in progress and restore state as at last save state.
+     */
     public void cancelEdit() {
         _restoreState();
         updateEntityRegistration();
     }
-    
+
+    /**
+     * Update entity registration for this entity. Set entity error based on
+     * check of entity rules and set entity save state based on current entity
+     * state.
+     */
     protected final void updateEntityRegistration() {
         if (checkRules()) {
             EntityRegistry.unregister(entityerror);
@@ -75,7 +104,12 @@ public abstract class Entity extends Rules {
             }
         }
     }
-    
+
+    /**
+     * Update entity registration for this entity at load state. Set entity error based on
+     * check of entity rules at load and set entity save state based on current entity
+     * state.
+     */
     protected final void updateEntityRegistrationAtLoad() {
         if (checkRulesAtLoad()) {
             EntityRegistry.unregister(entityerror);
@@ -86,22 +120,28 @@ public abstract class Entity extends Rules {
             EntityRegistry.unregister(entitysave);
         }
     }
-    
+
+    /**
+     * Remove entity error and entity save registrations for this entity.
+     */
     protected final void removeEntityRegistration() {
         EntityRegistry.unregister(entityerror);
         EntityRegistry.unregister(entitysave);
     }
 
+    /**
+     * Restore entity state.
+     */
     abstract protected void _restoreState();
-    
+
     private class EntityError implements EntityInError {
-        
+
         private final String name;
-        
+
         public EntityError(String name) {
             this.name = name;
         }
-        
+
         @Override
         public boolean equals(Object obj) {
             return (obj instanceof EntityError) && this == (((EntityError) obj));
@@ -112,15 +152,15 @@ public abstract class Entity extends Rules {
             return name.hashCode();
         }
     }
-    
+
     private class EntitySave implements EntityNeedsSaving {
-        
+
         private final String name;
-        
+
         public EntitySave(String name) {
             this.name = name;
         }
-        
+
         @Override
         public boolean equals(Object obj) {
             return (obj instanceof EntitySave) && this == (((EntitySave) obj));

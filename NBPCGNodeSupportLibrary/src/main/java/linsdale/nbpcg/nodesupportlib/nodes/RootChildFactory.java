@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,24 +24,40 @@ import linsdale.nbpcg.supportlib.Listener;
 import org.openide.nodes.ChildFactory;
 
 /**
- * class providing extended ChildFactory support
+ * Root ChildFactory support
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Parent Entity Class
  */
 public abstract class RootChildFactory<E extends Entity> extends ChildFactory<Entity> {
 
     private ChildListener childListener;
     private final E parentEntity;
-    
+
+    /**
+     * Constructor
+     *
+     * @param parentEntity the parent entity
+     */
     public RootChildFactory(E parentEntity) {
         this.parentEntity = parentEntity;
     }
-    
+
+    /**
+     * Get the parent entity.
+     *
+     * @return the parent entity
+     */
     public E getParentEntity() {
         return parentEntity;
     }
 
+    /**
+     * Enable Change listening on the child entity set.
+     *
+     * @param name the name of the listener (for reporting/logging)
+     * @param parent the parent entity
+     */
     public void enableChangeListening(String name, Entity parent) {
         childListener = new ChildListener(name);
         parent.addSetChangeListener(childListener);
@@ -55,7 +71,7 @@ public abstract class RootChildFactory<E extends Entity> extends ChildFactory<En
 
         @Override
         public void action(SetChangeListenerParams p) {
-            refresh(true); 
+            refresh(true);
         }
     }
 }

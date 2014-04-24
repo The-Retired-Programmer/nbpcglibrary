@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,17 @@ import org.openide.NotifyDescriptor;
 /**
  * A basic Confirmation Dialog (YES / NO)
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class ConfirmationDialog {
 
+    /**
+     * Display the dialog, wait for button response and return its selection.
+     *
+     * @param title the dialog title
+     * @param message the dialog message
+     * @return true if YES is pressed, otherwise false
+     */
     public static boolean show(String title, String message) {
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(message,
                 title, NotifyDescriptor.YES_NO_OPTION);

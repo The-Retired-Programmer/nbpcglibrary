@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import org.openide.windows.TopComponent;
 /**
  * Top component which displays an explorer object
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("linsdale.nbpcg.topcomponentsupportlib")
 public abstract class ExplorerTopComponent extends TopComponent implements ExplorerManager.Provider {
@@ -69,14 +69,17 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
         map.put("delete", ExplorerUtils.actionDelete(em, true));
         associateLookup(ExplorerUtils.createLookup(em, map));
     }
-    
+
+    /**
+     * Open the Topcomponent and make it visible.
+     */
     public void visible() {
         open();
         requestActive();
     }
 
     /**
-     * Get the explorer manager being used for this topcomponent
+     * Get the explorer manager being used for this topcomponent.
      *
      * @return the explorer manager
      */
@@ -85,9 +88,6 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
         return em;
     }
 
-    /**
-     * Standard topcomponent method - overwritten
-     */
     @Override
     public void componentOpened() {
         Logger log = Log.get("linsdale.nbpcg.topcomponentsupportlib");
@@ -95,9 +95,6 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
         em.setRootContext(getRootContextNode());
     }
 
-    /**
-     * Standard topcomponent method - overwritten
-     */
     @Override
     public void componentClosed() {
         Logger log = Log.get("linsdale.nbpcg.topcomponentsupportlib");
@@ -112,12 +109,11 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
      * @return the root node
      */
     public abstract AbstractNode getRootContextNode();
-    
+
     /**
      * Drop the Root Node
-     *
      */
-    public void dropRootContextNode(){
+    public void dropRootContextNode() {
         // empty default - can be overridden
     }
 }

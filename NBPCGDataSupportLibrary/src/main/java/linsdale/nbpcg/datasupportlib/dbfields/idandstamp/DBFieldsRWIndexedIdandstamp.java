@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,14 +25,17 @@ import linsdale.nbpcg.datasupportlib.dbfields.DBFieldsRWIndexed;
 import linsdale.nbpcg.datasupportlib.entity.EntityRWIndexed;
 
 /**
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * Handles Read-Write entity field management, for a entity which includes a Id,
+ * ordering index field and standardised timestamp (created and updated).
+ *
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
-public class DBFieldsRWIndexedIdandstamp <E extends EntityRWIndexed> extends DBFieldsRWIdandstamp<E>  implements DBFieldsRWIndexed<E>  {
+public class DBFieldsRWIndexedIdandstamp<E extends EntityRWIndexed> extends DBFieldsRWIdandstamp<E> implements DBFieldsRWIndexed<E> {
 
     private int idx = Integer.MAX_VALUE;
     private int idxOriginal;
-    
+
     @Override
     public void restoreState() {
         super.restoreState();
@@ -55,12 +58,12 @@ public class DBFieldsRWIndexedIdandstamp <E extends EntityRWIndexed> extends DBF
     public void setIndex(int idx) {
         this.idx = idx;
     }
-    
+
     @Override
-    public int getIndex(){
+    public int getIndex() {
         return idx;
     }
-    
+
     @Override
     public final void diffs(Map<String, Object> map) {
         if (idx != idxOriginal) {
@@ -69,10 +72,6 @@ public class DBFieldsRWIndexedIdandstamp <E extends EntityRWIndexed> extends DBF
         super.diffs(map);
     }
 
-    /**
-     * Update map with standard db fields
-     *
-     */
     @Override
     public final void values(Map<String, Object> map) {
         map.put("idx", idx);

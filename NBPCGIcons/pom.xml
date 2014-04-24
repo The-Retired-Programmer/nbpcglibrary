@@ -4,12 +4,12 @@
     <parent>
     <artifactId>NBPCGLibrary</artifactId>
     <groupId>linsdale.nbpcglibrary</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0.0</version>
   </parent>
 
     <groupId>linsdale.nbpcglibrary</groupId>
     <artifactId>NBPCGIcons</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <packaging>nbm</packaging>
 
     <name>NBPCGIcons</name>

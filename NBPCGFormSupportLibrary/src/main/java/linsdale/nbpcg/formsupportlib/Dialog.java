@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,9 +29,9 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 
 /**
- * the Dialog Class. Dialog are constructed with one or more panels.
+ * the Dialog Class. Dialogs are constructed with one or more panels.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class Dialog {
 
@@ -39,14 +39,39 @@ public class Dialog {
     private DialogDescriptor dd;
     private Form form;
     private String title;
+
+    /**
+     * Button responses - OK
+     */
     public static final int OK = -1;
+
+    /**
+     * Button responses - CANCEL
+     */
     public static final int CANCEL = -2;
+
+    /**
+     * Button responses - CLOSE
+     */
     public static final int CLOSE = -3;
 
+    /**
+     * Display the dialog.
+     *
+     * @param title the dialog title
+     * @param form the form used to create the body of the dialog
+     */
     public static void show(String title, Form form) {
         instance = new Dialog(title, form);
     }
 
+    /**
+     * Display the dialog.
+     *
+     * @param title the dialog title
+     * @param isModal true if this to be a modal dialog
+     * @param form the form used to create the body of the dialog
+     */
     public static void show(String title, boolean isModal, Form form) {
         instance = new Dialog(title, isModal, form);
     }

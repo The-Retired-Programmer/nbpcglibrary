@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,17 +21,28 @@ package linsdale.nbpcg.nodesupportlib.nodes;
 import linsdale.nbpcg.supportlib.ListenerParams;
 
 /**
+ * Listener Parameter Class for NameChange listeners.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class NameChangeListenerParams implements ListenerParams {
 
     private final String name;
 
+    /**
+     * Constructor.
+     *
+     * @param name the name
+     */
     public NameChangeListenerParams(String name) {
-        this.name=name;
+        this.name = name;
     }
 
+    /**
+     * Get the name.
+     *
+     * @return the name
+     */
     public String get() {
         return name;
     }

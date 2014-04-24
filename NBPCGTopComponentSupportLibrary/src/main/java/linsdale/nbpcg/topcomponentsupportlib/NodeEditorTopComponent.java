@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,22 +27,29 @@ import linsdale.nbpcg.supportlib.Log;
 import org.openide.windows.TopComponent;
 
 /**
- * Top component which displays/edits a node.
+ * Editor Topcomponent which displays/edits a node.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
 public abstract class NodeEditorTopComponent<E extends EntityRW> extends TopComponent {
 
     private final String name;
+
+    /**
+     * the node being edited
+     */
     protected final TreeNodeRW<E> node;
+
+    /**
+     * the entity being edited
+     */
     protected E entity;
-    
 
     /**
      * Constructor
      *
-     * @param node
+     * @param node the node
      * @param name the topcomponent name
      * @param hint the topcomponent hint
      */
@@ -53,36 +60,43 @@ public abstract class NodeEditorTopComponent<E extends EntityRW> extends TopComp
         this.name = name;
         this.node = node;
     }
-    
+
+    /**
+     * Open the Topcomponent and make it visible.
+     */
     public void visible() {
         open();
         requestActive();
     }
-    
-    /**
-     * Standard topcomponent method - overwritten
-     */
+
     @Override
     public void componentOpened() {
         Log.get("linsdale.nbpcg.topcomponentsupportlib").log(Level.FINE, "NodeEditorTopComponent for {0}: TopComponent opened()", name);
         entity = node.getEntity();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(getForm());
-        
+
     }
-    
-    protected abstract Form getForm();
 
     /**
-     * Standard topcomponent method - overwritten
+     * Get the form being displayed on this editor.
+     *
+     * @return the form
      */
+    protected abstract Form getForm();
+
     @Override
     public void componentClosed() {
         Log.get("linsdale.nbpcg.topcomponentsupportlib").log(Level.FINE, "NodeEditorTopComponent for {0}: TopComponent closed()", name);
         remove(dropForm());
         entity = null;
     }
-    
+
+    /**
+     * Drop the form
+     *
+     * @return the form
+     */
     protected abstract Form dropForm();
 
 }

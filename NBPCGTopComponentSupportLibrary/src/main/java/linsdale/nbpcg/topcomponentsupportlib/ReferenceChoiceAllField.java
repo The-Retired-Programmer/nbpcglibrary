@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,9 +27,10 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.Listener;
 
 /**
+ * Choice Field - taking values from all entities of a class.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
 public abstract class ReferenceChoiceAllField<E extends EntityRO> extends ReferenceChoiceField<E> {
 
@@ -40,13 +41,20 @@ public abstract class ReferenceChoiceAllField<E extends EntityRO> extends Refere
     /**
      * Constructor
      *
-     * @param field
+     * @param field the field Id
      * @param label the field label
      */
     public ReferenceChoiceAllField(IntWithDescription field, String label) {
         this(field, label, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param field the field Id
+     * @param label the field label
+     * @param listener the change listener
+     */
     public ReferenceChoiceAllField(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
         super(field, label, listener);
         choicesfieldListener = new ChoicesFieldListener(label + "/choices");
@@ -76,8 +84,19 @@ public abstract class ReferenceChoiceAllField<E extends EntityRO> extends Refere
         return choiceText;
     }
 
+    /**
+     * Get the set of entities.
+     *
+     * @return the set of entities
+     */
     protected abstract List<E> getChoicesEntities();
 
+    /**
+     * Get the Choice text from an entity.
+     *
+     * @param e the entity
+     * @return the choice text
+     */
     protected abstract String convertEntitytoText(E e);
 
     @Override

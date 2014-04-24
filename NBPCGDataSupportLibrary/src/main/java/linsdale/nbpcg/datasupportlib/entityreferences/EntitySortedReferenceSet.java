@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,11 +28,10 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.Listener;
 
 /**
- * Manages the list of child Entities - extends referencedentityset to implement
- * sortable child entity lists
+ * Manages the list of Entities - implements a sortable entity lists
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class
  */
 public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenceSet<E> {
 
@@ -41,6 +40,17 @@ public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenc
     private final ChildListener childListener;
     private final IntWithDescription field;
 
+    /**
+     * Constructor.
+     *
+     * @param name the set name (for reporting)
+     * @param field the Id for this set
+     * @param comparator the comparator to be used to sort the list
+     * @param columnname the column name for use in selection equality filter
+     * @param columnvalue the column value for use in the selection equality
+     * filter
+     * @param emclass the associated entity manager class
+     */
     public EntitySortedReferenceSet(String name, IntWithDescription field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
         super(name, field, columnname, columnvalue, emclass);
         this.field = field;
@@ -48,53 +58,49 @@ public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenc
         this.comparator = comparator;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param name the set name (for reporting)
+     * @param field the Id for this set
+     * @param comparator the comparator to be used to sort the list
+     * @param emclass the associated entity manager class
+     */
     public EntitySortedReferenceSet(String name, IntWithDescription field, Comparator<E> comparator, Class<? extends EntityManagerRO> emclass) {
         super(name, field, emclass);
         this.field = field;
         childListener = new ChildListener(name);
         this.comparator = comparator;
     }
-    
-     /**
-     * Sort the child entity List
-     *
-     *
+
+    /**
+     * Sort the entity List
      */
     protected final void sort() {
         List<E> el = super.get();
         java.util.Collections.sort(el, comparator);
-        
+
         childList = new ArrayList<>();
-        for (E e : el) {
+        el.stream().forEach((e) -> {
             childList.add(new EntityReference<>(name, e, em));
-        }
+        });
         unsorted = false;
         fireSetChange();
     }
 
-    /**
-     * Get the list of Child Entities
-     *
-     * @return List of child entities
-     */
     @Override
     public List<E> get() {
         if (unsorted) {
             sort();
             List<E> el = super.get();
-            for (E e : el) {
+            el.stream().forEach((e) -> {
                 e.addFieldListener(childListener);
-            }
+            });
             return el;
         }
         return super.get();
     }
 
-    /**
-     * Add a child entity to the child entity list
-     *
-     * @param e the Child Entity
-     */
     @Override
     public final void add(E e) {
         int index = 0;
@@ -109,12 +115,6 @@ public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenc
         add(index, e);
     }
 
-    /**
-     * Remove an entity from the child entity List
-     *
-     * @param e the Child Entity
-     * @return 
-     */
     @Override
     public boolean remove(E e) {
         if (super.remove(e)) {
@@ -126,9 +126,9 @@ public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenc
 
     @Override
     public void restoreState() {
-        for (E e : super.get()) {
+        super.get().stream().forEach((e) -> {
             e.removeFieldListener(childListener);
-        }
+        });
         super.restoreState();
         unsorted = true;
     }

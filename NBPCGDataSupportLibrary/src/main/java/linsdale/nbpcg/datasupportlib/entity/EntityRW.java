@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,10 +26,10 @@ import linsdale.nbpcg.datasupportlib.entityreferences.IdListenerParams;
 import linsdale.nbpcg.supportlib.*;
 
 /**
- * The abstract class defining an Entity.
+ * The abstract class defining an editable Entity.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
 public abstract class EntityRW<E extends EntityRW> extends EntityRO {
 
@@ -38,6 +38,14 @@ public abstract class EntityRW<E extends EntityRW> extends EntityRO {
     private final Listening<IdListenerParams> idListening;
     private final EntityManagerRW<E> em;
 
+    /**
+     * Constructor.
+     *
+     * @param entityname the entity name
+     * @param id the entity Id
+     * @param em the entity manager for this entity class
+     * @param dbfields the entity fields
+     */
     public EntityRW(String entityname, int id, EntityManagerRW<E> em, DBFieldsRW<E> dbfields) {
         this(entityname, id, em, em.getDataAccess(), dbfields);
     }
@@ -50,28 +58,45 @@ public abstract class EntityRW<E extends EntityRW> extends EntityRO {
         idListening = new Listening<>(entityname + "/id");
     }
 
+    /**
+     * Add an Id Listener to this entity.
+     *
+     * @param listener the listener
+     */
     public final void addIdListener(Listener<IdListenerParams> listener) {
         idListening.addListener(listener);
     }
 
+    /**
+     * Remove an Id listener from this entity.
+     *
+     * @param listener the listener
+     */
     public final void removeIdListener(Listener<IdListenerParams> listener) {
         idListening.removeListener(listener);
     }
 
+    /**
+     * Add an Id Listener to this entity.
+     *
+     * @param listener the listener
+     * @param flags the indicators of listener action (on current thread or on
+     * event queue; priority/normal)
+     */
     public final void addIdListener(Listener<IdListenerParams> listener, int flags) {
         idListening.addListener(listener, flags);
     }
 
-    /**
-     * Update the entity Id. (used internally changing transient to persistent Id)
-     *
-     * @param id the id to set
-     */
     final void updateId(int id) {
         setId(id);
         fireFieldChange(FieldChangeListenerParams.IDFIELD);
-    } 
+    }
 
+    /**
+     * Save this entity to entity storage.
+     *
+     * @return true
+     */
     public boolean save() {
         IntWithDescription oldState = getState();
         if (oldState == EntityStateChangeListenerParams.DBENTITY) {
@@ -107,10 +132,25 @@ public abstract class EntityRW<E extends EntityRW> extends EntityRO {
         return true;
     }
 
+    /**
+     * Add all field values to the given map.
+     *
+     * @param map the map into which field names (keys) and field values are to
+     * be inserted.
+     */
     abstract protected void _values(Map<String, Object> map);
 
+    /**
+     * Add any modified field values to the given map.
+     *
+     * @param map the map into which field names (keys) and field values are to
+     * be inserted.
+     */
     abstract protected void _diffs(Map<String, Object> map);
 
+    /**
+     * Delete this Entity.
+     */
     public final void remove() {
         IntWithDescription oldState = getState();
         if (oldState == EntityStateChangeListenerParams.NEW
@@ -135,8 +175,17 @@ public abstract class EntityRW<E extends EntityRW> extends EntityRO {
         throw new LogicException("Should not be trying to remove an entity in " + oldState + " state");
     }
 
+    /**
+     * Complete any entity specific removal actions prior to entity deletion.
+     * Basic use case: remove any linkage to parent entities.
+     */
     abstract protected void _remove();
 
+    /**
+     * Copy entity fields into this entity.
+     *
+     * @param e the copy source entity
+     */
     public final void copy(E e) {
         IntWithDescription oldState = getState();
         if (oldState == EntityStateChangeListenerParams.NEW) {
@@ -149,5 +198,10 @@ public abstract class EntityRW<E extends EntityRW> extends EntityRO {
         throw new LogicException("Should not be trying to copy an entity in " + oldState + " state");
     }
 
+    /**
+     * Field Copy actions - copy entity fields into this entity.
+     *
+     * @param from the copy source entity
+     */
     abstract protected void _copy(E from);
 }

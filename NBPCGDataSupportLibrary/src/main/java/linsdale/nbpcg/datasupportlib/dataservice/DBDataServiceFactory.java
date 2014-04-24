@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,25 @@ package linsdale.nbpcg.datasupportlib.dataservice;
 import linsdale.nbpcg.supportlib.DbConnectionParameters;
 
 /**
+ * Create a DBDataService.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <S>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <S> the DBDataService class to be be created
  */
-public interface DBDataServiceFactory <S extends DBDataService> {
-    
+public interface DBDataServiceFactory<S extends DBDataService> {
+
+    /**
+     * Get the type of DBDataService which this Factory creates.
+     *
+     * @return the type string
+     */
     public String getType();
-    
+
+    /**
+     * Create a DBDataService.
+     *
+     * @param p the Connection parameters which define the connection
+     * @return the DBDataService
+     */
     public S createDataService(DbConnectionParameters p);
-    
 }

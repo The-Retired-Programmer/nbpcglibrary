@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,18 @@ package linsdale.nbpcg.datasupportlib.dataservice;
 import java.sql.ResultSet;
 
 /**
+ * Interface for a ResultSet Loader. A resultsetloader takes a resultset and
+ * processes this. Typical use case: creating an entity and initialising its
+ * fields to those of the resultset.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public interface ResultSetLoader {
 
+    /**
+     * Process the given resultset. Use case: load it into an entity
+     *
+     * @param rs the resultset
+     */
     public void load(ResultSet rs);
 }

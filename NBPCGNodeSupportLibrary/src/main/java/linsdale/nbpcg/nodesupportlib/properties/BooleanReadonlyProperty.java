@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,12 +18,12 @@
  */
 package linsdale.nbpcg.nodesupportlib.properties;
 
-import java.lang.reflect.InvocationTargetException;
 import org.openide.nodes.PropertySupport;
 
 /**
  * Boolean Readonly Property item
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ *
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class BooleanReadonlyProperty extends PropertySupport.ReadOnly<String> {
 
@@ -31,6 +31,7 @@ public class BooleanReadonlyProperty extends PropertySupport.ReadOnly<String> {
 
     /**
      * Constructor
+     *
      * @param name the property name
      * @param val the property value
      */
@@ -39,9 +40,10 @@ public class BooleanReadonlyProperty extends PropertySupport.ReadOnly<String> {
         setName(name);
         update(val);
     }
-    
+
     /**
      * Constructor
+     *
      * @param name the property name
      * @param val the property value
      */
@@ -50,19 +52,18 @@ public class BooleanReadonlyProperty extends PropertySupport.ReadOnly<String> {
         setName(name);
         update(val);
     }
-    
-    public final void update(boolean val) {
-        this.val = val?"Yes":"No";
-    }
 
     /**
-     * Get the Property Value
-     * @return the property value
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
+     * Update the value
+     *
+     * @param val the value used to update (true/false)
      */
+    public final void update(boolean val) {
+        this.val = val ? "Yes" : "No";
+    }
+
     @Override
-    public String getValue() throws IllegalAccessException, InvocationTargetException {
+    public String getValue() {
         return val;
     }
 }

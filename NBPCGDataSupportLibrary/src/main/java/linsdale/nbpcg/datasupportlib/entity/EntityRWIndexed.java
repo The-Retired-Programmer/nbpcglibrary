@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,16 +23,25 @@ import linsdale.nbpcg.datasupportlib.dbfields.DBFieldsRWIndexed;
 import linsdale.nbpcg.supportlib.*;
 
 /**
- * The abstract class defining an Entity.
+ * The abstract class defining an editable Entity, with a index (orderable)
+ * field.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the entity class
  */
 public abstract class EntityRWIndexed<E extends EntityRWIndexed> extends EntityRW<E> {
 
     private final DBFieldsRWIndexed<E> dbfields;
     private final DataAccessRW dataAccess;
 
+    /**
+     * Constructor.
+     *
+     * @param entityname the entity name
+     * @param id the entity Id
+     * @param em the entity manager for this entity class
+     * @param dbfields the entity fields
+     */
     public EntityRWIndexed(String entityname, int id, EntityManagerRW<E> em, DBFieldsRWIndexed<E> dbfields) {
         super(entityname, id, em, dbfields);
         this.dbfields = dbfields;
@@ -50,10 +59,20 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed> extends EntityR
         return super.save();
     }
 
+    /**
+     * Get the Index Field value.
+     *
+     * @return the index value
+     */
     public int getIndex() {
         return dbfields.getIndex();
     }
 
+    /**
+     * Set the Index Field value.
+     *
+     * @param i the index value
+     */
     public final void setIndex(int i) {
         ensureEditing();
         dbfields.setIndex(i);

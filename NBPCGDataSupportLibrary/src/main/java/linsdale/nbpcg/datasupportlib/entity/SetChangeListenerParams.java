@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,17 +22,28 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.ListenerParams;
 
 /**
- *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * The Parameter Class for a SetChange listener.
+ * 
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class SetChangeListenerParams implements ListenerParams {
     
     private final IntWithDescription set;
     
+    /**
+     * Constructor.
+     * 
+     * @param set the Id of the set
+     */
     public SetChangeListenerParams(IntWithDescription set){
         this.set = set;
     }
     
+    /**
+     * Get the Id of the set.
+     * 
+     * @return the Id
+     */
     public IntWithDescription get() {
         return set;
     }
@@ -60,5 +71,4 @@ public class SetChangeListenerParams implements ListenerParams {
     public String toString(){
         return set+" change";
     }
-    
 }

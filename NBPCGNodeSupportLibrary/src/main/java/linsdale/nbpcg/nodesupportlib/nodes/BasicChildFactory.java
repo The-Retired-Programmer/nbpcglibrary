@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,20 +23,27 @@ import linsdale.nbpcg.datasupportlib.entity.EntityRO;
 import linsdale.nbpcg.datasupportlib.entityreferences.EntityReference;
 
 /**
- * class providing extended ChildFactory support
+ * Extended ChildFactory support
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
- * @param <E>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Parent Entity Class
  */
 public abstract class BasicChildFactory<E extends EntityRO> extends RootChildFactory<E> {
 
     private final EntityReference<E> parentref;
-    
-    public BasicChildFactory(String factoryname, E parentEntity,Class<? extends EntityManagerRO> emclass ) {
+
+    /**
+     * Contructor.
+     * 
+     * @param factoryname the factory name
+     * @param parentEntity the parent entity
+     * @param emclass the parent entity manager class 
+     */
+    public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManagerRO> emclass) {
         super(null);
-        parentref = new EntityReference<>(factoryname+"/parent",parentEntity,emclass);
+        parentref = new EntityReference<>(factoryname + "/parent", parentEntity, emclass);
     }
-    
+
     @Override
     public E getParentEntity() {
         return parentref.get();

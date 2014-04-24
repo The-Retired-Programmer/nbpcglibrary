@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,35 +22,63 @@ import linsdale.nbpcg.supportlib.IntWithDescription;
 import linsdale.nbpcg.supportlib.ListenerParams;
 
 /**
+ * The Parameter Class for a FieldChange listener.
  *
- * @author Richard Linsdale <richard.linsdale at blueyonder.co.uk>
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class FieldChangeListenerParams implements ListenerParams {
-    
+
+    /**
+     * Common Field Id - all fields have changed
+     */
     public static final IntWithDescription ALLFIELDS = new IntWithDescription(0, "ALL");
+
+    /**
+     * Common Field Id - the Id field has changed
+     */
     public static final IntWithDescription IDFIELD = new IntWithDescription(1, "Id");
+
+    /**
+     * Common Field Id - the Index (ordering) field has change
+     */
     public static final IntWithDescription IDXFIELD = new IntWithDescription(2, "Idx");
     private final IntWithDescription field;
     private final boolean formatOK;
-    
-    public FieldChangeListenerParams(IntWithDescription field, boolean formatOK){
+
+    /**
+     * Constructor.
+     *
+     * @param field the field Id
+     * @param formatOK true if field is correctly formatted
+     */
+    public FieldChangeListenerParams(IntWithDescription field, boolean formatOK) {
         this.field = field;
         this.formatOK = formatOK;
     }
-    
+
+    /**
+     * Get the field Id
+     *
+     * @return the field Id
+     */
     public IntWithDescription get() {
         return field;
     }
-    
-    public boolean isFormatOK(){
+
+    /**
+     * Test if the field was formatted correctly.
+     *
+     * @return true if field was formatted correctly
+     */
+    public boolean isFormatOK() {
         return formatOK;
     }
-    
+
     @Override
     public int hashCode() {
         return field.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -64,10 +92,9 @@ public class FieldChangeListenerParams implements ListenerParams {
         }
         return false;
     }
-    
+
     @Override
-    public String toString(){
-        return field+" change (data was formatted "+(formatOK?"OK":"badly")+")";
+    public String toString() {
+        return field + " change (data was formatted " + (formatOK ? "OK" : "badly") + ")";
     }
-    
 }
