@@ -1,2 +1,2 @@
 Manifest-Version: 1.0
-OpenIDE-Module-Localizing-Bundle: linsdale/nbpcg/nodesupportlib/Bundle.properties
+OpenIDE-Module-Localizing-Bundle: uk/org/rlinsdale/nbpcg/nodesupportlib/Bundle.properties

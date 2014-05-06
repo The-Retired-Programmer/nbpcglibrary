@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
     <artifactId>NBPCGLibrary</artifactId>
-    <groupId>linsdale.nbpcglibrary</groupId>
+    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <version>3.0.0</version>
   </parent>
 
-    <groupId>linsdale.nbpcglibrary</groupId>
+    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>NBPCGMySQL</artifactId>
     <version>3.0.0</version>
     <packaging>nbm</packaging>
@@ -41,29 +41,29 @@
             <version>RELEASE80</version>
         </dependency>
         <dependency>
-            <groupId>linsdale.nbpcglibrary</groupId>
-            <artifactId>NBPCGAnnotations</artifactId>
-            <version>3.0.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>linsdale.nbpcglibrary</groupId>
-            <artifactId>NBPCGDataSupportLibrary</artifactId>
-            <version>3.0.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>linsdale.nbpcglibrary</groupId>
-            <artifactId>NBPCGSupportLibrary</artifactId>
-            <version>3.0.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.29</version>
             <type>jar</type>
             <!-- <scope>runtime</scope> -->
+        </dependency>
+        <dependency>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <artifactId>NBPCGDataSupportLibrary</artifactId>
+            <version>3.0.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <artifactId>NBPCGAnnotations</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <type>jar</type>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>NBPCGSupportLibrary</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <type>jar</type>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
@@ -76,7 +76,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>linsdale.nbpcg.mysql</publicPackage>
+                        <publicPackage>uk.org.rlinsdale.nbpcg.mysql</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

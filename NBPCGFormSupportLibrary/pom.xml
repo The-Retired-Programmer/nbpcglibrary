@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
     <artifactId>NBPCGLibrary</artifactId>
-    <groupId>linsdale.nbpcglibrary</groupId>
+    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <version>3.0.0</version>
   </parent>
 
-    <groupId>linsdale.nbpcglibrary</groupId>
+    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>NBPCGFormSupportLibrary</artifactId>
     <version>3.0.0</version>
     <packaging>nbm</packaging>
@@ -41,14 +41,15 @@
             <version>RELEASE80</version>
         </dependency>
         <dependency>
-            <groupId>linsdale.nbpcglibrary</groupId>
-            <artifactId>NBPCGSupportLibrary</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-dialogs</artifactId>
             <version>RELEASE80</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <artifactId>NBPCGSupportLibrary</artifactId>
+            <version>3.0.0</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 
@@ -61,7 +62,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>linsdale.nbpcg.formsupportlib</publicPackage>
+                        <publicPackage>uk.org.rlinsdale.nbpcg.formsupportlib</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

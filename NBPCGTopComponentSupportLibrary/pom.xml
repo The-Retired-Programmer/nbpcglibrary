@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-    <artifactId>NBPCGLibrary</artifactId>
-    <groupId>linsdale.nbpcglibrary</groupId>
-    <version>3.0.0</version>
-  </parent>
+        <artifactId>NBPCGLibrary</artifactId>
+        <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        <version>3.0.0</version>
+    </parent>
 
-    <groupId>linsdale.nbpcglibrary</groupId>
+    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>NBPCGTopComponentSupportLibrary</artifactId>
     <version>3.0.0</version>
     <packaging>nbm</packaging>
@@ -41,23 +41,6 @@
             <version>RELEASE80</version>
         </dependency>
         <dependency>
-            <groupId>linsdale.nbpcglibrary</groupId>
-            <artifactId>NBPCGDataSupportLibrary</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <artifactId>NBPCGSupportLibrary</artifactId>
-            <groupId>linsdale.nbpcglibrary</groupId>
-            <type>jar</type>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <artifactId>NBPCGFormSupportLibrary</artifactId>
-            <groupId>linsdale.nbpcglibrary</groupId>
-            <type>jar</type>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-windows</artifactId>
             <version>RELEASE80</version>
@@ -74,8 +57,33 @@
             <version>RELEASE80</version>
         </dependency>
         <dependency>
-            <groupId>linsdale.nbpcglibrary</groupId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
             <artifactId>NBPCGNodeSupportLibrary</artifactId>
+            <version>3.0.0</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <artifactId>NBPCGDataSupportLibrary</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <type>jar</type>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>NBPCGAnnotations</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <type>jar</type>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>NBPCGFormSupportLibrary</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <type>jar</type>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>NBPCGSupportLibrary</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <type>jar</type>
             <version>3.0.0</version>
         </dependency>
     </dependencies>
