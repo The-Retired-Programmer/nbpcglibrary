@@ -97,7 +97,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>linsdale.nbpcg.topcomponentsupportlib</publicPackage>
+                        <publicPackage>uk.org.rlinsdale.nbpcg.topcomponentsupportlib</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
