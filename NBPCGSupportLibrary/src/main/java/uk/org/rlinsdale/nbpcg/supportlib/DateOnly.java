@@ -46,8 +46,7 @@ public class DateOnly {
      *
      * @param datestring the initial value of the timestamp (formatted in
      * display format ("dd-MMM-yyyy"))
-     * @throws linsdale.nbpcg.supportlib.BadFormatException if datastring is
-     * badly formatted
+     * @throws BadFormatException if datastring is badly formatted
      */
     public DateOnly(String datestring) throws BadFormatException {
         userformat.setLenient(true);
@@ -93,7 +92,7 @@ public class DateOnly {
 
     /**
      * Compare this date to the current date.
-     * 
+     *
      * @return +1 / 0 / -1 depending on result of compare
      */
     public int compareTo() {

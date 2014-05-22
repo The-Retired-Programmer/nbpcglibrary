@@ -46,7 +46,7 @@ public class Timestamp {
      *
      * @param datestring the initial value of the timestamp (formatted in
      * display format ("dd-MMM-yyyy-HH:mm:ss"))
-     * @throws linsdale.nbpcg.supportlib.BadFormatException when datestring is badly formatted
+     * @throws BadFormatException when datestring is badly formatted
      */
     public Timestamp(String datestring) throws BadFormatException {
         userformat.setLenient(true);
@@ -92,7 +92,7 @@ public class Timestamp {
 
     /**
      * Compare this timestamp to the current time.
-     * 
+     *
      * @return +1 / 0 / -1 as a result of the compare
      */
     public int compareTo() {
@@ -104,7 +104,7 @@ public class Timestamp {
      *
      * returns 1 if this date is greater that the target date; 0 if they are the
      * same and -1 if less that the target date
-     * 
+     *
      * @param target the target Timestamp
      * @return +1 / 0 / -1 as a result of the compare
      */
