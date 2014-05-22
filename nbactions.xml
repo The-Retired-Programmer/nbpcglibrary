@@ -8,5 +8,13 @@
                 <goal>javadoc:aggregate-jar</goal>
             </goals>
         </action>
+        <action>
+            <actionName>CUSTOM-Generate aggregated AutoUpdater</actionName>
+            <displayName>Generate aggregated AutoUpdater</displayName>
+            <goals>
+                <goal>generate-sources</goal>
+                <goal>nbm:autoupdate</goal>
+            </goals>
+        </action>
         
     </actions>
