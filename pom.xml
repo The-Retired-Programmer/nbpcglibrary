@@ -3,25 +3,71 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>uk.org.rlinsdale</groupId>
-        <artifactId>Master-rlinsdale-NB-Library-Parent-POM</artifactId>
+        <groupId>uk.org.rlinsdale.poms</groupId>
+        <artifactId>nb-library-parent</artifactId>
         <version>1.0.0</version>
     </parent>
     
-    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
-    <artifactId>NBPCGLibrary</artifactId>
+    <groupId>uk.org.rlinsdale</groupId>
+    <artifactId>nbpcglibrary</artifactId>
     <version>3.1.0</version>
     <packaging>pom</packaging>
     <name>NBPCG Library</name>
     
+    <properties>
+        <brandingToken>nbpcglib</brandingToken>
+        <ghpagesroot>nbpcglibrary</ghpagesroot>
+        <release>3</release>
+    </properties>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+                <artifactId>node</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <artifactId>data</artifactId>
+                <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <artifactId>form</artifactId>
+                <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <artifactId>common</artifactId>
+                <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <artifactId>topcomponent</artifactId>
+                <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <artifactId>mysql</artifactId>
+                <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <artifactId>icons</artifactId>
+                <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+                <version>3.1.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <modules>
-        <module>NBPCGSupportLibrary</module>
-        <module>NBPCGAnnotations</module>
-        <module>NBPCGDataSupportLibrary</module>
-        <module>NBPCGFormSupportLibrary</module>
-        <module>NBPCGMySQL</module>
-        <module>NBPCGNodeSupportLibrary</module>
-        <module>NBPCGIcons</module>
+        <module>data</module>
+        <module>form</module>
+        <module>icons</module>
+        <module>mysql</module>
+        <module>node</module>
+        <module>common</module>
+        <module>topcomponent</module>
     </modules>
     
 </project>

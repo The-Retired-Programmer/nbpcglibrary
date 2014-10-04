@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>uk.org.rlinsdale.poms</groupId>
+        <artifactId>nb-library-module</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+    <artifactId>data</artifactId>
+    <version>3.1.0</version>
+    <packaging>nbm</packaging>
+
+    <name>NBPCG Data Support Library</name>
+    <description>General Data Entity and Entity Management Support Classes and Interfaces for the modules generated using the NetBeans Platform Code Generator(NBPCG)</description>
+
+    <properties>
+        <brandingToken>nbpcglib</brandingToken>
+        <ghpagesroot>nbpcglibrary</ghpagesroot>
+    </properties>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>uk.org.rlinsdale</groupId>
+                <artifactId>nbpcglibrary</artifactId>
+                <version>3.1.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+        </dependency>
+        <dependency>
+            <artifactId>org-openide-util-lookup</artifactId>
+            <groupId>org.netbeans.api</groupId>
+        </dependency>
+        <dependency>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <artifactId>form</artifactId>
+        </dependency>
+        <dependency>
+            <artifactId>common</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>uk.org.rlinsdale.nbpcglibrary.data.*</publicPackage>
+                    </publicPackages>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,4 +1,3 @@
-/NBPCGAnnotations/target/
 /NBPCGDataSupportLibrary/target/
 /NBPCGFormSupportLibrary/target/
 /NBPCGMySQL/target/
@@ -7,3 +6,17 @@
 /NBPCGTopComponentSupportLibrary/target/
 /NBPCGIcons/target/
 /target/
+/nbpcgdatasupportlibrary/target/
+/nbpcgformsupportlibrary/target/
+/nbpcgicons/target/
+/nbpcgmysql/target/
+/nbpcgnodesupportlibrary/target/
+/nbpcgsupportlibrary/target/
+/nbpcgtopcomponentsupportlibrary/target/
+/icons/target/
+/common/target/
+/topcomponent/target/
+/form/target/
+/data/target/
+/mysql/target/
+/node/target/
