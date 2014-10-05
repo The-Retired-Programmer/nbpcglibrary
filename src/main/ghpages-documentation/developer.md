@@ -14,7 +14,7 @@ to obtain the whole source tree.  Tag v${project.version} refers to the sources
 relevant to this release.
 
 Online Javadoc for this release can be found
-[here](http://javadoc.rlinsdale.org.uk/nbpcglibrary/v${release}/index.html)
+[here](http://javadoc.rlinsdale.org.uk/nbpcglibrary/v${release}/index.html),
 whilst a downloadable jar file containing the same Javadoc is available from
 [here](http://repository.rlinsdale.org.uk/uk/org/rlinsdale/nbpcglibrary/${project.version}/nbpcglibrary-${project.version}-javadoc.jar)
 
