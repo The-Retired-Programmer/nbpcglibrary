@@ -25,10 +25,12 @@ and then add any required dependencies into the POM.  An example statement is:
         </dependencies>
     </dependencyManagement>
 
+    ...
     <dependency>
         <artifactId>xxxxx</artifactId>
         <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     </dependency>
+    ...
 
     where xxxxx is one of:
     common, data, form, icons, mysql, node or topcomponent
@@ -39,7 +41,7 @@ your IDE are extremely limited.  It is easier to manually add
 dependencies directly into your POM.
 
 Online Javadoc for this release can be found
-[here](http://javadoc.rlinsdale.org.uk/nbpcglibrary/v${release}/index.html)
+[here](http://javadoc.rlinsdale.org.uk/nbpcglibrary/v${release}/index.html),
 whilst a downloadable jar file containing the same Javadoc is available from
 [here](http://repository.rlinsdale.org.uk/uk/org/rlinsdale/nbpcglibrary/${project.version}/nbpcglibrary-${project.version}-javadoc.jar)
 
