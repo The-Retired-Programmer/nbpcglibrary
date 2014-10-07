@@ -33,7 +33,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("uk.org.rlinsdale.nbpcg.formsupportlib")
+@RegisterLog("uk.org.rlinsdale.nbpcglibrary.form")
 public class Form extends GridBagPanel {
 
     static final int SAVESUCCESS = 1;
@@ -51,7 +51,7 @@ public class Form extends GridBagPanel {
      * @param formname the form's name
      */
     public Form(String formname) {
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: create", formname);
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: create", formname);
         fieldsdefs = new ArrayList<>();
         this.formname = formname;
     }
@@ -75,7 +75,7 @@ public class Form extends GridBagPanel {
      */
     public final void addFieldsdef(FieldsDef fieldsdef) {
         if (fieldsdef != null) {
-            Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: add {0} fields", new Object[]{fieldsdef.getName(), formname});
+            Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {1}: add {0} fields", new Object[]{fieldsdef.getName(), formname});
             fieldsdefs.add(fieldsdef);
             fieldsdef.getFields().stream().map((field) -> {
                 addRow(field.getComponents());
@@ -109,7 +109,7 @@ public class Form extends GridBagPanel {
      * any failure messages due to rule set failures)
      */
     public final void finaliseForm(int msgwidth) {
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: finalise", formname);
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: finalise", formname);
         failuremessages = new JTextArea(3, msgwidth);
         failuremessages.setForeground(Color.red);
         failuremessages.setEditable(false);
@@ -135,7 +135,7 @@ public class Form extends GridBagPanel {
         presave();
         if (checkRules()) {
             boolean ok = true;
-            Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: save fields", formname);
+            Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: save fields", formname);
             failuremessages.setText("");
             for (FieldsDef f : fieldsdefs) {
                 if (!f.save()) {
@@ -154,7 +154,7 @@ public class Form extends GridBagPanel {
      * values.
      */
     public void reset() {
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: reset fields", formname);
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: reset fields", formname);
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
             f.reset();
@@ -165,7 +165,7 @@ public class Form extends GridBagPanel {
      * Set the values of fields in the collection.
      */
     public void set() {
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {0}: set fields", formname);
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: set fields", formname);
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
             f.set();
@@ -190,7 +190,7 @@ public class Form extends GridBagPanel {
                 valid = false;
             }
         }
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: check rules {0}", new Object[]{valid ? "valid" : "invalid", formname});
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {1}: check rules {0}", new Object[]{valid ? "valid" : "invalid", formname});
         return valid;
     }
 
@@ -206,7 +206,7 @@ public class Form extends GridBagPanel {
             additionalRules.addFailureMessages(sb);
         }
         String t = sb.toString();
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Form {1}: write all failure messages: \"{0}\"", new Object[]{t.replace("\n", "; "), formname});
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {1}: write all failure messages: \"{0}\"", new Object[]{t.replace("\n", "; "), formname});
         failuremessages.setText(t);
     }
 

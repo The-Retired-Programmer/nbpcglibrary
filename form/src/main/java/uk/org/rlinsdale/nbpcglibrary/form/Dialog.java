@@ -83,7 +83,7 @@ public class Dialog {
     private Dialog(String title, boolean isModal, Form form) {
         this.form = form;
         this.title = title;
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINE, "Dialogue {0} open", title);
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINE, "Dialogue {0} open", title);
         dd = new DialogDescriptor(
                 form,
                 title,
@@ -100,7 +100,7 @@ public class Dialog {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            Logger log = Log.get("uk.org.rlinsdale.nbpcg.formsupportlib");
+            Logger log = Log.get("uk.org.rlinsdale.nbpcglibrary.form");
             if (ae.getSource() == DialogDescriptor.OK_OPTION) {
                 switch (form.save()) {
                     case Form.SAVESUCCESS:
@@ -131,7 +131,7 @@ public class Dialog {
         public void propertyChange(PropertyChangeEvent pce) {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
-                Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINEST, "Dialog {0}: window close - treat as CANCEL response", title);
+                Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Dialog {0}: window close - treat as CANCEL response", title);
                 dd.setClosingOptions(null); // and allow closing
                 form.reset();
                 instance = null;

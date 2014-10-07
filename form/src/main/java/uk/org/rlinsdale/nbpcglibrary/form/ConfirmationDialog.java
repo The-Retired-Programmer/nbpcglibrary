@@ -41,7 +41,7 @@ public class ConfirmationDialog {
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(message,
                 title, NotifyDescriptor.YES_NO_OPTION);
         boolean res = DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION;
-        Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").log(Level.FINER, "Confirmation Dialog ({0}) requested with message ({1}); responce is {2}",
+        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINER, "Confirmation Dialog ({0}) requested with message ({1}); responce is {2}",
                 new Object[]{title, message, res ? "Positive" : "Negative"});
         return res;
     }

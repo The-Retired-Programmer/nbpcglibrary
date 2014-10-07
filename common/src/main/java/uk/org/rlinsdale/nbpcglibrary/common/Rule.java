@@ -25,7 +25,7 @@ import java.util.logging.Level;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("uk.org.rlinsdale.nbpcg.supportlib.rule")
+@RegisterLog("uk.org.rlinsdale.nbpcglibrary.common.rule")
 public abstract class Rule {
 
     private final String failuremessage;
@@ -61,7 +61,7 @@ public abstract class Rule {
     public final boolean check() {
         boolean res = ruleCheck();
         if (!res) {
-            Log.get("uk.org.rlinsdale.nbpcg.supportlib.rule").log(Level.FINEST, "Rule failure: {0}", failuremessage);
+            Log.get("uk.org.rlinsdale.nbpcglibrary.common.rule").log(Level.FINEST, "Rule failure: {0}", failuremessage);
         }
         return res;
     }

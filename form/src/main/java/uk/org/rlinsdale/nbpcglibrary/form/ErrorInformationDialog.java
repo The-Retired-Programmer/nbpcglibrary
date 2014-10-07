@@ -73,7 +73,7 @@ public class ErrorInformationDialog {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").finer("errorInformationdialogue action fired");
+            Log.get("uk.org.rlinsdale.nbpcglibrary.form").finer("errorInformationdialogue action fired");
             dd.setClosingOptions(null); // and allow closing
             listening.fire(SimpleListenerParams.EMPTY);
             instance = null;
@@ -86,7 +86,7 @@ public class ErrorInformationDialog {
         public void propertyChange(PropertyChangeEvent pce) {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
-                Log.get("uk.org.rlinsdale.nbpcg.formsupportlib").finest("ErrorInformationDialogue: window close");
+                Log.get("uk.org.rlinsdale.nbpcglibrary.form").finest("ErrorInformationDialogue: window close");
                 dd.setClosingOptions(null); // and allow closing
                 listening.fire(SimpleListenerParams.EMPTY);
                 instance = null;

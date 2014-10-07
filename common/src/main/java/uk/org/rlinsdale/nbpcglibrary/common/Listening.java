@@ -69,7 +69,7 @@ public class Listening<P extends ListenerParams> {
      * /log reporting
      */
     public Listening(String description) {
-        Log.get("uk.org.rlinsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listening {0}: created", description);
+        Log.get("uk.org.rlinsdale.nbpcglibrary.common.listener").log(Level.FINEST, "Listening {0}: created", description);
         this.description = description;
     }
 
@@ -106,7 +106,7 @@ public class Listening<P extends ListenerParams> {
      * @param listener the listener
      */
     public void removeListener(Listener<P> listener) {
-        Log.get("uk.org.rlinsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listening {0}: remove listener {1}", new Object[]{description, listener});
+        Log.get("uk.org.rlinsdale.nbpcglibrary.common.listener").log(Level.FINEST, "Listening {0}: remove listener {1}", new Object[]{description, listener});
         listenersImmediate.remove(listener);
         listenersEventQueue.remove(listener); // remove a listener from either queue
     }
@@ -127,7 +127,7 @@ public class Listening<P extends ListenerParams> {
      * @param p the listener parameters object
      */
     public void fire(P p) {
-        Log.get("uk.org.rlinsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listening {0}:  fire {1}; {2} immediate & {3} on eventqueue",
+        Log.get("uk.org.rlinsdale.nbpcglibrary.common.listener").log(Level.FINEST, "Listening {0}:  fire {1}; {2} immediate & {3} on eventqueue",
                 new Object[]{description, p, listenersImmediate.size(), listenersEventQueue.size()});
         listenersImmediate.fire(p);
         if (EventQueue.isDispatchThread()) {
@@ -187,9 +187,9 @@ public class Listening<P extends ListenerParams> {
 
         public final synchronized void add(Listener<P> listener, boolean priority) {
             if (allListeners().contains(listener)) {
-                Log.get("uk.org.rlinsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listening {0}: failed to add listener {1} (type={3};priority={2}) - reason duplicate", new Object[]{description, listener, priority ? "Priority" : "Normal", queuetype});
+                Log.get("uk.org.rlinsdale.nbpcglibrary.common.listener").log(Level.FINEST, "Listening {0}: failed to add listener {1} (type={3};priority={2}) - reason duplicate", new Object[]{description, listener, priority ? "Priority" : "Normal", queuetype});
             } else {
-                Log.get("uk.org.rlinsdale.nbpcg.supportlib.listener").log(Level.FINEST, "Listening {0}: added listener {1} (type={3};priority={2})", new Object[]{description, listener, priority ? "Priority" : "Normal", queuetype});
+                Log.get("uk.org.rlinsdale.nbpcglibrary.common.listener").log(Level.FINEST, "Listening {0}: added listener {1} (type={3};priority={2})", new Object[]{description, listener, priority ? "Priority" : "Normal", queuetype});
                 if (priority) {
                     listeners.add(0, new WeakReference<>(listener));
                 } else {
