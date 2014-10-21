@@ -20,7 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.common;
 
 /**
  * A Text formatter - substitutes values into string.
- * like String.format - so should be replaced 
+ * like MessageFormat.format - so should be replaced 
  * @deprecated 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
