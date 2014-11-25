@@ -14,12 +14,6 @@
     <packaging>pom</packaging>
     <name>NBPCG Library</name>
     
-    <properties>
-        <brandingToken>nbpcglib</brandingToken>
-        <ghpagesroot>nbpcglibrary</ghpagesroot>
-        <release>3</release>
-    </properties>
-    
     <dependencyManagement>
         <dependencies>
             <dependency>
