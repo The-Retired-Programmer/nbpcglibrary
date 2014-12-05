@@ -166,6 +166,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
             if (p.equals(EntityStateChangeListenerParams.SAVE)) {
                 nodeSavable.disable();
                 iconChange();
+                nameChange();
             }
             if (p.equals(EntityStateChangeListenerParams.REMOVE)) {
                 nodeSavable.disable();
