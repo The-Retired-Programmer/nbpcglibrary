@@ -33,6 +33,6 @@ public class SpecialIcons {
      * @return the image
      */
     public static Image get(String name) {
-        return ImageUtilities.loadImage("linsdale/nbpcg/icons/" + name + ".png");
+        return ImageUtilities.loadImage("uk.org.rlinsdale/nbpcglibrary/icons/" + name + ".png");
     }
 }

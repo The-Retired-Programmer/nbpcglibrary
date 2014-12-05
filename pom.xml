@@ -10,7 +10,7 @@
     
     <groupId>uk.org.rlinsdale</groupId>
     <artifactId>nbpcglibrary</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <packaging>pom</packaging>
     <name>NBPCG Library</name>
     
@@ -49,7 +49,7 @@
             <dependency>
                 <artifactId>icons</artifactId>
                 <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
-                <version>3.1.1</version>
+                <version>3.1.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
