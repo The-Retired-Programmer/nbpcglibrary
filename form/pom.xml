@@ -10,24 +10,12 @@
 
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>form</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.4</version>
     <packaging>nbm</packaging>
 
     <name>NBPCG Form Support Library</name>
     <description>General Forms and Dialogs Support Classes and Interfaces for the modules generated using the NetBeans Platform Code Generator(NBPCG)</description>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>uk.org.rlinsdale</groupId>
-                <artifactId>nbpcglibrary</artifactId>
-                <version>3.1.3</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    
     <dependencies>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -36,6 +24,7 @@
         <dependency>
             <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
             <artifactId>common</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

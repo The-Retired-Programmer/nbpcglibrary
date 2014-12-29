@@ -10,23 +10,12 @@
 
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>node</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.4</version>
     <packaging>nbm</packaging>
 
     <name>NBPCG Node Support Library</name>
     <description>General Node Support Classes and Interfaces for the modules generated using the NetBeans Platform Code Generator(NBPCG)</description>
     
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>uk.org.rlinsdale</groupId>
-                <artifactId>nbpcglibrary</artifactId>
-                <version>3.1.3</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -59,14 +48,17 @@
         <dependency>
             <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
             <artifactId>data</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <artifactId>common</artifactId>
             <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
             <artifactId>icons</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
