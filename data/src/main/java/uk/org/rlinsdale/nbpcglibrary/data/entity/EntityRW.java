@@ -33,13 +33,14 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdListenerParams;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
+ * @param <P> the Parent Entity Class
  */
-public abstract class EntityRW<E extends EntityRW> extends EntityRO {
+public abstract class EntityRW<E extends EntityRW, P extends Entity> extends EntityRO {
 
     private final DBFieldsRW<E> dbfields;
     private final DataAccessRW dataAccess;
     private final Listening<IdListenerParams> idListening;
-    private final EntityManagerRW<E> em;
+    private final EntityManagerRW<E, P> em;
 
     /**
      * Constructor.
@@ -49,11 +50,11 @@ public abstract class EntityRW<E extends EntityRW> extends EntityRO {
      * @param em the entity manager for this entity class
      * @param dbfields the entity fields
      */
-    public EntityRW(String entityname, int id, EntityManagerRW<E> em, DBFieldsRW<E> dbfields) {
+    public EntityRW(String entityname, int id, EntityManagerRW<E,P> em, DBFieldsRW<E> dbfields) {
         this(entityname, id, em, em.getDataAccess(), dbfields);
     }
 
-    private EntityRW(String entityname, int id, EntityManagerRW<E> em, DataAccessRW dataAccess, DBFieldsRW<E> dbfields) {
+    private EntityRW(String entityname, int id, EntityManagerRW<E,P> em, DataAccessRW dataAccess, DBFieldsRW<E> dbfields) {
         super(entityname, id, dataAccess, dbfields);
         this.em = em;
         this.dataAccess = dataAccess;

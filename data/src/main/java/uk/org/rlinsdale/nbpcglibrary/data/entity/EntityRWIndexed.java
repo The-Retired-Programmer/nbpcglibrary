@@ -28,8 +28,9 @@ import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
+ * @param <P> the Parent Entity Class
  */
-public abstract class EntityRWIndexed<E extends EntityRWIndexed> extends EntityRW<E> {
+public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entity> extends EntityRW<E, P> {
 
     private final DBFieldsRWIndexed<E> dbfields;
     private final DataAccessRW dataAccess;
@@ -42,7 +43,7 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed> extends EntityR
      * @param em the entity manager for this entity class
      * @param dbfields the entity fields
      */
-    public EntityRWIndexed(String entityname, int id, EntityManagerRW<E> em, DBFieldsRWIndexed<E> dbfields) {
+    public EntityRWIndexed(String entityname, int id, EntityManagerRW<E,P> em, DBFieldsRWIndexed<E> dbfields) {
         super(entityname, id, em, dbfields);
         this.dbfields = dbfields;
         this.dataAccess = em.getDataAccess();

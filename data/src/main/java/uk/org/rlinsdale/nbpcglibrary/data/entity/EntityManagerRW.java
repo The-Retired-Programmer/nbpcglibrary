@@ -33,8 +33,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class being managed
+ * @param <P> the Parent Entity Class
  */
-public abstract class EntityManagerRW<E extends EntityRW> extends EntityManagerRO<E> {
+public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> extends EntityManagerRO<E> {
 
     private final Map<Integer, E> transientCache;
     private int nextId = -1;
@@ -80,7 +81,7 @@ public abstract class EntityManagerRW<E extends EntityRW> extends EntityManagerR
      * @param parent the parent entity
      * @return the new entity
      */
-    public final synchronized E getNew(Entity parent) {
+    public final synchronized E getNew(P parent) {
         E e = getNew();
         _link2parent(e, parent);
         return e;
@@ -92,7 +93,7 @@ public abstract class EntityManagerRW<E extends EntityRW> extends EntityManagerR
      * @param e the child entity
      * @param rs the parent entity
      */
-    abstract protected void _link2parent(E e, Entity rs);
+    abstract protected void _link2parent(E e, P rs);
 
     /**
      * Create a new entity, copy it's field from another entity and  link it as child of a parent entity.
@@ -100,7 +101,7 @@ public abstract class EntityManagerRW<E extends EntityRW> extends EntityManagerR
      * @param parent the parent entity
      * @return the new entity
      */
-    public final synchronized E getNew(E from, Entity parent) {
+    public final synchronized E getNew(E from, P parent) {
         E e = getNew(parent);
         e.copy(from);
         return e;

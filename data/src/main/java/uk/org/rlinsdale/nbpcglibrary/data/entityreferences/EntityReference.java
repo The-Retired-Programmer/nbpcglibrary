@@ -161,7 +161,6 @@ public class EntityReference<E extends EntityRO> {
         boolean updated = this.id != id;
         this.id = id;
         this.entityreference = e == null ? null : new WeakReference<>(e);
-        saveState();
         return updated;
     }
 
@@ -175,6 +174,7 @@ public class EntityReference<E extends EntityRO> {
                 ((EntityRW) e).addIdListener(idlistener);
             }
         }
+        saveState();
     }
 
     private class IdListener extends Listener<IdListenerParams> {
