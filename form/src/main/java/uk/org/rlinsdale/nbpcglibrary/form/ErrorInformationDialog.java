@@ -22,13 +22,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Listening;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleListenerParams;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * A Standard Error Information Dialog Display
@@ -73,7 +74,7 @@ public class ErrorInformationDialog {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            Log.get("uk.org.rlinsdale.nbpcglibrary.form").finer("errorInformationdialogue action fired");
+            LogBuilder.writeEnteringLog("nbpcglibrary.form", "DialogDoneListener", "actionPerformed", ae);
             dd.setClosingOptions(null); // and allow closing
             listening.fire(SimpleListenerParams.EMPTY);
             instance = null;
@@ -86,7 +87,8 @@ public class ErrorInformationDialog {
         public void propertyChange(PropertyChangeEvent pce) {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
-                Log.get("uk.org.rlinsdale.nbpcglibrary.form").finest("ErrorInformationDialogue: window close");
+                 LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("CloseChangeListener", "propertyChange", pce)
+                                .addMsg("Window closed").write();
                 dd.setClosingOptions(null); // and allow closing
                 listening.fire(SimpleListenerParams.EMPTY);
                 instance = null;

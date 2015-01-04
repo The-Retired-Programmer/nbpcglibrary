@@ -19,21 +19,21 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import javax.swing.JTextArea;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * A Form object which can be displayed in a dialog box.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("uk.org.rlinsdale.nbpcglibrary.form")
+@RegisterLog("nbpcglibrary.form")
 public class Form extends GridBagPanel {
 
     static final int SAVESUCCESS = 1;
@@ -51,7 +51,7 @@ public class Form extends GridBagPanel {
      * @param formname the form's name
      */
     public Form(String formname) {
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: create", formname);
+        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.form", "Form", formname);
         fieldsdefs = new ArrayList<>();
         this.formname = formname;
     }
@@ -75,7 +75,8 @@ public class Form extends GridBagPanel {
      */
     public final void addFieldsdef(FieldsDef fieldsdef) {
         if (fieldsdef != null) {
-            Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {1}: add {0} fields", new Object[]{fieldsdef.getName(), formname});
+            LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "addFieldsdef", fieldsdef)
+                    .addMsg("adding fields to form {0}", formname).write();
             fieldsdefs.add(fieldsdef);
             fieldsdef.getFields().stream().map((field) -> {
                 addRow(field.getComponents());
@@ -109,7 +110,8 @@ public class Form extends GridBagPanel {
      * any failure messages due to rule set failures)
      */
     public final void finaliseForm(int msgwidth) {
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: finalise", formname);
+        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "finaliseForm", msgwidth)
+                .addMsg("finalise form {0}", formname).write();
         failuremessages = new JTextArea(3, msgwidth);
         failuremessages.setForeground(Color.red);
         failuremessages.setEditable(false);
@@ -135,7 +137,8 @@ public class Form extends GridBagPanel {
         presave();
         if (checkRules()) {
             boolean ok = true;
-            Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: save fields", formname);
+            LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "save")
+                    .addMsg("save fields in form {0}", formname).write();
             failuremessages.setText("");
             for (FieldsDef f : fieldsdefs) {
                 if (!f.save()) {
@@ -154,7 +157,8 @@ public class Form extends GridBagPanel {
      * values.
      */
     public void reset() {
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: reset fields", formname);
+        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "reset")
+                .addMsg("reset fields in form {0}", formname).write();
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
             f.reset();
@@ -165,7 +169,8 @@ public class Form extends GridBagPanel {
      * Set the values of fields in the collection.
      */
     public void set() {
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {0}: set fields", formname);
+        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "reset")
+                .addMsg("set fields in form {0}", formname).write();
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
             f.set();
@@ -190,7 +195,8 @@ public class Form extends GridBagPanel {
                 valid = false;
             }
         }
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {1}: check rules {0}", new Object[]{valid ? "valid" : "invalid", formname});
+        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "checkRules")
+                .addMsg("responce for form {0} is {1}", formname, valid).write();
         return valid;
     }
 
@@ -206,7 +212,8 @@ public class Form extends GridBagPanel {
             additionalRules.addFailureMessages(sb);
         }
         String t = sb.toString();
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Form {1}: write all failure messages: \"{0}\"", new Object[]{t.replace("\n", "; "), formname});
+        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "writeAllFailureMessages")
+                .addMsg("failures messages for form {0} are {1}", formname, t.replace("\n", "; ")).write();
         failuremessages.setText(t);
     }
 
@@ -227,4 +234,5 @@ public class Form extends GridBagPanel {
             writeAllFailureMessages();
         }
     }
+
 }

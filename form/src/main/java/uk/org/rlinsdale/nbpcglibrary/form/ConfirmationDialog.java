@@ -19,9 +19,9 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.logging.Level;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * A basic Confirmation Dialog (YES / NO)
@@ -41,8 +41,8 @@ public class ConfirmationDialog {
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(message,
                 title, NotifyDescriptor.YES_NO_OPTION);
         boolean res = DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION;
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINER, "Confirmation Dialog ({0}) requested with message ({1}); responce is {2}",
-                new Object[]{title, message, res ? "Positive" : "Negative"});
+        LogBuilder.create("nbpcglibrary.form", Level.FINER).addMethodName("ConfirmationDialog", "show", title, message)
+                            .addMsg("responce is {0}", res).write();
         return res;
     }
 }

@@ -75,9 +75,11 @@ public abstract class ReferenceChoiceField<E extends EntityRO> extends ChoiceFie
      * Update the choices text
      */
     protected void updateChoicesText() {
+        removeCollectionListeners();
         removeChoicesListeners();
         setChoices(getChoicesText());
         addChoicesListeners();
+        addCollectionListeners();
     }
 
     /**

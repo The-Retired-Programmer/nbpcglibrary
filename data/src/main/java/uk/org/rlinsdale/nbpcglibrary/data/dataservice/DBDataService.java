@@ -26,11 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Listening;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -38,7 +36,6 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("uk.org.rlinsdale.nbpcg.db")
 public abstract class DBDataService implements DataService {
 
     private Connection conn;
@@ -97,15 +94,15 @@ public abstract class DBDataService implements DataService {
      * Mark the start of a Transaction unit.
      */
     public void begin() {
-        Logger logger = Log.get("uk.org.rlinsdale.nbpcg.db");
-        logger.finer("Transaction Begin called");
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DBDataService", "begin");
         if (inTransaction) {
             throw new LogicException("begin() failed - already in transaction");
         } else {
             try {
                 conn.setAutoCommit(false);
             } catch (SQLException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "begin")
+                        .addException(ex).write();
             }
             inTransaction = true;
             transactionListening.fire(TransactionListenerParams.BEGINListenerParams);
@@ -116,13 +113,13 @@ public abstract class DBDataService implements DataService {
      * Mark the end of a transaction unit, commit all changes.
      */
     public void commit() {
-        Logger logger = Log.get("uk.org.rlinsdale.nbpcg.db");
-        logger.finer("Transaction Commit called");
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DBDataService", "commit");
         if (inTransaction) {
             try {
                 conn.commit();
             } catch (SQLException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "commit")
+                        .addException(ex).write();
             }
             transactionListening.fire(TransactionListenerParams.COMMITListenerParams);
             inTransaction = false;
@@ -135,13 +132,13 @@ public abstract class DBDataService implements DataService {
      * Mark the end of a transaction unit, rollback all changes.
      */
     public void rollback() {
-        Logger logger = Log.get("uk.org.rlinsdale.nbpcg.db");
-        logger.finer("Transaction Rollback called");
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DBDataService", "rollback");
         if (inTransaction) {
             try {
                 conn.rollback();
             } catch (SQLException ex) {
-                logger.log(Level.SEVERE, null, ex);
+                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "rollback")
+                        .addException(ex).write();
             }
             transactionListening.fire(TransactionListenerParams.ROLLBACKListenerParams);
             inTransaction = false;
@@ -166,7 +163,8 @@ public abstract class DBDataService implements DataService {
         try {
             conn.close();
         } catch (SQLException ex) {
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "disconnect")
+                        .addException(ex).write();
         }
     }
 
@@ -193,7 +191,8 @@ public abstract class DBDataService implements DataService {
                 }
             }
         } catch (SQLException ex) {
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "query",sql, parameter)
+                        .addException(ex).write();
         }
         return li;
     }
@@ -206,16 +205,17 @@ public abstract class DBDataService implements DataService {
      */
     public synchronized List<Integer> query(String sql) {
         List<Integer> li = new ArrayList<>();
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DBDataService", "query", sql);
         try {
             try (Statement stat = conn.createStatement()) {
-                Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.FINER, "Simple SQL: {0}", sql);
                 ResultSet rs = stat.executeQuery(sql);
                 while (rs.next()) {
                     li.add(rs.getInt("id"));
                 }
             }
         } catch (SQLException ex) {
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "query", sql)
+                        .addException(ex).write();
         }
         return li;
     }
@@ -230,15 +230,16 @@ public abstract class DBDataService implements DataService {
      */
     public synchronized int simpleIntQuery(String sql, String columnname) {
         int res = 0;
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DBDataService", "simpleIntQuery", sql, columnname);
         try {
             try (Statement stat = conn.createStatement()) {
-                Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.FINER, "Simple SQL returning {1}: {0}", new Object[]{sql, columnname});
                 ResultSet rs = stat.executeQuery(sql);
                 rs.first();
                 res = rs.getInt(columnname);
             }
         } catch (SQLException ex) {
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "simpleIntQuery", sql, columnname)
+                        .addException(ex).write();
         }
         return res;
     }
@@ -251,16 +252,17 @@ public abstract class DBDataService implements DataService {
      * @param rsl the loader to be used
      */
     public synchronized void simpleQuery(String sql, ResultSetLoader rsl) {
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DBDataService", "simpleQuery", sql, rsl);
         try {
             Statement stat = conn.createStatement();
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.FINER, "Simple SQL: {0}", sql);
             ResultSet rs = stat.executeQuery(sql);
             if (!rs.first()) {
                 throw new LogicException("DBDataService.simpleQuery resulted in an empty ResultSet");
             }
             rsl.load(rs);
         } catch (SQLException ex) {
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "simpleQuery", sql, rsl)
+                        .addException(ex).write();
         }
     }
 
@@ -286,7 +288,8 @@ public abstract class DBDataService implements DataService {
                 res = stat.executeUpdate(buildsql(sql, parameters));
             }
         } catch (SQLException ex) {
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "execute", sql, parameters)
+                        .addException(ex).write();
         }
         return res;
     }
@@ -310,7 +313,8 @@ public abstract class DBDataService implements DataService {
                 res = stat.executeUpdate(buildsql(sql, parameter));
             }
         } catch (SQLException ex) {
-            Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "execute", sql, parameter)
+                        .addException(ex).write();
         }
         return res;
     }
@@ -336,13 +340,13 @@ public abstract class DBDataService implements DataService {
         for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
             sql = sql.replace("{" + parameter.getKey() + "}", format(parameter.getValue()));
         }
-        Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.FINER, "Build SQL: {0}", sql);
+        LogBuilder.writeExitingLog("nbpcglibrary.data", "DBDataService", "buildsql", sql);
         return sql;
     }
 
     private String buildsql(String sql, Object parameter) {
         sql = sql.replace("{P}", format(parameter));
-        Log.get("uk.org.rlinsdale.nbpcg.db").log(Level.FINER, "Build SQL: {0}", sql);
+        LogBuilder.writeExitingLog("nbpcglibrary.data", "DBDataService", "buildsql", sql);
         return sql;
     }
 

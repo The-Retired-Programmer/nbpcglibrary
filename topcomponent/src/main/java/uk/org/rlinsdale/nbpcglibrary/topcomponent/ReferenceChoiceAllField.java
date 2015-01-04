@@ -25,6 +25,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeListenerParams;
 import uk.org.rlinsdale.nbpcglibrary.form.FormFieldChangeListenerParams;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeListenerParams;
 
 /**
  * Choice Field - taking values from all entities of a class.
@@ -37,6 +38,7 @@ public abstract class ReferenceChoiceAllField<E extends EntityRO> extends Refere
     private List<E> choices;
     private List<String> choiceText;
     private ChoicesFieldListener choicesfieldListener;
+    private CollectionFieldListener collectionfieldListener;
 
     /**
      * Constructor
@@ -101,13 +103,25 @@ public abstract class ReferenceChoiceAllField<E extends EntityRO> extends Refere
 
     @Override
     protected void addCollectionListeners() {
-        // null action as set does not change
+        addAllCollectionListeners(collectionfieldListener);
     }
+    
+    /**
+     * add a given listener to all parent collections which could affect this reference choice.
+     * @param listener the set change listener
+     */
+    protected abstract void addAllCollectionListeners(Listener<SetChangeListenerParams> listener);
 
     @Override
     protected void removeCollectionListeners() {
-        // null action as set does not change
+        removeAllCollectionListeners(collectionfieldListener);
     }
+    
+    /**
+     * remove a given listener from all parent collections which could affect this reference choice.
+     * @param listener the set change listener
+     */
+    protected abstract void removeAllCollectionListeners(Listener<SetChangeListenerParams> listener);
 
     @Override
     public E findSelectedEntity() {
@@ -119,6 +133,19 @@ public abstract class ReferenceChoiceAllField<E extends EntityRO> extends Refere
         }
         return null;
     }
+    
+    private class CollectionFieldListener extends Listener<SetChangeListenerParams> {
+
+        public CollectionFieldListener(String name) {
+            super(name);
+        }
+
+        @Override
+        public void action(SetChangeListenerParams p) {
+                updateChoicesText();
+        }
+    }
+
 
     private class ChoicesFieldListener extends Listener<FieldChangeListenerParams> {
 

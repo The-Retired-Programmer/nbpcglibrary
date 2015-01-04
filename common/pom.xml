@@ -29,6 +29,11 @@
             <artifactId>org-openide-util</artifactId>
             <groupId>org.netbeans.api</groupId>
         </dependency>
+        <dependency>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -40,13 +45,6 @@
                     <publicPackages>
                         <publicPackage>uk.org.rlinsdale.nbpcglibrary.common</publicPackage>
                     </publicPackages>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>uk.org.rlinsdale.nbpcglibrary.common.impl</excludePackageNames>
                 </configuration>
             </plugin>
         </plugins>

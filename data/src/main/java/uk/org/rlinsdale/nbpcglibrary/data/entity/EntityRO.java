@@ -22,13 +22,13 @@ import uk.org.rlinsdale.nbpcglibrary.data.dataservice.ResultSetLoader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRO;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Listening;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -36,7 +36,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("uk.org.rlinsdale.nbpcg.datasupportlib")
+@RegisterLog("nbpcglibrary.data")
 public abstract class EntityRO extends Entity {
 
     private final Listening<EntityStateChangeListenerParams> stateListening;
@@ -268,7 +268,8 @@ public abstract class EntityRO extends Entity {
                     dbfields.load(rs);
                     _load(rs);
                 } catch (SQLException ex) {
-                    Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").log(Level.SEVERE, null, ex);
+                    LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("EntityROLoader", "load", rs)
+                        .addException(ex).write();
                 }
                 setState(EntityStateChangeListenerParams.DBENTITY);
                 fireStateChange(EntityStateChangeListenerParams.LOAD, oldState, EntityStateChangeListenerParams.DBENTITY);

@@ -27,7 +27,6 @@ import java.util.logging.Level;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <P> the Class of the listener parameter
  */
-@RegisterLog("uk.org.rlinsdale.nbpcglibrary.common.listener")
 public abstract class Listener<P extends ListenerParams> {
 
     private final String description;
@@ -48,7 +47,8 @@ public abstract class Listener<P extends ListenerParams> {
      * @param p the listener parameters
      */
     public void actionPerformed(P p) {
-        Log.get("uk.org.rlinsdale.nbpcglibrary.common.listener").log(Level.FINEST, "Listener {0}: action {1}", new Object[]{description, p});
+        LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("Listener", "actionPerformed", p)
+                .addMsg("Listener is {0}", this).write();
         action(p);
     }
 

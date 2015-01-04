@@ -27,7 +27,6 @@ import java.util.logging.Level;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <C> The class of the values found
  */
-@RegisterLog("uk.org.rlinsdale.nbpcglibrary.common.finder")
 public abstract class FindAction<C> {
 
     private final String name;
@@ -48,7 +47,8 @@ public abstract class FindAction<C> {
      */
     public List<C> find() {
         List<C> res = findValues();
-        Log.get("uk.org.rlinsdale.nbpcglibrary.common.finder").log(Level.FINE, "Find: {0} called - returning {1} values", new Object[]{name, res.size()});
+        LogBuilder.create("nbpcglibrary.common", Level.FINE).addMethodName("FindAction", "find")
+                .addMsg("FindAction is {0} - returns  {1} values", this, res.size()).write();
         return res;
     }
 
@@ -58,4 +58,9 @@ public abstract class FindAction<C> {
      * @return the set of values
      */
     public abstract List<C> findValues();
+    
+    @Override
+    public String toString() {
+        return name;
+    }
 }

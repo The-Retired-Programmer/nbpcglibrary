@@ -24,9 +24,8 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -45,7 +44,6 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The Entity Class being managed
  */
-@RegisterLog("uk.org.rlinsdale.nbpcg.entitymanager")
 abstract public class EntityManagerRO<E extends EntityRO> {
 
     private static final int MAXLRUCACHE = 10;
@@ -98,13 +96,15 @@ abstract public class EntityManagerRO<E extends EntityRO> {
      * @return the entity
      */
     public final synchronized E get(int id) {
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "EntityManagerRO", "get", id);
         if (id <= 0) {
             throw new LogicException("Cache Get() Failure (class=" + name + ";id=" + id + ")");
         }
         freeReleasedEntries();
         E e = lrucache.get(id);
         if (e != null) {
-            Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINEST, "Cache Get {0}({1}): hit on LRUCache", new Object[]{name, id});
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "get", id)
+                .addMsg("hit on LRUCache for {0}.{1}", name, e).write();
             return e;
         }
         // not in lru cache - now look up the entity in the cache
@@ -113,18 +113,22 @@ abstract public class EntityManagerRO<E extends EntityRO> {
             e = ref.get();
             if (e != null) {
                 lrucache.put(id, e); // insert object into LRU cache
-                Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINEST, "Cache Get {0}({1}): hit on Cache (& reinserted into LRU cache)", new Object[]{name, id});
+                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "get", id)
+                .addMsg("hit on Cache (& reinserted into LRU cache) for {0}.{1}", name, e).write();
                 return e;
             } else {
-                Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINEST, "Cache Get {0}({1}): miss on Cache (SoftReference clear)", new Object[]{name, id});
+                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "get", id)
+                .addMsg("miss on Cache (SoftReference clear) for {0}", name ).write();
             }
         } else {
-            Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINEST, "Cache Get {0}({1}): miss on Cache", new Object[]{name, id});
+             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "get", id)
+                .addMsg("miss on Cache for {0}", name ).write();
         }
-        Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINER, "Create New {0} Entity (id = {1})", new Object[]{name, id});
         e = _createNewEntity(id);
         e.load(id);
         insertIntoCache(id, e);
+        LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "get", id)
+                .addMsg("create new Entity {0}.{1} (and insert into Cache)", name, e ).write();
         return e;
     }
 
@@ -141,7 +145,8 @@ abstract public class EntityManagerRO<E extends EntityRO> {
         while ((r = (Reference<? extends E>) refqueue.poll()) != null) {
             int id = r.get().getId();
             cache.remove(id);
-            Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINER, "Cache Free {0}({1}): SoftReference cache", new Object[]{name, id});
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "freeReleasedEntries")
+                .addMsg("Cache Free {0}({1}) (SoftReference cache)", name, id ).write();
         }
     }
 
@@ -166,7 +171,8 @@ abstract public class EntityManagerRO<E extends EntityRO> {
         if (id > 0) {
             lrucache.remove(id);
             cache.remove(id);
-            Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINEST, "Cache Remove {0}({1})", new Object[]{name, id});
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "removeFromCache")
+                .addMsg("Cache Remove {0}.{1}", name, e ).write();
             return;
         }
         throw new LogicException("Remove from Cache Failure (class=" + name + ";id=" + id + ")");

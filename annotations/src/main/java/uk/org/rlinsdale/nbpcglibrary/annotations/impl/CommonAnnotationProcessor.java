@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.common.impl;
+package uk.org.rlinsdale.nbpcglibrary.annotations.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,7 +29,7 @@ import javax.lang.model.element.TypeElement;
 import org.openide.filesystems.annotations.LayerGeneratingProcessor;
 import org.openide.filesystems.annotations.LayerGenerationException;
 import org.openide.util.lookup.ServiceProvider;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 
 /**
  * The Common Annotation processor for NBPCG annotations.
@@ -38,7 +38,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
  */
 @ServiceProvider(service = Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class AnnotationProcessor extends LayerGeneratingProcessor {
+public class CommonAnnotationProcessor extends LayerGeneratingProcessor {
 
     @Override
     public final Set<String> getSupportedAnnotationTypes() {

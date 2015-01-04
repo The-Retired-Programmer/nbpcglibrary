@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * Simple implementation of an LRU cache
@@ -58,7 +58,8 @@ public class LRUCache<E> extends LinkedHashMap<Integer, E> {
     @Override
     protected boolean removeEldestEntry(Map.Entry<Integer, E> eldest) {
         if (size() > maxcache) {
-            Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINER, "Cache Free {0}({1}): LRU cache", new Object[]{name, eldest.getKey()});
+            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("LRUCache", "removeEldestEntry")
+                .addMsg("LRUCache Free {0}({1})", name, eldest.getKey()).write();
             return true;
         }
         return false;

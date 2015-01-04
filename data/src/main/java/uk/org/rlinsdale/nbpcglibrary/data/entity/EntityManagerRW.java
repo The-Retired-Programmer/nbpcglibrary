@@ -21,8 +21,8 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -68,7 +68,8 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
      * @return the new entity
      */
     public final synchronized E getNew() {
-        Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINER, "Create New {0} Entity (id = {1})", new Object[]{name, nextId});
+        LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("EntityManagerRW", "getNew")
+                .addMsg("Create New {0} Entity (id = {1})", name, nextId).write();
         E e = _createNewEntity(nextId);
         e.setId(nextId);
         transientCache.put(nextId--, e);
@@ -76,8 +77,9 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
     }
 
     /**
-     * Create a new entity (initialised) and link it as child of a parent entity.
-     * 
+     * Create a new entity (initialised) and link it as child of a parent
+     * entity.
+     *
      * @param parent the parent entity
      * @return the new entity
      */
@@ -89,14 +91,16 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
 
     /**
      * Link a child entity to its parent.
-     * 
+     *
      * @param e the child entity
      * @param rs the parent entity
      */
     abstract protected void _link2parent(E e, P rs);
 
     /**
-     * Create a new entity, copy it's field from another entity and  link it as child of a parent entity.
+     * Create a new entity, copy it's field from another entity and link it as
+     * child of a parent entity.
+     *
      * @param from the copy source entity
      * @param parent the parent entity
      * @return the new entity
@@ -109,14 +113,15 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
 
     /**
      * Remove from Transient Cache.
-     * 
+     *
      * @param e the entity
      */
     protected final synchronized void removeFromTransientCache(E e) {
         int id = e.getId();
         if (transientCache.containsKey(id)) {
             transientCache.remove(id);
-            Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINEST, "Transient Cache Remove {0}({1})", new Object[]{name, e.getId()});
+            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("EntityManagerRW", "removeFromTransientCache")
+                    .addMsg("remove from Transient Cache {0}.{1}", name, e).write();
             return;
         }
         throw new LogicException("Remove Transient Failure (class=" + name + ";id=" + id + ")");
@@ -124,6 +129,7 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
 
     /**
      * Persist a Transient Cache Entity into standard persistance cache.
+     *
      * @param e the entity
      * @param newId the new entity Id
      */
@@ -133,7 +139,8 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
             transientCache.remove(id);
             e.updateId(newId);
             insertIntoCache(newId, e);
-            Log.get("uk.org.rlinsdale.nbpcg.entitymanager").log(Level.FINEST, "Persist (Transient Cache to Cache) {0}({1} as {2})", new Object[]{name, id, newId});
+            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("EntityManagerRW", "persistTransient")
+                    .addMsg("persist (Transient Cache to Cache) {0}.{1}({2} as {3})", name, e, id, newId).write();
             return;
         }
         throw new LogicException("Persist Transient Failure (class=" + name + ";id=" + id + ";newid=" + newId + ")");
@@ -147,6 +154,7 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
         }
         return dataAccess;
     }
+
     @Override
     abstract protected DataAccessRW _createDataAccess();
 }

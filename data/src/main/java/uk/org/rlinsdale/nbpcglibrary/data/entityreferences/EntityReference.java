@@ -19,15 +19,14 @@
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
 import java.lang.ref.WeakReference;
-import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import org.openide.util.Lookup;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * A reference to an Entity.
@@ -157,7 +156,7 @@ public class EntityReference<E extends EntityRO> {
     }
 
     private boolean set(int id, E e) {
-        Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").log(Level.FINEST, "Setting entity reference (id={0}; entity={1}", new Object[]{id, e == null ? "Undefined" : "Defined"});
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "EntityReference", "set", id, e);
         boolean updated = this.id != id;
         this.id = id;
         this.entityreference = e == null ? null : new WeakReference<>(e);

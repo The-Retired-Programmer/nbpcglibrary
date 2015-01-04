@@ -23,8 +23,8 @@ import javax.swing.BoxLayout;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.form.Form;
 import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNodeRW;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import org.openide.windows.TopComponent;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * Editor Topcomponent which displays/edits a node.
@@ -54,7 +54,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW> extends TopComp
      * @param hint the topcomponent hint
      */
     public NodeEditorTopComponent(TreeNodeRW<E> node, String name, String hint) {
-        Log.get("uk.org.rlinsdale.nbpcg.topcomponentsupportlib").log(Level.FINE, "NodeEditorTopComponent for {0}: TopComponent created", name);
+        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.topcomponent", "NodeEditorTopComponent", node, name, hint);
         setName(name);
         setToolTipText(hint);
         this.name = name;
@@ -71,7 +71,8 @@ public abstract class NodeEditorTopComponent<E extends EntityRW> extends TopComp
 
     @Override
     public void componentOpened() {
-        Log.get("uk.org.rlinsdale.nbpcg.topcomponentsupportlib").log(Level.FINE, "NodeEditorTopComponent for {0}: TopComponent opened()", name);
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("NodeEditorTopComponent", "componentOpened")
+                .addMsg("TopComponent is {0})", this).write();
         entity = node.getEntity();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(getForm());
@@ -87,9 +88,15 @@ public abstract class NodeEditorTopComponent<E extends EntityRW> extends TopComp
 
     @Override
     public void componentClosed() {
-        Log.get("uk.org.rlinsdale.nbpcg.topcomponentsupportlib").log(Level.FINE, "NodeEditorTopComponent for {0}: TopComponent closed()", name);
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("NodeEditorTopComponent", "componentClosed")
+                .addMsg("TopComponent is {0})", this).write();
         remove(dropForm());
         entity = null;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     /**

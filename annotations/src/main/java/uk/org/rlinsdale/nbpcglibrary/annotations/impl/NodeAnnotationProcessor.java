@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.node.impl;
+package uk.org.rlinsdale.nbpcglibrary.annotations.impl;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,11 +31,11 @@ import org.openide.filesystems.annotations.LayerBuilder;
 import org.openide.filesystems.annotations.LayerGeneratingProcessor;
 import org.openide.filesystems.annotations.LayerGenerationException;
 import org.openide.util.lookup.ServiceProvider;
-import uk.org.rlinsdale.nbpcglibrary.node.RegisterImageFileFinder;
-import uk.org.rlinsdale.nbpcglibrary.node.RegisterNodeAction;
-import uk.org.rlinsdale.nbpcglibrary.node.RegisterNodeSavedAction;
-import uk.org.rlinsdale.nbpcglibrary.node.RegisterNodeSavedActions;
-import uk.org.rlinsdale.nbpcglibrary.node.SaveNodeAction;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterImageFileFinder;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterNodeAction;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterNodeSavedAction;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterNodeSavedActions;
+import uk.org.rlinsdale.nbpcglibrary.annotations.SaveNodeAction;
 
 /**
  * The Common Annotation processor for NBPCG annotations.
@@ -44,7 +44,7 @@ import uk.org.rlinsdale.nbpcglibrary.node.SaveNodeAction;
  */
 @ServiceProvider(service = Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-public class AnnotationProcessor extends LayerGeneratingProcessor {
+public class NodeAnnotationProcessor extends LayerGeneratingProcessor {
 
     @Override
     public final Set<String> getSupportedAnnotationTypes() {

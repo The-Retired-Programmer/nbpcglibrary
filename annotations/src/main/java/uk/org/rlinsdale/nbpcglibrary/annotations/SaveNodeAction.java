@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.node;
+package uk.org.rlinsdale.nbpcglibrary.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -24,18 +24,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Register a set of NodeSavedActions.
+ * A Save NodeAction.
  * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target({ElementType.METHOD, ElementType.TYPE})
-public @interface RegisterNodeSavedActions {
-
-    /**
-     * Get the set of RegisterNodeSavedActions.
-     * 
-     * @return the set of RegisterNodeSavedActions
-     */
-    RegisterNodeSavedAction[] value();
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface SaveNodeAction {
 }

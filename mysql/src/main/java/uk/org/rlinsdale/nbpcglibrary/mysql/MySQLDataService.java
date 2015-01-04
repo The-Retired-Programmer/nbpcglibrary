@@ -21,11 +21,11 @@ package uk.org.rlinsdale.nbpcglibrary.mysql;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.data.dataservice.DBDataService;
 import uk.org.rlinsdale.nbpcglibrary.common.DateOnly;
 import uk.org.rlinsdale.nbpcglibrary.common.DbConnectionParameters;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Timestamp;
 
@@ -34,7 +34,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Timestamp;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("uk.org.rlinsdale.mysql")
+@RegisterLog("nbpcglibrary.mysql")
 public class MySQLDataService extends DBDataService {
     
     private boolean operational = false;
@@ -51,7 +51,8 @@ public class MySQLDataService extends DBDataService {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            Log.get("uk.org.rlinsdale.mysql").log(Level.SEVERE, null, ex);
+            LogBuilder.create("nbpcglibrary.mysql", Level.SEVERE).addConstructorName("MySQLDataService")
+                .addException(ex).write();
         }
         try {
             setConnection(DriverManager.getConnection(p.connection, p.user, p.password));

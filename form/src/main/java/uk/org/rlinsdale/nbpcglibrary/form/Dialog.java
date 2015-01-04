@@ -23,10 +23,9 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * the Dialog Class. Dialogs are constructed with one or more panels.
@@ -83,7 +82,7 @@ public class Dialog {
     private Dialog(String title, boolean isModal, Form form) {
         this.form = form;
         this.title = title;
-        Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINE, "Dialogue {0} open", title);
+        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.form", "Dialog", title, isModal, form);
         dd = new DialogDescriptor(
                 form,
                 title,
@@ -100,25 +99,28 @@ public class Dialog {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            Logger log = Log.get("uk.org.rlinsdale.nbpcglibrary.form");
             if (ae.getSource() == DialogDescriptor.OK_OPTION) {
                 switch (form.save()) {
                     case Form.SAVESUCCESS:
-                        log.log(Level.FINEST, "Dialog {0}: OK response, form is valid, save() processed", title);
+                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
+                                .addMsg("Dialog {0}: OK response, form is valid, save() processed", title).write();
                         dd.setClosingOptions(null); // and allow closing
                         instance = null;
                         break;
                     case Form.SAVEVALIDATIONFAIL:
-                        log.log(Level.FINEST, "Dialog {0}: OK response but Form is invalid", title);
+                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
+                                .addMsg("Dialog {0}: OK response but Form is invalid", title).write();
                         break;
                     case Form.SAVEFAIL:
-                        log.log(Level.FINEST, "Dialog {0}: OK response, form is valid, save() failed", title);
+                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
+                                .addMsg("Dialog {0}: OK response, form is valid, save() failed", title).write();
                         instance = null;
                         break;
                 }
             } else {
                 form.reset();
-                log.log(Level.FINEST, "Dialog {0}: CANCEL response, reset() processed", title);
+                LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
+                        .addMsg("Dialog {0}: CANCEL response, reset() processed", title).write();
                 dd.setClosingOptions(null); // and allow closing
                 instance = null;
             }
@@ -131,7 +133,8 @@ public class Dialog {
         public void propertyChange(PropertyChangeEvent pce) {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
-                Log.get("uk.org.rlinsdale.nbpcglibrary.form").log(Level.FINEST, "Dialog {0}: window close - treat as CANCEL response", title);
+                LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("CloseChangeListener", "propertyChange", pce)
+                        .addMsg("Dialog {0}: window close - treat as CANCEL response", title).write();
                 dd.setClosingOptions(null); // and allow closing
                 form.reset();
                 instance = null;

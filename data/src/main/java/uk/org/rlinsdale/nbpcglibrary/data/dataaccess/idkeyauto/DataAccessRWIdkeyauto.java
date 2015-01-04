@@ -19,10 +19,9 @@
 package uk.org.rlinsdale.nbpcglibrary.data.dataaccess.idkeyauto;
 
 import java.util.Map;
-import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
 import uk.org.rlinsdale.nbpcglibrary.data.dataservice.DBDataService;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * DB data access methods for a "Standard" data base table
@@ -61,23 +60,23 @@ public class DataAccessRWIdkeyauto extends DataAccessROIdkeyauto implements Data
 
     @Override
     public final int insert(Map<String, Object> values) {
-        Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").finer("DataAccessRWIdkeyauto.insert()");
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "insert", values);
         dbdataservice.execute("INSERT INTO " + tablename + " ({$KEYLIST}) VALUES ({$VALUELIST})", values);
         int id = dbdataservice.simpleIntQuery("SELECT LAST_INSERT_ID() as id", "id");
-        Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").log(Level.FINEST, "entity insert (id = {0})", id);
+        LogBuilder.writeExitingLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "insert", id);
         return id;
     }
 
     @Override
     public final void update(int id, Map<String, Object> diff) {
-        Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").finer("DataAccessRWIdkeyauto.update()");
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "update", id, diff);
         dbdataservice.execute("UPDATE " + tablename + " SET {$KEYVALUELIST} WHERE id=" + id, diff);
-        Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").log(Level.FINEST, "entity updated (id = {0})", id);
+         LogBuilder.writeExitingLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "update");
     }
 
     @Override
     public final void delete(int id) {
-        Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").finer("DataAccessRWIdkeyauto.delete()");
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "delete", id);
         dbdataservice.execute("DELETE from " + tablename + " WHERE id = {P}", id);
     }
 }

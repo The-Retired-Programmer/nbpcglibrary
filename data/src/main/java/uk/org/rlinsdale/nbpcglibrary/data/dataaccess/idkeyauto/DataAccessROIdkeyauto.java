@@ -19,11 +19,10 @@
 package uk.org.rlinsdale.nbpcglibrary.data.dataaccess.idkeyauto;
 
 import java.util.List;
-import java.util.logging.Level;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.data.dataservice.DBDataService;
 import uk.org.rlinsdale.nbpcglibrary.data.dataservice.ResultSetLoader;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -67,7 +66,7 @@ public class DataAccessROIdkeyauto implements DataAccessRO {
 
     @Override
     public final void load(int id, ResultSetLoader loader) {
-        Log.get("uk.org.rlinsdale.nbpcg.datasupportlib").log(Level.FINEST, "DataAccessROIdkeyauto.getData({0})", id);
+        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DataAccessROIdkeyauto", "load", id, loader);
         dbdataservice.simpleQuery("SELECT * from " + tablename + " where id=" + id, loader);
     }
 

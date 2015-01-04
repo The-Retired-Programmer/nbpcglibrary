@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.node;
+package uk.org.rlinsdale.nbpcglibrary.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

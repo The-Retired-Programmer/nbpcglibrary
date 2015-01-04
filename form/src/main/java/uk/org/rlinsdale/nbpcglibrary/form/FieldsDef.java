@@ -137,4 +137,9 @@ public abstract class FieldsDef {
         }
         return valid && rules.checkRules();
     }
+    
+    @Override
+    public String toString() {
+        return name;
+    }
 }

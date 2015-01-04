@@ -26,10 +26,10 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.swing.Action;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -42,6 +42,7 @@ import org.openide.util.Utilities;
 import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * Root Node Abstract Class
@@ -49,7 +50,7 @@ import org.openide.util.lookup.InstanceContent;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
  */
-@RegisterLog("uk.org.rlinsdale.nbpcg.nodesupportlib")
+@RegisterLog("nbpcglibrary.node")
 public abstract class RootNode<E extends Entity> extends AbstractNode {
 
     private E e;
@@ -197,7 +198,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
     // CUT and PASTE target support
     @Override
     public final PasteType getDropType(final Transferable t, int action, int index) {
-        Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("RootNode:getDropType()");
+        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNode", "getDropType");
         if (allowedPaste != null) {
             for (DataFlavorAndAction dfa : allowedPaste) {
                 if (t.isDataFlavorSupported(dfa.dataflavor) && ((action & (dfa.action)) != 0)) {
@@ -222,7 +223,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
 
         @Override
         public Transferable paste() throws IOException {
-            Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("RootNode$AllowPasteType:paste()");
+            LogBuilder.writeEnteringLog("nbpcglibrary.node", "AllowedPasteType", "paste");
             Entity e;
             try {
                 e = (Entity) t.getTransferData(dfa.dataflavor);
@@ -234,23 +235,28 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
                 case DataFlavorAndAction.MOVE:
                     node = NodeTransfer.node(t, action);
                     if (node != null) {
-                        Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("RootNode$AllowPasteType:paste() - remove previous node");
+                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                                .addMsg("remove previous node").write();
                         ((TreeNodeRW) node)._cutAndPasteRemove();
                     }
-                    Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("RootNode$AllowPasteType:paste() - drag/drop action");
+                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                            .addMsg("drag/drop action").write();
                     _moveAddChild(e);
                     break;
                 case DataFlavorAndAction.CUT:
                     node = NodeTransfer.node(t, action);
                     if (node != null) {
-                        Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("ExtendedNode$AllowPasteType:paste() - remove previous node");
+                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                                .addMsg("remove previous node").write();
                         ((TreeNodeRW) node)._cutAndPasteRemove();
                     }
-                    Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("ExtendedNode$AllowPasteType:paste() - cut/paste action");
+                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                            .addMsg("cut/paste action").write();
                     _cutAddChild(e);
                     break;
                 case DataFlavorAndAction.COPY:
-                    Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("ExtendedNode$AllowPasteType:paste() - copy/paste action");
+                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                            .addMsg("copy/paste action").write();
                     _copyAddChild(e);
                     break;
                 default:
@@ -335,7 +341,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
         @Override
         public void reorder(int[] perm) {
             if ((dfa.action & DataFlavorAndAction.MOVE) != 0) {
-                Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("RootNode$ChildIndex:reorder()");
+                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("ChildIndex", "reorder").write();
                 _moveReorderChildByFlavor(dfa.dataflavor, perm);
             }
         }

@@ -22,18 +22,17 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.node.ImageFileFinder;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import org.openide.cookies.InstanceCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * Read-Write Icon Node Abstract Class
@@ -116,17 +115,18 @@ public abstract class IconNodeRW<E extends EntityRW> extends TreeNodeRW<E> {
 
     @Override
     public Image getIcon(int type) {
-        Logger log = Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib");
         E entity = getEntity();
         File fi = imagefilefinder.getFile(entity);
         if (fi == null) {
-            log.log(Level.WARNING, "{0}:getIcon(): No image defined)", nodename);
+            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName("IconNodeRW", "getIcon")
+                .addMsg("Nodename is {0} - No image defined", nodename).write();
             return _getIconWithError();
         }
         try {
             return entity.checkRules() ? ImageIO.read(fi) : _addErrorToIcon(ImageIO.read(fi));
         } catch (IOException ex) {
-            log.log(Level.WARNING, "{0}:getIcon(): IOException when reading image", ex);
+            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName("IconNodeRW", "getIcon")
+                .addMsg("Nodename is {0} - IOException when reading image", nodename).addException(ex).write();
             return _getIconWithError();
         }
     }

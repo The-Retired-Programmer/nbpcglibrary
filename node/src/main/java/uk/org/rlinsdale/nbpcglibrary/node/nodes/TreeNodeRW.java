@@ -33,9 +33,9 @@ import uk.org.rlinsdale.nbpcglibrary.node.SaveHandler;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Listening;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * Read-Only Tree Node Abstract Class
@@ -268,11 +268,13 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
             this.e = e;
             content.add(this);
             register();
-            Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").log(Level.FINEST, "NodeSavable:enable() for node {0}", nodename);
+            LogBuilder.create("nbpcglibrary.node", Level.FINEST).addMethodName("NodeSavable", "enable")
+                            .addMsg("node is {0}", nodename).write();
         }
 
         public void disable() {
-            Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").log(Level.FINEST, "NodeSavable:disable() for node {0}", nodename);
+            LogBuilder.create("nbpcglibrary.node", Level.FINEST).addMethodName("NodeSavable", "disable")
+                            .addMsg("node is {0}", nodename).write();
             content.remove(this);
             unregister();
             e = null;
@@ -280,7 +282,8 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
         @Override
         protected void handleSave() throws IOException {
-            Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").log(Level.FINE, "NodeSavable:handleSave() for node {0}", nodename);
+            LogBuilder.create("nbpcglibrary.node", Level.FINE).addMethodName("NodeSavable", "handleSave")
+                            .addMsg("node is {0}", nodename).write();
             saveHandler.handleSave();
         }
 
@@ -343,13 +346,13 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
     @Override
     public final void destroy() throws IOException {
-        Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("TreeNodeRW:destroy()");
+        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNodeRW", "destroy");
         _deleteRemove();
     }
 
     @Override
     public final Transferable clipboardCut() throws IOException {
-        Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("TreeNodeRW:clipboardCut()");
+        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNodeRW", "clipboardCut");
         ExTransferable added = ExTransferable.create(super.clipboardCut());
         added.put(new ExTransfer());
         return added;
@@ -357,7 +360,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
     @Override
     public final Transferable clipboardCopy() throws IOException {
-        Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("TreeNodeRW:clipboardCopy()");
+        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNodeRW", "clipboardCopy");
         ExTransferable added = ExTransferable.create(super.clipboardCopy());
         added.put(new ExTransfer());
         return added;
@@ -371,7 +374,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
         @Override
         protected E getData() {
-            Log.get("uk.org.rlinsdale.nbpcg.nodesupportlib").finer("TreeNodeRW$ExTransfer:getData()");
+            LogBuilder.writeEnteringLog("nbpcglibrary.node", "ExTransfer", "getData");
             return getEntity();
         }
     }

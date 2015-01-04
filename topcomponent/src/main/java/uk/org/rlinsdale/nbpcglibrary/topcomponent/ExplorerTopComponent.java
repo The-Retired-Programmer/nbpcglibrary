@@ -19,25 +19,24 @@
 package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ActionMap;
 import javax.swing.GroupLayout;
 import javax.swing.JScrollPane;
 import javax.swing.text.DefaultEditorKit;
-import uk.org.rlinsdale.nbpcglibrary.common.RegisterLog;
-import uk.org.rlinsdale.nbpcglibrary.common.Log;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
 import org.openide.windows.TopComponent;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * Top component which displays an explorer object
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("uk.org.rlinsdale.nbpcg.topcomponentsupportlib")
+@RegisterLog("nbpcglibrary.topcomponent")
 public abstract class ExplorerTopComponent extends TopComponent implements ExplorerManager.Provider {
 
     private final ExplorerManager em = new ExplorerManager();
@@ -53,7 +52,7 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
      */
     public ExplorerTopComponent(String topComponentName, JScrollPane viewComponent, String name, String hint) {
         this.topComponentName = topComponentName;
-        Log.get("uk.org.rlinsdale.nbpcg.topcomponentsupportlib").log(Level.FINE, "ExplorerTopComponent for {0}: TopComponent created", topComponentName);
+        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.topcomponent", "ExplorerTopComponent", topComponentName, viewComponent, name, hint);
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -90,17 +89,22 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
 
     @Override
     public void componentOpened() {
-        Logger log = Log.get("uk.org.rlinsdale.nbpcg.topcomponentsupportlib");
-        log.log(Level.FINE, "ExplorerTopComponent for {0}: Component Opened", topComponentName);
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("ExplorerTopComponent", "componentOpened")
+                .addMsg("TopComponent is {0})", this).write();
         em.setRootContext(getRootContextNode());
     }
 
     @Override
     public void componentClosed() {
-        Logger log = Log.get("uk.org.rlinsdale.nbpcg.topcomponentsupportlib");
-        log.log(Level.FINE, "ExplorerTopComponent for {0}: Component Closed", topComponentName);
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("ExplorerTopComponent", "componentClosed")
+                .addMsg("TopComponent is {0})", this).write();
         dropRootContextNode();
         em.setRootContext(Node.EMPTY);
+    }
+    
+    @Override
+    public String toString() {
+        return topComponentName;
     }
 
     /**

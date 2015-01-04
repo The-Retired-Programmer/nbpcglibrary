@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.node.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import uk.org.rlinsdale.nbpcglibrary.node.SaveNodeAction;
+import uk.org.rlinsdale.nbpcglibrary.annotations.SaveNodeAction;
 import org.openide.actions.CutAction;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
