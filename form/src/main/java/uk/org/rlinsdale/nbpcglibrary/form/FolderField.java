@@ -69,7 +69,7 @@ public class FolderField extends TextField {
      * @param listener the listener for changes to field value
      * @return the created Folder field
      */
-    public static FolderField createWithRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    public static FolderField createWithRules(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         return new FolderField(field, label, 20, listener);
     }
 
@@ -82,11 +82,11 @@ public class FolderField extends TextField {
      * @param listener the listener for changes to field value
      * @return the created Folder field
      */
-    public static FolderField createWithRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    public static FolderField createWithRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         return new FolderField(field, label, size, listener);
     }
 
-    private FolderField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    private FolderField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         super(field, label, size, listener);
         addMinRule(1);
         addRule(new FolderExistsRule());

@@ -176,14 +176,14 @@ public class EntityReference<E extends EntityRO> {
         saveState();
     }
 
-    private class IdListener extends Listener<IdListenerParams> {
+    private class IdListener extends Listener<IdChangeEventParams> {
 
         public IdListener(String name) {
             super(name + "/entityref/id");
         }
 
         @Override
-        public void action(IdListenerParams p) {
+        public void action(IdChangeEventParams p) {
             if (entityreference != null) {
                 E e = entityreference.get();
                 if (e != null) {

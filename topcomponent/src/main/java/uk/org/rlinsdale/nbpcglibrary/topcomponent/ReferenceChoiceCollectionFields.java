@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,101 +20,77 @@ package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeListenerParams;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeListenerParams;
-import uk.org.rlinsdale.nbpcglibrary.form.FormFieldChangeListenerParams;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.form.ChoiceField;
+import uk.org.rlinsdale.nbpcglibrary.form.FormFieldChangeEventParams;
 
 /**
- * Choice Field - taking values from all entities in a parent entities
- * collection.
+ * Choice Field - taking values from all entities of a class.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
- * @param <R> the parent class
  */
-public abstract class ReferenceChoiceFieldFromEntity<E extends EntityRO, R extends Entity> extends ReferenceChoiceField<E> {
+public abstract class ReferenceChoiceCollectionFields<E extends EntityRO> extends ChoiceField {
 
-    private R parententity;
     private List<E> choices;
     private List<String> choiceText;
-    private ChoicesFieldListener choicesfieldListener;
-    private CollectionFieldListener collectionfieldListener;
-    private IntWithDescription collectionFieldId;
-
-    /**
-     * Constructor
-     *
-     * @param field the field Id
-     * @param label the field label
-     * @param parententity the parent entity
-     * @param collectionFieldId the collection field Id
-     */
-    public ReferenceChoiceFieldFromEntity(IntWithDescription field, String label, R parententity, IntWithDescription collectionFieldId) {
-        this(field, label, parententity, collectionFieldId, null);
-    }
+    private final ChoicesFieldListener choicesfieldListener;
+    private final CollectionFieldListener collectionfieldListener ;
 
     /**
      * Constructor.
      *
      * @param field the field Id
      * @param label the field label
-     * @param parententity the parent entity
-     * @param collectionFieldId the collection field Id
      * @param listener the change listener
      */
-    public ReferenceChoiceFieldFromEntity(IntWithDescription field, String label, R parententity, IntWithDescription collectionFieldId, Listener<FormFieldChangeListenerParams> listener) {
+    public ReferenceChoiceCollectionFields(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         super(field, label, listener);
         choicesfieldListener = new ChoicesFieldListener(label + "/choices");
-        collectionfieldListener = new CollectionFieldListener(label + "/collection");
-        this.parententity = parententity;
-        this.collectionFieldId = collectionFieldId;
+        collectionfieldListener = new CollectionFieldListener(label+"/setchange");
+    }
+    
+    /**
+     * initialise the choices text
+     */
+    public void initChoices() {
+        setChoices(getChoicesText());
+        addChoicesListeners();
+        addCollectionListeners(collectionfieldListener);
     }
 
-    @Override
-    protected void addCollectionListeners() {
-        parententity.addSetChangeListener(collectionfieldListener);
+    /**
+     * finish managing the choices text
+     */
+    public void closeChoices() {
+        removeCollectionListeners(collectionfieldListener);
+        removeChoicesListeners();
     }
 
-    @Override
-    protected void removeCollectionListeners() {
-        parententity.removeSetChangeListener(collectionfieldListener);
-    }
 
-    @Override
-    protected void addChoicesListeners() {
+    private void addChoicesListeners() {
         choices.stream().filter((e) -> (e != null)).forEach((e) -> {
             e.addFieldListener(choicesfieldListener);
         });
     }
 
-    @Override
-    protected void removeChoicesListeners() {
+    private void removeChoicesListeners() {
         choices.stream().filter((e) -> (e != null)).forEach((e) -> {
             e.removeFieldListener(choicesfieldListener);
         });
     }
 
-    @Override
-    protected List<String> getChoicesText() {
+    private List<String> getChoicesText() {
         choiceText = new ArrayList<>();
         choices = getChoicesEntities();
         choices.stream().forEach((e) -> {
             choiceText.add(convertEntitytoText(e));
         });
         return choiceText;
-    }
-
-    /**
-     * Get the parent entity.
-     *
-     * @return the parent entity
-     */
-    protected R getParentEntity() {
-        return parententity;
     }
 
     /**
@@ -132,7 +108,20 @@ public abstract class ReferenceChoiceFieldFromEntity<E extends EntityRO, R exten
      */
     protected abstract String convertEntitytoText(E e);
 
-    @Override
+    
+    /**
+     * add a given listener to all parent collections which could affect this reference choice.
+     * @param listener the set change listener
+     */
+    protected abstract void addCollectionListeners(Listener<SetChangeEventParams> listener);
+
+    
+    /**
+     * remove a given listener from all parent collections which could affect this reference choice.
+     * @param listener the set change listener
+     */
+    protected abstract void removeCollectionListeners(Listener<SetChangeEventParams> listener);
+
     public E findSelectedEntity() {
         String choicename = get();
         for (int i = 0; i < choiceText.size(); i++) {
@@ -143,29 +132,38 @@ public abstract class ReferenceChoiceFieldFromEntity<E extends EntityRO, R exten
         return null;
     }
 
-    private class CollectionFieldListener extends Listener<SetChangeListenerParams> {
+    /**
+     * Update the choices text
+     */
+    protected void updateChoicesText() {
+        removeCollectionListeners(collectionfieldListener);
+        removeChoicesListeners();
+        setChoices(getChoicesText());
+        addChoicesListeners();
+        addCollectionListeners(collectionfieldListener);
+    }
+    
+    private class CollectionFieldListener extends Listener<SetChangeEventParams> {
 
         public CollectionFieldListener(String name) {
             super(name);
         }
 
         @Override
-        @SuppressWarnings("IncompatibleEquals")
-        public void action(SetChangeListenerParams p) {
-            if (p.equals(collectionFieldId)) {
+        public void action(SetChangeEventParams p) {
                 updateChoicesText();
-            }
         }
     }
 
-    private class ChoicesFieldListener extends Listener<FieldChangeListenerParams> {
+
+    private class ChoicesFieldListener extends Listener<FieldChangeEventParams> {
 
         public ChoicesFieldListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeListenerParams p) {
+        public void action(FieldChangeEventParams p) {
             updateChoicesText();
         }
     }

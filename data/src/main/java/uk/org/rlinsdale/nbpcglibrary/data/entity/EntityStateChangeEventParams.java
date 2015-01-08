@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,14 +19,14 @@
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.ListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 
 /**
  * The Parameter Class for a EntityStateChange listener.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class EntityStateChangeListenerParams implements ListenerParams {
+public class EntityStateChangeEventParams implements EventParams {
 
     /**
      * State Id - Init. entity created but not populated.
@@ -111,7 +111,7 @@ public class EntityStateChangeListenerParams implements ListenerParams {
      * @param oldState the previous state Id
      * @param newState the new state Id
      */
-    public EntityStateChangeListenerParams(IntWithDescription transition, IntWithDescription oldState, IntWithDescription newState) {
+    public EntityStateChangeEventParams(IntWithDescription transition, IntWithDescription oldState, IntWithDescription newState) {
         this.transition = transition;
         this.oldState = oldState;
         this.newState = newState;
@@ -154,8 +154,8 @@ public class EntityStateChangeListenerParams implements ListenerParams {
         if (obj == null) {
             return false;
         }
-        if (obj instanceof EntityStateChangeListenerParams) {
-            return this.transition == ((EntityStateChangeListenerParams) obj).transition;
+        if (obj instanceof EntityStateChangeEventParams) {
+            return this.transition == ((EntityStateChangeEventParams) obj).transition;
         }
         if (obj instanceof IntWithDescription) {
             return this.transition == (IntWithDescription) obj;

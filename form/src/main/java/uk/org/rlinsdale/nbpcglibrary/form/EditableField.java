@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 
 /**
  * Abstract Class representing an editable Field on a Form
@@ -31,7 +31,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listening;
  */
 public abstract class EditableField extends BaseField {
 
-    private final Listening<FormFieldChangeListenerParams> listening;
+    private final Event<FormFieldChangeEventParams> listening;
     private final IntWithDescription field;
     private final Rules rules = new Rules();
 
@@ -44,7 +44,7 @@ public abstract class EditableField extends BaseField {
     public EditableField(IntWithDescription field, String label) {
         super(label);
         this.field = field;
-        listening = new Listening<>("Form/" + label);
+        listening = new Event<>(field.toString());
     }
 
     /**
@@ -53,7 +53,7 @@ public abstract class EditableField extends BaseField {
      *
      * @param listener the listener
      */
-    public void addListener(Listener<FormFieldChangeListenerParams> listener) {
+    public void addListener(Listener<FormFieldChangeEventParams> listener) {
         listening.addListener(listener);
     }
 
@@ -62,7 +62,7 @@ public abstract class EditableField extends BaseField {
      *
      * @param listener the listener
      */
-    public void removeListener(Listener<FormFieldChangeListenerParams> listener) {
+    public void removeListener(Listener<FormFieldChangeEventParams> listener) {
         listening.removeListener(listener);
     }
 
@@ -107,6 +107,6 @@ public abstract class EditableField extends BaseField {
      * fire the listener - called when a change to this field occurs.
      */
     protected void fireChanged() {
-        listening.fire(new FormFieldChangeListenerParams(field));
+        listening.fire(new FormFieldChangeEventParams(field));
     }
 }

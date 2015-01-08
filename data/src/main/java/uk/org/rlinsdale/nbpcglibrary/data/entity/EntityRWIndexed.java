@@ -52,7 +52,7 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
     @Override
     public final boolean save() {
         IntWithDescription oldState = getState();
-        if (oldState == EntityStateChangeListenerParams.NEW || oldState == EntityStateChangeListenerParams.NEWEDITING) {
+        if (oldState == EntityStateChangeEventParams.NEW || oldState == EntityStateChangeEventParams.NEWEDITING) {
             if (dbfields.getIndex() == Integer.MAX_VALUE) {
                 dbfields.setIndex(dataAccess.getNextIdx());
             }
@@ -77,6 +77,6 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
     public final void setIndex(int i) {
         ensureEditing();
         dbfields.setIndex(i);
-        fireFieldChange(FieldChangeListenerParams.IDXFIELD);
+        fireFieldChange(FieldChangeEventParams.IDXFIELD);
     }
 }

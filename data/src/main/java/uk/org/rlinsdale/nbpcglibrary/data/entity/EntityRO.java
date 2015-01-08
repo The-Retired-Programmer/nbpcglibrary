@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRO;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
@@ -39,9 +39,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 @RegisterLog("nbpcglibrary.data")
 public abstract class EntityRO extends Entity {
 
-    private final Listening<EntityStateChangeListenerParams> stateListening;
-    private final Listening<FieldChangeListenerParams> fieldListening;
-    private IntWithDescription state = EntityStateChangeListenerParams.INIT;
+    private final Event<EntityStateChangeEventParams> stateListening;
+    private final Event<FieldChangeEventParams> fieldListening;
+    private IntWithDescription state = EntityStateChangeEventParams.INIT;
     private int id;
     private final DBFieldsRO dbfields;
     private final DataAccessRO dataAccess;
@@ -71,11 +71,11 @@ public abstract class EntityRO extends Entity {
         this.id = id;
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
-        stateListening = new Listening<>(entityname + "/state");
-        fieldListening = new Listening<>(entityname + "/field");
+        stateListening = new Event<>(entityname + "/state");
+        fieldListening = new Event<>(entityname + "/field");
         IntWithDescription oldState = state;
-        state = EntityStateChangeListenerParams.NEW;
-        fireStateChange(EntityStateChangeListenerParams.CREATE, oldState, state);
+        state = EntityStateChangeEventParams.NEW;
+        fireStateChange(EntityStateChangeEventParams.CREATE, oldState, state);
     }
 
     final void setState(IntWithDescription state) {
@@ -91,7 +91,7 @@ public abstract class EntityRO extends Entity {
      *
      * @param listener the listener
      */
-    public final void addStateListener(Listener<EntityStateChangeListenerParams> listener) {
+    public final void addStateListener(Listener<EntityStateChangeEventParams> listener) {
         stateListening.addListener(listener);
     }
 
@@ -100,7 +100,7 @@ public abstract class EntityRO extends Entity {
      *
      * @param listener the listener
      */
-    public final void removeStateListener(Listener<EntityStateChangeListenerParams> listener) {
+    public final void removeStateListener(Listener<EntityStateChangeEventParams> listener) {
         stateListening.removeListener(listener);
     }
 
@@ -109,7 +109,7 @@ public abstract class EntityRO extends Entity {
      *
      * @param listener the listener
      */
-    public final void addFieldListener(Listener<FieldChangeListenerParams> listener) {
+    public final void addFieldListener(Listener<FieldChangeEventParams> listener) {
         fieldListening.addListener(listener);
     }
 
@@ -118,7 +118,7 @@ public abstract class EntityRO extends Entity {
      *
      * @param listener the listener
      */
-    public final void removeFieldListener(Listener<FieldChangeListenerParams> listener) {
+    public final void removeFieldListener(Listener<FieldChangeEventParams> listener) {
         fieldListening.removeListener(listener);
     }
 
@@ -139,7 +139,7 @@ public abstract class EntityRO extends Entity {
      */
     protected final void fireFieldChange(IntWithDescription field, boolean formatOK) {
         updateEntityRegistration();
-        fieldListening.fire(new FieldChangeListenerParams(field, formatOK));
+        fieldListening.fire(new FieldChangeEventParams(field, formatOK));
     }
 
     /**
@@ -150,7 +150,7 @@ public abstract class EntityRO extends Entity {
      * @param newState the new state
      */
     protected final void fireStateChange(IntWithDescription transition, IntWithDescription oldState, IntWithDescription newState) {
-        stateListening.fire(new EntityStateChangeListenerParams(transition, oldState, newState));
+        stateListening.fire(new EntityStateChangeEventParams(transition, oldState, newState));
     }
 
     /**
@@ -160,7 +160,7 @@ public abstract class EntityRO extends Entity {
      */
     protected final void fireFieldChangeAtLoad(IntWithDescription field) {
         updateEntityRegistrationAtLoad();
-        fieldListening.fire(new FieldChangeListenerParams(field, true));
+        fieldListening.fire(new FieldChangeEventParams(field, true));
     }
 
     /**
@@ -182,7 +182,7 @@ public abstract class EntityRO extends Entity {
      * @return true if new
      */
     public final boolean isNew() {
-        return state == EntityStateChangeListenerParams.NEW || state == EntityStateChangeListenerParams.NEWEDITING;
+        return state == EntityStateChangeEventParams.NEW || state == EntityStateChangeEventParams.NEWEDITING;
     }
 
     /**
@@ -191,7 +191,7 @@ public abstract class EntityRO extends Entity {
      * @return true if editing
      */
     public final boolean isEditing() {
-        return state == EntityStateChangeListenerParams.NEWEDITING || state == EntityStateChangeListenerParams.DBENTITYEDITING;
+        return state == EntityStateChangeEventParams.NEWEDITING || state == EntityStateChangeEventParams.DBENTITYEDITING;
     }
 
     /**
@@ -199,22 +199,22 @@ public abstract class EntityRO extends Entity {
      * statechange listeners. If already in state then this does nothing.
      */
     protected final void ensureEditing() {
-        if (state == EntityStateChangeListenerParams.NEWEDITING || state == EntityStateChangeListenerParams.DBENTITYEDITING) {
+        if (state == EntityStateChangeEventParams.NEWEDITING || state == EntityStateChangeEventParams.DBENTITYEDITING) {
             return;
         }
         IntWithDescription oldState = state;
-        if (state == EntityStateChangeListenerParams.NEW) {
+        if (state == EntityStateChangeEventParams.NEW) {
             _saveState();
             dbfields.saveState();
-            state = EntityStateChangeListenerParams.NEWEDITING;
-            fireStateChange(EntityStateChangeListenerParams.EDIT, oldState, state);
+            state = EntityStateChangeEventParams.NEWEDITING;
+            fireStateChange(EntityStateChangeEventParams.EDIT, oldState, state);
             return;
         }
-        if (state == EntityStateChangeListenerParams.DBENTITY) {
+        if (state == EntityStateChangeEventParams.DBENTITY) {
             _saveState();
             dbfields.saveState();
-            state = EntityStateChangeListenerParams.DBENTITYEDITING;
-            fireStateChange(EntityStateChangeListenerParams.EDIT, oldState, state);
+            state = EntityStateChangeEventParams.DBENTITYEDITING;
+            fireStateChange(EntityStateChangeEventParams.EDIT, oldState, state);
             return;
         }
         throw new LogicException("Should not be trying to edit an entity in " + state + " state");
@@ -230,19 +230,19 @@ public abstract class EntityRO extends Entity {
     public final void cancelEdit() {
         IntWithDescription oldState = state;
         boolean wasEditing = false;
-        if (state == EntityStateChangeListenerParams.NEWEDITING) {
-            state = EntityStateChangeListenerParams.NEW;
+        if (state == EntityStateChangeEventParams.NEWEDITING) {
+            state = EntityStateChangeEventParams.NEW;
             wasEditing = true;
         }
-        if (state == EntityStateChangeListenerParams.DBENTITYEDITING) {
-            state = EntityStateChangeListenerParams.DBENTITY;
+        if (state == EntityStateChangeEventParams.DBENTITYEDITING) {
+            state = EntityStateChangeEventParams.DBENTITY;
             wasEditing = true;
         }
         if (wasEditing) {
             _restoreState();
             dbfields.restoreState();
-            fireFieldChange(FieldChangeListenerParams.ALLFIELDS);
-            fireStateChange(EntityStateChangeListenerParams.RESET, oldState, state);
+            fireFieldChange(FieldChangeEventParams.ALLFIELDS);
+            fireStateChange(EntityStateChangeEventParams.RESET, oldState, state);
         }
     }
 
@@ -254,7 +254,7 @@ public abstract class EntityRO extends Entity {
      */
     protected void load(int id) {
         dataAccess.load(id, new EntityROLoader());
-        fireFieldChangeAtLoad(FieldChangeListenerParams.ALLFIELDS);
+        fireFieldChangeAtLoad(FieldChangeEventParams.ALLFIELDS);
     }
 
     private class EntityROLoader implements ResultSetLoader {
@@ -262,7 +262,7 @@ public abstract class EntityRO extends Entity {
         @Override
         public void load(ResultSet rs) {
             IntWithDescription oldState = getState();
-            if (oldState == EntityStateChangeListenerParams.NEW) {
+            if (oldState == EntityStateChangeEventParams.NEW) {
                 try {
                     setId(rs.getInt("id"));
                     dbfields.load(rs);
@@ -271,8 +271,8 @@ public abstract class EntityRO extends Entity {
                     LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("EntityROLoader", "load", rs)
                         .addException(ex).write();
                 }
-                setState(EntityStateChangeListenerParams.DBENTITY);
-                fireStateChange(EntityStateChangeListenerParams.LOAD, oldState, EntityStateChangeListenerParams.DBENTITY);
+                setState(EntityStateChangeEventParams.DBENTITY);
+                fireStateChange(EntityStateChangeEventParams.LOAD, oldState, EntityStateChangeEventParams.DBENTITY);
                 return;
             }
             throw new LogicException("Should not be trying to load an entity in " + oldState + " state");

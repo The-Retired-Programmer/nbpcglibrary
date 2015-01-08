@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,8 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.common;
 
-import java.util.logging.Level;
-
 /**
  * A Standard Listener - defined with a generic class for use as parameters
  * passed on action.
@@ -27,7 +25,7 @@ import java.util.logging.Level;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <P> the Class of the listener parameter
  */
-public abstract class Listener<P extends ListenerParams> {
+public abstract class Listener<P extends EventParams> implements LogHelper {
 
     private final String description;
 
@@ -39,6 +37,13 @@ public abstract class Listener<P extends ListenerParams> {
      */
     public Listener(String description) {
         this.description = description;
+        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.common", this, description);
+    }
+    
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription("Listener", description);
     }
 
     /**
@@ -47,8 +52,7 @@ public abstract class Listener<P extends ListenerParams> {
      * @param p the listener parameters
      */
     public void actionPerformed(P p) {
-        LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("Listener", "actionPerformed", p)
-                .addMsg("Listener is {0}", this).write();
+        LogBuilder.writeEnteringLog("nbpcglibrary.common",this, "actionPerformed", p);
         action(p);
     }
 

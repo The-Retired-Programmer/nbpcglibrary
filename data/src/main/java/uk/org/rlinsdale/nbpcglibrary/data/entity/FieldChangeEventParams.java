@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,28 +16,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.form;
+package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.ListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 
 /**
- * The listener parameters which are passed when the listener is fired for a
- * Form Field Change.
+ * The Parameter Class for a FieldChange listener.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FormFieldChangeListenerParams implements ListenerParams {
-
-    private final IntWithDescription field;
+public class FieldChangeEventParams implements EventParams {
 
     /**
-     * Constructor
-     *
-     * @param field the Field ID
+     * Common Field Id - all fields have changed
      */
-    public FormFieldChangeListenerParams(IntWithDescription field) {
+    public static final IntWithDescription ALLFIELDS = new IntWithDescription(0, "ALL");
+
+    /**
+     * Common Field Id - the Id field has changed
+     */
+    public static final IntWithDescription IDFIELD = new IntWithDescription(1, "Id");
+
+    /**
+     * Common Field Id - the Index (ordering) field has change
+     */
+    public static final IntWithDescription IDXFIELD = new IntWithDescription(2, "Idx");
+    private final IntWithDescription field;
+    private final boolean formatOK;
+
+    /**
+     * Constructor.
+     *
+     * @param field the field Id
+     * @param formatOK true if field is correctly formatted
+     */
+    public FieldChangeEventParams(IntWithDescription field, boolean formatOK) {
         this.field = field;
+        this.formatOK = formatOK;
     }
 
     /**
@@ -47,6 +63,15 @@ public class FormFieldChangeListenerParams implements ListenerParams {
      */
     public IntWithDescription get() {
         return field;
+    }
+
+    /**
+     * Test if the field was formatted correctly.
+     *
+     * @return true if field was formatted correctly
+     */
+    public boolean isFormatOK() {
+        return formatOK;
     }
 
     @Override
@@ -59,8 +84,8 @@ public class FormFieldChangeListenerParams implements ListenerParams {
         if (obj == null) {
             return false;
         }
-        if (obj instanceof FormFieldChangeListenerParams) {
-            return this.field == ((FormFieldChangeListenerParams) obj).field;
+        if (obj instanceof FieldChangeEventParams) {
+            return this.field == ((FieldChangeEventParams) obj).field;
         }
         if (obj instanceof IntWithDescription) {
             return this.field == (IntWithDescription) obj;
@@ -70,6 +95,6 @@ public class FormFieldChangeListenerParams implements ListenerParams {
 
     @Override
     public String toString() {
-        return field + " change";
+        return field + " change (data was formatted " + (formatOK ? "OK" : "badly") + ")";
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import javax.swing.JTextArea;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 
 /**
  * A Form object which can be displayed in a dialog box.
@@ -34,7 +35,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("nbpcglibrary.form")
-public class Form extends GridBagPanel {
+public class Form extends GridBagPanel implements LogHelper {
 
     static final int SAVESUCCESS = 1;
     static final int SAVEVALIDATIONFAIL = 2;
@@ -42,7 +43,7 @@ public class Form extends GridBagPanel {
     private JTextArea failuremessages;
     private String formname;
     private List<FieldsDef> fieldsdefs;
-    private final FormFieldChangeListener formfieldchangelistener = new FormFieldChangeListener();
+    private final FormFieldChangeListener formfieldchangelistener;
     private Rules additionalRules;
 
     /**
@@ -51,9 +52,10 @@ public class Form extends GridBagPanel {
      * @param formname the form's name
      */
     public Form(String formname) {
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.form", "Form", formname);
         fieldsdefs = new ArrayList<>();
         this.formname = formname;
+        formfieldchangelistener = new FormFieldChangeListener();
+        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.form", this, formname);
     }
 
     /**
@@ -67,6 +69,12 @@ public class Form extends GridBagPanel {
         addFieldsdef(fieldsdef);
         finaliseForm();
     }
+    
+     @Override
+    public String classDescription() {
+        return LogBuilder.classDescription("Form", formname);
+    }
+
 
     /**
      * Add a collection of fields for display on this form
@@ -75,8 +83,7 @@ public class Form extends GridBagPanel {
      */
     public final void addFieldsdef(FieldsDef fieldsdef) {
         if (fieldsdef != null) {
-            LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "addFieldsdef", fieldsdef)
-                    .addMsg("adding fields to form {0}", formname).write();
+            LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
             fieldsdefs.add(fieldsdef);
             fieldsdef.getFields().stream().map((field) -> {
                 addRow(field.getComponents());
@@ -110,8 +117,7 @@ public class Form extends GridBagPanel {
      * any failure messages due to rule set failures)
      */
     public final void finaliseForm(int msgwidth) {
-        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "finaliseForm", msgwidth)
-                .addMsg("finalise form {0}", formname).write();
+        LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "finaliseForm", msgwidth);
         failuremessages = new JTextArea(3, msgwidth);
         failuremessages.setForeground(Color.red);
         failuremessages.setEditable(false);
@@ -137,8 +143,7 @@ public class Form extends GridBagPanel {
         presave();
         if (checkRules()) {
             boolean ok = true;
-            LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "save")
-                    .addMsg("save fields in form {0}", formname).write();
+            LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "save");
             failuremessages.setText("");
             for (FieldsDef f : fieldsdefs) {
                 if (!f.save()) {
@@ -157,8 +162,7 @@ public class Form extends GridBagPanel {
      * values.
      */
     public void reset() {
-        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "reset")
-                .addMsg("reset fields in form {0}", formname).write();
+        LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "reset");
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
             f.reset();
@@ -169,8 +173,7 @@ public class Form extends GridBagPanel {
      * Set the values of fields in the collection.
      */
     public void set() {
-        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "reset")
-                .addMsg("set fields in form {0}", formname).write();
+        LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "set");
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
             f.set();
@@ -195,8 +198,7 @@ public class Form extends GridBagPanel {
                 valid = false;
             }
         }
-        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "checkRules")
-                .addMsg("responce for form {0} is {1}", formname, valid).write();
+        LogBuilder.writeExitingLog("nbpcglibrary.form",this, "checkRules", valid);
         return valid;
     }
 
@@ -212,8 +214,7 @@ public class Form extends GridBagPanel {
             additionalRules.addFailureMessages(sb);
         }
         String t = sb.toString();
-        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("Form", "writeAllFailureMessages")
-                .addMsg("failures messages for form {0} are {1}", formname, t.replace("\n", "; ")).write();
+        LogBuilder.writeExitingLog("nbpcglibrary.form",this, "writeAllFailureMessages", t.replace("\n", "; "));
         failuremessages.setText(t);
     }
 
@@ -223,14 +224,14 @@ public class Form extends GridBagPanel {
         });
     }
 
-    private class FormFieldChangeListener extends Listener<FormFieldChangeListenerParams> {
+    private class FormFieldChangeListener extends Listener<FormFieldChangeEventParams> {
 
         public FormFieldChangeListener() {
-            super("Form/field");
+            super(formname+"_all_fields");
         }
 
         @Override
-        public void action(FormFieldChangeListenerParams p) {
+        public void action(FormFieldChangeEventParams p) {
             writeAllFailureMessages();
         }
     }

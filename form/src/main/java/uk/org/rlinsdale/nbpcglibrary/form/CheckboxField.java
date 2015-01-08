@@ -59,11 +59,11 @@ public class CheckboxField extends EditableField {
      * @param listener the listener for changes to field value
      * @return the created checkbox field
      */
-    public static CheckboxField create(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    public static CheckboxField create(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         return new CheckboxField(field, label, listener);
     }
 
-    private CheckboxField(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    private CheckboxField(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         super(field, label);
         checkbox = new JCheckBox("", false);
         addListener(listener);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
@@ -29,7 +29,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  */
 public abstract class Entity extends Rules {
 
-    private final Listening<SetChangeListenerParams> setListening;
+    private final Event<SetChangeEventParams> setChangeEvent;
     private final EntityError entityerror;
     private final EntitySave entitysave;
 
@@ -42,7 +42,7 @@ public abstract class Entity extends Rules {
         super();
         entityerror = new EntityError(entityname);
         entitysave = new EntitySave(entityname);
-        setListening = new Listening<>(entityname + "/setchange");
+        setChangeEvent = new Event<>(entityname + "/setchange");
         updateEntityRegistration();
     }
 
@@ -51,8 +51,8 @@ public abstract class Entity extends Rules {
      *
      * @param listener the listener to add
      */
-    public final void addSetChangeListener(Listener<SetChangeListenerParams> listener) {
-        setListening.addListener(listener);
+    public final void addSetChangeListener(Listener<SetChangeEventParams> listener) {
+        setChangeEvent.addListener(listener);
     }
 
     /**
@@ -60,8 +60,8 @@ public abstract class Entity extends Rules {
      *
      * @param listener the listener to remove
      */
-    public final void removeSetChangeListener(Listener<SetChangeListenerParams> listener) {
-        setListening.removeListener(listener);
+    public final void removeSetChangeListener(Listener<SetChangeEventParams> listener) {
+        setChangeEvent.removeListener(listener);
     }
 
     /**
@@ -69,8 +69,8 @@ public abstract class Entity extends Rules {
      *
      * @param p the setchange parameters
      */
-    protected final void fireSetChange(SetChangeListenerParams p) {
-        setListening.fire(p);
+    protected final void fireSetChange(SetChangeEventParams p) {
+        setChangeEvent.fire(p);
     }
 
     /**

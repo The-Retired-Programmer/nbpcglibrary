@@ -73,7 +73,7 @@ public class PasswordField extends EditableField {
      * @param listener the listener for changes to field value
      * @return the created password field
      */
-    public static PasswordField create(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    public static PasswordField create(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         return new PasswordField(field, label, 20, listener);
     }
 
@@ -86,7 +86,7 @@ public class PasswordField extends EditableField {
      * @param listener the listener for changes to field value
      * @return the created password field
      */
-    public static PasswordField create(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    public static PasswordField create(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         return new PasswordField(field, label, size, listener);
     }
 
@@ -127,7 +127,7 @@ public class PasswordField extends EditableField {
      * @param max maximum number of characters to enter
      * @return the created password field
      */
-    public static PasswordField createWithMinMaxRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
+    public static PasswordField createWithMinMaxRules(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener, int min, int max) {
         return new PasswordField(field, label, 20, listener, min, max);
     }
 
@@ -142,11 +142,11 @@ public class PasswordField extends EditableField {
      * @param max maximum number of characters to enter
      * @return the created password field
      */
-    public static PasswordField createWithMinMaxRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
+    public static PasswordField createWithMinMaxRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, int min, int max) {
         return new PasswordField(field, label, size, listener, min, max);
     }
 
-    private PasswordField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    private PasswordField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         super(field, label);
         passwordfield = new JPasswordField();
         passwordfield.setColumns(size);
@@ -156,7 +156,7 @@ public class PasswordField extends EditableField {
         passwordfield.addFocusListener(passwordFocusListener);
     }
 
-    private PasswordField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
+    private PasswordField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, int min, int max) {
         this(field, label, size, listener);
         addMinRule(min);
         addMaxRule(max);

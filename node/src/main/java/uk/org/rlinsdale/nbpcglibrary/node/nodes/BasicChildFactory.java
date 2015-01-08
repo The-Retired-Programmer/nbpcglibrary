@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ public abstract class BasicChildFactory<E extends EntityRO> extends RootChildFac
     private final EntityReference<E> parentref;
 
     /**
-     * Contructor.
+     * Constructor.
      * 
      * @param factoryname the factory name
      * @param parentEntity the parent entity

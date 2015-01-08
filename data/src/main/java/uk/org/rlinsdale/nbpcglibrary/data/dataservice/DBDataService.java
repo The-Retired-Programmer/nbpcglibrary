@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
@@ -39,7 +39,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 public abstract class DBDataService implements DataService {
 
     private Connection conn;
-    private final Listening<TransactionListenerParams> transactionListening;
+    private final Event<TransactionEventParams> transactionListening;
     private boolean inTransaction = false;
 
     /**
@@ -48,7 +48,7 @@ public abstract class DBDataService implements DataService {
      * @param name the dataservice name
      */
     public DBDataService(String name) {
-        transactionListening = new Listening<>(name + " transactions");
+        transactionListening = new Event<>(name + " transactions");
     }
 
     /**
@@ -66,7 +66,7 @@ public abstract class DBDataService implements DataService {
      *
      * @param l the listener
      */
-    public void addListener(Listener<TransactionListenerParams> l) {
+    public void addListener(Listener<TransactionEventParams> l) {
         transactionListening.addListener(l);
     }
 
@@ -75,7 +75,7 @@ public abstract class DBDataService implements DataService {
      *
      * @param l the listener
      */
-    public void removeListener(Listener<TransactionListenerParams> l) {
+    public void removeListener(Listener<TransactionEventParams> l) {
         transactionListening.removeListener(l);
     }
 
@@ -83,11 +83,11 @@ public abstract class DBDataService implements DataService {
      * Add a listener for Transaction events (Begin, Commit and Rollback).
      *
      * @param l the listener
-     * @param flags the listener control flags (fire or event queue or
-     * immediately; priority)
+     * @param mode the listener mode (fire on event queue or immediately;
+     * priority)
      */
-    public void addListener(Listener<TransactionListenerParams> l, int flags) {
-        transactionListening.addListener(l, flags);
+    public void addListener(Listener<TransactionEventParams> l, Event.ListenerMode mode) {
+        transactionListening.addListener(l, mode);
     }
 
     /**
@@ -105,7 +105,7 @@ public abstract class DBDataService implements DataService {
                         .addException(ex).write();
             }
             inTransaction = true;
-            transactionListening.fire(TransactionListenerParams.BEGINListenerParams);
+            transactionListening.fire(TransactionEventParams.BEGINListenerParams);
         }
     }
 
@@ -121,7 +121,7 @@ public abstract class DBDataService implements DataService {
                 LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "commit")
                         .addException(ex).write();
             }
-            transactionListening.fire(TransactionListenerParams.COMMITListenerParams);
+            transactionListening.fire(TransactionEventParams.COMMITListenerParams);
             inTransaction = false;
         } else {
             throw new LogicException("commit() failed - not in transaction");
@@ -140,7 +140,7 @@ public abstract class DBDataService implements DataService {
                 LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "rollback")
                         .addException(ex).write();
             }
-            transactionListening.fire(TransactionListenerParams.ROLLBACKListenerParams);
+            transactionListening.fire(TransactionEventParams.ROLLBACKListenerParams);
             inTransaction = false;
         } else {
             throw new LogicException("rollback() failed - not in transaction");
@@ -164,7 +164,7 @@ public abstract class DBDataService implements DataService {
             conn.close();
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "disconnect")
-                        .addException(ex).write();
+                    .addException(ex).write();
         }
     }
 
@@ -191,8 +191,8 @@ public abstract class DBDataService implements DataService {
                 }
             }
         } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "query",sql, parameter)
-                        .addException(ex).write();
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "query", sql, parameter)
+                    .addException(ex).write();
         }
         return li;
     }
@@ -215,7 +215,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "query", sql)
-                        .addException(ex).write();
+                    .addException(ex).write();
         }
         return li;
     }
@@ -239,7 +239,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "simpleIntQuery", sql, columnname)
-                        .addException(ex).write();
+                    .addException(ex).write();
         }
         return res;
     }
@@ -262,7 +262,7 @@ public abstract class DBDataService implements DataService {
             rsl.load(rs);
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "simpleQuery", sql, rsl)
-                        .addException(ex).write();
+                    .addException(ex).write();
         }
     }
 
@@ -289,7 +289,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "execute", sql, parameters)
-                        .addException(ex).write();
+                    .addException(ex).write();
         }
         return res;
     }
@@ -314,7 +314,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("DBDataService", "execute", sql, parameter)
-                        .addException(ex).write();
+                    .addException(ex).write();
         }
         return res;
     }

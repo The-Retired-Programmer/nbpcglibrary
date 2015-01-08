@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,12 +24,12 @@ package uk.org.rlinsdale.nbpcglibrary.common;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class SimpleListenerParams implements ListenerParams {
+public class SimpleEventParams implements EventParams {
 
     /**
      * An Empty Listener parameters - static sharable readonly listener parameters
      */
-    public static final SimpleListenerParams EMPTY = new SimpleListenerParams();
+    public static final SimpleEventParams EMPTY = new SimpleEventParams();
 
     @Override
     public String toString() {

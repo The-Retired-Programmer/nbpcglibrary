@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,7 @@ public class ChoiceField extends EditableField {
     public static ChoiceField create(IntWithDescription field, String label) {
         return new ChoiceField(field, label, null);
     }
-
+    
     /**
      * Factory method to create a choice field
      *
@@ -65,7 +65,7 @@ public class ChoiceField extends EditableField {
      * @param listener the listener for changes to field value
      * @return the created choice field
      */
-    public static ChoiceField create(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    public static ChoiceField create(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         return new ChoiceField(field, label, listener);
     }
 
@@ -76,7 +76,7 @@ public class ChoiceField extends EditableField {
      * @param label the label text for the field
      * @param listener the listener for changes to field value
      */
-    protected ChoiceField(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    protected ChoiceField(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         super(field, label);
         combobox = new JComboBox();
         combobox.setEditable(false);

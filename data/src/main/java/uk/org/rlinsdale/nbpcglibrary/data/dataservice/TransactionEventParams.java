@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,14 +19,14 @@
 package uk.org.rlinsdale.nbpcglibrary.data.dataservice;
 
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.ListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 
 /**
  * The Parameter Object passed when a Transaction Listener action is fired.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class TransactionListenerParams implements ListenerParams {
+public class TransactionEventParams implements EventParams {
 
     /**
      * Id for Begin Transaction
@@ -42,9 +42,9 @@ public class TransactionListenerParams implements ListenerParams {
      * Id for Rollback Transaction
      */
     public static final IntWithDescription ROLLBACK = new IntWithDescription(3, "Rollback");
-    static final TransactionListenerParams BEGINListenerParams = new TransactionListenerParams(BEGIN);
-    static final TransactionListenerParams COMMITListenerParams = new TransactionListenerParams(COMMIT);
-    static final TransactionListenerParams ROLLBACKListenerParams = new TransactionListenerParams(ROLLBACK);
+    static final TransactionEventParams BEGINListenerParams = new TransactionEventParams(BEGIN);
+    static final TransactionEventParams COMMITListenerParams = new TransactionEventParams(COMMIT);
+    static final TransactionEventParams ROLLBACKListenerParams = new TransactionEventParams(ROLLBACK);
     //
     private final IntWithDescription type;
 
@@ -53,7 +53,7 @@ public class TransactionListenerParams implements ListenerParams {
      *
      * @param type the transaction type
      */
-    public TransactionListenerParams(IntWithDescription type) {
+    public TransactionEventParams(IntWithDescription type) {
         this.type = type;
     }
 
@@ -76,8 +76,8 @@ public class TransactionListenerParams implements ListenerParams {
         if (obj == null) {
             return false;
         }
-        if (obj instanceof TransactionListenerParams) {
-            return this.type == ((TransactionListenerParams) obj).type;
+        if (obj instanceof TransactionEventParams) {
+            return this.type == ((TransactionEventParams) obj).type;
         }
         if (obj instanceof IntWithDescription) {
             return this.type == (IntWithDescription) obj;

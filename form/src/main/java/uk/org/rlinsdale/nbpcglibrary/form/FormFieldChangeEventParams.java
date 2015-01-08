@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,59 +16,60 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.data.entity;
+package uk.org.rlinsdale.nbpcglibrary.form;
 
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.ListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 
 /**
- * The Parameter Class for a SetChange listener.
- * 
+ * The listener parameters which are passed when the listener is fired for a
+ * Form Field Change.
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class SetChangeListenerParams implements ListenerParams {
-    
-    private final IntWithDescription set;
-    
+public class FormFieldChangeEventParams implements EventParams {
+
+    private final IntWithDescription field;
+
     /**
-     * Constructor.
-     * 
-     * @param set the Id of the set
+     * Constructor
+     *
+     * @param field the Field ID
      */
-    public SetChangeListenerParams(IntWithDescription set){
-        this.set = set;
+    public FormFieldChangeEventParams(IntWithDescription field) {
+        this.field = field;
     }
-    
+
     /**
-     * Get the Id of the set.
-     * 
-     * @return the Id
+     * Get the field Id
+     *
+     * @return the field Id
      */
     public IntWithDescription get() {
-        return set;
+        return field;
     }
-    
+
     @Override
     public int hashCode() {
-        return set.hashCode();
+        return field.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
-        if (obj instanceof SetChangeListenerParams) {
-            return this.set == ((SetChangeListenerParams) obj).set;
+        if (obj instanceof FormFieldChangeEventParams) {
+            return this.field == ((FormFieldChangeEventParams) obj).field;
         }
         if (obj instanceof IntWithDescription) {
-            return this.set == (IntWithDescription) obj;
+            return this.field == (IntWithDescription) obj;
         }
         return false;
     }
-    
+
     @Override
-    public String toString(){
-        return set+" change";
+    public String toString() {
+        return field + " change";
     }
 }

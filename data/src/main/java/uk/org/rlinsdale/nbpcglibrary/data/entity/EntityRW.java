@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,13 +20,13 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import java.util.HashMap;
 import java.util.Map;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRW;
-import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
 
 /**
  * The abstract class defining an editable Entity.
@@ -39,7 +39,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
 
     private final DBFieldsRW<E> dbfields;
     private final DataAccessRW dataAccess;
-    private final Listening<IdListenerParams> idListening;
+    private final Event<IdChangeEventParams> idListening;
     private final EntityManagerRW<E, P> em;
 
     /**
@@ -59,7 +59,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
         this.em = em;
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
-        idListening = new Listening<>(entityname + "/id");
+        idListening = new Event<>(entityname + "/id");
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
      *
      * @param listener the listener
      */
-    public final void addIdListener(Listener<IdListenerParams> listener) {
+    public final void addIdListener(Listener<IdChangeEventParams> listener) {
         idListening.addListener(listener);
     }
 
@@ -76,7 +76,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
      *
      * @param listener the listener
      */
-    public final void removeIdListener(Listener<IdListenerParams> listener) {
+    public final void removeIdListener(Listener<IdChangeEventParams> listener) {
         idListening.removeListener(listener);
     }
 
@@ -84,16 +84,16 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
      * Add an Id Listener to this entity.
      *
      * @param listener the listener
-     * @param flags the indicators of listener action (on current thread or on
+     * @param mode the indicators of listener action (on current thread or on
      * event queue; priority/normal)
      */
-    public final void addIdListener(Listener<IdListenerParams> listener, int flags) {
-        idListening.addListener(listener, flags);
+    public final void addIdListener(Listener<IdChangeEventParams> listener, Event.ListenerMode mode) {
+        idListening.addListener(listener, mode);
     }
 
     final void updateId(int id) {
         setId(id);
-        fireFieldChange(FieldChangeListenerParams.IDFIELD);
+        fireFieldChange(FieldChangeEventParams.IDFIELD);
     }
 
     /**
@@ -103,36 +103,36 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
      */
     public boolean save() {
         IntWithDescription oldState = getState();
-        if (oldState == EntityStateChangeListenerParams.DBENTITY) {
+        if (oldState == EntityStateChangeEventParams.DBENTITY) {
             return true; //we don't need to do anything as this is a straight copy of a db entity
         }
-        if (oldState == EntityStateChangeListenerParams.INIT) {
+        if (oldState == EntityStateChangeEventParams.INIT) {
             throw new LogicException("Should not be trying to save an entity in INIT state");
         }
-        if (oldState == EntityStateChangeListenerParams.REMOVED) {
+        if (oldState == EntityStateChangeEventParams.REMOVED) {
             throw new LogicException("Should not be trying to save an entity in REMOVED state");
         }
         if (!checkRules()) {
             throw new LogicException("save() on an entity which is not valid");
         }
-        if (oldState == EntityStateChangeListenerParams.NEW || oldState == EntityStateChangeListenerParams.NEWEDITING) {
+        if (oldState == EntityStateChangeEventParams.NEW || oldState == EntityStateChangeEventParams.NEWEDITING) {
             Map<String, Object> map = new HashMap<>();
             _values(map);
             dbfields.values(map);
             em.persistTransient((E) this, dataAccess.insert(map));
-            idListening.fire(new IdListenerParams());
-            setState(EntityStateChangeListenerParams.DBENTITY);
+            idListening.fire(new IdChangeEventParams());
+            setState(EntityStateChangeEventParams.DBENTITY);
         }
-        if (oldState == EntityStateChangeListenerParams.DBENTITYEDITING) {
+        if (oldState == EntityStateChangeEventParams.DBENTITYEDITING) {
             Map<String, Object> map = new HashMap<>();
             _diffs(map);
             dbfields.diffs(map);
             if (!map.isEmpty()) {
                 dataAccess.update(getId(), map);
             }
-            setState(EntityStateChangeListenerParams.DBENTITY);
+            setState(EntityStateChangeEventParams.DBENTITY);
         }
-        fireStateChange(EntityStateChangeListenerParams.SAVE, oldState, EntityStateChangeListenerParams.DBENTITY);
+        fireStateChange(EntityStateChangeEventParams.SAVE, oldState, EntityStateChangeEventParams.DBENTITY);
         return true;
     }
 
@@ -157,22 +157,22 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
      */
     public final void remove() {
         IntWithDescription oldState = getState();
-        if (oldState == EntityStateChangeListenerParams.NEW
-                || oldState == EntityStateChangeListenerParams.NEWEDITING) {
+        if (oldState == EntityStateChangeEventParams.NEW
+                || oldState == EntityStateChangeEventParams.NEWEDITING) {
             _remove();
             em.removeFromTransientCache((E) this);
-            setState(EntityStateChangeListenerParams.REMOVED);
-            fireStateChange(EntityStateChangeListenerParams.REMOVE, oldState, EntityStateChangeListenerParams.REMOVED);
+            setState(EntityStateChangeEventParams.REMOVED);
+            fireStateChange(EntityStateChangeEventParams.REMOVE, oldState, EntityStateChangeEventParams.REMOVED);
             removeEntityRegistration();
             return;
         }
-        if (oldState == EntityStateChangeListenerParams.DBENTITY
-                || oldState == EntityStateChangeListenerParams.DBENTITYEDITING) {
+        if (oldState == EntityStateChangeEventParams.DBENTITY
+                || oldState == EntityStateChangeEventParams.DBENTITYEDITING) {
             _remove();
             dataAccess.delete(getId());
             em.removeFromCache((E) this);
-            setState(EntityStateChangeListenerParams.REMOVED);
-            fireStateChange(EntityStateChangeListenerParams.REMOVE, oldState, EntityStateChangeListenerParams.REMOVED);
+            setState(EntityStateChangeEventParams.REMOVED);
+            fireStateChange(EntityStateChangeEventParams.REMOVE, oldState, EntityStateChangeEventParams.REMOVED);
             removeEntityRegistration();
             return;
         }
@@ -192,11 +192,11 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
      */
     public final void copy(E e) {
         IntWithDescription oldState = getState();
-        if (oldState == EntityStateChangeListenerParams.NEW) {
+        if (oldState == EntityStateChangeEventParams.NEW) {
             _copy(e);
             dbfields.copy(e);
             ensureEditing();
-            fireFieldChange(FieldChangeListenerParams.ALLFIELDS);
+            fireFieldChange(FieldChangeEventParams.ALLFIELDS);
             return;
         }
         throw new LogicException("Should not be trying to copy an entity in " + oldState + " state");

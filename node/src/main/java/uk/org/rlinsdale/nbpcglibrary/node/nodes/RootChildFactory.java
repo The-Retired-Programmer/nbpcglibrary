@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import org.openide.nodes.ChildFactory;
 
@@ -63,14 +63,14 @@ public abstract class RootChildFactory<E extends Entity> extends ChildFactory<En
         parent.addSetChangeListener(childListener);
     }
 
-    private class ChildListener extends Listener<SetChangeListenerParams> {
+    private class ChildListener extends Listener<SetChangeEventParams> {
 
         public ChildListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(SetChangeListenerParams p) {
+        public void action(SetChangeEventParams p) {
             refresh(true);
         }
     }

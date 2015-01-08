@@ -24,8 +24,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
-import uk.org.rlinsdale.nbpcglibrary.common.SimpleListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
+import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -39,7 +39,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 public class ErrorInformationDialog {
 
     private final DialogDescriptor dd;
-    private final Listening<SimpleListenerParams> listening = new Listening<>("ErrorInformationDialog");
+    private final Event<SimpleEventParams> listening = new Event<>("ErrorInformationDialog");
     private static ErrorInformationDialog instance;
 
     /**
@@ -49,11 +49,11 @@ public class ErrorInformationDialog {
      * @param message the dialog message
      * @param l a listener which will be fired when the dialog is closed
      */
-    public static void show(String title, String message, Listener<SimpleListenerParams> l) {
+    public static void show(String title, String message, Listener<SimpleEventParams> l) {
         instance = new ErrorInformationDialog(title, message, l);
     }
 
-    private ErrorInformationDialog(String title, String message, Listener<SimpleListenerParams> l) {
+    private ErrorInformationDialog(String title, String message, Listener<SimpleEventParams> l) {
         listening.addListener(l);
         dd = new DialogDescriptor(
                 message,
@@ -76,7 +76,7 @@ public class ErrorInformationDialog {
         public void actionPerformed(ActionEvent ae) {
             LogBuilder.writeEnteringLog("nbpcglibrary.form", "DialogDoneListener", "actionPerformed", ae);
             dd.setClosingOptions(null); // and allow closing
-            listening.fire(SimpleListenerParams.EMPTY);
+            listening.fire(SimpleEventParams.EMPTY);
             instance = null;
         }
     }
@@ -90,7 +90,7 @@ public class ErrorInformationDialog {
                  LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("CloseChangeListener", "propertyChange", pce)
                                 .addMsg("Window closed").write();
                 dd.setClosingOptions(null); // and allow closing
-                listening.fire(SimpleListenerParams.EMPTY);
+                listening.fire(SimpleEventParams.EMPTY);
                 instance = null;
             }
         }

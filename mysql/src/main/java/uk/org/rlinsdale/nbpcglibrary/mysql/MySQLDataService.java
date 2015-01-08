@@ -51,7 +51,7 @@ public class MySQLDataService extends DBDataService {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            LogBuilder.create("nbpcglibrary.mysql", Level.SEVERE).addConstructorName("MySQLDataService")
+            LogBuilder.create("nbpcglibrary.mysql", Level.SEVERE).addConstructorName("MySQLDataService", p)
                 .addException(ex).write();
         }
         try {

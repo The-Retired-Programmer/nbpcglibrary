@@ -69,7 +69,7 @@ public class FileField extends TextField {
      * @param listener the listener for changes to field value
      * @return the created File field
      */
-    public static FileField createWithRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    public static FileField createWithRules(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         return new FileField(field, label, 20, listener);
     }
 
@@ -82,11 +82,11 @@ public class FileField extends TextField {
      * @param listener the listener for changes to field value
      * @return the created File field
      */
-    public static FileField createWithRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    public static FileField createWithRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         return new FileField(field, label, size, listener);
     }
 
-    private FileField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    private FileField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         super(field, label, size, listener);
         addMinRule(1);
         addRule(new FileExistsRule());

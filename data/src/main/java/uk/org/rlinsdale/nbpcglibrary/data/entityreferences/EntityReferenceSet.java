@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,12 +23,13 @@ import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import org.openide.util.Lookup;
+import uk.org.rlinsdale.nbpcglibrary.common.Event.ListenerMode;
 
 /**
  * Manages the list of Entities. The list of Entities is lazy loaded when
@@ -56,7 +57,7 @@ public class EntityReferenceSet<E extends EntityRO> {
      * The name of the Set (for reporting purposes)
      */
     protected final String name;
-    private final Listening<SetChangeListenerParams> setListening;
+    private final Event<SetChangeEventParams> setChangeEvent;
     private final IntWithDescription field;
 
     /**
@@ -93,7 +94,7 @@ public class EntityReferenceSet<E extends EntityRO> {
     private EntityReferenceSet(Class<? extends EntityManagerRO> emclass, String name, IntWithDescription field, String columnname, int columnvalue) {
         this.name = name;
         this.field = field;
-        setListening = new Listening<>(name + "/set");
+        setChangeEvent = new Event<>(name + "/set");
         em = Lookup.getDefault().lookup(emclass);
         this.columnvalue = columnvalue;
         this.columnname = columnname;
@@ -113,8 +114,8 @@ public class EntityReferenceSet<E extends EntityRO> {
      *
      * @param listener the listener
      */
-    public final void addSetListener(Listener<SetChangeListenerParams> listener) {
-        setListening.addListener(listener);
+    public final void addSetListener(Listener<SetChangeEventParams> listener) {
+        setChangeEvent.addListener(listener);
     }
 
     /**
@@ -123,10 +124,10 @@ public class EntityReferenceSet<E extends EntityRO> {
      * depending on the flags set.
      *
      * @param listener the listener
-     * @param flags the listener flags
+     * @param mode the listener mode
      */
-    public final void addSetListener(Listener<SetChangeListenerParams> listener, int flags) {
-        setListening.addListener(listener, flags);
+    public final void addSetListener(Listener<SetChangeEventParams> listener, ListenerMode mode) {
+        setChangeEvent.addListener(listener, mode);
     }
 
     /**
@@ -134,15 +135,15 @@ public class EntityReferenceSet<E extends EntityRO> {
      *
      * @param listener the listener
      */
-    public final void removeSetListener(Listener<SetChangeListenerParams> listener) {
-        setListening.removeListener(listener);
+    public final void removeSetListener(Listener<SetChangeEventParams> listener) {
+        setChangeEvent.removeListener(listener);
     }
 
     /**
      * Fire all set change listeners.
      */
     protected void fireSetChange() {
-        setListening.fire(new SetChangeListenerParams(field));
+        setChangeEvent.fire(new SetChangeEventParams(field));
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,14 +18,14 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
-import uk.org.rlinsdale.nbpcglibrary.common.ListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 
 /**
  * Listener Parameter Class for NameChange listeners.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class NameChangeListenerParams implements ListenerParams {
+public class NameChangeEventParams implements EventParams {
 
     private final String name;
 
@@ -34,7 +34,7 @@ public class NameChangeListenerParams implements ListenerParams {
      *
      * @param name the name
      */
-    public NameChangeListenerParams(String name) {
+    public NameChangeEventParams(String name) {
         this.name = name;
     }
 
@@ -57,8 +57,8 @@ public class NameChangeListenerParams implements ListenerParams {
         if (obj == null) {
             return false;
         }
-        if (obj instanceof NameChangeListenerParams) {
-            return name.equals(((NameChangeListenerParams) obj).name);
+        if (obj instanceof NameChangeEventParams) {
+            return name.equals(((NameChangeEventParams) obj).name);
         }
         return false;
     }

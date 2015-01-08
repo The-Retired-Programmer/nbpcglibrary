@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -171,7 +171,7 @@ abstract public class EntityManagerRO<E extends EntityRO> {
         if (id > 0) {
             lrucache.remove(id);
             cache.remove(id);
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "removeFromCache")
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName("EntityManagerRO", "removeFromCache",e)
                 .addMsg("Cache Remove {0}.{1}", name, e ).write();
             return;
         }

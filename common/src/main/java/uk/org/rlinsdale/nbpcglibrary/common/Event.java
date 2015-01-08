@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,46 +31,50 @@ import java.util.logging.Level;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <P> the listener parameter class
  */
-public class Listening<P extends ListenerParams> {
+public class Event<P extends EventParams> implements LogHelper {
 
     /**
-     * Flag - indicates the event should fire immediately on the observer's
-     * thread.
+     * the Modes that a listener can request it is added
      */
-    public static final int IMMEDIATE = 1;
+    public enum ListenerMode { 
 
-    /**
-     * Flag - indicates the event should fire as soon as possible on the Event
-     * queue thread.
-     */
-    public static final int EVENTQUEUE = 0;
-    private static final int QUEUEMASK = 1;
+        /**
+         * fire on event with priority (ie before normal listeners), fire on the current thread
+         */
+        PRIORITY_IMMEDIATE, 
 
-    /**
-     * Flag - indicates the event should be given priority. Priority events in
-     * any one class (immediate or eventqueue) will always fire prior to those
-     * with normal priority.
-     */
-    public static final int PRIORITY = 2;
+        /**
+         * fire on event with normal priority, fire on the current thread
+         */
+        IMMEDIATE, 
 
-    /**
-     * Flag - indicates the event has normal priority.
-     */
-    public static final int NORMAL = 0;
-    private static final int PRIORITYMASK = 2;
-    private final ListenerStore<P> listenersImmediate = new ListenerStore<>("Immediate");
-    private final ListenerStore<P> listenersEventQueue = new ListenerStore<>("EventQueue");
+        /**
+         * fire on event with priority (ie before normal listeners), fire on the event queue thread
+         */
+        PRIORITY_EVENTQUEUE, 
+
+        /**
+         * fire on event with normal priority, fire on the event queue thread
+         */
+        EVENTQUEUE };
+    
+    private final ListenerStore<P> listenersImmediate = new ListenerStore<>();
+    private final ListenerStore<P> listenersEventQueue = new ListenerStore<>();
     private final String description;
 
     /**
      * Constructor
      *
-     * @param description the listening's descriptive name - for use in error
-     * /log reporting
+     * @param description the listening's descriptive name
      */
-    public Listening(String description) {
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.common", "Listening", description);
+    public Event(String description) {
         this.description = description;
+        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.common", this, description);
+    }
+
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription("Event", description);
     }
 
     /**
@@ -79,7 +83,7 @@ public class Listening<P extends ListenerParams> {
      * @param listener the listener
      */
     public void addListener(Listener<P> listener) {
-        addListener(listener, EVENTQUEUE + NORMAL);
+        addListener(listener, ListenerMode.EVENTQUEUE);
     }
 
     /**
@@ -87,17 +91,24 @@ public class Listening<P extends ListenerParams> {
      * depending on parameter setting.
      *
      * @param listener the listener
-     * @param flags flags indicating priority v. normal and immediate v event
+     * @param mode mode indicating priority v. normal and immediate v event
      * queue
      */
-    public void addListener(Listener<P> listener, int flags) {
-        LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("Listening", "addListener", listener, flags)
-                .addMsg("Listening is {0})", this).write();
+    public void addListener(Listener<P> listener, ListenerMode mode) {
+        LogBuilder.writeEnteringLog("nbpcglibrary.common",this, "addListener", listener, mode);
         if (listener != null) {
-            if ((flags & QUEUEMASK) == IMMEDIATE) {
-                listenersImmediate.add(listener, (flags & PRIORITYMASK) == PRIORITY);
-            } else {
-                listenersEventQueue.add(listener, (flags & PRIORITYMASK) == PRIORITY);
+            switch (mode) {
+                case PRIORITY_IMMEDIATE:
+                    listenersImmediate.add(listener, true);
+                    break;
+                case PRIORITY_EVENTQUEUE:
+                    listenersEventQueue.add(listener, true);
+                    break;
+                case IMMEDIATE:
+                    listenersImmediate.add(listener, false);
+                    break;
+                case EVENTQUEUE:
+                    listenersEventQueue.add(listener, false);
             }
         }
     }
@@ -108,8 +119,7 @@ public class Listening<P extends ListenerParams> {
      * @param listener the listener
      */
     public void removeListener(Listener<P> listener) {
-        LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("Listening", "removeListener", listener)
-                .addMsg("Listening is {0})", this).write();
+        LogBuilder.writeEnteringLog("nbpcglibrary.common",this, "removeListener", listener);
         listenersImmediate.remove(listener);
         listenersEventQueue.remove(listener); // remove a listener from either queue
     }
@@ -130,8 +140,7 @@ public class Listening<P extends ListenerParams> {
      * @param p the listener parameters object
      */
     public void fire(P p) {
-        LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("Listening", "fire", p)
-                .addMsg("Listening is {0} (Listeners: {1} immediate & {2} on eventqueue)", this, listenersImmediate.size(), listenersEventQueue.size()).write();
+        LogBuilder.writeEnteringLog("nbpcglibrary.common", this, "fire", p);
         listenersImmediate.fire(p);
         if (EventQueue.isDispatchThread()) {
             listenersEventQueue.fire(p);
@@ -140,18 +149,13 @@ public class Listening<P extends ListenerParams> {
         }
     }
 
-    @Override
-    public String toString() {
-        return description;
-    }
-
-    private class ListenerStore<P extends ListenerParams> {
+    private class ListenerStore<P extends EventParams> implements LogHelper {
 
         private final List<WeakReference<Listener<P>>> listeners = new ArrayList<>();
-        private final String queuetype;
 
-        public ListenerStore(String queuetype) {
-            this.queuetype = queuetype;
+        @Override
+        public String classDescription() {
+            return LogBuilder.classDescription("Event$ListenerStore", description);
         }
 
         private void removeEmptyReferences() {
@@ -195,11 +199,9 @@ public class Listening<P extends ListenerParams> {
 
         public final synchronized void add(Listener<P> listener, boolean priority) {
             if (allListeners().contains(listener)) {
-                LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("ListenerStore", "add", listener, priority)
-                        .addMsg("Listening is {0} - failed to add listener (type={1}) - reason duplicate", description, queuetype).write();
+                LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName(this, "add", listener, priority)
+                        .addMsg("failed to add listener - reason duplicate").write();
             } else {
-                LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("ListenerStore", "add", listener, priority)
-                        .addMsg("Listening is {0} - added listener (type={1})", description, queuetype).write();
                 if (priority) {
                     listeners.add(0, new WeakReference<>(listener));
                 } else {
@@ -232,7 +234,7 @@ public class Listening<P extends ListenerParams> {
         }
     }
 
-    private class FireEventQueueListener<P extends ListenerParams> implements Runnable {
+    private class FireEventQueueListener<P extends EventParams> implements Runnable {
 
         private final P p;
         private final Listener<P> al;

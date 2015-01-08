@@ -81,9 +81,23 @@ public class LogBuilder {
      * @param methodName the method name
      * @return the LogBuilder
      */
-    public LogBuilder addMethodName(String className, String methodName) {
+    private LogBuilder addMethodName(String className, String methodName) {
         if (shouldBuild) {
             msgbuilder.append(' ').append(className).append('.').append(methodName);
+        }
+        return this;
+    }
+    
+    /**
+     * Add a method string to the log message
+     * (format is space classname dot methodname).
+     * @param classObject the class Object
+     * @param methodName the method name
+     * @return the LogBuilder
+     */
+    private LogBuilder addMethodName(LogHelper classObject, String methodName) {
+        if (shouldBuild) {
+            msgbuilder.append(' ').append(classObject.classDescription()).append('.').append(methodName);
         }
         return this;
     }
@@ -94,9 +108,22 @@ public class LogBuilder {
      * @param className the class name
      * @return the LogBuilder
      */
-    public LogBuilder addConstructorName(String className) {
+    private LogBuilder addConstructorName(String className) {
         if (shouldBuild) {
             msgbuilder.append(' ').append(className);
+        }
+        return this;
+    }
+    
+    /**
+     * Add a constructor string to the log message
+     * (format is space classname).
+     * @param classObject the Class Object
+     * @return the LogBuilder
+     */
+    private LogBuilder addConstructorName(LogHelper classObject) {
+        if (shouldBuild) {
+            msgbuilder.append(' ').append(classObject.classDescription());
         }
         return this;
     }
@@ -113,6 +140,19 @@ public class LogBuilder {
         addMethodName(className, methodName);
         return addMethodParameters(parameters);
     }
+    
+    /**
+     * Add a method string with parameters to the log message
+     * (format is space classname dot methodname bra [param [comma param]] ket).
+     * @param classObject the Class Object
+     * @param methodName the method name
+     * @param parameters the parameters for this method call
+     * @return the LogBuilder
+     */
+    public LogBuilder addMethodName(LogHelper classObject, String methodName, Object... parameters) {
+        addMethodName(classObject, methodName);
+        return addMethodParameters(parameters);
+    }
 
     /**
      * Add a constructor string with parameters to the log message
@@ -125,6 +165,18 @@ public class LogBuilder {
         addConstructorName(className);
         return addMethodParameters(parameters);
     }
+    
+    /**
+     * Add a constructor string with parameters to the log message
+     * (format is space classname bra [param [comma param]] ket).
+     * @param classObject the Class Object
+     * @param parameters the parameters for this constructor
+     * @return the LogBuilder
+     */
+    public LogBuilder addConstructorName(LogHelper classObject, Object... parameters) {
+        addConstructorName(classObject);
+        return addMethodParameters(parameters);
+    }
 
     private LogBuilder addMethodParameters(Object... parameters) {
         if (shouldBuild) {
@@ -135,6 +187,7 @@ public class LogBuilder {
                     msgbuilder.append(", ");
                 }
                 msgbuilder.append(p);
+                first = false;
             }
             msgbuilder.append(')');
         }
@@ -177,6 +230,16 @@ public class LogBuilder {
         }
         return this;
     }
+    
+    /**
+     * Create an instance description from a class ane and its instance name
+     * @param className the class name
+     * @param instanceName the instance name
+     * @return the instance description
+    */
+    public static String classDescription(String className, String instanceName) {
+        return className+"@"+instanceName;
+    }
 
     /* convenience methods */
 
@@ -191,6 +254,18 @@ public class LogBuilder {
     public static void writeEnteringLog(String logname, String className, String methodName, Object... parameters) {
         new LogBuilder(logname, Level.FINER).addMsg("Entering").addMethodName(className, methodName, parameters).write();
     }
+    
+    /**
+     * Convenience method - write a standard log message on entering a method (level is FINER)
+     * @param logname  the log name
+     * @param classObject the class object
+     * @param methodName the method name
+     * @param parameters the method parameters
+     */
+    
+    public static void writeEnteringLog(String logname, LogHelper classObject, String methodName, Object... parameters) {
+        new LogBuilder(logname, Level.FINER).addMsg("Entering").addMethodName(classObject, methodName, parameters).write();
+    }
 
     /**
      * Convenience method - write a standard log message on entering a constructor (level is FINER)
@@ -199,7 +274,17 @@ public class LogBuilder {
      * @param parameters the constructor parameters
      */
     public static void writeEnteringConstructorLog(String logname, String className, Object... parameters) {
-        new LogBuilder(logname, Level.FINER).addMsg("Entering").addConstructorName(className, parameters).write();
+        new LogBuilder(logname, Level.FINER).addMsg("Constructing").addConstructorName(className, parameters).write();
+    }
+    
+    /**
+     * Convenience method - write a standard log message on entering a constructor (level is FINER)
+     * @param logname  the log name
+     * @param classObject the class object
+     * @param parameters the constructor parameters
+     */
+    public static void writeEnteringConstructorLog(String logname, LogHelper classObject, Object... parameters) {
+        new LogBuilder(logname, Level.FINER).addMsg("Constructing").addConstructorName(classObject, parameters).write();
     }
 
     /**
@@ -208,8 +293,19 @@ public class LogBuilder {
      * @param className the class name
      * @param methodName the method name
      */
-    public static void writeExitingLog(String logname, String className, String methodName) {
-        new LogBuilder(logname, Level.FINER).addMsg("Exiting").addMethodName(className, methodName).write();
+    public static void writeExitingLog(String logname, String className, String methodName, Object... parameters) {
+        new LogBuilder(logname, Level.FINER).addMsg("Exiting").addMethodName(className, methodName, parameters).write();
+    }
+    
+    /**
+     * Convenience method - write a standard log message on exiting a method (level is FINER)
+     * @param logname  the log name
+     * @param classObject the class object
+     * @param methodName the method name
+     * @param parameters the constructor parameters
+     */
+    public static void writeExitingLog(String logname, LogHelper classObject, String methodName, Object... parameters) {
+        new LogBuilder(logname, Level.FINER).addMsg("Exiting").addMethodName(classObject, methodName, parameters).write();
     }
 
     /**

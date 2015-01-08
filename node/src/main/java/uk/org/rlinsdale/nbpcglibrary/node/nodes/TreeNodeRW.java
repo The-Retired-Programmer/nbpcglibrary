@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,12 +27,12 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeListenerParams;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.node.SaveHandler;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Listening;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -49,8 +49,8 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
     private SaveHandler saveHandler;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
-    private Listening<NameChangeListenerParams> titleListening;
-    private Listening<NameChangeListenerParams> nameListening;
+    private Event<NameChangeEventParams> titleListening;
+    private Event<NameChangeEventParams> nameListening;
     private boolean isCutDestroyEnabled;
 
     /**
@@ -85,8 +85,8 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
     private void commonConstructor(String nodename, E e, boolean isCutDestroyEnabled) {
         this.isCutDestroyEnabled = isCutDestroyEnabled;
-        nameListening = new Listening<>(nodename + "/name");
-        titleListening = new Listening<>(nodename + "/title");
+        nameListening = new Event<>(nodename + "/name");
+        titleListening = new Event<>(nodename + "/title");
         nodeSavable = new NodeSavable<>(nodename);
         saveHandler = nodeSavable.getDefaultSaveHandler();
         e.addStateListener(stateListener = new EntityStateChangeListener(nodename + "/state"));
@@ -101,7 +101,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      *
      * @param listener the listener
      */
-    public final void addNameListener(Listener<NameChangeListenerParams> listener) {
+    public final void addNameListener(Listener<NameChangeEventParams> listener) {
         nameListening.addListener(listener);
     }
 
@@ -110,12 +110,12 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      *
      * @param listener the listener
      */
-    public final void removeNameListener(Listener<NameChangeListenerParams> listener) {
+    public final void removeNameListener(Listener<NameChangeEventParams> listener) {
         nameListening.removeListener(listener);
     }
 
     final void nameListenerFire() {
-        nameListening.fire(new NameChangeListenerParams(getDisplayName()));
+        nameListening.fire(new NameChangeEventParams(getDisplayName()));
     }
 
     /**
@@ -123,7 +123,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      *
      * @param listener the listener
      */
-    public final void addTitleListener(Listener<NameChangeListenerParams> listener) {
+    public final void addTitleListener(Listener<NameChangeEventParams> listener) {
         titleListening.addListener(listener);
     }
 
@@ -132,12 +132,12 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      *
      * @param listener the listener
      */
-    public final void removeTitleListener(Listener<NameChangeListenerParams> listener) {
+    public final void removeTitleListener(Listener<NameChangeEventParams> listener) {
         titleListening.removeListener(listener);
     }
 
     final void titleListenerFire() {
-        titleListening.fire(new NameChangeListenerParams(getDisplayTitle()));
+        titleListening.fire(new NameChangeEventParams(getDisplayTitle()));
     }
 
     /**
@@ -150,7 +150,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
         this.saveHandler = saveHandler == null ? nodeSavable.getDefaultSaveHandler() : saveHandler;
     }
 
-    private class EntityStateChangeListener extends Listener<EntityStateChangeListenerParams> {
+    private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
 
         public EntityStateChangeListener(String name) {
             super(name);
@@ -158,21 +158,21 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
         @Override
         @SuppressWarnings("IncompatibleEquals")
-        public void action(EntityStateChangeListenerParams p) {
-            if (p.equals(EntityStateChangeListenerParams.EDIT)) {
+        public void action(EntityStateChangeEventParams p) {
+            if (p.equals(EntityStateChangeEventParams.EDIT)) {
                 nodeSavable.enable(getEntity());
                 iconChange();
             }
-            if (p.equals(EntityStateChangeListenerParams.SAVE)) {
+            if (p.equals(EntityStateChangeEventParams.SAVE)) {
                 nodeSavable.disable();
                 iconChange();
                 nameChange();
             }
-            if (p.equals(EntityStateChangeListenerParams.REMOVE)) {
+            if (p.equals(EntityStateChangeEventParams.REMOVE)) {
                 nodeSavable.disable();
                 setNoEntity();
             }
-            if (p.equals(EntityStateChangeListenerParams.RESET)) {
+            if (p.equals(EntityStateChangeEventParams.RESET)) {
                 nodeSavable.disable();
             }
         }
@@ -184,14 +184,14 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
         return (entity.isNew() ? "<font color='#0000FF'><b>" : (entity.isEditing() ? "<b>" : "")) + getDisplayName();
     }
 
-    private class EntityFieldChangeListener extends Listener<FieldChangeListenerParams> {
+    private class EntityFieldChangeListener extends Listener<FieldChangeEventParams> {
 
         public EntityFieldChangeListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeListenerParams p) {
+        public void action(FieldChangeEventParams p) {
             _processFieldChange(p.get());
             // TODO make decision about the Icon changes (based on changes to error state)
             iconChange(); // temporary - do always (just in case!)

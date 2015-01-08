@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,20 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
-
-import uk.org.rlinsdale.nbpcglibrary.common.ListenerParams;
+package uk.org.rlinsdale.nbpcglibrary.common;
 
 /**
- * The Listener Parameter Object - used to transfer state when listener is
- * fired.
- *
+ * Interface marker - for any listener parameter class to use. 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class IdListenerParams implements ListenerParams {
-
-    @Override
-    public String toString() {
-        return "IdListenerParams";
-    }
+public interface EventParams {
 }

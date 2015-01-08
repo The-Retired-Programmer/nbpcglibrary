@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.form.ChoiceField;
-import uk.org.rlinsdale.nbpcglibrary.form.FormFieldChangeListenerParams;
+import uk.org.rlinsdale.nbpcglibrary.form.FormFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 
@@ -52,7 +52,7 @@ public abstract class EnumChoiceField extends ChoiceField {
      * @param choices the list of possible values
      * @param listener change listener
      */
-    public EnumChoiceField(IntWithDescription field, String label, List<String> choices, Listener<FormFieldChangeListenerParams> listener) {
+    public EnumChoiceField(IntWithDescription field, String label, List<String> choices, Listener<FormFieldChangeEventParams> listener) {
         super(field, label, listener);
         this.choices = choices;
     }

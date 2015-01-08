@@ -76,7 +76,7 @@ public class TextField extends EditableField {
      * @param listener the listener for changes to field value
      * @return the created text field
      */
-    public static TextField create(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener) {
+    public static TextField create(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
         return new TextField(field, label, 20, listener);
     }
 
@@ -89,7 +89,7 @@ public class TextField extends EditableField {
      * @param listener the listener for changes to field value
      * @return the created text field
      */
-    public static TextField create(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    public static TextField create(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         return new TextField(field, label, size, listener);
     }
 
@@ -130,7 +130,7 @@ public class TextField extends EditableField {
      * @param max maximum number of characters to enter
      * @return the created text field
      */
-    public static TextField createWithMinMaxRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
+    public static TextField createWithMinMaxRules(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener, int min, int max) {
         return new TextField(field, label, 20, listener, min, max);
     }
 
@@ -145,7 +145,7 @@ public class TextField extends EditableField {
      * @param max maximum number of characters to enter
      * @return the created text field
      */
-    public static TextField createWithMinMaxRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
+    public static TextField createWithMinMaxRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, int min, int max) {
         return new TextField(field, label, size, listener, min, max);
     }
 
@@ -192,7 +192,7 @@ public class TextField extends EditableField {
      * @param findOthers the object used to find the set of given values
      * @return the created text field
      */
-    public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener, int min, int max, FindAction<String> findOthers) {
+    public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener, int min, int max, FindAction<String> findOthers) {
         return new TextField(field, label, 20, listener, min, max, findOthers);
     }
 
@@ -209,7 +209,7 @@ public class TextField extends EditableField {
      * @param findOthers the object used to find the set of given values
      * @return the created text field
      */
-    public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max, FindAction<String> findOthers) {
+    public static TextField createWithMinMaxUnqiueRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, int min, int max, FindAction<String> findOthers) {
         return new TextField(field, label, size, listener, min, max, findOthers);
     }
 
@@ -250,7 +250,7 @@ public class TextField extends EditableField {
      * @param findOthers the object used to find the set of given values
      * @return the created text field
      */
-    public static TextField createWithUnqiueRule(IntWithDescription field, String label, Listener<FormFieldChangeListenerParams> listener, FindAction<String> findOthers) {
+    public static TextField createWithUnqiueRule(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener, FindAction<String> findOthers) {
         return new TextField(field, label, 20, listener, findOthers);
     }
 
@@ -265,7 +265,7 @@ public class TextField extends EditableField {
      * @param findOthers the object used to find the set of given values
      * @return the created text field
      */
-    public static TextField createWithUnqiueRule(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, FindAction<String> findOthers) {
+    public static TextField createWithUnqiueRule(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, FindAction<String> findOthers) {
         return new TextField(field, label, size, listener, findOthers);
     }
 
@@ -277,7 +277,7 @@ public class TextField extends EditableField {
      * @param size size of the value display
      * @param listener the listener for changes to field value
      */
-    protected TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener) {
+    protected TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
         super(field, label);
         textfield = new JTextField();
         textfield.setColumns(size);
@@ -286,18 +286,18 @@ public class TextField extends EditableField {
         textfield.addFocusListener(textFocusListener);
     }
 
-    private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max) {
+    private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, int min, int max) {
         this(field, label, size, listener);
         addMinRule(min);
         addMaxRule(max);
     }
 
-    private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, int min, int max, FindAction<String> findOthers) {
+    private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, int min, int max, FindAction<String> findOthers) {
         this(field, label, size, listener, min, max);
         addUniqueRule(findOthers);
     }
 
-    private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeListenerParams> listener, FindAction<String> findOthers) {
+    private TextField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener, FindAction<String> findOthers) {
         this(field, label, size, listener);
         addUniqueRule(findOthers);
     }
