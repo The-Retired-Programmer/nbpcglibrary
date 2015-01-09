@@ -26,11 +26,11 @@ package uk.org.rlinsdale.nbpcglibrary.common;
  */
 public class SimpleEventParams implements EventParams {
 
-    /**
-     * An Empty Listener parameters - static sharable readonly listener parameters
-     */
-    public static final SimpleEventParams EMPTY = new SimpleEventParams();
-
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this);
+    }
+    
     @Override
     public String toString() {
         return "Simple(Empty)";

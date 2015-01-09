@@ -22,5 +22,5 @@ package uk.org.rlinsdale.nbpcglibrary.common;
  * Interface marker - for any listener parameter class to use. 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface EventParams {
+public interface EventParams extends LogHelper {
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,12 +18,14 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dataservice;
 
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+
 /**
  * Interface - defines the core functions of a data service.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface DataService {
+public interface DataService extends LogHelper {
 
     /**
      * Test if DataService is operational - ie available and able to access

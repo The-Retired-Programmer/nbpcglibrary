@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
@@ -27,7 +28,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class Entity extends Rules {
+public abstract class Entity extends Rules implements LogHelper {
 
     private final Event<SetChangeEventParams> setChangeEvent;
     private final EntityError entityerror;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,7 +76,7 @@ public class ErrorInformationDialog {
         public void actionPerformed(ActionEvent ae) {
             LogBuilder.writeEnteringLog("nbpcglibrary.form", "DialogDoneListener", "actionPerformed", ae);
             dd.setClosingOptions(null); // and allow closing
-            listening.fire(SimpleEventParams.EMPTY);
+            listening.fire(new SimpleEventParams());
             instance = null;
         }
     }
@@ -90,7 +90,7 @@ public class ErrorInformationDialog {
                  LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("CloseChangeListener", "propertyChange", pce)
                                 .addMsg("Window closed").write();
                 dd.setClosingOptions(null); // and allow closing
-                listening.fire(SimpleEventParams.EMPTY);
+                listening.fire(new SimpleEventParams());
                 instance = null;
             }
         }

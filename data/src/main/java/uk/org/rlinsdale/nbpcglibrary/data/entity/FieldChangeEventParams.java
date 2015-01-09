@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Parameter Class for a FieldChange listener.
@@ -91,6 +92,11 @@ public class FieldChangeEventParams implements EventParams {
             return this.field == (IntWithDescription) obj;
         }
         return false;
+    }
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, field.toString());
     }
 
     @Override

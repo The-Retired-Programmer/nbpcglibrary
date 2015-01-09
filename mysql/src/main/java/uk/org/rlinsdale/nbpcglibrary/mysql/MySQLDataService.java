@@ -60,6 +60,11 @@ public class MySQLDataService extends DBDataService {
         } catch (SQLException ex) {
         }
     }
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, getName());
+    }
 
     @Override
     protected String format(Object value) {

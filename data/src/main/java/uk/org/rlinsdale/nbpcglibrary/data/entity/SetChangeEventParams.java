@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Parameter Class for a SetChange listener.
@@ -65,6 +66,11 @@ public class SetChangeEventParams implements EventParams {
             return this.set == (IntWithDescription) obj;
         }
         return false;
+    }
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, set.toString());
     }
     
     @Override

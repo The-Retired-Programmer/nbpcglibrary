@@ -19,6 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * Listener Parameter Class for NameChange listeners.
@@ -36,6 +37,11 @@ public class NameChangeEventParams implements EventParams {
      */
     public NameChangeEventParams(String name) {
         this.name = name;
+    }
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, name);
     }
 
     /**

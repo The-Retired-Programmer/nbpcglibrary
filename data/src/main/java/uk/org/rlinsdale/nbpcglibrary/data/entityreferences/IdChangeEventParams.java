@@ -19,6 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Listener Parameter Object - used to transfer state when listener is
@@ -28,6 +29,11 @@ import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
  */
 public class IdChangeEventParams implements EventParams {
 
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this);
+    }
+    
     @Override
     public String toString() {
         return "IdChangeEventParams";

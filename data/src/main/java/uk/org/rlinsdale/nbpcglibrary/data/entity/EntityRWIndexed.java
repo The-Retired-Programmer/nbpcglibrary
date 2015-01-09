@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,11 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEW;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEWEDITING;
 
 /**
  * The abstract class defining an editable Entity, with a index (orderable)
@@ -51,8 +53,8 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
 
     @Override
     public final boolean save() {
-        IntWithDescription oldState = getState();
-        if (oldState == EntityStateChangeEventParams.NEW || oldState == EntityStateChangeEventParams.NEWEDITING) {
+        EntityState oldState = getState();
+        if (oldState == NEW || oldState == NEWEDITING) {
             if (dbfields.getIndex() == Integer.MAX_VALUE) {
                 dbfields.setIndex(dataAccess.getNextIdx());
             }

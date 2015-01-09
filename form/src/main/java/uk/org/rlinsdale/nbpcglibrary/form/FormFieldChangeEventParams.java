@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The listener parameters which are passed when the listener is fired for a
@@ -38,6 +39,11 @@ public class FormFieldChangeEventParams implements EventParams {
      */
     public FormFieldChangeEventParams(IntWithDescription field) {
         this.field = field;
+    }
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, field.toString());
     }
 
     /**

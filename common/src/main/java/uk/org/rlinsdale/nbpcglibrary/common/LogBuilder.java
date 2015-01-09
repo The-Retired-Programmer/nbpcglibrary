@@ -194,7 +194,11 @@ public class LogBuilder {
                 if (!first) {
                     msgbuilder.append(", ");
                 }
-                msgbuilder.append(p);
+                if (p instanceof LogHelper) {
+                    msgbuilder.append(((LogHelper)p).classDescription());
+                } else {
+                    msgbuilder.append(p);
+                }
                 first = false;
             }
             msgbuilder.append(')');
@@ -252,6 +256,17 @@ public class LogBuilder {
      */
     public static String classDescription(Object instance, String instanceName) {
         return instance.getClass().getSimpleName() + "@" + instanceName;
+    }
+    
+     /**
+     * Create an instance description from a class ane and its instance name
+     *
+     * @param instance the instance
+     * @param instanceNameObject the instance name object
+     * @return the instance description
+     */
+    public static String classDescription(Object instance, LogHelper instanceNameObject) {
+        return instance.getClass().getSimpleName() + "@" + instanceNameObject.classDescription();
     }
 
     /**

@@ -36,6 +36,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 
 /**
  * Read-Only Tree Node Abstract Class
@@ -49,8 +50,8 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
     private SaveHandler saveHandler;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
-    private Event<NameChangeEventParams> titleListening;
-    private Event<NameChangeEventParams> nameListening;
+    private Event<NameChangeEventParams> titleChangeEvent;
+    private Event<NameChangeEventParams> nameChangeEvent;
     private boolean isCutDestroyEnabled;
 
     /**
@@ -85,12 +86,12 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
     private void commonConstructor(String nodename, E e, boolean isCutDestroyEnabled) {
         this.isCutDestroyEnabled = isCutDestroyEnabled;
-        nameListening = new Event<>(nodename + "/name");
-        titleListening = new Event<>(nodename + "/title");
+        nameChangeEvent = new Event<>(nodename + "-namechange");
+        titleChangeEvent = new Event<>(nodename + "-titlechange");
         nodeSavable = new NodeSavable<>(nodename);
         saveHandler = nodeSavable.getDefaultSaveHandler();
-        e.addStateListener(stateListener = new EntityStateChangeListener(nodename + "/state"));
-        e.addFieldListener(fieldListener = new EntityFieldChangeListener(nodename + "/field"));
+        e.addStateListener(stateListener = new EntityStateChangeListener(nodename + "-statechange"));
+        e.addFieldListener(fieldListener = new EntityFieldChangeListener(nodename + "-fieldchange"));
         if (e.isEditing()) {
             nodeSavable.enable(e);
         }
@@ -102,7 +103,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      * @param listener the listener
      */
     public final void addNameListener(Listener<NameChangeEventParams> listener) {
-        nameListening.addListener(listener);
+        nameChangeEvent.addListener(listener);
     }
 
     /**
@@ -111,11 +112,11 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      * @param listener the listener
      */
     public final void removeNameListener(Listener<NameChangeEventParams> listener) {
-        nameListening.removeListener(listener);
+        nameChangeEvent.removeListener(listener);
     }
 
     final void nameListenerFire() {
-        nameListening.fire(new NameChangeEventParams(getDisplayName()));
+        nameChangeEvent.fire(new NameChangeEventParams(getDisplayName()));
     }
 
     /**
@@ -124,7 +125,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      * @param listener the listener
      */
     public final void addTitleListener(Listener<NameChangeEventParams> listener) {
-        titleListening.addListener(listener);
+        titleChangeEvent.addListener(listener);
     }
 
     /**
@@ -133,11 +134,11 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      * @param listener the listener
      */
     public final void removeTitleListener(Listener<NameChangeEventParams> listener) {
-        titleListening.removeListener(listener);
+        titleChangeEvent.removeListener(listener);
     }
 
     final void titleListenerFire() {
-        titleListening.fire(new NameChangeEventParams(getDisplayTitle()));
+        titleChangeEvent.fire(new NameChangeEventParams(getDisplayTitle()));
     }
 
     /**
@@ -159,21 +160,22 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
         @Override
         @SuppressWarnings("IncompatibleEquals")
         public void action(EntityStateChangeEventParams p) {
-            if (p.equals(EntityStateChangeEventParams.EDIT)) {
-                nodeSavable.enable(getEntity());
-                iconChange();
-            }
-            if (p.equals(EntityStateChangeEventParams.SAVE)) {
-                nodeSavable.disable();
-                iconChange();
-                nameChange();
-            }
-            if (p.equals(EntityStateChangeEventParams.REMOVE)) {
-                nodeSavable.disable();
-                setNoEntity();
-            }
-            if (p.equals(EntityStateChangeEventParams.RESET)) {
-                nodeSavable.disable();
+            switch (p.getTransition()) {
+                case EDIT:
+                    nodeSavable.enable(getEntity());
+                    iconChange();
+                    break;
+                case SAVE:
+                    nodeSavable.disable();
+                    iconChange();
+                    nameChange();
+                    break;
+                case REMOVE:
+                    nodeSavable.disable();
+                    setNoEntity();
+                    break;
+                case RESET:
+                    nodeSavable.disable();
             }
         }
     }
@@ -241,7 +243,7 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
         fireOpenedIconChange();
     }
 
-    private class NodeSavable<Z extends EntityRW> extends AbstractSavable implements Icon {
+    private class NodeSavable<Z extends EntityRW> extends AbstractSavable implements Icon, LogHelper {
 
         private final String nodename;
         private Icon nodeicon;
@@ -250,6 +252,11 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
         public NodeSavable(String nodename) {
             this.nodename = nodename;
+        }
+
+        @Override
+        public String classDescription() {
+            return LogBuilder.classDescription(this.nodename);
         }
 
         public SaveHandler getDefaultSaveHandler() {
@@ -268,13 +275,13 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
             this.e = e;
             content.add(this);
             register();
-            LogBuilder.create("nbpcglibrary.node", Level.FINEST).addMethodName("NodeSavable", "enable")
-                            .addMsg("node is {0}", nodename).write();
+            LogBuilder.create("nbpcglibrary.node", Level.FINEST).addMethodName(this, "enable")
+                    .addMsg("node is {0}", nodename).write();
         }
 
         public void disable() {
-            LogBuilder.create("nbpcglibrary.node", Level.FINEST).addMethodName("NodeSavable", "disable")
-                            .addMsg("node is {0}", nodename).write();
+            LogBuilder.create("nbpcglibrary.node", Level.FINEST).addMethodName(this, "disable")
+                    .addMsg("node is {0}", nodename).write();
             content.remove(this);
             unregister();
             e = null;
@@ -282,8 +289,8 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
 
         @Override
         protected void handleSave() throws IOException {
-            LogBuilder.create("nbpcglibrary.node", Level.FINE).addMethodName("NodeSavable", "handleSave")
-                            .addMsg("node is {0}", nodename).write();
+            LogBuilder.create("nbpcglibrary.node", Level.FINE).addMethodName(this, "handleSave")
+                    .addMsg("node is {0}", nodename).write();
             saveHandler.handleSave();
         }
 

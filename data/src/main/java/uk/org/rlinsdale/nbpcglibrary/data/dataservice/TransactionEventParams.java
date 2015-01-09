@@ -18,8 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dataservice;
 
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Parameter Object passed when a Transaction Listener action is fired.
@@ -29,64 +29,46 @@ import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 public class TransactionEventParams implements EventParams {
 
     /**
-     * Id for Begin Transaction
+     * Transaction State Requests
      */
-    public static final IntWithDescription BEGIN = new IntWithDescription(1, "Begin");
+    public enum TransactionRequest {
 
-    /**
-     * Id for Commit Transaction
-     */
-    public static final IntWithDescription COMMIT = new IntWithDescription(2, "Commit");
-
-    /**
-     * Id for Rollback Transaction
-     */
-    public static final IntWithDescription ROLLBACK = new IntWithDescription(3, "Rollback");
-    static final TransactionEventParams BEGINListenerParams = new TransactionEventParams(BEGIN);
-    static final TransactionEventParams COMMITListenerParams = new TransactionEventParams(COMMIT);
-    static final TransactionEventParams ROLLBACKListenerParams = new TransactionEventParams(ROLLBACK);
+        /**
+         * BEGIN transaction Request
+         */
+        BEGIN,
+        /**
+         * COMIT transaction Request
+         */
+        COMMIT,
+        /**
+         * ROLLBACK transaction Request
+         */
+        ROLLBACK
+    }
     //
-    private final IntWithDescription type;
+    private final TransactionRequest type;
 
     /**
      * Constructor.
      *
      * @param type the transaction type
      */
-    public TransactionEventParams(IntWithDescription type) {
+    public TransactionEventParams(TransactionRequest type) {
         this.type = type;
     }
 
     /**
      * Get the Transaction Type.
      *
-     * @return the transaction type
+     * @return the transaction request
      */
-    public IntWithDescription get() {
+    public TransactionRequest get() {
         return type;
     }
 
     @Override
-    public int hashCode() {
-        return type.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj instanceof TransactionEventParams) {
-            return this.type == ((TransactionEventParams) obj).type;
-        }
-        if (obj instanceof IntWithDescription) {
-            return this.type == (IntWithDescription) obj;
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "Transaction: " + type;
+    public String classDescription() {
+        return LogBuilder.classDescription(this, type.toString());
     }
 }

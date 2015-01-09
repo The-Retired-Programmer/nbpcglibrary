@@ -18,8 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Parameter Class for a EntityStateChange listener.
@@ -29,142 +29,118 @@ import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 public class EntityStateChangeEventParams implements EventParams {
 
     /**
-     * State Id - Init. entity created but not populated.
+     * Entity State
      */
-    public final static IntWithDescription INIT = new IntWithDescription(1, "Init");
+    public enum EntityState {
 
-    /**
-     * State Id - New. entity created and data initialised.
-     */
-    public final static IntWithDescription NEW = new IntWithDescription(2, "New");
+        /**
+         * Init. entity created but not populated.
+         */
+        INIT,
+        /**
+         * New. entity created and data initialised.
+         */
+        NEW,
+        /**
+         * NewEditing. new entity which has subsequently been modified.
+         */
+        NEWEDITING,
+        /**
+         * Removed. entity removed.
+         */
+        REMOVED,
+        /**
+         * DbEntity. entity is a copy of the entity in entity storage.
+         */
+        DBENTITY,
+        /**
+         * DbEntityEditiong. DBentity which has subsequently been modified.
+         */
+        DBENTITYEDITING,
+        /**
+         * State Id - Deleted. entity deleted from entity storage.
+         */
+        DELETED
+    };
 
-    /**
-     * State Id - NewEditing. new entity which has subsequently been modified.
-     */
-    public final static IntWithDescription NEWEDITING = new IntWithDescription(3, "NewEditing");
+    public enum EntityStateChange {
 
-    /**
-     * State Id - Removed. entity removed.
-     */
-    public final static IntWithDescription REMOVED = new IntWithDescription(4, "Removed");
-
-    /**
-     * State Id - DbEntity. entity is a copy of the entity in entity storage.
-     */
-    public final static IntWithDescription DBENTITY = new IntWithDescription(5, "DbEntity");
-
-    /**
-     * State Id - DbEntityEditiong. DBentity which has subsequently been
-     * modified.
-     */
-    public final static IntWithDescription DBENTITYEDITING = new IntWithDescription(6, "DbEntityEditing");
-
-    /**
-     * State Id - Deleted. entity deleted from entity storage.
-     */
-    public final static IntWithDescription DELETED = new IntWithDescription(7, "Deleted");
-    // transitions within the state model
-
-    /**
-     * State Change Id - Create. entity created
-     */
-    public final static IntWithDescription CREATE = new IntWithDescription(1, "Create");
-
-    /**
-     * State change Id - Load. entity loaded with data.
-     */
-    public final static IntWithDescription LOAD = new IntWithDescription(2, "Load");
-
-    /**
-     * State change Id - Edit. entity has been edited
-     */
-    public final static IntWithDescription EDIT = new IntWithDescription(3, "Edit");
-
-    /**
-     * State change Id - Save. entity has been saved.
-     */
-    public final static IntWithDescription SAVE = new IntWithDescription(4, "Save");
-
-    /**
-     * State change Id - Reset. entity has been reset.
-     */
-    public final static IntWithDescription RESET = new IntWithDescription(5, "Reset");
-
-    /**
-     * State change Id - Delete. entity has been deleted.
-     */
-    public final static IntWithDescription DELETE = new IntWithDescription(6, "Delete");
-
-    /**
-     * State change Id - Remove. entity has been removed.
-     */
-    public final static IntWithDescription REMOVE = new IntWithDescription(7, "Remove");
+        /**
+         * Create. entity created
+         */
+        CREATE,
+        /**
+         * Load. entity loaded with data.
+         */
+        LOAD,
+        /**
+         * Edit. entity has been edited
+         */
+        EDIT,
+        /**
+         * Save. entity has been saved.
+         */
+        SAVE,
+        /**
+         * Reset. entity has been reset.
+         */
+        RESET,
+        /**
+         * Delete. entity has been deleted.
+         */
+        DELETE,
+        /**
+         * Remove. entity has been removed.
+         */
+        REMOVE
+    };
     //
-    private final IntWithDescription transition;
-    private final IntWithDescription oldState;
-    private final IntWithDescription newState;
+    private final EntityStateChange transition;
+    private final EntityState oldState;
+    private final EntityState newState;
 
     /**
      * Constructor.
      *
-     * @param transition the State change Id
-     * @param oldState the previous state Id
-     * @param newState the new state Id
+     * @param transition the State change
+     * @param oldState the previous state
+     * @param newState the new state
      */
-    public EntityStateChangeEventParams(IntWithDescription transition, IntWithDescription oldState, IntWithDescription newState) {
+    public EntityStateChangeEventParams(EntityStateChange transition, EntityState oldState, EntityState newState) {
         this.transition = transition;
         this.oldState = oldState;
         this.newState = newState;
     }
 
     /**
-     * Get the transition Id.
+     * Get the transition
      *
-     * @return the transition Id
+     * @return the transition
      */
-    public IntWithDescription getTransition() {
+    public EntityStateChange getTransition() {
         return transition;
     }
 
     /**
-     * Get the old state Id.
+     * Get the old state
      *
-     * @return the old state Id
+     * @return the old state
      */
-    public IntWithDescription getOldState() {
+    public EntityState getOldState() {
         return oldState;
     }
 
     /**
-     * Get the new state Id.
+     * Get the new state.
      *
-     * @return the new state Id
+     * @return the new state
      */
-    public IntWithDescription getNewState() {
+    public EntityState getNewState() {
         return newState;
     }
 
     @Override
-    public int hashCode() {
-        return transition.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj instanceof EntityStateChangeEventParams) {
-            return this.transition == ((EntityStateChangeEventParams) obj).transition;
-        }
-        if (obj instanceof IntWithDescription) {
-            return this.transition == (IntWithDescription) obj;
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return transition + "(" + oldState + "->" + newState + ")";
+    public String classDescription() {
+        return LogBuilder.classDescription(this, transition + "(" + oldState + "->" + newState);
     }
 }

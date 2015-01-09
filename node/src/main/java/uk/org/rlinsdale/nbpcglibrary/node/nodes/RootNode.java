@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,6 +43,7 @@ import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 
 /**
  * Root Node Abstract Class
@@ -51,7 +52,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * @param <E> the Entity Class
  */
 @RegisterLog("nbpcglibrary.node")
-public abstract class RootNode<E extends Entity> extends AbstractNode {
+public abstract class RootNode<E extends Entity> extends AbstractNode implements LogHelper {
 
     private E e;
 
@@ -110,6 +111,11 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
         this.e = e;
         this.iconname = iconname;
         content.add(this);
+    }
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this,e);
     }
 
     /**
@@ -198,7 +204,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
     // CUT and PASTE target support
     @Override
     public final PasteType getDropType(final Transferable t, int action, int index) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNode", "getDropType");
+        LogBuilder.writeEnteringLog("nbpcglibrary.node", this, "getDropType");
         if (allowedPaste != null) {
             for (DataFlavorAndAction dfa : allowedPaste) {
                 if (t.isDataFlavorSupported(dfa.dataflavor) && ((action & (dfa.action)) != 0)) {
@@ -209,7 +215,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
         return null;
     }
 
-    private class AllowedPasteType extends PasteType {
+    private class AllowedPasteType extends PasteType implements LogHelper {
 
         private final Transferable t;
         private final DataFlavorAndAction dfa;
@@ -220,10 +226,15 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
             this.dfa = dfa;
             this.action = action;
         }
+        
+        @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this);
+    }
 
         @Override
         public Transferable paste() throws IOException {
-            LogBuilder.writeEnteringLog("nbpcglibrary.node", "AllowedPasteType", "paste");
+            LogBuilder.writeEnteringLog("nbpcglibrary.node", this, "paste");
             Entity e;
             try {
                 e = (Entity) t.getTransferData(dfa.dataflavor);
@@ -235,27 +246,27 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
                 case DataFlavorAndAction.MOVE:
                     node = NodeTransfer.node(t, action);
                     if (node != null) {
-                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                                 .addMsg("remove previous node").write();
                         ((TreeNodeRW) node)._cutAndPasteRemove();
                     }
-                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                             .addMsg("drag/drop action").write();
                     _moveAddChild(e);
                     break;
                 case DataFlavorAndAction.CUT:
                     node = NodeTransfer.node(t, action);
                     if (node != null) {
-                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                                 .addMsg("remove previous node").write();
                         ((TreeNodeRW) node)._cutAndPasteRemove();
                     }
-                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                             .addMsg("cut/paste action").write();
                     _cutAddChild(e);
                     break;
                 case DataFlavorAndAction.COPY:
-                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("AllowedPasteType", "paste")
+                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                             .addMsg("copy/paste action").write();
                     _copyAddChild(e);
                     break;
@@ -320,13 +331,18 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
      */
     abstract protected DataFlavor _getDataFlavor();
 
-    private class ChildIndex extends Index.Support {
+    private class ChildIndex extends Index.Support implements LogHelper {
 
         private final DataFlavorAndAction dfa;
 
         public ChildIndex(DataFlavorAndAction dfa) {
             this.dfa = dfa;
         }
+        
+        @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this);
+    }
 
         @Override
         public Node[] getNodes() {
@@ -341,7 +357,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode {
         @Override
         public void reorder(int[] perm) {
             if ((dfa.action & DataFlavorAndAction.MOVE) != 0) {
-                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName("ChildIndex", "reorder").write();
+                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "reorder").write();
                 _moveReorderChildByFlavor(dfa.dataflavor, perm);
             }
         }
