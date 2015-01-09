@@ -233,12 +233,12 @@ public class LogBuilder {
     
     /**
      * Create an instance description from a class ane and its instance name
-     * @param className the class name
+     * @param Object the instance
      * @param instanceName the instance name
      * @return the instance description
     */
-    public static String classDescription(String className, String instanceName) {
-        return className+"@"+instanceName;
+    public static String classDescription(Object instance, String instanceName) {
+        return instance.getClass().getSimpleName()+"@"+instanceName;
     }
 
     /* convenience methods */

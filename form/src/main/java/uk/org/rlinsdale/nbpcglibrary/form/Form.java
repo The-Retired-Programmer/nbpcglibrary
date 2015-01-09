@@ -23,7 +23,6 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import javax.swing.JTextArea;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -51,6 +50,7 @@ public class Form extends GridBagPanel implements LogHelper {
      *
      * @param formname the form's name
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public Form(String formname) {
         fieldsdefs = new ArrayList<>();
         this.formname = formname;
@@ -72,7 +72,7 @@ public class Form extends GridBagPanel implements LogHelper {
     
      @Override
     public String classDescription() {
-        return LogBuilder.classDescription("Form", formname);
+        return LogBuilder.classDescription(this, formname);
     }
 
 

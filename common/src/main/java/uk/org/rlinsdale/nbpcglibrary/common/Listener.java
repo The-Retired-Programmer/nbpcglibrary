@@ -43,7 +43,7 @@ public abstract class Listener<P extends EventParams> implements LogHelper {
     
     @Override
     public String classDescription() {
-        return LogBuilder.classDescription("Listener", description);
+        return LogBuilder.classDescription(this, description);
     }
 
     /**

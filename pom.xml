@@ -10,7 +10,7 @@
     
     <groupId>uk.org.rlinsdale</groupId>
     <artifactId>nbpcglibrary</artifactId>
-    <version>3.1.4</version>
+    <version>3.1.5</version>
     <packaging>pom</packaging>
     <name>NBPCG Library</name>
     

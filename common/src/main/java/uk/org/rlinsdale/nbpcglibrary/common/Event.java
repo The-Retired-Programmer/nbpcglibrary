@@ -74,7 +74,7 @@ public class Event<P extends EventParams> implements LogHelper {
 
     @Override
     public String classDescription() {
-        return LogBuilder.classDescription("Event", description);
+        return LogBuilder.classDescription(this, description);
     }
 
     /**
@@ -155,7 +155,7 @@ public class Event<P extends EventParams> implements LogHelper {
 
         @Override
         public String classDescription() {
-            return LogBuilder.classDescription("Event$ListenerStore", description);
+            return LogBuilder.classDescription(this, description);
         }
 
         private void removeEmptyReferences() {

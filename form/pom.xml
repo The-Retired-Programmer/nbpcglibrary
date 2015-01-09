@@ -10,7 +10,7 @@
 
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>form</artifactId>
-    <version>3.1.4</version>
+    <version>3.1.5</version>
     <packaging>nbm</packaging>
 
     <name>NBPCG Form Support Library</name>
