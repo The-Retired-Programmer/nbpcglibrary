@@ -39,8 +39,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
+ * @param <F> the Entity Field enum class
  */
-public abstract class IconNodeRW<E extends EntityRW> extends TreeNodeRW<E> {
+public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F> {
 
     private final ImageFileFinder<E> imagefilefinder;
     private final String nodename;

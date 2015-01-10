@@ -31,15 +31,16 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
+ * @param <F> the entity fields enum class
  */
-public abstract class NodeEditorTopComponent<E extends EntityRW> extends TopComponent {
+public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopComponent {
 
     private final String name;
 
     /**
      * the node being edited
      */
-    protected final TreeNodeRW<E> node;
+    protected final TreeNodeRW<E, F> node;
 
     /**
      * the entity being edited
@@ -53,7 +54,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW> extends TopComp
      * @param name the topcomponent name
      * @param hint the topcomponent hint
      */
-    public NodeEditorTopComponent(TreeNodeRW<E> node, String name, String hint) {
+    public NodeEditorTopComponent(TreeNodeRW<E, F> node, String name, String hint) {
         LogBuilder.writeEnteringConstructorLog("nbpcglibrary.topcomponent", "NodeEditorTopComponent", node, name, hint);
         setName(name);
         setToolTipText(hint);

@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRWIndexed;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -30,20 +29,21 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
+ * @param <F> the Fields enum class
  */
-public class EntityIndexedReferenceSet<E extends EntityRWIndexed> extends EntityReferenceSet<E> {
+public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends EntityReferenceSet<E, F> {
 
     /**
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param field the IF for this set
+     * @param field field identifier
      * @param columnname the column name for use in selection equality filter
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
      */
-    public EntityIndexedReferenceSet(String name, IntWithDescription field, String columnname, int columnvalue, Class<? extends EntityManagerRW> emclass) {
+    public EntityIndexedReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRW> emclass) {
         super(name, field, columnname, columnvalue, emclass);
     }
 
@@ -51,10 +51,10 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed> extends Entity
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param field the Id for this set
+     * @param field field identifier
      * @param emclass the associated entity manager class
      */
-    public EntityIndexedReferenceSet(String name, IntWithDescription field, Class<? extends EntityManagerRW> emclass) {
+    public EntityIndexedReferenceSet(String name, F field, Class<? extends EntityManagerRW> emclass) {
         super(name, field, emclass);
     }
 

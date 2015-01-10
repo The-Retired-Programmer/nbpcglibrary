@@ -23,6 +23,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEW;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEWEDITING;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField.IDX;
 
 /**
  * The abstract class defining an editable Entity, with a index (orderable)
@@ -31,8 +32,9 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventPa
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
  * @param <P> the Parent Entity Class
+ * @param <F> the entity field enum class
  */
-public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entity> extends EntityRW<E, P> {
+public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entity, F> extends EntityRW<E, P, F> {
 
     private final DBFieldsRWIndexed<E> dbfields;
     private final DataAccessRW dataAccess;
@@ -79,6 +81,6 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
     public final void setIndex(int i) {
         ensureEditing();
         dbfields.setIndex(i);
-        fireFieldChange(FieldChangeEventParams.IDXFIELD);
+        fireFieldChange(IDX);
     }
 }

@@ -24,7 +24,6 @@ import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
@@ -37,8 +36,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.Event.ListenerMode;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
+ * @param <F> the Fields enum class
  */
-public class EntityReferenceSet<E extends EntityRO> {
+public class EntityReferenceSet<E extends EntityRO, F> {
 
     /**
      * The Entity Manager associated with the entities
@@ -58,19 +58,19 @@ public class EntityReferenceSet<E extends EntityRO> {
      */
     protected final String name;
     private final Event<SetChangeEventParams> setChangeEvent;
-    private final IntWithDescription field;
+    private final F field;
 
     /**
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param field the Id for this set
+     * @param field field identifier
      * @param columnname the column name for use in selection equality filter
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
      */
-    public EntityReferenceSet(String name, IntWithDescription field, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
+    public EntityReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
         this(emclass, name, field, columnname, columnvalue);
         if (columnvalue > 0) {
             createChildList(em, dataAccess.find(columnname, columnvalue));
@@ -83,15 +83,15 @@ public class EntityReferenceSet<E extends EntityRO> {
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param field the Id for this set
+     * @param field field identifier
      * @param emclass the associated entity manager class
      */
-    public EntityReferenceSet(String name, IntWithDescription field, Class<? extends EntityManagerRO> emclass) {
+    public EntityReferenceSet(String name, F field, Class<? extends EntityManagerRO> emclass) {
         this(emclass, name, field, null, 0);
         createChildList(em, dataAccess.find());
     }
 
-    private EntityReferenceSet(Class<? extends EntityManagerRO> emclass, String name, IntWithDescription field, String columnname, int columnvalue) {
+    private EntityReferenceSet(Class<? extends EntityManagerRO> emclass, String name, F field, String columnname, int columnvalue) {
         this.name = name;
         this.field = field;
         setChangeEvent = new Event<>(name + "/set");

@@ -33,8 +33,9 @@ import uk.org.rlinsdale.nbpcglibrary.form.FormFieldChangeEventParams;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
+ * @param <F> the entity fields enum class
  */
-public abstract class ReferenceChoiceCollectionFields<E extends EntityRO> extends ChoiceField {
+public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> extends ChoiceField {
 
     private List<E> choices;
     private List<String> choiceText;
@@ -156,14 +157,14 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO> extend
     }
 
 
-    private class ChoicesFieldListener extends Listener<FieldChangeEventParams> {
+    private class ChoicesFieldListener extends Listener<FieldChangeEventParams<F>> {
 
         public ChoicesFieldListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeEventParams p) {
+        public void action(FieldChangeEventParams<F> p) {
             updateChoicesText();
         }
     }

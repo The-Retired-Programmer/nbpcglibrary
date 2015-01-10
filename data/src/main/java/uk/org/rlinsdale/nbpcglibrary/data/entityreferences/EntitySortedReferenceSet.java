@@ -24,7 +24,6 @@ import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 
 /**
@@ -32,26 +31,27 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listener;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
+ * @param <F> the Fields enum class
  */
-public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenceSet<E> {
+public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityReferenceSet<E, F> {
 
     private final Comparator<E> comparator;
     private boolean unsorted = true;
     private final ChildListener childListener;
-    private final IntWithDescription field;
+    private final F field;
 
     /**
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param field the Id for this set
+     * @param field field identifier
      * @param comparator the comparator to be used to sort the list
      * @param columnname the column name for use in selection equality filter
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
      */
-    public EntitySortedReferenceSet(String name, IntWithDescription field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
+    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
         super(name, field, columnname, columnvalue, emclass);
         this.field = field;
         childListener = new ChildListener(name);
@@ -62,11 +62,11 @@ public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenc
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param field the Id for this set
+     * @param field field identifier
      * @param comparator the comparator to be used to sort the list
      * @param emclass the associated entity manager class
      */
-    public EntitySortedReferenceSet(String name, IntWithDescription field, Comparator<E> comparator, Class<? extends EntityManagerRO> emclass) {
+    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, Class<? extends EntityManagerRO> emclass) {
         super(name, field, emclass);
         this.field = field;
         childListener = new ChildListener(name);
@@ -133,14 +133,14 @@ public class EntitySortedReferenceSet<E extends EntityRO> extends EntityReferenc
         unsorted = true;
     }
 
-    private class ChildListener extends Listener<FieldChangeEventParams> {
+    private class ChildListener extends Listener<FieldChangeEventParams<F>> {
 
         public ChildListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeEventParams p) {
+        public void action(FieldChangeEventParams<F> p) {
             sort();
         }
     }

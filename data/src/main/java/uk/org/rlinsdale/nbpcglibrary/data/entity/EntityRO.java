@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
@@ -41,17 +40,20 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventPa
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.EDIT;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.LOAD;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.RESET;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField.ALL;
 
 /**
  * The Basic Read-Only (uneditable) Entity Abstract Class.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <F> the Fields enum class
  */
 @RegisterLog("nbpcglibrary.data")
-public abstract class EntityRO extends Entity {
-
+public abstract class EntityRO<F> extends Entity {
+    
     private final Event<EntityStateChangeEventParams> stateEvent;
-    private final Event<FieldChangeEventParams> fieldEvent;
+    private final Event<FieldChangeEventParams<F>> fieldEvent;
     private EntityState state = INIT;
     private int id;
     private final DBFieldsRO dbfields;
@@ -120,7 +122,7 @@ public abstract class EntityRO extends Entity {
      *
      * @param listener the listener
      */
-    public final void addFieldListener(Listener<FieldChangeEventParams> listener) {
+    public final void addFieldListener(Listener<FieldChangeEventParams<F>> listener) {
         fieldEvent.addListener(listener);
     }
 
@@ -129,7 +131,7 @@ public abstract class EntityRO extends Entity {
      *
      * @param listener the listener
      */
-    public final void removeFieldListener(Listener<FieldChangeEventParams> listener) {
+    public final void removeFieldListener(Listener<FieldChangeEventParams<F>> listener) {
         fieldEvent.removeListener(listener);
     }
 
@@ -138,8 +140,17 @@ public abstract class EntityRO extends Entity {
      *
      * @param field the field Id
      */
-    protected final void fireFieldChange(IntWithDescription field) {
+    protected final void fireFieldChange(F field) {
         fireFieldChange(field, true);
+    }
+    
+    /**
+     * Fire actions on all field change listeners.
+     *
+     * @param field the field Id
+     */
+    protected final void fireFieldChange(CommonEntityField field) {
+        fireCommonFieldChange(field, true);
     }
 
     /**
@@ -148,9 +159,20 @@ public abstract class EntityRO extends Entity {
      * @param field the field Id
      * @param formatOK true if the field is formatted correctly
      */
-    protected final void fireFieldChange(IntWithDescription field, boolean formatOK) {
+    protected final void fireFieldChange(F field, boolean formatOK) {
         updateEntityRegistration();
-        fieldEvent.fire(new FieldChangeEventParams(field, formatOK));
+        fieldEvent.fire(new FieldChangeEventParams<>(field, null, formatOK));
+    }
+    
+    /**
+     * Fire actions on all field change listeners.
+     *
+     * @param field the field Id
+     * @param formatOK true if the field is formatted correctly
+     */
+    protected final void fireCommonFieldChange(CommonEntityField field, boolean formatOK) {
+        updateEntityRegistration();
+        fieldEvent.fire(new FieldChangeEventParams<>(null, field, formatOK));
     }
 
     /**
@@ -169,9 +191,9 @@ public abstract class EntityRO extends Entity {
      *
      * @param field the field Id
      */
-    protected final void fireFieldChangeAtLoad(IntWithDescription field) {
+    protected final void fireFieldChangeAtLoad(CommonEntityField field) {
         updateEntityRegistrationAtLoad();
-        fieldEvent.fire(new FieldChangeEventParams(field, true));
+        fieldEvent.fire(new FieldChangeEventParams<>(null, field, true));
     }
 
     /**
@@ -255,7 +277,7 @@ public abstract class EntityRO extends Entity {
         if (wasEditing) {
             _restoreState();
             dbfields.restoreState();
-            fireFieldChange(FieldChangeEventParams.ALLFIELDS);
+            fireFieldChange(ALL);
             fireStateChange(RESET, oldState, state);
         }
     }
@@ -268,7 +290,7 @@ public abstract class EntityRO extends Entity {
      */
     protected void load(int id) {
         dataAccess.load(id, new EntityROLoader());
-        fireFieldChangeAtLoad(FieldChangeEventParams.ALLFIELDS);
+        fireFieldChangeAtLoad(ALL);
     }
 
     private class EntityROLoader implements ResultSetLoader {

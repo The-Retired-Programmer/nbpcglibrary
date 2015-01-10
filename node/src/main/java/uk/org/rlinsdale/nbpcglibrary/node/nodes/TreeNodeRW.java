@@ -30,21 +30,22 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.node.SaveHandler;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField;
 
 /**
  * Read-Only Tree Node Abstract Class
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
+ * @param <F> the Entity field enum class
  */
-public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
+public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
     private NodeSavable<E> nodeSavable;
     private SaveHandler saveHandler;
@@ -186,15 +187,22 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
         return (entity.isNew() ? "<font color='#0000FF'><b>" : (entity.isEditing() ? "<b>" : "")) + getDisplayName();
     }
 
-    private class EntityFieldChangeListener extends Listener<FieldChangeEventParams> {
+    private class EntityFieldChangeListener extends Listener<FieldChangeEventParams<F>> {
 
         public EntityFieldChangeListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeEventParams p) {
-            _processFieldChange(p.get());
+        public void action(FieldChangeEventParams<F> p) {
+            F f = p.get();
+            if (f != null) {
+                _processFieldChange(f);
+            }
+            CommonEntityField c = p.getCommon();
+            if (c != null) {
+                _processCommonFieldChange(c);
+            }
             // TODO make decision about the Icon changes (based on changes to error state)
             iconChange(); // temporary - do always (just in case!)
         }
@@ -205,7 +213,14 @@ public abstract class TreeNodeRW<E extends EntityRW> extends TreeNodeRO<E> {
      *
      * @param field the field Id
      */
-    protected abstract void _processFieldChange(IntWithDescription field);
+    protected abstract void _processFieldChange(F field);
+    
+     /**
+     * Process field changes.
+     *
+     * @param field the field Id
+     */
+    protected abstract void _processCommonFieldChange(CommonEntityField field);
 
     /**
      * Fire the Property Change.

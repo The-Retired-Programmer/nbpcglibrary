@@ -31,6 +31,8 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventPa
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.REMOVED;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.SAVE;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField.ALL;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField.ID;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
 
 /**
@@ -39,8 +41,9 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
  * @param <P> the Parent Entity Class
+ * @param <F>  the Fields enum class
  */
-public abstract class EntityRW<E extends EntityRW, P extends Entity> extends EntityRO {
+public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends EntityRO<F> {
 
     private final DBFieldsRW<E> dbfields;
     private final DataAccessRW dataAccess;
@@ -98,7 +101,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
 
     final void updateId(int id) {
         setId(id);
-        fireFieldChange(FieldChangeEventParams.IDFIELD);
+        fireFieldChange(ID);
     }
 
     /**
@@ -210,7 +213,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity> extends Ent
             _copy(e);
             dbfields.copy(e);
             ensureEditing();
-            fireFieldChange(FieldChangeEventParams.ALLFIELDS);
+            fireFieldChange(ALL);
             return;
         }
         throw new LogicException("Should not be trying to copy an entity in " + oldState + " state");

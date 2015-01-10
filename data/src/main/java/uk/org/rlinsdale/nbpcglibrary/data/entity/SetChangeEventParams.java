@@ -18,63 +18,39 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Parameter Class for a SetChange listener.
- * 
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <F> the Fields enum class
  */
-public class SetChangeEventParams implements EventParams {
-    
-    private final IntWithDescription set;
-    
+public class SetChangeEventParams<F> implements EventParams {
+
+    private final F set;
+
     /**
      * Constructor.
-     * 
+     *
      * @param set the Id of the set
      */
-    public SetChangeEventParams(IntWithDescription set){
+    public SetChangeEventParams(F set) {
         this.set = set;
     }
-    
+
     /**
      * Get the Id of the set.
-     * 
+     *
      * @return the Id
      */
-    public IntWithDescription get() {
+    public F get() {
         return set;
     }
-    
-    @Override
-    public int hashCode() {
-        return set.hashCode();
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj instanceof SetChangeEventParams) {
-            return this.set == ((SetChangeEventParams) obj).set;
-        }
-        if (obj instanceof IntWithDescription) {
-            return this.set == (IntWithDescription) obj;
-        }
-        return false;
-    }
-    
+
     @Override
     public String classDescription() {
-        return LogBuilder.classDescription(this, set.toString());
-    }
-    
-    @Override
-    public String toString(){
-        return set+" change";
+        return LogBuilder.classDescription(this, set.toString() + " change");
     }
 }

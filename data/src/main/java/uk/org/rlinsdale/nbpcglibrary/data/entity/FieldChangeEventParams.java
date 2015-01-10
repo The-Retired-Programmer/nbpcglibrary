@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
@@ -26,44 +25,48 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * The Parameter Class for a FieldChange listener.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <F> the Fields enum class
  */
-public class FieldChangeEventParams implements EventParams {
+public class FieldChangeEventParams<F> implements EventParams {
+    
+    public enum CommonEntityField {
+        ALL,
+        ID,
+        IDX
+    };
 
-    /**
-     * Common Field Id - all fields have changed
-     */
-    public static final IntWithDescription ALLFIELDS = new IntWithDescription(0, "ALL");
-
-    /**
-     * Common Field Id - the Id field has changed
-     */
-    public static final IntWithDescription IDFIELD = new IntWithDescription(1, "Id");
-
-    /**
-     * Common Field Id - the Index (ordering) field has change
-     */
-    public static final IntWithDescription IDXFIELD = new IntWithDescription(2, "Idx");
-    private final IntWithDescription field;
+    private final F field;
+    private final CommonEntityField commonfield;
     private final boolean formatOK;
 
     /**
      * Constructor.
      *
-     * @param field the field Id
+     * @param field the entity field identifier
+     * @param commonfield the common entity field identifier
      * @param formatOK true if field is correctly formatted
      */
-    public FieldChangeEventParams(IntWithDescription field, boolean formatOK) {
+    public FieldChangeEventParams(F field, CommonEntityField commonfield, boolean formatOK) {
         this.field = field;
+        this.commonfield = commonfield;
         this.formatOK = formatOK;
     }
 
     /**
      * Get the field Id
      *
-     * @return the field Id
+     * @return the field identifier
      */
-    public IntWithDescription get() {
+    public F get() {
         return field;
+    }
+    /**
+     * Get the common field Id
+     *
+     * @return the common field identifier
+     */
+    public CommonEntityField getCommon() {
+        return commonfield;
     }
 
     /**
@@ -76,31 +79,7 @@ public class FieldChangeEventParams implements EventParams {
     }
 
     @Override
-    public int hashCode() {
-        return field.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj instanceof FieldChangeEventParams) {
-            return this.field == ((FieldChangeEventParams) obj).field;
-        }
-        if (obj instanceof IntWithDescription) {
-            return this.field == (IntWithDescription) obj;
-        }
-        return false;
-    }
-    
-    @Override
     public String classDescription() {
-        return LogBuilder.classDescription(this, field.toString());
-    }
-
-    @Override
-    public String toString() {
-        return field + " change (data was formatted " + (formatOK ? "OK" : "badly") + ")";
+        return LogBuilder.classDescription(this, field.toString()+"/"+commonfield.toString()+ " change (data was formatted " + (formatOK ? "OK" : "badly") + ")");
     }
 }
