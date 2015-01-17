@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <F> the Fields enum class
  */
-public class FieldChangeEventParams<F> implements EventParams {
+public class EntityFieldChangeEventParams<F> implements EventParams {
     
     public enum CommonEntityField {
         ALL,
@@ -46,7 +46,7 @@ public class FieldChangeEventParams<F> implements EventParams {
      * @param commonfield the common entity field identifier
      * @param formatOK true if field is correctly formatted
      */
-    public FieldChangeEventParams(F field, CommonEntityField commonfield, boolean formatOK) {
+    public EntityFieldChangeEventParams(F field, CommonEntityField commonfield, boolean formatOK) {
         this.field = field;
         this.commonfield = commonfield;
         this.formatOK = formatOK;
@@ -80,6 +80,6 @@ public class FieldChangeEventParams<F> implements EventParams {
 
     @Override
     public String classDescription() {
-        return LogBuilder.classDescription(this, field.toString()+"/"+commonfield.toString()+ " change (data was formatted " + (formatOK ? "OK" : "badly") + ")");
+        return LogBuilder.classDescription(this, (field!=null?field.toString():"--")+"/"+(commonfield!=null?commonfield.toString():"--")+ " change (data was formatted " + (formatOK ? "OK" : "badly") + ")");
     }
 }

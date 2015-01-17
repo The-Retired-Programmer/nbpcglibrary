@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -68,8 +68,8 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
      * @return the new entity
      */
     public final synchronized E getNew() {
-        LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("EntityManagerRW", "getNew")
-                .addMsg("Create New {0} Entity (id = {1})", name, nextId).write();
+        LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "getNew")
+                .addMsg("Create New Entity (id = {1})", nextId).write();
         E e = _createNewEntity(nextId);
         e.setId(nextId);
         transientCache.put(nextId--, e);
@@ -120,8 +120,8 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
         int id = e.getId();
         if (transientCache.containsKey(id)) {
             transientCache.remove(id);
-            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("EntityManagerRW", "removeFromTransientCache")
-                    .addMsg("remove from Transient Cache {0}.{1}", name, e).write();
+            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "removeFromTransientCache")
+                    .addMsg("remove from Transient Cache {1}", e).write();
             return;
         }
         throw new LogicException("Remove Transient Failure (class=" + name + ";id=" + id + ")");
@@ -139,8 +139,8 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
             transientCache.remove(id);
             e.updateId(newId);
             insertIntoCache(newId, e);
-            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("EntityManagerRW", "persistTransient")
-                    .addMsg("persist (Transient Cache to Cache) {0}.{1}({2} as {3})", name, e, id, newId).write();
+            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "persistTransient")
+                    .addMsg("persist (Transient Cache to Cache) {0}({1} as {2})", e, id, newId).write();
             return;
         }
         throw new LogicException("Persist Transient Failure (class=" + name + ";id=" + id + ";newid=" + newId + ")");

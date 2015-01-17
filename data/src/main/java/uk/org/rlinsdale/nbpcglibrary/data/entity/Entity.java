@@ -18,8 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
@@ -30,7 +28,6 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  */
 public abstract class Entity extends Rules implements LogHelper {
 
-    private final Event<SetChangeEventParams> setChangeEvent;
     private final EntityError entityerror;
     private final EntitySave entitysave;
 
@@ -43,36 +40,9 @@ public abstract class Entity extends Rules implements LogHelper {
         super();
         entityerror = new EntityError(entityname);
         entitysave = new EntitySave(entityname);
-        setChangeEvent = new Event<>(entityname + "/setchange");
         updateEntityRegistration();
     }
 
-    /**
-     * Add a listener to the SetChange listeners.
-     *
-     * @param listener the listener to add
-     */
-    public final void addSetChangeListener(Listener<SetChangeEventParams> listener) {
-        setChangeEvent.addListener(listener);
-    }
-
-    /**
-     * Remove a listener from the SetChange listeners.
-     *
-     * @param listener the listener to remove
-     */
-    public final void removeSetChangeListener(Listener<SetChangeEventParams> listener) {
-        setChangeEvent.removeListener(listener);
-    }
-
-    /**
-     * Fire the SetChange listeners.
-     *
-     * @param p the setchange parameters
-     */
-    protected final void fireSetChange(SetChangeEventParams p) {
-        setChangeEvent.fire(p);
-    }
 
     /**
      * Cancel any changes in progress and restore state as at last save state.

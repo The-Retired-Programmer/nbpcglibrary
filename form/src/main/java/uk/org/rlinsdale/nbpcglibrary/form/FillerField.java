@@ -18,31 +18,25 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.util.logging.Level;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-
 /**
- * A basic Confirmation Dialog (YES / NO)
+ * A Field which creates a blank empty row in the form.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class ConfirmationDialog {
+public class FillerField extends BaseField<String> {
 
     /**
-     * Display the dialog, wait for button response and return its selection.
-     *
-     * @param title the dialog title
-     * @param message the dialog message
-     * @return true if YES is pressed, otherwise false
+     * Constructor
      */
-    public static boolean show(String title, String message) {
-        NotifyDescriptor nd = new NotifyDescriptor.Confirmation(message,
-                title, NotifyDescriptor.YES_NO_OPTION);
-        boolean res = DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION;
-        LogBuilder.create("nbpcglibrary.form", Level.FINER).addMethodName(ConfirmationDialog.class, "show", title, message)
-                            .addMsg("responce is {0}", res).write();
-        return res;
+    public FillerField() {
+        super(null, "");
+    }
+    
+    @Override
+    void setField(String value) {
+    }
+    
+    @Override
+    public void updateFieldFromBackingObject() {
     }
 }

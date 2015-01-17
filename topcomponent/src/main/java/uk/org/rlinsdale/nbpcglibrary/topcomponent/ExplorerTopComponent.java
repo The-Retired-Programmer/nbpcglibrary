@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
      */
     public ExplorerTopComponent(String topComponentName, JScrollPane viewComponent, String name, String hint) {
         this.topComponentName = topComponentName;
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.topcomponent", "ExplorerTopComponent", topComponentName, viewComponent, name, hint);
+        LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, topComponentName, viewComponent, name, hint);
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -89,14 +89,14 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
 
     @Override
     public void componentOpened() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("ExplorerTopComponent", "componentOpened")
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentOpened")
                 .addMsg("TopComponent is {0})", this).write();
         em.setRootContext(getRootContextNode());
     }
 
     @Override
     public void componentClosed() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("ExplorerTopComponent", "componentClosed")
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentClosed")
                 .addMsg("TopComponent is {0})", this).write();
         dropRootContextNode();
         em.setRootContext(Node.EMPTY);

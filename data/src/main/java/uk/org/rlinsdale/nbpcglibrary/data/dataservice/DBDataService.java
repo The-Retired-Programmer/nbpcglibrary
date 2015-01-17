@@ -51,7 +51,7 @@ public abstract class DBDataService implements DataService {
      * @param name the dataservice name
      */
     public DBDataService(String name) {
-        transactionEvent = new Event<>(name + "-transactions");
+        transactionEvent = new Event<>("transactions:"+name);
     }
 
     /**
@@ -97,7 +97,7 @@ public abstract class DBDataService implements DataService {
      * Mark the start of a Transaction unit.
      */
     public void begin() {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", this, "begin");
+        LogBuilder.writeLog("nbpcglibrary.data", this, "begin");
         if (inTransaction) {
             throw new LogicException("begin() failed - already in transaction");
         } else {
@@ -116,7 +116,7 @@ public abstract class DBDataService implements DataService {
      * Mark the end of a transaction unit, commit all changes.
      */
     public void commit() {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", this, "commit");
+        LogBuilder.writeLog("nbpcglibrary.data", this, "commit");
         if (inTransaction) {
             try {
                 conn.commit();
@@ -135,7 +135,7 @@ public abstract class DBDataService implements DataService {
      * Mark the end of a transaction unit, rollback all changes.
      */
     public void rollback() {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", this, "rollback");
+        LogBuilder.writeLog("nbpcglibrary.data", this, "rollback");
         if (inTransaction) {
             try {
                 conn.rollback();
@@ -208,7 +208,7 @@ public abstract class DBDataService implements DataService {
      */
     public synchronized List<Integer> query(String sql) {
         List<Integer> li = new ArrayList<>();
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", this, "query", sql);
+        LogBuilder.writeLog("nbpcglibrary.data", this, "query", sql);
         try {
             try (Statement stat = conn.createStatement()) {
                 ResultSet rs = stat.executeQuery(sql);
@@ -233,7 +233,7 @@ public abstract class DBDataService implements DataService {
      */
     public synchronized int simpleIntQuery(String sql, String columnname) {
         int res = 0;
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", this, "simpleIntQuery", sql, columnname);
+        LogBuilder.writeLog("nbpcglibrary.data", this, "simpleIntQuery", sql, columnname);
         try {
             try (Statement stat = conn.createStatement()) {
                 ResultSet rs = stat.executeQuery(sql);
@@ -255,7 +255,7 @@ public abstract class DBDataService implements DataService {
      * @param rsl the loader to be used
      */
     public synchronized void simpleQuery(String sql, ResultSetLoader rsl) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", this, "simpleQuery", sql, rsl);
+        LogBuilder.writeLog("nbpcglibrary.data", this, "simpleQuery", sql);
         try {
             Statement stat = conn.createStatement();
             ResultSet rs = stat.executeQuery(sql);
@@ -264,7 +264,7 @@ public abstract class DBDataService implements DataService {
             }
             rsl.load(rs);
         } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "simpleQuery", sql, rsl)
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "simpleQuery", sql)
                     .addException(ex).write();
         }
     }

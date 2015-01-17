@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,33 +26,19 @@ import java.util.logging.Level;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 
 /**
  * the Dialog Class. Dialogs are constructed with one or more panels.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class Dialog {
+public class Dialog implements LogHelper {
 
     private static Dialog instance;
     private DialogDescriptor dd;
     private Form form;
     private String title;
-
-    /**
-     * Button responses - OK
-     */
-    public static final int OK = -1;
-
-    /**
-     * Button responses - CANCEL
-     */
-    public static final int CANCEL = -2;
-
-    /**
-     * Button responses - CLOSE
-     */
-    public static final int CLOSE = -3;
 
     /**
      * Display the dialog.
@@ -79,10 +65,11 @@ public class Dialog {
         this(title, false, form);
     }
 
+    @SuppressWarnings("LeakingThisInConstructor")
     private Dialog(String title, boolean isModal, Form form) {
         this.form = form;
         this.title = title;
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.form", "Dialog", title, isModal, form);
+        LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title, isModal, form);
         dd = new DialogDescriptor(
                 form,
                 title,
@@ -95,32 +82,42 @@ public class Dialog {
         DialogDisplayer.getDefault().notifyLater(dd);
     }
 
-    private class DialogDoneListener implements ActionListener {
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, title);
+    }
+
+    private class DialogDoneListener implements ActionListener, LogHelper {
+        
+        @Override
+        public String classDescription() {
+            return LogBuilder.classDescription(this);
+        }
 
         @Override
         public void actionPerformed(ActionEvent ae) {
             if (ae.getSource() == DialogDescriptor.OK_OPTION) {
                 switch (form.save()) {
-                    case Form.SAVESUCCESS:
-                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
+                    case SAVESUCCESS:
+                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "actionPerformed")
                                 .addMsg("Dialog {0}: OK response, form is valid, save() processed", title).write();
                         dd.setClosingOptions(null); // and allow closing
                         instance = null;
                         break;
-                    case Form.SAVEVALIDATIONFAIL:
-                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
+                    case SAVEVALIDATIONFAIL:
+                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "actionPerformed")
                                 .addMsg("Dialog {0}: OK response but Form is invalid", title).write();
                         break;
-                    case Form.SAVEFAIL:
-                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
+                    case SAVEFAIL:
+                        LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "actionPerformed")
                                 .addMsg("Dialog {0}: OK response, form is valid, save() failed", title).write();
                         instance = null;
                         break;
                 }
             } else {
-                form.reset();
-                LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("DialogDoneListener", "actionPerformed", ae)
-                        .addMsg("Dialog {0}: CANCEL response, reset() processed", title).write();
+                form.cancel();
+                LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "actionPerformed")
+                        .addMsg("Dialog {0}: CANCEL response", title).write();
                 dd.setClosingOptions(null); // and allow closing
                 instance = null;
             }
@@ -133,10 +130,10 @@ public class Dialog {
         public void propertyChange(PropertyChangeEvent pce) {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
-                LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("CloseChangeListener", "propertyChange", pce)
-                        .addMsg("Dialog {0}: window close - treat as CANCEL response", title).write();
+                LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "propertyChange")
+                        .addMsg("Dialog {0}: window closed - setting CANCEL response", title).write();
                 dd.setClosingOptions(null); // and allow closing
-                form.reset();
+                form.cancel();
                 instance = null;
             }
         }

@@ -28,7 +28,7 @@ import javax.swing.ImageIcon;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.node.SaveHandler;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
@@ -36,7 +36,7 @@ import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
 
 /**
  * Read-Only Tree Node Abstract Class
@@ -87,12 +87,12 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
     private void commonConstructor(String nodename, E e, boolean isCutDestroyEnabled) {
         this.isCutDestroyEnabled = isCutDestroyEnabled;
-        nameChangeEvent = new Event<>(nodename + "-namechange");
-        titleChangeEvent = new Event<>(nodename + "-titlechange");
+        nameChangeEvent = new Event<>("namechange:"+nodename);
+        titleChangeEvent = new Event<>("titlechange:"+nodename);
         nodeSavable = new NodeSavable<>(nodename);
         saveHandler = nodeSavable.getDefaultSaveHandler();
-        e.addStateListener(stateListener = new EntityStateChangeListener(nodename + "-statechange"));
-        e.addFieldListener(fieldListener = new EntityFieldChangeListener(nodename + "-fieldchange"));
+        e.addStateListener(stateListener = new EntityStateChangeListener(e.classDescription()));
+        e.addFieldListener(fieldListener = new EntityFieldChangeListener(e.classDescription()));
         if (e.isEditing()) {
             nodeSavable.enable(e);
         }
@@ -159,7 +159,6 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
         }
 
         @Override
-        @SuppressWarnings("IncompatibleEquals")
         public void action(EntityStateChangeEventParams p) {
             switch (p.getTransition()) {
                 case EDIT:
@@ -187,14 +186,14 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
         return (entity.isNew() ? "<font color='#0000FF'><b>" : (entity.isEditing() ? "<b>" : "")) + getDisplayName();
     }
 
-    private class EntityFieldChangeListener extends Listener<FieldChangeEventParams<F>> {
+    private class EntityFieldChangeListener extends Listener<EntityFieldChangeEventParams<F>> {
 
         public EntityFieldChangeListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeEventParams<F> p) {
+        public void action(EntityFieldChangeEventParams<F> p) {
             F f = p.get();
             if (f != null) {
                 _processFieldChange(f);
@@ -368,13 +367,13 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
     @Override
     public final void destroy() throws IOException {
-        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNodeRW", "destroy");
+        LogBuilder.writeLog("nbpcglibrary.node", this, "destroy");
         _deleteRemove();
     }
 
     @Override
     public final Transferable clipboardCut() throws IOException {
-        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNodeRW", "clipboardCut");
+        LogBuilder.writeLog("nbpcglibrary.node", this, "clipboardCut");
         ExTransferable added = ExTransferable.create(super.clipboardCut());
         added.put(new ExTransfer());
         return added;
@@ -382,7 +381,7 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
     @Override
     public final Transferable clipboardCopy() throws IOException {
-        LogBuilder.writeEnteringLog("nbpcglibrary.node", "RootNodeRW", "clipboardCopy");
+        LogBuilder.writeLog("nbpcglibrary.node", this, "clipboardCopy");
         ExTransferable added = ExTransferable.create(super.clipboardCopy());
         added.put(new ExTransfer());
         return added;
@@ -396,7 +395,7 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
         @Override
         protected E getData() {
-            LogBuilder.writeEnteringLog("nbpcglibrary.node", "ExTransfer", "getData");
+            LogBuilder.writeLog("nbpcglibrary.node", this, "getData");
             return getEntity();
         }
     }

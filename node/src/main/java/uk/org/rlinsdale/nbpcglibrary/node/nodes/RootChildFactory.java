@@ -53,14 +53,14 @@ public abstract class RootChildFactory<E extends Entity> extends ChildFactory<En
     }
 
     /**
-     * Enable Change listening on the child entity set.
+     * get Change listener for the child entity set.
      *
      * @param name the name of the listener (for reporting/logging)
-     * @param parent the parent entity
+     * @return  the required listener
      */
-    public void enableChangeListening(String name, Entity parent) {
-        childListener = new ChildListener(name);
-        parent.addSetChangeListener(childListener);
+    public Listener<SetChangeEventParams> getSetChangeListener(String name) {
+        return new ChildListener(name);
+        
     }
 
     private class ChildListener extends Listener<SetChangeEventParams> {

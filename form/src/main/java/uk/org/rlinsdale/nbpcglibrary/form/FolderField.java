@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,75 +25,42 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
- * A field class to get folder path information.
+ * A folder class to get file path information.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FolderField extends TextField {
+public abstract class FolderField extends TextField {
 
     private JButton folderButton;
 
     /**
-     * Factory method to create a Folder field
+     * Constructor
      *
-     * @param field the field id
-     * @param label the label text for the field
-     * @return the created Folder field
+     * @param backingObject the backing Object
+     * @param label field label
+     * @param size size of the field
      */
-    public static FolderField createWithRules(IntWithDescription field, String label) {
-        return new FolderField(field, label, 20, null);
-    }
-
-    /**
-     * Factory method to create a Folder field
-     *
-     * @param field the field id
-     * @param label the label text for the field
-     * @param size the display size of the field
-     * @return the created Folder field
-     */
-    public static FolderField createWithRules(IntWithDescription field, String label, int size) {
-        return new FolderField(field, label, size, null);
-    }
-
-    /**
-     * Factory method to create a Folder field
-     *
-     * @param field the field id
-     * @param label the label text for the field
-     * @param listener the listener for changes to field value
-     * @return the created Folder field
-     */
-    public static FolderField createWithRules(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
-        return new FolderField(field, label, 20, listener);
-    }
-
-    /**
-     * Factory method to create a Folder field
-     *
-     * @param field the field id
-     * @param label the label text for the field
-     * @param size the display size of the field
-     * @param listener the listener for changes to field value
-     * @return the created Folder field
-     */
-    public static FolderField createWithRules(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
-        return new FolderField(field, label, size, listener);
-    }
-
-    private FolderField(IntWithDescription field, String label, int size, Listener<FormFieldChangeEventParams> listener) {
-        super(field, label, size, listener);
-        addMinRule(1);
+    protected FolderField(EditableFieldBackingObject<String> backingObject, String label, int size) {
+        super(backingObject, label, size);
+        addStringMinRule(1);
         addRule(new FolderExistsRule());
     }
 
+    /**
+     * Constructor
+     *
+     * @param backingObject the backing object
+     * @param label field label
+     */
+    protected FolderField(EditableFieldBackingObject<String> backingObject, String label) {
+        this(backingObject, label, 20);
+    }
+
     @Override
-    public JComponent getAdditionalComponent() {
+    protected JComponent getAdditionalComponent() {
         return folderButton();
     }
 
@@ -113,7 +80,7 @@ public class FolderField extends TextField {
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             fc.setSelectedFile(new File(get()));
             if (fc.showOpenDialog(folderButton) == JFileChooser.APPROVE_OPTION) {
-                update(fc.getSelectedFile().getAbsolutePath());
+                updateIfChange(fc.getSelectedFile().getAbsolutePath());
             }
         }
     }
@@ -121,7 +88,7 @@ public class FolderField extends TextField {
     private class FolderExistsRule extends Rule {
 
         public FolderExistsRule() {
-            super(label + " - folder does not exist");
+            super(getLabel() + " - folder does not exist");
         }
 
         @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,26 +20,38 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 
 /**
  * Abstract Class representing a Field on a Form
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param  <T> type of the data connecting to the backing Object
  */
-public abstract class BaseField {
+public abstract class BaseField<T> implements LogHelper {
+
+    private final BaseFieldBackingObject<T> backingObject;
 
     /**
      * the label text associated with this field
      */
-    protected final String label;
+    private final String label;
 
     /**
      * Constructor
      *
+     * @param backingObject the backingobject
      * @param label the label text for this field
      */
-    public BaseField(String label) {
+    public BaseField(BaseFieldBackingObject<T> backingObject, String label) {
         this.label = label;
+        this.backingObject = backingObject;
+    }
+
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, label);
     }
 
     /**
@@ -65,7 +77,7 @@ public abstract class BaseField {
      *
      * @return the working component in which the value is displayed
      */
-    public JComponent getComponent() {
+    JComponent getComponent() {
         return null;
     }
 
@@ -75,7 +87,7 @@ public abstract class BaseField {
      *
      * @return the additional component (or null)
      */
-    public JComponent getAdditionalComponent() {
+    JComponent getAdditionalComponent() {
         return null;
     }
 
@@ -85,11 +97,27 @@ public abstract class BaseField {
      *
      * @return an array of components
      */
-    public JComponent[] getComponents() {
+    JComponent[] getComponents() {
         return new JComponent[]{
             getLabelComponent(),
             getComponent(),
             getAdditionalComponent()
         };
     }
+
+    /**
+     * request that the value in the field is updated from the value in the
+     * Backing Object
+     */
+    public void updateFieldFromBackingObject() {
+        setField(backingObject.get());
+    }
+
+    /**
+     * Set a value in the field
+     *
+     * @param value the value to setField into the field
+     */
+    abstract void setField(T value);
+
 }

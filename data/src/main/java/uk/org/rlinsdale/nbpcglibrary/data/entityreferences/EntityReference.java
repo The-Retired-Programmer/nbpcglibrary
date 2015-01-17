@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import org.openide.util.Lookup;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 
 /**
  * A reference to an Entity.
@@ -38,7 +39,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The Entity Class
  */
-public class EntityReference<E extends EntityRO> {
+public class EntityReference<E extends EntityRO> implements LogHelper {
 
     private final static int NONE = 0;
     private final String name;
@@ -81,10 +82,10 @@ public class EntityReference<E extends EntityRO> {
     }
 
     private EntityReference(String name, int id, E e, EntityManagerRO<E> em) {
-        idlistener = new IdListener(name);
-        init(id, e);
         this.name = name;
         this.em = em;
+        idlistener = new IdListener(name);
+        init(id, e);
     }
 
     /**
@@ -120,10 +121,16 @@ public class EntityReference<E extends EntityRO> {
     }
 
     private EntityReference(String name, int id, E e, Class<? extends EntityManagerRO> emclass) {
-        idlistener = new IdListener(name);
-        init(id, e);
         this.name = name;
         this.em = Lookup.getDefault().lookup(emclass);
+        idlistener = new IdListener(name);
+        init(id, e);
+        
+    }
+    
+     @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, name);
     }
 
     /**
@@ -156,7 +163,7 @@ public class EntityReference<E extends EntityRO> {
     }
 
     private boolean set(int id, E e) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", "EntityReference", "set", id, e);
+        LogBuilder.writeLog("nbpcglibrary.data", this, "set", id, e);
         boolean updated = this.id != id;
         this.id = id;
         this.entityreference = e == null ? null : new WeakReference<>(e);
@@ -179,7 +186,7 @@ public class EntityReference<E extends EntityRO> {
     private class IdListener extends Listener<IdChangeEventParams> {
 
         public IdListener(String name) {
-            super(name + "/entityref/id");
+            super(name);
         }
 
         @Override

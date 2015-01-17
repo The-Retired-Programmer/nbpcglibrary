@@ -18,147 +18,104 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.List;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 
 /**
- * A Field to select a string value from a set of values (implemented as a
+ * A Field to select a string from a setField of values (implemented as a
  * ComboBox)
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class ChoiceField extends EditableField {
+public class ChoiceField extends EditableField<String> {
 
     /**
      * The undefined text as displayed in a choice field
      */
     public final static String UNDEFINED = "...";
     private List<String> choices;
-    private final JComboBox combobox;
-    private String value = UNDEFINED;
-    private final ComboActionListener comboactionlistener = new ComboActionListener();
-    private final ComboFocusListener combofocuslistener = new ComboFocusListener();
-
-    /**
-     * Factory method to create a choice field
-     *
-     * @param field the field id
-     * @param label the label text for the field
-     * @return the created choice field
-     */
-    public static ChoiceField create(IntWithDescription field, String label) {
-        return new ChoiceField(field, label, null);
-    }
-    
-    /**
-     * Factory method to create a choice field
-     *
-     * @param field the field id
-     * @param label the label text for the field
-     * @param listener the listener for changes to field value
-     * @return the created choice field
-     */
-    public static ChoiceField create(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
-        return new ChoiceField(field, label, listener);
-    }
+    private final JComboBox<String> combobox;
+    private final ChoiceFieldBackingObject backingObject;
 
     /**
      * Constructor
      *
-     * @param field the field id
+     * @param backingObject the backing Object
      * @param label the label text for the field
-     * @param listener the listener for changes to field value
      */
-    protected ChoiceField(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
-        super(field, label);
-        combobox = new JComboBox();
+    public ChoiceField(ChoiceFieldBackingObject backingObject, String label) {
+        this(backingObject, label, new JComboBox<>());
+    }
+
+    private ChoiceField(ChoiceFieldBackingObject backingObject, String label, JComboBox<String> combobox) {
+        super(backingObject, label, combobox);
+        this.backingObject = backingObject;
+        this.combobox = combobox;
         combobox.setEditable(false);
-        addListener(listener);
+        updateChoicesFromBackingObject(backingObject.get());
     }
 
-    private class ComboActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            update(get());
-        }
+    /**
+     * get the ChoiceFileBackingObject for this field
+     *
+     * @return
+     */
+    public ChoiceFieldBackingObject getBackingObject() {
+        return backingObject;
     }
-
-    private class ComboFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent fe) {
-        }
-
-        @Override
-        public void focusLost(FocusEvent fe) {
-            update(get());
-        }
+    
+    /**
+     * Get the choices
+     * 
+     * @return list of choice texts
+     */
+    protected List<String> getChoicesText() {
+        return backingObject.getChoices();
     }
 
     @Override
-    public JComponent getComponent() {
-        return combobox;
+    final String get() {
+        return combobox.getItemAt(combobox.getSelectedIndex());
     }
 
-    /**
-     * Get the value of this field
-     *
-     * @return the field value
-     */
-    public final String get() {
-        return (String) combobox.getSelectedItem();
-    }
-
-    /**
-     * Set the value of the field
-     *
-     * @param value the value
-     */
-    public final void set(String value) {
-        this.value = value;
-        setupCombobox();
-    }
-
-    private void update(String newvalue) {
-        if ((newvalue != null) && (!newvalue.equals(value)) && (!newvalue.equals(UNDEFINED))) {
-            value = newvalue;
-            fireChanged();
+    @Override
+    void updateIfChange(String value) {
+        if ((value != null) && (!value.equals(lastvaluesetinfield)) && (!value.equals(UNDEFINED))) {
+            setField(value);
+            backingObject.set(value);
         }
     }
 
     /**
-     * Set the set of possible choices for this field
-     *
-     * @param choices the set of choices
+     * request that the choices for the field are updated from the values in the
+     * Backing Object
      */
-    public final void setChoices(List<String> choices) {
-        this.choices = choices;
-        setupCombobox();
+    public final void updateChoicesFromBackingObject() {
+        updateChoicesFromBackingObject(lastvaluesetinfield);
+    }
+    
+    private void updateChoicesFromBackingObject(String value){
+        choices = getChoicesText();
+        preFieldUpdateAction();
+        setField(value);
+        postFieldUpdateAction();
     }
 
     /**
-     * Set the value and the set of possible choices for this field
-     *
-     * @param value the field value
-     * @param choices the set of choices
+     * hook to allow actions to take place before updating a combobox
      */
-    public final void setValueAndChoices(String value, List<String> choices) {
-        this.value = value;
-        this.choices = choices;
-        setupCombobox();
+    public void preFieldUpdateAction() {
     }
 
-    private void setupCombobox() {
-        combobox.removeActionListener(comboactionlistener);
-        combobox.removeFocusListener(combofocuslistener);
+    /**
+     * hook to allow actions to take place after updating a combobox
+     */
+    public void postFieldUpdateAction() {
+    }
+
+    @Override
+    void set(String value) {
         boolean selected = false;
         combobox.removeAllItems();
         if (choices != null) {
@@ -173,9 +130,17 @@ public class ChoiceField extends EditableField {
         if (!selected) {
             combobox.insertItemAt(UNDEFINED, 0);
             combobox.setSelectedItem(UNDEFINED);
-            value = UNDEFINED;
+            lastvaluesetinfield = UNDEFINED;
         }
-        combobox.addActionListener(comboactionlistener);
-        combobox.addFocusListener(combofocuslistener);
+    }
+
+    @Override
+    final void addActionListener(ActionListener listener) {
+        combobox.addActionListener(listener);
+    }
+
+    @Override
+    final void removeActionListener(ActionListener listener) {
+        combobox.removeActionListener(listener);
     }
 }

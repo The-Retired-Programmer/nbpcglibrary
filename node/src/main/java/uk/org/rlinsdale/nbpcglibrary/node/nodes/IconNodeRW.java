@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -119,14 +119,14 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
         E entity = getEntity();
         File fi = imagefilefinder.getFile(entity);
         if (fi == null) {
-            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName("IconNodeRW", "getIcon")
+            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
                 .addMsg("Nodename is {0} - No image defined", nodename).write();
             return _getIconWithError();
         }
         try {
             return entity.checkRules() ? ImageIO.read(fi) : _addErrorToIcon(ImageIO.read(fi));
         } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName("IconNodeRW", "getIcon")
+            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
                 .addMsg("Nodename is {0} - IOException when reading image", nodename).addException(ex).write();
             return _getIconWithError();
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,6 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.Color;
-import javax.swing.JComponent;
 import javax.swing.JTextField;
 
 /**
@@ -28,59 +27,37 @@ import javax.swing.JTextField;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class TextReadonlyField extends BaseField {
+public class TextReadonlyField extends BaseField<String> {
 
     private final JTextField textfield;
-
+   
     /**
-     * Factory method to create a read-only text field.
+     * Constructor
      *
-     * @param label the label text for the field
-     * @return the created read-only text field
+     * @param backingObject the backingObject
+     * @param label field label
+     * @param size size of the value display
      */
-    public static TextReadonlyField create(String label) {
-        return new TextReadonlyField(label, 20);
-    }
-
-    /**
-     * Factory method to create a read-only text field.
-     *
-     * @param label the label text for the field
-     * @param size the display size of the field
-     * @return the created read-only text field
-     */
-    public static TextReadonlyField create(String label, int size) {
-        return new TextReadonlyField(label, size);
-    }
-
-    private TextReadonlyField(String label, int size) {
-        super(label);
+    public TextReadonlyField(BaseFieldBackingObject<String> backingObject, String label, int size) {
+        super(backingObject, label);
         textfield = new JTextField();
         textfield.setColumns(size);
         textfield.setEditable(false);
         textfield.setForeground(Color.GRAY);
     }
 
+    /**
+     * Constructor
+     * 
+     * @param backingObject the backing object
+     * @param label field label
+     */
+    public TextReadonlyField(BaseFieldBackingObject<String> backingObject, String label) {
+        this(backingObject, label, 20);
+    }
+
     @Override
-    public final JComponent getComponent() {
-        return textfield;
-    }
-
-    /**
-     * Get the value of this field
-     *
-     * @return the field value
-     */
-    public final String get() {
-        return textfield.getText().trim();
-    }
-
-    /**
-     * Set the value of the field
-     *
-     * @param value the value
-     */
-    public final void set(String value) {
+    protected final void setField(String value) {
         textfield.setText(value);
     }
 }

@@ -31,8 +31,8 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventPa
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.REMOVED;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.SAVE;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField.ALL;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField.ID;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ALL;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ID;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
 
 /**
@@ -67,7 +67,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
         this.em = em;
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
-        idChangeEvent = new Event<>(entityname + "/id");
+        idChangeEvent = new Event<>(entityname);
     }
 
     /**

@@ -41,7 +41,7 @@ public abstract class BasicChildFactory<E extends EntityRO> extends RootChildFac
      */
     public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManagerRO> emclass) {
         super(null);
-        parentref = new EntityReference<>(factoryname + "/parent", parentEntity, emclass);
+        parentref = new EntityReference<>( factoryname+">"+parentEntity.classDescription(), parentEntity, emclass);
     }
 
     @Override

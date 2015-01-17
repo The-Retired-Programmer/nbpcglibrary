@@ -141,6 +141,6 @@ public class EntityStateChangeEventParams implements EventParams {
 
     @Override
     public String classDescription() {
-        return LogBuilder.classDescription(this, transition + "(" + oldState + "->" + newState);
+        return LogBuilder.classDescription(this, transition + "[" + oldState + ">" + newState+"]");
     }
 }

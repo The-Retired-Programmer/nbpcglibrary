@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 
 /**
  * Simple implementation of an LRU cache
@@ -29,7 +30,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The entity Class being managed
  */
-public class LRUCache<E> extends LinkedHashMap<Integer, E> {
+public class LRUCache<E> extends LinkedHashMap<Integer, E> implements LogHelper {
 
     private static final float LOADFACTOR = (float) 0.9;
     private final int maxcache;
@@ -47,19 +48,18 @@ public class LRUCache<E> extends LinkedHashMap<Integer, E> {
         this.maxcache = maxcache;
         this.name = name;
     }
+    
+    
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this, name);
+    }
 
-    /**
-     * test if eldest (based on recent use) entry in cache should be removed
-     *
-     * @param eldest the eldest entry
-     * @return true if max cache size has be reached and eldest should be
-     * removed
-     */
     @Override
     protected boolean removeEldestEntry(Map.Entry<Integer, E> eldest) {
         if (size() > maxcache) {
-            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName("LRUCache", "removeEldestEntry")
-                .addMsg("LRUCache Free {0}({1})", name, eldest.getKey()).write();
+            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "removeEldestEntry")
+                .addMsg("frees {0}", eldest.getKey()).write();
             return true;
         }
         return false;

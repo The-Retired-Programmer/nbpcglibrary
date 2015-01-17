@@ -19,7 +19,6 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +26,9 @@ import javax.swing.JTextArea;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEFAIL;
+import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVESUCCESS;
+import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDATIONFAIL;
 
 /**
  * A Form object which can be displayed in a dialog box.
@@ -36,13 +38,15 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 @RegisterLog("nbpcglibrary.form")
 public class Form extends GridBagPanel implements LogHelper {
 
-    static final int SAVESUCCESS = 1;
-    static final int SAVEVALIDATIONFAIL = 2;
-    static final int SAVEFAIL = 3;
+    enum FormSaveResult {
+        SAVESUCCESS,
+        SAVEVALIDATIONFAIL,
+        SAVEFAIL
+    }
+    
     private JTextArea failuremessages;
     private String formname;
     private List<FieldsDef> fieldsdefs;
-    private final FormFieldChangeListener formfieldchangelistener;
     private Rules additionalRules;
 
     /**
@@ -54,8 +58,7 @@ public class Form extends GridBagPanel implements LogHelper {
     public Form(String formname) {
         fieldsdefs = new ArrayList<>();
         this.formname = formname;
-        formfieldchangelistener = new FormFieldChangeListener();
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.form", this, formname);
+        LogBuilder.writeConstructorLog("nbpcglibrary.form", this, formname);
     }
 
     /**
@@ -83,14 +86,11 @@ public class Form extends GridBagPanel implements LogHelper {
      */
     public final void addFieldsdef(FieldsDef fieldsdef) {
         if (fieldsdef != null) {
-            LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
+            LogBuilder.writeLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
             fieldsdefs.add(fieldsdef);
-            fieldsdef.getFields().stream().map((field) -> {
+            for (BaseField field : fieldsdef.getFields() ) {
                 addRow(field.getComponents());
-                return field;
-            }).filter((field) -> (field instanceof EditableField)).map((field) -> (EditableField) field).filter((editablefield) -> (!editablefield.hasListener())).forEach((editablefield) -> {
-                editablefield.addListener(formfieldchangelistener);
-            });
+            }
         }
     }
 
@@ -117,7 +117,7 @@ public class Form extends GridBagPanel implements LogHelper {
      * any failure messages due to rule set failures)
      */
     public final void finaliseForm(int msgwidth) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "finaliseForm", msgwidth);
+        LogBuilder.writeLog("nbpcglibrary.form", this, "finaliseForm", msgwidth);
         failuremessages = new JTextArea(3, msgwidth);
         failuremessages.setForeground(Color.red);
         failuremessages.setEditable(false);
@@ -125,25 +125,22 @@ public class Form extends GridBagPanel implements LogHelper {
         addSpannedRow(failuremessages, Color.LIGHT_GRAY);
     }
 
-    /**
-     * First phase of the saving of values of fields in the form.
-     */
-    public void presave() {
-        fieldsdefs.stream().forEach((f) -> {
-            f.presave();
-        });
-    }
 
     /**
-     * Second phase of the saving of values of fields in the form.
+     * do the form save actions:
+     * save the field values
+     * check the form rules are ok
+     * if ok do the form (fielddefs) save action
      *
-     * @return true if save was successful
+     * @return save result code 
      */
-    public int save() {
-        presave();
+    public FormSaveResult save() {
+        fieldsdefs.stream().forEach((f) -> {
+            f.saveFields();
+        });
         if (checkRules()) {
             boolean ok = true;
-            LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "save");
+            LogBuilder.writeLog("nbpcglibrary.form", this, "save");
             failuremessages.setText("");
             for (FieldsDef f : fieldsdefs) {
                 if (!f.save()) {
@@ -158,14 +155,13 @@ public class Form extends GridBagPanel implements LogHelper {
     }
 
     /**
-     * Reset values of fields in the form to their previously checkpointed
-     * values.
+     * Cancel action
      */
-    public void reset() {
-        LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "reset");
+    public void cancel() {
+        LogBuilder.writeLog("nbpcglibrary.form", this, "cancel");
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
-            f.reset();
+            f.cancel();
         });
     }
 
@@ -173,7 +169,7 @@ public class Form extends GridBagPanel implements LogHelper {
      * Set the values of fields in the collection.
      */
     public void set() {
-        LogBuilder.writeEnteringLog("nbpcglibrary.form", this, "set");
+        LogBuilder.writeLog("nbpcglibrary.form", this, "set");
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
             f.set();
@@ -223,17 +219,4 @@ public class Form extends GridBagPanel implements LogHelper {
             f.addFailureMessages(msg);
         });
     }
-
-    private class FormFieldChangeListener extends Listener<FormFieldChangeEventParams> {
-
-        public FormFieldChangeListener() {
-            super(formname+"_all_fields");
-        }
-
-        @Override
-        public void action(FormFieldChangeEventParams p) {
-            writeAllFailureMessages();
-        }
-    }
-
 }

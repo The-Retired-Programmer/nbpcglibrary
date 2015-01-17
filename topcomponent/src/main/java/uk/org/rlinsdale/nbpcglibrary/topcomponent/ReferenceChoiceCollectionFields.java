@@ -20,13 +20,12 @@ package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.form.ChoiceField;
-import uk.org.rlinsdale.nbpcglibrary.form.FormFieldChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.form.ChoiceFieldBackingObject;
 
 /**
  * Choice Field - taking values from all entities of a class.
@@ -40,28 +39,19 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
     private List<E> choices;
     private List<String> choiceText;
     private final ChoicesFieldListener choicesfieldListener;
-    private final CollectionFieldListener collectionfieldListener ;
+    private final CollectionFieldListener collectionfieldListener;
 
     /**
      * Constructor.
      *
-     * @param field the field Id
+     * @param backingObject the backingObject
      * @param label the field label
-     * @param listener the change listener
      */
-    public ReferenceChoiceCollectionFields(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
-        super(field, label, listener);
+    public ReferenceChoiceCollectionFields(ChoiceFieldBackingObject backingObject, String label) {
+        super(backingObject, label);
         choicesfieldListener = new ChoicesFieldListener(label + "/choices");
-        collectionfieldListener = new CollectionFieldListener(label+"/setchange");
-    }
-    
-    /**
-     * initialise the choices text
-     */
-    public void initChoices() {
-        setChoices(getChoicesText());
-        addChoicesListeners();
-        addCollectionListeners(collectionfieldListener);
+        collectionfieldListener = new CollectionFieldListener(label + "/setchange");
+        postFieldUpdateAction();
     }
 
     /**
@@ -71,7 +61,6 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
         removeCollectionListeners(collectionfieldListener);
         removeChoicesListeners();
     }
-
 
     private void addChoicesListeners() {
         choices.stream().filter((e) -> (e != null)).forEach((e) -> {
@@ -85,7 +74,8 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
         });
     }
 
-    private List<String> getChoicesText() {
+    @Override
+    protected  List<String> getChoicesText() {
         choiceText = new ArrayList<>();
         choices = getChoicesEntities();
         choices.stream().forEach((e) -> {
@@ -109,24 +99,15 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
      */
     protected abstract String convertEntitytoText(E e);
 
-    
     /**
-     * add a given listener to all parent collections which could affect this reference choice.
-     * @param listener the set change listener
+     * Get the Choice entity from its text form.
+     *
+     * @param text the textual form
+     * @return the choice entity
      */
-    protected abstract void addCollectionListeners(Listener<SetChangeEventParams> listener);
-
-    
-    /**
-     * remove a given listener from all parent collections which could affect this reference choice.
-     * @param listener the set change listener
-     */
-    protected abstract void removeCollectionListeners(Listener<SetChangeEventParams> listener);
-
-    public E findSelectedEntity() {
-        String choicename = get();
+    public E convertTexttoEntity(String text) {
         for (int i = 0; i < choiceText.size(); i++) {
-            if (choiceText.get(i).equals(choicename)) {
+            if (choiceText.get(i).equals(text)) {
                 return choices.get(i);
             }
         }
@@ -134,12 +115,35 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
     }
 
     /**
-     * Update the choices text
+     * add a given listener to all parent collections which could affect this
+     * reference choice.
+     *
+     * @param listener the set change listener
      */
-    protected void updateChoicesText() {
+    protected abstract void addCollectionListeners(Listener<SetChangeEventParams> listener);
+
+    /**
+     * remove a given listener from all parent collections which could affect
+     * this reference choice.
+     *
+     * @param listener the set change listener
+     */
+    protected abstract void removeCollectionListeners(Listener<SetChangeEventParams> listener);
+
+    /**
+     * hook to allow actions to take place before updating a combobox
+     */
+    @Override
+    public final void preFieldUpdateAction() {
         removeCollectionListeners(collectionfieldListener);
         removeChoicesListeners();
-        setChoices(getChoicesText());
+    }
+    
+    /**
+     * hook to allow actions to take place after updating a combobox
+     */
+    @Override
+    public final void postFieldUpdateAction() {
         addChoicesListeners();
         addCollectionListeners(collectionfieldListener);
     }
@@ -152,20 +156,19 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
 
         @Override
         public void action(SetChangeEventParams p) {
-                updateChoicesText();
+            updateChoicesFromBackingObject();
         }
     }
 
-
-    private class ChoicesFieldListener extends Listener<FieldChangeEventParams<F>> {
+    private class ChoicesFieldListener extends Listener<EntityFieldChangeEventParams<F>> {
 
         public ChoicesFieldListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeEventParams<F> p) {
-            updateChoicesText();
+        public void action(EntityFieldChangeEventParams<F> p) {
+            updateChoicesFromBackingObject();
         }
     }
 }

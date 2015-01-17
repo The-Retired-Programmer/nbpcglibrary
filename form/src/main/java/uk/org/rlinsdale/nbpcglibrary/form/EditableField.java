@@ -18,62 +18,60 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.Event;
 
 /**
  * Abstract Class representing an editable Field on a Form
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <T> type of the data connecting to the backing Object
  */
-public abstract class EditableField extends BaseField {
+public abstract class EditableField<T> extends BaseField<T> {
 
-    private final Event<FormFieldChangeEventParams> listening;
-    private final IntWithDescription field;
+    private final FieldActionListener actionListener = new FieldActionListener();
+    private final FieldFocusListener focusListener = new FieldFocusListener();
     private final Rules rules = new Rules();
+    private final JComponent field;
+    protected T lastvaluesetinfield;
+    private final EditableFieldBackingObject<T> backingObject;
 
     /**
      * Constructor
      *
-     * @param field the field id
+     * @param backingObject the backing object
      * @param label the label text for this field
+     * @param field the swing field component
      */
-    public EditableField(IntWithDescription field, String label) {
-        super(label);
+    public EditableField(EditableFieldBackingObject<T> backingObject, String label, JComponent field) {
+        super(backingObject, label);
+        this.backingObject = backingObject;
         this.field = field;
-        listening = new Event<>(field.toString());
+    }
+
+    @Override
+    final JComponent getComponent() {
+        return field;
     }
 
     /**
-     * Add a listener to this field. The listener will fire on changes to field
-     * content.
+     * setField an action listener for this field
      *
      * @param listener the listener
      */
-    public void addListener(Listener<FormFieldChangeEventParams> listener) {
-        listening.addListener(listener);
-    }
+    abstract void addActionListener(ActionListener listener);
 
     /**
-     * Remove a listener from this field.
+     * remove an action listener for this field
      *
      * @param listener the listener
      */
-    public void removeListener(Listener<FormFieldChangeEventParams> listener) {
-        listening.removeListener(listener);
-    }
-
-    /**
-     * Test if there are any listeners attached to this field.
-     *
-     * @return true if one or more listeners are attached to this field
-     */
-    public boolean hasListener() {
-        return listening.hasListener();
-    }
+    abstract void removeActionListener(ActionListener listener);
 
     /**
      * Add a rule to this field's Rule Set.
@@ -85,28 +83,83 @@ public abstract class EditableField extends BaseField {
     }
 
     /**
-     * Check if all rules in the field's rule set are valid.
+     * Check if all rules in the field's rule setField are valid.
      *
      * @return true if all rules are valid
      */
-    public boolean checkRules() {
+    boolean checkRules() {
         return rules.checkRules();
     }
 
     /**
      * Add failure messages to the StringBuilder for each rule in this field's
-     * rule set which is failing.
+ rule setField which is failing.
      *
      * @param sb the StringBuilder collecting failure messages
      */
-    public final void addFailureMessages(StringBuilder sb) {
+    void addFailureMessages(StringBuilder sb) {
         rules.addFailureMessages(sb);
     }
 
-    /**
-     * fire the listener - called when a change to this field occurs.
-     */
-    protected void fireChanged() {
-        listening.fire(new FormFieldChangeEventParams(field));
+    @Override
+    final void setField(T value) {
+        removeActionListener(actionListener);
+        field.removeFocusListener(focusListener);
+        this.lastvaluesetinfield = value;
+        set(value);
+        addActionListener(actionListener);
+        field.addFocusListener(focusListener);
     }
+
+    /**
+     * Set a value into the Field
+     *
+     * @param value the value to be inserted into the Field
+     */
+    abstract void set(T value);
+
+    /**
+     * request that the backing bean has its value updated with the
+     * current value of the field
+     */
+    public void updateBackingObjectFromField() {
+        backingObject.set(get());
+    }
+
+    /**
+     * Get a value from the field
+     *
+     * @return the value of the field
+     */
+    abstract T get();
+
+    private class FieldActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            updateIfChange(get());
+        }
+    }
+
+    private class FieldFocusListener implements FocusListener {
+
+        @Override
+        public void focusGained(FocusEvent fe) {
+        }
+
+        @Override
+        public void focusLost(FocusEvent fe) {
+            updateIfChange(get());
+        }
+    }
+
+    /**
+     * check that the value has changed and if so then update the
+     * lastvalue variable, and update the backingobject if rule check is
+     * passed
+     *
+     * @param value the new value to test
+     */
+    abstract void updateIfChange(T value);
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -54,8 +54,9 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
      * @param name the topcomponent name
      * @param hint the topcomponent hint
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public NodeEditorTopComponent(TreeNodeRW<E, F> node, String name, String hint) {
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.topcomponent", "NodeEditorTopComponent", node, name, hint);
+        LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, node, name, hint);
         setName(name);
         setToolTipText(hint);
         this.name = name;
@@ -72,7 +73,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
 
     @Override
     public void componentOpened() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("NodeEditorTopComponent", "componentOpened")
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentOpened")
                 .addMsg("TopComponent is {0})", this).write();
         entity = node.getEntity();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -89,7 +90,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
 
     @Override
     public void componentClosed() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName("NodeEditorTopComponent", "componentClosed")
+        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentClosed")
                 .addMsg("TopComponent is {0})", this).write();
         remove(dropForm());
         entity = null;

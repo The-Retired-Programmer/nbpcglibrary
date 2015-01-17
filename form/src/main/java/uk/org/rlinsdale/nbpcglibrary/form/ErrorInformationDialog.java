@@ -39,7 +39,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 public class ErrorInformationDialog {
 
     private final DialogDescriptor dd;
-    private final Event<SimpleEventParams> listening = new Event<>("ErrorInformationDialog");
+    private final Event<SimpleEventParams> dialogDone = new Event<>("ErrorInformationDialogDone");
     private static ErrorInformationDialog instance;
 
     /**
@@ -54,7 +54,7 @@ public class ErrorInformationDialog {
     }
 
     private ErrorInformationDialog(String title, String message, Listener<SimpleEventParams> l) {
-        listening.addListener(l);
+        dialogDone.addListener(l);
         dd = new DialogDescriptor(
                 message,
                 title,
@@ -74,9 +74,9 @@ public class ErrorInformationDialog {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            LogBuilder.writeEnteringLog("nbpcglibrary.form", "DialogDoneListener", "actionPerformed", ae);
+            LogBuilder.writeLog("nbpcglibrary.form", this, "actionPerformed");
             dd.setClosingOptions(null); // and allow closing
-            listening.fire(new SimpleEventParams());
+            dialogDone.fire(new SimpleEventParams());
             instance = null;
         }
     }
@@ -87,10 +87,10 @@ public class ErrorInformationDialog {
         public void propertyChange(PropertyChangeEvent pce) {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
-                 LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName("CloseChangeListener", "propertyChange", pce)
+                 LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "propertyChange")
                                 .addMsg("Window closed").write();
                 dd.setClosingOptions(null); // and allow closing
-                listening.fire(new SimpleEventParams());
+                dialogDone.fire(new SimpleEventParams());
                 instance = null;
             }
         }

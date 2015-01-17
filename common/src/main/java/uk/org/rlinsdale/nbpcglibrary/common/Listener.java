@@ -35,11 +35,11 @@ public abstract class Listener<P extends EventParams> implements LogHelper {
      * @param description the listener's descriptive name - for use in error
      * /log reporting
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public Listener(String description) {
         this.description = description;
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.common", this, description);
+        LogBuilder.writeConstructorLog("nbpcglibrary.common", this, description);
     }
-    
     
     @Override
     public String classDescription() {
@@ -52,7 +52,7 @@ public abstract class Listener<P extends EventParams> implements LogHelper {
      * @param p the listener parameters
      */
     public void actionPerformed(P p) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.common",this, "actionPerformed", p);
+        LogBuilder.writeLog("nbpcglibrary.common",this, "actionPerformed", p);
         action(p);
     }
 

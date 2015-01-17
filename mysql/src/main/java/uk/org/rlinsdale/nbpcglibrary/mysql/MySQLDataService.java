@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ public class MySQLDataService extends DBDataService {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            LogBuilder.create("nbpcglibrary.mysql", Level.SEVERE).addConstructorName("MySQLDataService", p)
+            LogBuilder.create("nbpcglibrary.mysql", Level.SEVERE).addConstructorName(this, p)
                 .addException(ex).write();
         }
         try {

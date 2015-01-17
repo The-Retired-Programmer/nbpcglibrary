@@ -94,7 +94,7 @@ public class EntityReferenceSet<E extends EntityRO, F> {
     private EntityReferenceSet(Class<? extends EntityManagerRO> emclass, String name, F field, String columnname, int columnvalue) {
         this.name = name;
         this.field = field;
-        setChangeEvent = new Event<>(name + "/set");
+        setChangeEvent = new Event<>(name);
         em = Lookup.getDefault().lookup(emclass);
         this.columnvalue = columnvalue;
         this.columnname = columnname;

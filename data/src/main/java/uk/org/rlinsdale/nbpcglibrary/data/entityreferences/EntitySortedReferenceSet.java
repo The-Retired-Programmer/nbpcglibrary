@@ -23,7 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 
 /**
@@ -133,14 +133,14 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
         unsorted = true;
     }
 
-    private class ChildListener extends Listener<FieldChangeEventParams<F>> {
+    private class ChildListener extends Listener<EntityFieldChangeEventParams<F>> {
 
         public ChildListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(FieldChangeEventParams<F> p) {
+        public void action(EntityFieldChangeEventParams<F> p) {
             sort();
         }
     }

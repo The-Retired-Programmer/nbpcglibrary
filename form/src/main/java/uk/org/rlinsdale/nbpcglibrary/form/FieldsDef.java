@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,43 +20,31 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.ArrayList;
 import java.util.List;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
- * A collection of a set of fields - for use in defining the fields content of a
- * form segment.
+ * A collection of a setField of fields - for use in defining the fields content of a
+ form segment.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class FieldsDef {
+public abstract class FieldsDef implements LogHelper {
 
     private final List<BaseField> fields = new ArrayList<>();
-    private final String name;
     private final Rules rules = new Rules();
 
-    /**
-     * Constructor
-     *
-     * @param name the name for this collection of fields.
-     */
-    public FieldsDef(String name) {
-        this.name = name;
+    @Override
+    public String classDescription() {
+        return LogBuilder.classDescription(this);
     }
-
-    /**
-     * Get the name of this collection of fields.
-     *
-     * @return the name
-     */
-    public final String getName() {
-        return name;
-    }
-
+    
     /**
      * add a field to this collection.
      *
-     * @param f teh field to add
+     * @param f the field to add
      */
     public final void add(BaseField f) {
         fields.add(f);
@@ -74,29 +62,34 @@ public abstract class FieldsDef {
     /**
      * Set the values of fields in the collection.
      */
-    public abstract void set();
-
+    public final void set() {
+        fields.stream().forEach((f) -> {
+            f.updateFieldFromBackingObject();
+        });
+    }
+    
     /**
-     * First phase of the saving of values of fields in the collection.
+     * save the field values
      */
-    public void presave() {
+    public final void saveFields() {
+        fields.stream().forEach((f) -> {
+            if (f instanceof EditableField) {
+                ((EditableField)f).updateBackingObjectFromField();
+            }
+        });
     }
 
     /**
-     * Second phase of the saving of values of fields in the collection
+     * finalise the save action
      *
      * @return true if save was successful
      */
-    public boolean save() {
-        return true;
-    }
+    public abstract boolean save();
 
     /**
-     * Reset values of fields in the collection to their previously checkpointed
-     * values.
+     * Cancel occurred - action this.
      */
-    public void reset() {
-    }
+    public abstract void cancel();
 
     /**
      * Add a rule to the collection - these rules are not individual field rules
@@ -111,7 +104,7 @@ public abstract class FieldsDef {
 
     /**
      * Add failure messages to the StringBuilder for each rule in the
-     * collection's rule set and each individual field which is failing.
+ collection's rule setField and each individual field which is failing.
      *
      * @param sb the StringBuilder collecting failure messages
      */
@@ -123,8 +116,8 @@ public abstract class FieldsDef {
     }
 
     /**
-     * Check if all rules in the collection's rule set and each individual field
-     * are valid.
+     * Check if all rules in the collection's rule setField and each individual field
+ are valid.
      *
      * @return true if all rules are valid
      */
@@ -136,10 +129,5 @@ public abstract class FieldsDef {
             }
         }
         return valid && rules.checkRules();
-    }
-    
-    @Override
-    public String toString() {
-        return name;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ public abstract class Rule {
     public final boolean check() {
         boolean res = ruleCheck();
         if (!res) {
-            LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName("Rule", "check")
+            LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName(this, "check")
                     .addMsg("Rule failure: {0}", failuremessage).write();
         }
         return res;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ public abstract class FindAction<C> {
      */
     public List<C> find() {
         List<C> res = findValues();
-        LogBuilder.create("nbpcglibrary.common", Level.FINE).addMethodName("FindAction", "find")
+        LogBuilder.create("nbpcglibrary.common", Level.FINE).addMethodName(this, "find")
                 .addMsg("FindAction is {0} - returns  {1} values", this, res.size()).write();
         return res;
     }

@@ -204,7 +204,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
     // CUT and PASTE target support
     @Override
     public final PasteType getDropType(final Transferable t, int action, int index) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.node", this, "getDropType");
+        LogBuilder.writeLog("nbpcglibrary.node", this, "getDropType");
         if (allowedPaste != null) {
             for (DataFlavorAndAction dfa : allowedPaste) {
                 if (t.isDataFlavorSupported(dfa.dataflavor) && ((action & (dfa.action)) != 0)) {
@@ -234,7 +234,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
 
         @Override
         public Transferable paste() throws IOException {
-            LogBuilder.writeEnteringLog("nbpcglibrary.node", this, "paste");
+            LogBuilder.writeLog("nbpcglibrary.node", this, "paste");
             Entity e;
             try {
                 e = (Entity) t.getTransferData(dfa.dataflavor);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,26 +57,26 @@ public class DataAccessRWIdkeyauto extends DataAccessROIdkeyauto implements Data
         this.tablename = tablename;
         this.dbdataservice = dbdataservice;
     }
-
+    
     @Override
     public final int insert(Map<String, Object> values) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "insert", values);
+        LogBuilder.writeLog("nbpcglibrary.data", this, "insert", values);
         dbdataservice.execute("INSERT INTO " + tablename + " ({$KEYLIST}) VALUES ({$VALUELIST})", values);
         int id = dbdataservice.simpleIntQuery("SELECT LAST_INSERT_ID() as id", "id");
-        LogBuilder.writeExitingLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "insert", id);
+        LogBuilder.writeExitingLog("nbpcglibrary.data", this, "insert", id);
         return id;
     }
 
     @Override
     public final void update(int id, Map<String, Object> diff) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "update", id, diff);
+        LogBuilder.writeLog("nbpcglibrary.data", this, "update", id, diff);
         dbdataservice.execute("UPDATE " + tablename + " SET {$KEYVALUELIST} WHERE id=" + id, diff);
-         LogBuilder.writeExitingLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "update");
+         LogBuilder.writeExitingLog("nbpcglibrary.data", this, "update");
     }
 
     @Override
     public final void delete(int id) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.data", "DataAccessRWIdkeyauto", "delete", id);
+        LogBuilder.writeLog("nbpcglibrary.data", this, "delete", id);
         dbdataservice.execute("DELETE from " + tablename + " WHERE id = {P}", id);
     }
 }

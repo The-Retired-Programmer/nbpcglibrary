@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,14 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import uk.org.rlinsdale.nbpcglibrary.common.IntWithDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 
 /**
  * A General purpose Field for displaying and editing a value which is a simple
@@ -33,102 +27,55 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listener;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class CheckboxField extends EditableField {
+public class CheckboxField extends EditableField<Boolean> {
 
     private final JCheckBox checkbox;
-    private boolean value;
-    private final CheckboxActionListener checkboxActionListener = new CheckboxActionListener();
-    private final CheckboxFocusListener checkboxFocusListener = new CheckboxFocusListener();
+    private final CheckboxFieldBackingObject backingObject;
 
     /**
-     * Factory method to create a checkbox field
-     * 
-     * @param field the field id
-     * @param label the label text for the field
-     * @return the created checkbox field
-     */
-    public static CheckboxField create(IntWithDescription field, String label) {
-        return new CheckboxField(field, label, null);
-    }
-
-    /**
-     * Factory method to create a checkbox field
+     * Constructor
      *
-     * @param field the field id
-     * @param label the label text for the field
-     * @param listener the listener for changes to field value
-     * @return the created checkbox field
+     * @param backingObject the backing object
+     * @param label field label
      */
-    public static CheckboxField create(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
-        return new CheckboxField(field, label, listener);
+    public CheckboxField(CheckboxFieldBackingObject backingObject, String label) {
+        this(backingObject, label, new JCheckBox("", false));
     }
-
-    private CheckboxField(IntWithDescription field, String label, Listener<FormFieldChangeEventParams> listener) {
-        super(field, label);
-        checkbox = new JCheckBox("", false);
-        addListener(listener);
-        checkbox.addActionListener(checkboxActionListener);
-        checkbox.addFocusListener(checkboxFocusListener);
-    }
-
-    private class CheckboxActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            update(get());
-        }
-    }
-
-    private class CheckboxFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent fe) {
-        }
-
-        @Override
-        public void focusLost(FocusEvent fe) {
-            update(get());
-        }
+    
+    public CheckboxField(CheckboxFieldBackingObject backingObject, String label, JCheckBox checkbox) {
+        super(backingObject, label, checkbox);
+        this.checkbox = checkbox;
+        this.backingObject = backingObject;
+        setField(backingObject.get());
     }
 
     @Override
-    public final JComponent getComponent() {
-        return checkbox;
-    }
-
-    /**
-     * Get the value of this field
-     *
-     * @return the field value
-     */
-    public final boolean get() {
+    protected Boolean get() {
         return checkbox.isSelected();
     }
 
-    /**
-     * Set the value of the field
-     *
-     * @param value the value
-     */
-    public final void set(boolean value) {
-        checkbox.removeActionListener(checkboxActionListener);
-        checkbox.removeFocusListener(checkboxFocusListener);
-        checkbox.setSelected(value);
-        this.value = value;
-        checkbox.addActionListener(checkboxActionListener);
-        checkbox.addFocusListener(checkboxFocusListener);
+    @Override
+    void addActionListener(ActionListener listener) {
+        checkbox.addActionListener(listener);
     }
 
-    /**
-     * Update the value of the field, firing the listener action if the value
-     * changes.
-     * 
-     * @param newvalue the new value
-     */
-    public final void update(boolean newvalue) {
-        if (newvalue != value) {
-            set(newvalue);
-            fireChanged();
+    @Override
+    void removeActionListener(ActionListener listener) {
+        checkbox.removeActionListener(listener);
+    }
+
+    @Override
+    void set(Boolean value) {
+        checkbox.setSelected(value);
+    }
+
+    @Override
+    void updateIfChange(Boolean value) {
+        if (!value.equals(lastvaluesetinfield)) {
+            lastvaluesetinfield = value;
+            if (checkRules()) {
+                backingObject.set(value);
+            }
         }
     }
 }

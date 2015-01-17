@@ -69,7 +69,7 @@ public class Event<P extends EventParams> implements LogHelper {
      */
     public Event(String description) {
         this.description = description;
-        LogBuilder.writeEnteringConstructorLog("nbpcglibrary.common", this, description);
+        LogBuilder.writeConstructorLog("nbpcglibrary.common", this, description);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class Event<P extends EventParams> implements LogHelper {
      * queue
      */
     public void addListener(Listener<P> listener, ListenerMode mode) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.common",this, "addListener", listener, mode);
+        LogBuilder.writeLog("nbpcglibrary.common",this, "addListener", listener, mode);
         if (listener != null) {
             switch (mode) {
                 case PRIORITY_IMMEDIATE:
@@ -119,7 +119,7 @@ public class Event<P extends EventParams> implements LogHelper {
      * @param listener the listener
      */
     public void removeListener(Listener<P> listener) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.common",this, "removeListener", listener);
+        LogBuilder.writeLog("nbpcglibrary.common",this, "removeListener", listener);
         listenersImmediate.remove(listener);
         listenersEventQueue.remove(listener); // remove a listener from either queue
     }
@@ -140,7 +140,7 @@ public class Event<P extends EventParams> implements LogHelper {
      * @param p the listener parameters object
      */
     public void fire(P p) {
-        LogBuilder.writeEnteringLog("nbpcglibrary.common", this, "fire", p);
+        LogBuilder.writeLog("nbpcglibrary.common", this, "fire", p);
         listenersImmediate.fire(p);
         if (EventQueue.isDispatchThread()) {
             listenersEventQueue.fire(p);

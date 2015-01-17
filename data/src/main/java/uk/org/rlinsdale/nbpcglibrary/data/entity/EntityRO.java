@@ -25,6 +25,7 @@ import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.data.dataservice.ResultSetLoader;
@@ -40,8 +41,8 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventPa
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.EDIT;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.LOAD;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.RESET;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.CommonEntityField.ALL;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ALL;
 
 /**
  * The Basic Read-Only (uneditable) Entity Abstract Class.
@@ -53,11 +54,12 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.FieldChangeEventParams.C
 public abstract class EntityRO<F> extends Entity {
     
     private final Event<EntityStateChangeEventParams> stateEvent;
-    private final Event<FieldChangeEventParams<F>> fieldEvent;
+    private final Event<EntityFieldChangeEventParams<F>> fieldEvent;
     private EntityState state = INIT;
     private int id;
     private final DBFieldsRO dbfields;
     private final DataAccessRO dataAccess;
+    private final String entityname;
 
     /**
      * Constructor.
@@ -79,13 +81,15 @@ public abstract class EntityRO<F> extends Entity {
      * @param dataAccess the Data Access object for this entity class
      * @param dbfields the entity fields
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     protected EntityRO(String entityname, int id, DataAccessRO dataAccess, DBFieldsRO dbfields) {
         super(entityname);
         this.id = id;
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
-        stateEvent = new Event<>(entityname + "/state");
-        fieldEvent = new Event<>(entityname + "/field");
+        this.entityname = entityname;
+        stateEvent = new Event<>("statechange:"+ LogBuilder.classDescription(this, Integer.toString(id)));
+        fieldEvent = new Event<>("fieldchange:"+ LogBuilder.classDescription(this, Integer.toString(id)));
         EntityState oldState = state;
         state = NEW;
         fireStateChange(CREATE, oldState, state);
@@ -122,7 +126,7 @@ public abstract class EntityRO<F> extends Entity {
      *
      * @param listener the listener
      */
-    public final void addFieldListener(Listener<FieldChangeEventParams<F>> listener) {
+    public final void addFieldListener(Listener<EntityFieldChangeEventParams<F>> listener) {
         fieldEvent.addListener(listener);
     }
 
@@ -131,7 +135,7 @@ public abstract class EntityRO<F> extends Entity {
      *
      * @param listener the listener
      */
-    public final void removeFieldListener(Listener<FieldChangeEventParams<F>> listener) {
+    public final void removeFieldListener(Listener<EntityFieldChangeEventParams<F>> listener) {
         fieldEvent.removeListener(listener);
     }
 
@@ -161,7 +165,7 @@ public abstract class EntityRO<F> extends Entity {
      */
     protected final void fireFieldChange(F field, boolean formatOK) {
         updateEntityRegistration();
-        fieldEvent.fire(new FieldChangeEventParams<>(field, null, formatOK));
+        fieldEvent.fire(new EntityFieldChangeEventParams<>(field, null, formatOK));
     }
     
     /**
@@ -172,7 +176,7 @@ public abstract class EntityRO<F> extends Entity {
      */
     protected final void fireCommonFieldChange(CommonEntityField field, boolean formatOK) {
         updateEntityRegistration();
-        fieldEvent.fire(new FieldChangeEventParams<>(null, field, formatOK));
+        fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, formatOK));
     }
 
     /**
@@ -193,7 +197,7 @@ public abstract class EntityRO<F> extends Entity {
      */
     protected final void fireFieldChangeAtLoad(CommonEntityField field) {
         updateEntityRegistrationAtLoad();
-        fieldEvent.fire(new FieldChangeEventParams<>(null, field, true));
+        fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, true));
     }
 
     /**
@@ -293,7 +297,7 @@ public abstract class EntityRO<F> extends Entity {
         fireFieldChangeAtLoad(ALL);
     }
 
-    private class EntityROLoader implements ResultSetLoader {
+    private class EntityROLoader implements ResultSetLoader, LogHelper {
 
         @Override
         public void load(ResultSet rs) {
@@ -304,7 +308,7 @@ public abstract class EntityRO<F> extends Entity {
                     dbfields.load(rs);
                     _load(rs);
                 } catch (SQLException ex) {
-                    LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName("EntityROLoader", "load", rs)
+                    LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", rs)
                             .addException(ex).write();
                 }
                 setState(DBENTITY);
@@ -312,6 +316,12 @@ public abstract class EntityRO<F> extends Entity {
                 return;
             }
             throw new LogicException("Should not be trying to load an entity in " + oldState + " state");
+        }
+        
+        
+        @Override
+        public String classDescription() {
+            return LogBuilder.classDescription(this, entityname);
         }
     }
 
