@@ -495,7 +495,7 @@ public class LogBuilder {
         private LogRegistry() {
             loggers = new HashMap<>();
             register("nbpcglibrary.common");
-            FileObject ff = FileUtil.getConfigFile("/nbpcg/logs"); // get folder
+            FileObject ff = FileUtil.getConfigFile("nbpcglibrary/common/LogBuilder/"); // get folder
             if (ff != null) {
                 for (FileObject cfo : ff.getChildren()) {
                     register(cfo.getName().replace('-', '.'));

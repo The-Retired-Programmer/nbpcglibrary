@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ public class CommonAnnotationProcessor extends LayerGeneratingProcessor {
         roundEnv.getElementsAnnotatedWith(RegisterLog.class).stream().forEach((e) -> {
             RegisterLog r = e.getAnnotation(RegisterLog.class);
             if (r != null) {
-                layer(e).file("nbpcg/logs/" + r.value().replace(".", "-")).write();
+                layer(e).file("nbpcglibrary/common/LogBuilder/" + r.value().replace(".", "-")).write();
             }
         });
         return true;

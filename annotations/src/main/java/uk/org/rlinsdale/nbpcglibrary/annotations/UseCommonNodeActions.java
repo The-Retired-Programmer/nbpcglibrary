@@ -30,12 +30,12 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface RegisterNodeSavedActions {
+public @interface UseCommonNodeActions {
 
     /**
      * Get the set of RegisterNodeSavedActions.
      * 
      * @return the set of RegisterNodeSavedActions
      */
-    RegisterNodeSavedAction[] value();
+    UseCommonNodeAction[] value();
 }

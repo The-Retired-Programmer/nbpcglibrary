@@ -166,7 +166,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
      */
     @SuppressWarnings("SuspiciousToArrayCall")
     protected Action[] findActions(String classname) {
-        List<? extends Action> myActions = Utilities.actionsForPath("nbpcg/node/" + classname + "/actions/all");
+        List<? extends Action> myActions = Utilities.actionsForPath("nbpcglibrary/node/" + classname + "/actions/all");
         return myActions.toArray(new Action[myActions.size()]);
     }
 
@@ -177,7 +177,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
      * @return the default action or null
      */
     protected Action findDefaultAction(String classname) {
-        List<? extends Action> myActions = Utilities.actionsForPath("nbpcg/node/" + classname + "/actions/default");
+        List<? extends Action> myActions = Utilities.actionsForPath("nbpcglibrary/node/" + classname + "/actions/default");
         return myActions.isEmpty() ? null : myActions.get(0);
     }
 

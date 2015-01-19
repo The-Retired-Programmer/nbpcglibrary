@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface RegisterNodeSavedAction {
+public @interface UseCommonNodeAction {
     
     /**
      * The action name parameter.

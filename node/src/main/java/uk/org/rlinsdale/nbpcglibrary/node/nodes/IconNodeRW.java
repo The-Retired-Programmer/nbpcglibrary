@@ -79,7 +79,7 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
     }
 
     private ImageFileFinder<E> getImageFileFinder(String nodename) {
-        FileObject ff = FileUtil.getConfigFile("nbpcg/node/" + nodename + "/imagefilefinder"); // get folder
+        FileObject ff = FileUtil.getConfigFile("nbpcglibrary/node/" + nodename + "/imagefilefinder"); // get folder
         if (ff == null) {
             throw new LogicException("no image file finders defined for node " + nodename);
         }

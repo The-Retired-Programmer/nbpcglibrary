@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.node.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import uk.org.rlinsdale.nbpcglibrary.annotations.SaveNodeAction;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterCommonNodeAction;
 import org.openide.actions.DeleteAction;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
@@ -30,7 +30,7 @@ import org.openide.util.Lookup;
  * Delete - Context Aware Action for use with node menus
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@SaveNodeAction
+@RegisterCommonNodeAction
 public final class NodeDeleteAction extends AbstractAction implements ContextAwareAction {
 
     @Override

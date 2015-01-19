@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.node.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import uk.org.rlinsdale.nbpcglibrary.annotations.SaveNodeAction;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterCommonNodeAction;
 import org.openide.actions.ReorderAction;
 import org.openide.util.ContextAwareAction;
 import org.openide.util.Lookup;
@@ -31,7 +31,7 @@ import org.openide.util.Lookup;
  * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@SaveNodeAction
+@RegisterCommonNodeAction
 public final class NodeReorderAction extends AbstractAction implements ContextAwareAction {
 
     @Override
