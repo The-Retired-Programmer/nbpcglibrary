@@ -41,7 +41,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
  */
 public class EntityReference<E extends EntityRO> implements LogHelper {
 
-    private final static int NONE = 0;
+    public final static int NONE = 0;
     private final String name;
     private int id;
     private int saveId;
