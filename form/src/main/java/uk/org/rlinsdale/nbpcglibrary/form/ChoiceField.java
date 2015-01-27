@@ -37,6 +37,7 @@ public class ChoiceField extends EditableField<String> {
     private List<String> choices;
     private final JComboBox<String> combobox;
     private final ChoiceFieldBackingObject backingObject;
+    private final boolean nullSelectionAllowed;
 
     /**
      * Constructor
@@ -45,13 +46,25 @@ public class ChoiceField extends EditableField<String> {
      * @param label the label text for the field
      */
     public ChoiceField(ChoiceFieldBackingObject backingObject, String label) {
-        this(backingObject, label, new JComboBox<>());
+        this(backingObject, label, new JComboBox<>(), false);
+    }
+    
+    /**
+     * Constructor
+     *
+     * @param backingObject the backing Object
+     * @param label the label text for the field
+     * @param nullSelectionAllowed true if a null selection item is to be added to the choice items
+     */
+    public ChoiceField(ChoiceFieldBackingObject backingObject, String label, boolean nullSelectionAllowed) {
+        this(backingObject, label, new JComboBox<>(), nullSelectionAllowed);
     }
 
-    private ChoiceField(ChoiceFieldBackingObject backingObject, String label, JComboBox<String> combobox) {
+    private ChoiceField(ChoiceFieldBackingObject backingObject, String label, JComboBox<String> combobox, boolean nullSelectionAllowed) {
         super(backingObject, label, combobox);
         this.backingObject = backingObject;
         this.combobox = combobox;
+        this.nullSelectionAllowed = nullSelectionAllowed;
         combobox.setEditable(false);
         updateChoicesFromBackingObject(backingObject.get());
     }
@@ -81,7 +94,7 @@ public class ChoiceField extends EditableField<String> {
 
     @Override
     void updateIfChange(String value) {
-        if ((value != null) && (!value.equals(lastvaluesetinfield)) && (!value.equals(UNDEFINED))) {
+        if ((value != null) && (!value.equals(lastvaluesetinfield)) && (nullSelectionAllowed || !value.equals(UNDEFINED))) {
             setField(value);
             backingObject.set(value);
         }
@@ -113,6 +126,7 @@ public class ChoiceField extends EditableField<String> {
      */
     public void postFieldUpdateAction() {
     }
+    
 
     @Override
     void set(String value) {
@@ -127,8 +141,10 @@ public class ChoiceField extends EditableField<String> {
                 }
             }
         }
-        if (!selected) {
+        if (!selected || nullSelectionAllowed) {
             combobox.insertItemAt(UNDEFINED, 0);
+        }
+        if (!selected) {
             combobox.setSelectedItem(UNDEFINED);
             lastvaluesetinfield = UNDEFINED;
         }

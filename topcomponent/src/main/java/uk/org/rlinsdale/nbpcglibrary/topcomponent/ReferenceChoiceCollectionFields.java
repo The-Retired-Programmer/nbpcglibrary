@@ -47,8 +47,8 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
      * @param backingObject the backingObject
      * @param label the field label
      */
-    public ReferenceChoiceCollectionFields(ChoiceFieldBackingObject backingObject, String label) {
-        super(backingObject, label);
+    public ReferenceChoiceCollectionFields(ChoiceFieldBackingObject backingObject, String label, boolean nullSelectionAllowed) {
+        super(backingObject, label, nullSelectionAllowed);
         choicesfieldListener = new ChoicesFieldListener(label + "/choices");
         collectionfieldListener = new CollectionFieldListener(label + "/setchange");
         postFieldUpdateAction();
