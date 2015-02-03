@@ -27,6 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.data.dataservice.ResultSetLoader;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRO;
@@ -52,9 +53,11 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventPa
  */
 @RegisterLog("nbpcglibrary.data")
 public abstract class EntityRO<F> extends Entity {
-    
+
     private final Event<EntityStateChangeEventParams> stateEvent;
     private final Event<EntityFieldChangeEventParams<F>> fieldEvent;
+    private Event<SimpleEventParams> titleChangeEvent;
+    private Event<SimpleEventParams> nameChangeEvent;
     private EntityState state = INIT;
     private int id;
     private final DBFieldsRO dbfields;
@@ -88,8 +91,11 @@ public abstract class EntityRO<F> extends Entity {
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
         this.entityname = entityname;
-        stateEvent = new Event<>("statechange:"+ LogBuilder.classDescription(this, Integer.toString(id)));
-        fieldEvent = new Event<>("fieldchange:"+ LogBuilder.classDescription(this, Integer.toString(id)));
+        String name = LogBuilder.classDescription(this, Integer.toString(id));
+        stateEvent = new Event<>("statechange:" + name);
+        fieldEvent = new Event<>("fieldchange:" + name);
+        nameChangeEvent = new Event<>("namechange:" + name);
+        titleChangeEvent = new Event<>("titlechange:" + name);
         EntityState oldState = state;
         state = NEW;
         fireStateChange(CREATE, oldState, state);
@@ -147,7 +153,7 @@ public abstract class EntityRO<F> extends Entity {
     protected final void fireFieldChange(F field) {
         fireFieldChange(field, true);
     }
-    
+
     /**
      * Fire actions on all field change listeners.
      *
@@ -167,7 +173,7 @@ public abstract class EntityRO<F> extends Entity {
         updateEntityRegistration();
         fieldEvent.fire(new EntityFieldChangeEventParams<>(field, null, formatOK));
     }
-    
+
     /**
      * Fire actions on all field change listeners.
      *
@@ -198,6 +204,50 @@ public abstract class EntityRO<F> extends Entity {
     protected final void fireFieldChangeAtLoad(CommonEntityField field) {
         updateEntityRegistrationAtLoad();
         fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, true));
+    }
+
+    /**
+     * Add a Name listener.
+     *
+     * @param listener the listener
+     */
+    public final void addNameListener(Listener<SimpleEventParams> listener) {
+        nameChangeEvent.addListener(listener);
+    }
+
+    /**
+     * Remove a Name listener.
+     *
+     * @param listener the listener
+     */
+    public final void removeNameListener(Listener<SimpleEventParams> listener) {
+        nameChangeEvent.removeListener(listener);
+    }
+
+    protected void nameListenerFire() {
+        nameChangeEvent.fire(new SimpleEventParams());
+    }
+
+    /**
+     * Add a Title listener.
+     *
+     * @param listener the listener
+     */
+    public final void addTitleListener(Listener<SimpleEventParams> listener) {
+        titleChangeEvent.addListener(listener);
+    }
+
+    /**
+     * Remove a Title listener.
+     *
+     * @param listener the listener
+     */
+    public final void removeTitleListener(Listener<SimpleEventParams> listener) {
+        titleChangeEvent.removeListener(listener);
+    }
+
+    protected void titleListenerFire() {
+        titleChangeEvent.fire(new SimpleEventParams());
     }
 
     /**
@@ -317,8 +367,7 @@ public abstract class EntityRO<F> extends Entity {
             }
             throw new LogicException("Should not be trying to load an entity in " + oldState + " state");
         }
-        
-        
+
         @Override
         public String classDescription() {
             return LogBuilder.classDescription(this, entityname);
@@ -332,4 +381,19 @@ public abstract class EntityRO<F> extends Entity {
      * @throws SQLException if problems
      */
     abstract protected void _load(ResultSet rs) throws SQLException;
+
+    /**
+     * get the key string which will be used in when sorting this entity
+     *
+     * @return the sort key
+     */
+    public abstract String getSortKey();
+
+    /**
+     * get the title string which will be used to display the fully in context
+     * name for the entity
+     *
+     * @return the title string
+     */
+    public abstract String getDisplayTitle();
 }

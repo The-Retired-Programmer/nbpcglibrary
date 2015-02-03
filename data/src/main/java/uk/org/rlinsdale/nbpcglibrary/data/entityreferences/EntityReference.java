@@ -26,8 +26,10 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import org.openide.util.Lookup;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 
 /**
  * A reference to an Entity.
@@ -48,6 +50,8 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
     private WeakReference<E> entityreference = null;
     private final EntityManagerRO<E> em;
     private final IdListener idlistener;
+    private Listener<SimpleEventParams> titleListener;
+    private final Event<SimpleEventParams> changeEntityEvent;
 
     /**
      * Constructor.
@@ -56,7 +60,19 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      * @param em the associated Entity Manager
      */
     public EntityReference(String name, EntityManagerRO<E> em) {
-        this(name, NONE, null, em);
+        this(name, NONE, null, em, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param em the associated Entity Manager
+     * @param titleChangeListener a listener to call if the reference entities'
+     * title changes (due to either entity change or entity content change.
+     */
+    public EntityReference(String name, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) {
+        this(name, NONE, null, em, titleChangeListener);
     }
 
     /**
@@ -67,7 +83,20 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      * @param em the associated Entity Manager
      */
     public EntityReference(String name, int id, EntityManagerRO<E> em) {
-        this(name, id, null, em);
+        this(name, id, null, em, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param id the entity id
+     * @param em the associated Entity Mana
+     * @param titleChangeListener a listener to call if the reference entities'
+     * title changes (due to either entity change or entity content change.
+     */
+    public EntityReference(String name, int id, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) {
+        this(name, id, null, em, titleChangeListener);
     }
 
     /**
@@ -78,14 +107,20 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      * @param em the associated Entity Manager
      */
     public EntityReference(String name, E e, EntityManagerRO<E> em) {
-        this(name, e.getId(), e, em);
+        this(name, e.getId(), e, em, null);
     }
 
-    private EntityReference(String name, int id, E e, EntityManagerRO<E> em) {
-        this.name = name;
-        this.em = em;
-        idlistener = new IdListener(name);
-        init(id, e);
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param e the entity
+     * @param em the associated Entity Manager
+     * @param titleChangeListener a listener to call if the reference entities'
+     * title changes (due to either entity change or entity content change.
+     */
+    public EntityReference(String name, E e, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) {
+        this(name, e.getId(), e, em, titleChangeListener);
     }
 
     /**
@@ -95,7 +130,19 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      * @param emclass the associated Entity Manager class
      */
     public EntityReference(String name, Class<? extends EntityManagerRO> emclass) {
-        this(name, NONE, null, emclass);
+        this(name, NONE, null, Lookup.getDefault().lookup(emclass), null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param emclass the associated Entity Manager class
+     * @param titleChangeListener a listener to call if the reference entities'
+     * title changes (due to either entity change or entity content change.
+     */
+    public EntityReference(String name, Class<? extends EntityManagerRO> emclass, Listener<SimpleEventParams> titleChangeListener) {
+        this(name, NONE, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
     }
 
     /**
@@ -106,7 +153,20 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      * @param emclass the associated Entity Manager class
      */
     public EntityReference(String name, int id, Class<? extends EntityManagerRO> emclass) {
-        this(name, id, null, emclass);
+        this(name, id, null, Lookup.getDefault().lookup(emclass), null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param id the entity id
+     * @param emclass the associated Entity Manager class
+     * @param titleChangeListener a listener to call if the reference entities'
+     * title changes (due to either entity change or entity content change.
+     */
+    public EntityReference(String name, int id, Class<? extends EntityManagerRO> emclass, Listener<SimpleEventParams> titleChangeListener) {
+        this(name, id, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
     }
 
     /**
@@ -117,18 +177,44 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      * @param emclass the associated Entity Manager class
      */
     public EntityReference(String name, E e, Class<? extends EntityManagerRO> emclass) {
-        this(name, e.getId(), e, emclass);
+        this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), null);
     }
 
-    private EntityReference(String name, int id, E e, Class<? extends EntityManagerRO> emclass) {
-        this.name = name;
-        this.em = Lookup.getDefault().lookup(emclass);
-        idlistener = new IdListener(name);
-        init(id, e);
-        
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param e the entity
+     * @param emclass the associated Entity Manager class
+     * @param titleChangeListener a listener to call if the reference entities'
+     * title changes (due to either entity change or entity content change.
+     */
+    public EntityReference(String name, E e, Class<? extends EntityManagerRO> emclass, Listener<SimpleEventParams> titleChangeListener) {
+        this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), titleChangeListener);
     }
-    
-     @Override
+
+    private EntityReference(String name, int id, E e, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) {
+        this.name = name;
+        this.em = em;
+        idlistener = new IdListener(name);
+        changeEntityEvent = new Event<>("EntityRefChange:" + name);
+        if (titleChangeListener != null) {
+            titleListener = titleChangeListener;
+            changeEntityEvent.addListener(titleChangeListener);
+        }
+        set(id, e);
+        if (id < 0) {
+            if (e == null) {
+                e = get();
+            }
+            if (e != null && e instanceof EntityRW) {
+                ((EntityRW) e).addIdListener(idlistener);
+            }
+        }
+        saveState();
+    }
+
+    @Override
     public String classDescription() {
         return LogBuilder.classDescription(this, name);
     }
@@ -165,22 +251,21 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
     private boolean set(int id, E e) {
         LogBuilder.writeLog("nbpcglibrary.data", this, "set", id, e);
         boolean updated = this.id != id;
-        this.id = id;
-        this.entityreference = e == null ? null : new WeakReference<>(e);
-        return updated;
-    }
-
-    private void init(int id, E e) {
-        set(id, e);
-        if (id < 0) {
-            if (e == null) {
-                e = get();
+        if (updated) {
+            E old = get();
+            if (old != null && titleListener != null) {
+                old.removeTitleListener(titleListener);
             }
-            if (e != null && e instanceof EntityRW) {
-                ((EntityRW) e).addIdListener(idlistener);
+            this.id = id;
+            this.entityreference = e == null ? null : new WeakReference<>(e);
+            if (titleListener != null) {
+                if (e != null) {
+                    e.addTitleListener(titleListener);
+                }
+                changeEntityEvent.fire(new SimpleEventParams());
             }
         }
-        saveState();
+        return updated;
     }
 
     private class IdListener extends Listener<IdChangeEventParams> {
@@ -220,7 +305,20 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
         }
         E e = em.get(id);
         this.entityreference = e == null ? null : new WeakReference<>(e);
+        if (e != null) {
+            e.addTitleListener(titleListener);
+        }
         return e;
+    }
+
+    /**
+     * Get the Entity Referenced if it is actually directly referenced, but
+     * don't load it from db it not.
+     *
+     * @return the Entity
+     */
+    public final E getNoLoad() {
+        return entityreference == null ? null : entityreference.get();
     }
 
     /**
@@ -230,15 +328,6 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      */
     public final int getId() {
         return id;
-    }
-
-    /**
-     * Test is this references a valid entity (if is not "Null").
-     *
-     * @return true if references an entity
-     */
-    public final boolean isValidEntity() {
-        return id != NONE;
     }
 
     /**
@@ -264,6 +353,10 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
      */
     public final void restoreState() {
         if (isDirty()) {
+            E dirtyE = get();
+            if (dirtyE != null) {
+                dirtyE.removeTitleListener(titleListener);
+            }
             entityreference = null;
             id = saveId;
         }
@@ -286,7 +379,7 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
 
         @Override
         public boolean ruleCheck() {
-            return isValidEntity();
+            return id != NONE;
         }
     }
 }

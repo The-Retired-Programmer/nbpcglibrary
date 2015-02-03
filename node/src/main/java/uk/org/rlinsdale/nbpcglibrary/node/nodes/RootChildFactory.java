@@ -31,7 +31,6 @@ import org.openide.nodes.ChildFactory;
  */
 public abstract class RootChildFactory<E extends Entity> extends ChildFactory<Entity> {
 
-    private ChildListener childListener;
     private final E parentEntity;
 
     /**
@@ -59,13 +58,12 @@ public abstract class RootChildFactory<E extends Entity> extends ChildFactory<En
      * @return  the required listener
      */
     public Listener<SetChangeEventParams> getSetChangeListener(String name) {
-        return new ChildListener(name);
-        
+        return new ChildSetChangeListener(name);
     }
 
-    private class ChildListener extends Listener<SetChangeEventParams> {
+    private class ChildSetChangeListener extends Listener<SetChangeEventParams> {
 
-        public ChildListener(String name) {
+        public ChildSetChangeListener(String name) {
             super(name);
         }
 

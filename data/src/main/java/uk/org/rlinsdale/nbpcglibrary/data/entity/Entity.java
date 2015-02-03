@@ -43,7 +43,6 @@ public abstract class Entity extends Rules implements LogHelper {
         updateEntityRegistration();
     }
 
-
     /**
      * Cancel any changes in progress and restore state as at last save state.
      */
@@ -77,9 +76,9 @@ public abstract class Entity extends Rules implements LogHelper {
     }
 
     /**
-     * Update entity registration for this entity at load state. Set entity error based on
-     * check of entity rules at load and set entity save state based on current entity
-     * state.
+     * Update entity registration for this entity at load state. Set entity
+     * error based on check of entity rules at load and set entity save state
+     * based on current entity state.
      */
     protected final void updateEntityRegistrationAtLoad() {
         if (checkRulesAtLoad()) {
@@ -142,4 +141,11 @@ public abstract class Entity extends Rules implements LogHelper {
             return name.hashCode();
         }
     }
+
+    /**
+     * get the string which will be used to display the name for the entity
+     *
+     * @return the name string
+     */
+    public abstract String getDisplayName();
 }
