@@ -22,7 +22,7 @@ package uk.org.rlinsdale.nbpcglibrary.common;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface LogHelper {
+public interface HasInstanceDescription {
     
-    public String classDescription();
+    public String instanceDescription();
 }

@@ -30,8 +30,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 public class IdChangeEventParams implements EventParams {
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this);
     }
     
     @Override

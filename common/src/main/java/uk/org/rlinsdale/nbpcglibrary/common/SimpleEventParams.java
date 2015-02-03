@@ -27,8 +27,8 @@ package uk.org.rlinsdale.nbpcglibrary.common;
 public class SimpleEventParams implements EventParams {
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this);
     }
     
     @Override

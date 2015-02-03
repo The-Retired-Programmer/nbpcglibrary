@@ -31,7 +31,7 @@ import java.util.logging.Level;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <P> the listener parameter class
  */
-public class Event<P extends EventParams> implements LogHelper {
+public class Event<P extends EventParams> implements HasInstanceDescription {
 
     /**
      * the Modes that a listener can request it is added
@@ -73,8 +73,8 @@ public class Event<P extends EventParams> implements LogHelper {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, description);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, description);
     }
 
     /**
@@ -149,13 +149,13 @@ public class Event<P extends EventParams> implements LogHelper {
         }
     }
 
-    private class ListenerStore<P extends EventParams> implements LogHelper {
+    private class ListenerStore<P extends EventParams> implements HasInstanceDescription {
 
         private final List<WeakReference<Listener<P>>> listeners = new ArrayList<>();
 
         @Override
-        public String classDescription() {
-            return LogBuilder.classDescription(this, description);
+        public String instanceDescription() {
+            return LogBuilder.instanceDescription(this, description);
         }
 
         private void removeEmptyReferences() {

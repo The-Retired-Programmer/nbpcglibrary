@@ -25,7 +25,7 @@ import java.util.List;
 import javax.swing.JTextArea;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEFAIL;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVESUCCESS;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDATIONFAIL;
@@ -36,7 +36,7 @@ import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDAT
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("nbpcglibrary.form")
-public class Form extends GridBagPanel implements LogHelper {
+public class Form extends GridBagPanel implements HasInstanceDescription {
 
     enum FormSaveResult {
         SAVESUCCESS,
@@ -74,8 +74,8 @@ public class Form extends GridBagPanel implements LogHelper {
     }
     
      @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, formname);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, formname);
     }
 
 

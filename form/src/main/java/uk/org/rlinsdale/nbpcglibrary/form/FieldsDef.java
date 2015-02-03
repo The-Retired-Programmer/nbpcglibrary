@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.util.ArrayList;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
@@ -31,14 +31,14 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class FieldsDef implements LogHelper {
+public abstract class FieldsDef implements HasInstanceDescription {
 
     private final List<BaseField> fields = new ArrayList<>();
     private final Rules rules = new Rules();
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this);
     }
     
     /**

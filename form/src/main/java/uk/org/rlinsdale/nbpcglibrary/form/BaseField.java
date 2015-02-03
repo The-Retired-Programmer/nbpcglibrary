@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 
 /**
  * Abstract Class representing a Field on a Form
@@ -29,7 +29,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param  <T> type of the data connecting to the backing Object
  */
-public abstract class BaseField<T> implements LogHelper {
+public abstract class BaseField<T> implements HasInstanceDescription {
 
     private final BaseFieldBackingObject<T> backingObject;
 
@@ -50,8 +50,8 @@ public abstract class BaseField<T> implements LogHelper {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, label);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, label);
     }
 
     /**

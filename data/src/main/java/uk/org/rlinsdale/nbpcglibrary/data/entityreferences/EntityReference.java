@@ -28,7 +28,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import org.openide.util.Lookup;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 
 /**
@@ -41,7 +41,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The Entity Class
  */
-public class EntityReference<E extends EntityRO> implements LogHelper {
+public class EntityReference<E extends EntityRO> implements HasInstanceDescription {
 
     public final static int NONE = 0;
     private final String name;
@@ -215,8 +215,8 @@ public class EntityReference<E extends EntityRO> implements LogHelper {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, name);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, name);
     }
 
     /**

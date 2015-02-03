@@ -43,7 +43,7 @@ import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 
 /**
  * Root Node Abstract Class
@@ -52,7 +52,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
  * @param <E> the Entity Class
  */
 @RegisterLog("nbpcglibrary.node")
-public abstract class RootNode<E extends Entity> extends AbstractNode implements LogHelper {
+public abstract class RootNode<E extends Entity> extends AbstractNode implements HasInstanceDescription {
 
     private E e;
 
@@ -114,8 +114,8 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
     }
     
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this,e);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this,e);
     }
 
     /**
@@ -215,7 +215,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
         return null;
     }
 
-    private class AllowedPasteType extends PasteType implements LogHelper {
+    private class AllowedPasteType extends PasteType implements HasInstanceDescription {
 
         private final Transferable t;
         private final DataFlavorAndAction dfa;
@@ -228,8 +228,8 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
         }
         
         @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this);
     }
 
         @Override
@@ -331,7 +331,7 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
      */
     abstract protected DataFlavor _getDataFlavor();
 
-    private class ChildIndex extends Index.Support implements LogHelper {
+    private class ChildIndex extends Index.Support implements HasInstanceDescription {
 
         private final DataFlavorAndAction dfa;
 
@@ -340,8 +340,8 @@ public abstract class RootNode<E extends Entity> extends AbstractNode implements
         }
         
         @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this);
     }
 
         @Override

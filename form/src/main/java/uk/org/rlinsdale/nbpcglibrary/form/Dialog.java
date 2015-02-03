@@ -26,14 +26,14 @@ import java.util.logging.Level;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 
 /**
  * the Dialog Class. Dialogs are constructed with one or more panels.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class Dialog implements LogHelper {
+public class Dialog implements HasInstanceDescription {
 
     private static Dialog instance;
     private DialogDescriptor dd;
@@ -83,15 +83,15 @@ public class Dialog implements LogHelper {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, title);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, title);
     }
 
-    private class DialogDoneListener implements ActionListener, LogHelper {
+    private class DialogDoneListener implements ActionListener, HasInstanceDescription {
         
         @Override
-        public String classDescription() {
-            return LogBuilder.classDescription(this);
+        public String instanceDescription() {
+            return LogBuilder.instanceDescription(this);
         }
 
         @Override

@@ -25,7 +25,7 @@ import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
@@ -91,7 +91,7 @@ public abstract class EntityRO<F> extends Entity {
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
         this.entityname = entityname;
-        String name = LogBuilder.classDescription(this, Integer.toString(id));
+        String name = LogBuilder.instanceDescription(this, Integer.toString(id));
         stateEvent = new Event<>("statechange:" + name);
         fieldEvent = new Event<>("fieldchange:" + name);
         nameChangeEvent = new Event<>("namechange:" + name);
@@ -347,7 +347,7 @@ public abstract class EntityRO<F> extends Entity {
         fireFieldChangeAtLoad(ALL);
     }
 
-    private class EntityROLoader implements ResultSetLoader, LogHelper {
+    private class EntityROLoader implements ResultSetLoader, HasInstanceDescription {
 
         @Override
         public void load(ResultSet rs) {
@@ -369,8 +369,8 @@ public abstract class EntityRO<F> extends Entity {
         }
 
         @Override
-        public String classDescription() {
-            return LogBuilder.classDescription(this, entityname);
+        public String instanceDescription() {
+            return LogBuilder.instanceDescription(this, entityname);
         }
     }
 

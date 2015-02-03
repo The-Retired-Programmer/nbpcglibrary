@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
@@ -26,7 +26,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class Entity extends Rules implements LogHelper {
+public abstract class Entity extends Rules implements HasInstanceDescription {
 
     private final EntityError entityerror;
     private final EntitySave entitysave;

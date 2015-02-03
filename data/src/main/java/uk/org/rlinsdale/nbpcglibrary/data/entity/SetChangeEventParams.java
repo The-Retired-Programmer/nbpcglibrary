@@ -50,7 +50,7 @@ public class SetChangeEventParams<F> implements EventParams {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, set.toString() + " change");
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, set.toString() + " change");
     }
 }

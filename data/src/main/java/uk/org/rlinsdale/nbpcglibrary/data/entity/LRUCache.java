@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 
 /**
  * Simple implementation of an LRU cache
@@ -30,7 +30,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The entity Class being managed
  */
-public class LRUCache<E> extends LinkedHashMap<Integer, E> implements LogHelper {
+public class LRUCache<E> extends LinkedHashMap<Integer, E> implements HasInstanceDescription {
 
     private static final float LOADFACTOR = (float) 0.9;
     private final int maxcache;
@@ -51,8 +51,8 @@ public class LRUCache<E> extends LinkedHashMap<Integer, E> implements LogHelper 
     
     
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, name);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, name);
     }
 
     @Override

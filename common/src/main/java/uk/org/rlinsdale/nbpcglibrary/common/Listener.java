@@ -25,7 +25,7 @@ package uk.org.rlinsdale.nbpcglibrary.common;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <P> the Class of the listener parameter
  */
-public abstract class Listener<P extends EventParams> implements LogHelper {
+public abstract class Listener<P extends EventParams> implements HasInstanceDescription {
 
     private final String description;
 
@@ -42,8 +42,8 @@ public abstract class Listener<P extends EventParams> implements LogHelper {
     }
     
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, description);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, description);
     }
 
     /**

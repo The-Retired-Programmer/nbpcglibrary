@@ -29,6 +29,7 @@ import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
 import org.openide.windows.TopComponent;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
@@ -37,7 +38,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("nbpcglibrary.topcomponent")
-public abstract class ExplorerTopComponent extends TopComponent implements ExplorerManager.Provider {
+public abstract class ExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, HasInstanceDescription {
 
     private final ExplorerManager em = new ExplorerManager();
     private final String topComponentName;
@@ -50,9 +51,10 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
      * @param name the topcomponent name
      * @param hint the topcomponent hint
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public ExplorerTopComponent(String topComponentName, JScrollPane viewComponent, String name, String hint) {
         this.topComponentName = topComponentName;
-        LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, topComponentName, viewComponent, name, hint);
+        LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, name, hint);
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -89,15 +91,13 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
 
     @Override
     public void componentOpened() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentOpened")
-                .addMsg("TopComponent is {0})", this).write();
+        LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentOpened");
         em.setRootContext(getRootContextNode());
     }
 
     @Override
     public void componentClosed() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentClosed")
-                .addMsg("TopComponent is {0})", this).write();
+        LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentClosed");
         dropRootContextNode();
         em.setRootContext(Node.EMPTY);
     }

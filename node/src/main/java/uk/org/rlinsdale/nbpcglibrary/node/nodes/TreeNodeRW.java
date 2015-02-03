@@ -33,7 +33,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
 
@@ -87,7 +87,7 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
         this.isCutDestroyEnabled = isCutDestroyEnabled;
         nodeSavable = new NodeSavable<>(nodename);
         saveHandler = nodeSavable.getDefaultSaveHandler();
-        String desc = e.classDescription();
+        String desc = e.instanceDescription();
         e.addStateListener(stateListener = new EntityStateChangeListener(desc));
         e.addFieldListener(fieldListener = new EntityFieldChangeListener(desc));
         e.addNameListener(nameListener = new EntityNameChangeListener(desc));
@@ -212,7 +212,7 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
         fireOpenedIconChange();
     }
 
-    private class NodeSavable<Z extends EntityRW> extends AbstractSavable implements Icon, LogHelper {
+    private class NodeSavable<Z extends EntityRW> extends AbstractSavable implements Icon, HasInstanceDescription {
 
         private final String nodename;
         private Icon nodeicon;
@@ -224,8 +224,8 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
         }
 
         @Override
-        public String classDescription() {
-            return LogBuilder.classDescription(this, nodename);
+        public String instanceDescription() {
+            return LogBuilder.instanceDescription(this, nodename);
         }
 
         public SaveHandler getDefaultSaveHandler() {

@@ -62,8 +62,8 @@ public class MySQLDataService extends DBDataService {
     }
     
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, getName());
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, getName());
     }
 
     @Override

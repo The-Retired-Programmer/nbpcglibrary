@@ -18,14 +18,14 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dataservice;
 
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 
 /**
  * Interface - defines the core functions of a data service.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface DataService extends LogHelper {
+public interface DataService extends HasInstanceDescription {
 
     /**
      * Test if DataService is operational - ie available and able to access

@@ -79,7 +79,7 @@ public class EntityFieldChangeEventParams<F> implements EventParams {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, (field!=null?field.toString():"--")+"/"+(commonfield!=null?commonfield.toString():"--")+ " change (data was formatted " + (formatOK ? "OK" : "badly") + ")");
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, (field!=null?field.toString():"--")+"/"+(commonfield!=null?commonfield.toString():"--")+ " change (data was formatted " + (formatOK ? "OK" : "badly") + ")");
     }
 }

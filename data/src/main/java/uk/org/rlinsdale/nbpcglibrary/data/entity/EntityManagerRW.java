@@ -20,7 +20,6 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
@@ -68,8 +67,7 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
      * @return the new entity
      */
     public final synchronized E getNew() {
-        LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "getNew")
-                .addMsg("Create New Entity (id = {1})", nextId).write();
+        LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", nextId);
         E e = _createNewEntity(nextId);
         e.setId(nextId);
         transientCache.put(nextId--, e);
@@ -120,8 +118,7 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
         int id = e.getId();
         if (transientCache.containsKey(id)) {
             transientCache.remove(id);
-            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "removeFromTransientCache")
-                    .addMsg("remove from Transient Cache {1}", e).write();
+            LogBuilder.writeLog("nbpcglibrary.data", this, "removeFromTransientCache", id);
             return;
         }
         throw new LogicException("Remove Transient Failure (class=" + name + ";id=" + id + ")");
@@ -139,8 +136,7 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
             transientCache.remove(id);
             e.updateId(newId);
             insertIntoCache(newId, e);
-            LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "persistTransient")
-                    .addMsg("persist (Transient Cache to Cache) {0}({1} as {2})", e, id, newId).write();
+            LogBuilder.writeLog("nbpcglibrary.data", this, "persistTransient", id, "as", newId);
             return;
         }
         throw new LogicException("Persist Transient Failure (class=" + name + ";id=" + id + ";newid=" + newId + ")");

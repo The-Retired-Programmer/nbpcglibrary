@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
@@ -45,7 +45,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The Entity Class being managed
  */
-abstract public class EntityManagerRO<E extends EntityRO> implements LogHelper {
+abstract public class EntityManagerRO<E extends EntityRO> implements HasInstanceDescription {
 
     private static final int MAXLRUCACHE = 10;
 
@@ -90,8 +90,8 @@ abstract public class EntityManagerRO<E extends EntityRO> implements LogHelper {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, name);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, name);
     }
 
     /**
@@ -109,7 +109,7 @@ abstract public class EntityManagerRO<E extends EntityRO> implements LogHelper {
         E e = lrucache.get(id);
         if (e != null) {
             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
-                    .addMsg("hit on LRUCache for {0}", e.classDescription()).write();
+                    .addMsg("hit on LRUCache for {0}", e.instanceDescription()).write();
             return e;
         }
         // not in lru cache - now look up the entity in the cache
@@ -119,7 +119,7 @@ abstract public class EntityManagerRO<E extends EntityRO> implements LogHelper {
             if (e != null) {
                 lrucache.put(id, e); // insert object into LRU cache
                 LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
-                        .addMsg("hit on Cache (& reinserted into LRU cache) for {0}", e.classDescription()).write();
+                        .addMsg("hit on Cache (& reinserted into LRU cache) for {0}", e.instanceDescription()).write();
                 return e;
             } else {
                 LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
@@ -133,7 +133,7 @@ abstract public class EntityManagerRO<E extends EntityRO> implements LogHelper {
         e.load(id);
         insertIntoCache(id, e);
         LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
-                .addMsg("create new Entity {0} (and insert into Cache)", e.classDescription()).write();
+                .addMsg("create new Entity {0} (and insert into Cache)", e.instanceDescription()).write();
         return e;
     }
 
@@ -177,7 +177,7 @@ abstract public class EntityManagerRO<E extends EntityRO> implements LogHelper {
             lrucache.remove(id);
             cache.remove(id);
             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "removeFromCache", e)
-                    .addMsg("Cache Remove {0}", e.classDescription()).write();
+                    .addMsg("Cache Remove {0}", e.instanceDescription()).write();
             return;
         }
         throw new LogicException("Remove from Cache Failure (class=" + name + ";id=" + id + ")");

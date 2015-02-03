@@ -68,7 +68,7 @@ public class TransactionEventParams implements EventParams {
     }
 
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, type.toString());
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, type.toString());
     }
 }

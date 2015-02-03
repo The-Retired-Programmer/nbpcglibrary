@@ -51,8 +51,8 @@ public class DataAccessROIdkeyauto implements DataAccessRO {
     }
     
     @Override
-    public String classDescription() {
-        return LogBuilder.classDescription(this, LogBuilder.classDescription(dbdataservice)+"-"+tablename);
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this, LogBuilder.instanceDescription(dbdataservice)+"-"+tablename);
     }
 
     /**

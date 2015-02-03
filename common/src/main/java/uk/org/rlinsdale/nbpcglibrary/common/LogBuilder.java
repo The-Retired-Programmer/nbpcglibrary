@@ -84,9 +84,9 @@ public class LogBuilder {
      * @param methodName the method name
      * @return the LogBuilder
      */
-    private LogBuilder addMethodName(LogHelper classObject, String methodName) {
+    private LogBuilder addMethodName(HasInstanceDescription classObject, String methodName) {
         if (shouldBuild) {
-            msgbuilder.append(' ').append(classObject.classDescription()).append('.').append(methodName);
+            msgbuilder.append(' ').append(classObject.instanceDescription()).append('.').append(methodName);
         }
         return this;
     }
@@ -101,7 +101,7 @@ public class LogBuilder {
      */
     private LogBuilder addMethodName(Object classObject, String methodName) {
         if (shouldBuild) {
-            msgbuilder.append(' ').append(LogBuilder.classDescription(classObject)).append('.').append(methodName);
+            msgbuilder.append(' ').append(LogBuilder.instanceDescription(classObject)).append('.').append(methodName);
         }
         return this;
     }
@@ -112,9 +112,9 @@ public class LogBuilder {
      * @param classObject the Class Object
      * @return the LogBuilder
      */
-    private LogBuilder addConstructorName(LogHelper classObject) {
+    private LogBuilder addConstructorName(HasInstanceDescription classObject) {
         if (shouldBuild) {
-            msgbuilder.append(' ').append(classObject.classDescription());
+            msgbuilder.append(' ').append(classObject.instanceDescription());
         }
         return this;
     }
@@ -127,7 +127,7 @@ public class LogBuilder {
      */
     private LogBuilder addConstructorName(Object classObject) {
         if (shouldBuild) {
-            msgbuilder.append(' ').append(LogBuilder.classDescription(classObject));
+            msgbuilder.append(' ').append(LogBuilder.instanceDescription(classObject));
         }
         return this;
     }
@@ -141,7 +141,7 @@ public class LogBuilder {
      * @param parameters the parameters for this method call
      * @return the LogBuilder
      */
-    public LogBuilder addMethodName(LogHelper classObject, String methodName, Object... parameters) {
+    public LogBuilder addMethodName(HasInstanceDescription classObject, String methodName, Object... parameters) {
         addMethodName(classObject, methodName);
         return addMethodParameters(parameters);
     }
@@ -168,7 +168,7 @@ public class LogBuilder {
      * @param parameters the parameters for this constructor
      * @return the LogBuilder
      */
-    public LogBuilder addConstructorName(LogHelper classObject, Object... parameters) {
+    public LogBuilder addConstructorName(HasInstanceDescription classObject, Object... parameters) {
         addConstructorName(classObject);
         return addMethodParameters(parameters);
     }
@@ -194,8 +194,8 @@ public class LogBuilder {
                 if (!first) {
                     msgbuilder.append(", ");
                 }
-                if (p instanceof LogHelper) {
-                    msgbuilder.append(((LogHelper)p).classDescription());
+                if (p instanceof HasInstanceDescription) {
+                    msgbuilder.append(((HasInstanceDescription)p).instanceDescription());
                 } else {
                     msgbuilder.append(p);
                 }
@@ -254,7 +254,7 @@ public class LogBuilder {
      * @param instanceName the instance name
      * @return the instance description
      */
-    public static String classDescription(Object instance, String instanceName) {
+    public static String instanceDescription(Object instance, String instanceName) {
         return instance.getClass().getSimpleName() + "[" + instanceName + "]";
     }
     
@@ -265,10 +265,10 @@ public class LogBuilder {
      * @param instanceNameObject the instance name object
      * @return the instance description
      */
-    public static String classDescription(Object instance, LogHelper instanceNameObject) {
+    public static String instanceDescription(Object instance, HasInstanceDescription instanceNameObject) {
         return instanceNameObject== null?
                 instance.getClass().getSimpleName():
-                instance.getClass().getSimpleName() + "[" + instanceNameObject.classDescription()+ "]";
+                instance.getClass().getSimpleName() + "[" + instanceNameObject.instanceDescription()+ "]";
     }
 
     /**
@@ -277,7 +277,7 @@ public class LogBuilder {
      * @param instance the instance
      * @return the instance description
      */
-    public static String classDescription(Object instance) {
+    public static String instanceDescription(Object instance) {
         return instance.getClass().getSimpleName();
     }
 
@@ -291,7 +291,7 @@ public class LogBuilder {
      * @param methodName the method name
      * @param parameters the method parameters
      */
-    public static void writeLog(String logname, LogHelper classObject, String methodName, Object... parameters) {
+    public static void writeLog(String logname, HasInstanceDescription classObject, String methodName, Object... parameters) {
         new LogBuilder(logname, Level.FINEST).addMethodName(classObject, methodName, parameters).write();
     }
     
@@ -316,7 +316,7 @@ public class LogBuilder {
      * @param classObject the class object
      * @param parameters the constructor parameters
      */
-    public static void writeConstructorLog(String logname, LogHelper classObject, Object... parameters) {
+    public static void writeConstructorLog(String logname, HasInstanceDescription classObject, Object... parameters) {
         new LogBuilder(logname, Level.FINEST).addConstructorName(classObject, parameters).addMsg(" - Constructor").write();
     }
     
@@ -340,7 +340,7 @@ public class LogBuilder {
      * @param classObject the class object
      * @param methodName the method name
      */
-    public static void writeExitingLog(String logname, LogHelper classObject, String methodName) {
+    public static void writeExitingLog(String logname, HasInstanceDescription classObject, String methodName) {
         new LogBuilder(logname, Level.FINEST).addMsg("Exiting").addMethodName(classObject, methodName).write();
     }
     
@@ -365,7 +365,7 @@ public class LogBuilder {
      * @param methodName the method name
      * @param result the result being returned by this method
      */
-    public static void writeExitingLog(String logname, LogHelper className, String methodName, Object result) {
+    public static void writeExitingLog(String logname, HasInstanceDescription className, String methodName, Object result) {
         new LogBuilder(logname, Level.FINEST).addMsg("Exiting").addMethodName(className, methodName).addMsg("with result {0}", result).write();
     }
     
@@ -378,8 +378,8 @@ public class LogBuilder {
      * @param methodName the method name
      * @param result the result being returned by this method
      */
-    public static void writeExitingLog(String logname, LogHelper className, String methodName, LogHelper result) {
-        new LogBuilder(logname, Level.FINEST).addMsg("Exiting").addMethodName(className, methodName).addMsg("with result {0}", result.classDescription()).write();
+    public static void writeExitingLog(String logname, HasInstanceDescription className, String methodName, HasInstanceDescription result) {
+        new LogBuilder(logname, Level.FINEST).addMsg("Exiting").addMethodName(className, methodName).addMsg("with result {0}", result.instanceDescription()).write();
     }
     
     /**
@@ -404,8 +404,8 @@ public class LogBuilder {
      * @param methodName the method name
      * @param result the result being returned by this method
      */
-    public static void writeExitingLog(String logname, Object className, String methodName, LogHelper result) {
-        new LogBuilder(logname, Level.FINEST).addMsg("Exiting").addMethodName(className, methodName).addMsg("with result {0}", result.classDescription()).write();
+    public static void writeExitingLog(String logname, Object className, String methodName, HasInstanceDescription result) {
+        new LogBuilder(logname, Level.FINEST).addMsg("Exiting").addMethodName(className, methodName).addMsg("with result {0}", result.instanceDescription()).write();
     }
 
 
@@ -488,7 +488,7 @@ public class LogBuilder {
         return registry.getLoggerNames();
     }
 
-    private static class LogRegistry implements LogHelper {
+    private static class LogRegistry implements HasInstanceDescription {
 
         private final HashMap<String, Logger> loggers;
 
@@ -504,8 +504,8 @@ public class LogBuilder {
         }
 
         @Override
-        public String classDescription() {
-            return LogBuilder.classDescription(this);
+        public String instanceDescription() {
+            return LogBuilder.instanceDescription(this);
         }
 
         private void register(String name) {

@@ -19,7 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.data.dataaccess;
 
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.common.LogHelper;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.data.dataservice.ResultSetLoader;
 
 /**
@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.dataservice.ResultSetLoader;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface DataAccessRO extends LogHelper{
+public interface DataAccessRO extends HasInstanceDescription{
 
     /**
      * Get the set of entity Ids for all stored entities.
