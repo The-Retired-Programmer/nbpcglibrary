@@ -45,7 +45,6 @@ public class FileField extends TextField {
      */
     public FileField(EditableFieldBackingObject<String> backingObject, String label, int size) {
         super(backingObject, label, size);
-        addStringMinRule(1);
         addRule(new FileExistsRule());
     }
 
@@ -56,7 +55,7 @@ public class FileField extends TextField {
      * @param label field label
      */
     public FileField(EditableFieldBackingObject<String> backingObject, String label) {
-        this(backingObject, label, 20);
+        this(backingObject, label, 50);
     }
 
     @Override
@@ -79,7 +78,9 @@ public class FileField extends TextField {
             final JFileChooser fc = new JFileChooser(get() + "/");
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             if (fc.showOpenDialog(fileButton) == JFileChooser.APPROVE_OPTION) {
-                updateIfChange(fc.getSelectedFile().getAbsolutePath());
+                String filepath = fc.getSelectedFile().getAbsolutePath();
+                set(filepath);
+                updateIfChange(filepath);
             }
         }
     }

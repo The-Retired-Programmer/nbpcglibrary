@@ -32,7 +32,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class FolderField extends TextField {
+public class FolderField extends TextField {
 
     private JButton folderButton;
 
@@ -43,9 +43,8 @@ public abstract class FolderField extends TextField {
      * @param label field label
      * @param size size of the field
      */
-    protected FolderField(EditableFieldBackingObject<String> backingObject, String label, int size) {
+    public FolderField(EditableFieldBackingObject<String> backingObject, String label, int size) {
         super(backingObject, label, size);
-        addStringMinRule(1);
         addRule(new FolderExistsRule());
     }
 
@@ -55,8 +54,8 @@ public abstract class FolderField extends TextField {
      * @param backingObject the backing object
      * @param label field label
      */
-    protected FolderField(EditableFieldBackingObject<String> backingObject, String label) {
-        this(backingObject, label, 20);
+    public FolderField(EditableFieldBackingObject<String> backingObject, String label) {
+        this(backingObject, label, 50);
     }
 
     @Override
@@ -80,7 +79,9 @@ public abstract class FolderField extends TextField {
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             fc.setSelectedFile(new File(get()));
             if (fc.showOpenDialog(folderButton) == JFileChooser.APPROVE_OPTION) {
-                updateIfChange(fc.getSelectedFile().getAbsolutePath());
+                String filepath = fc.getSelectedFile().getAbsolutePath();
+                set(filepath);
+                updateIfChange(filepath);
             }
         }
     }
