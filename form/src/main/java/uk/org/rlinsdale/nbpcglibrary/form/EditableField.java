@@ -82,21 +82,12 @@ public abstract class EditableField<T> extends BaseField<T> {
         rules.addRule(r);
     }
 
-    /**
-     * Check if all rules in the field's rule setField are valid.
-     *
-     * @return true if all rules are valid
-     */
+    @Override
     boolean checkRules() {
         return rules.checkRules();
     }
 
-    /**
-     * Add failure messages to the StringBuilder for each rule in this field's
- rule setField which is failing.
-     *
-     * @param sb the StringBuilder collecting failure messages
-     */
+    @Override
     void addFailureMessages(StringBuilder sb) {
         rules.addFailureMessages(sb);
     }
@@ -118,10 +109,7 @@ public abstract class EditableField<T> extends BaseField<T> {
      */
     abstract void set(T value);
 
-    /**
-     * request that the backing bean has its value updated with the
-     * current value of the field
-     */
+    @Override
     public void updateBackingObjectFromField() {
         backingObject.set(get());
     }
@@ -154,9 +142,8 @@ public abstract class EditableField<T> extends BaseField<T> {
     }
 
     /**
-     * check that the value has changed and if so then update the
-     * lastvalue variable, and update the backingobject if rule check is
-     * passed
+     * check that the value has changed and if so then update the lastvalue
+     * variable, and update the backingobject if rule check is passed
      *
      * @param value the new value to test
      */

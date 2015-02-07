@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
  * Abstract Class representing a Field on a Form
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param  <T> type of the data connecting to the backing Object
+ * @param <T> type of the data connecting to the backing Object
  */
 public abstract class BaseField<T> implements HasInstanceDescription {
 
@@ -114,10 +114,37 @@ public abstract class BaseField<T> implements HasInstanceDescription {
     }
 
     /**
+     * request that the backing bean has its value updated with the current
+     * value of the field
+     */
+    public void updateBackingObjectFromField() {
+        // a null action for a RO field - overwrite for a RW field
+    }
+
+    /**
      * Set a value in the field
      *
      * @param value the value to setField into the field
      */
     abstract void setField(T value);
 
+    /**
+     * Check if all rules in the field's rule set are valid.
+     *
+     * @return true if all rules are valid
+     */
+    boolean checkRules() {
+        // a default action for a RO field - overwrite for a RW field
+        return true;
+    }
+
+    /**
+     * Add failure messages to the StringBuilder for each rule in this field's
+     * rule set which is failing.
+     *
+     * @param sb the StringBuilder collecting failure messages
+     */
+    void addFailureMessages(StringBuilder sb) {
+        // a null action for a RO field - overwrite for a RW field
+    }
 }

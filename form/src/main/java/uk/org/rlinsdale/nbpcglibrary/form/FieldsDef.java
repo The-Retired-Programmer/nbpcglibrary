@@ -26,8 +26,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
- * A collection of a setField of fields - for use in defining the fields content of a
- form segment.
+ * A collection of a setField of fields - for use in defining the fields content
+ * of a form segment.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
@@ -35,12 +35,13 @@ public abstract class FieldsDef implements HasInstanceDescription {
 
     private final List<BaseField> fields = new ArrayList<>();
     private final Rules rules = new Rules();
+    private String[] parameters;
 
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
     }
-    
+
     /**
      * add a field to this collection.
      *
@@ -60,36 +61,54 @@ public abstract class FieldsDef implements HasInstanceDescription {
     }
 
     /**
-     * Set the values of fields in the collection.
+     * Set the values of all fields.
      */
-    public final void set() {
+    public final void updateAllFieldsFromBackingObject() {
         fields.stream().forEach((f) -> {
             f.updateFieldFromBackingObject();
         });
     }
-    
+
     /**
-     * save the field values
+     * Test each field and if OK then copy its value into the backing Object,
+     * finally test any fieldsef rules and if all rules are OK then return true
+     * (ie the fieldsdef is savable).
+     *
+     * @return true if all rules are OK.
      */
-    public final void saveFields() {
-        fields.stream().forEach((f) -> {
-            if (f instanceof EditableField) {
-                ((EditableField)f).updateBackingObjectFromField();
+    public final boolean testAndSaveAllFields() {
+        boolean valid = true;
+        for (BaseField f : fields) {
+            if (f.checkRules()) {
+                f.updateBackingObjectFromField();
+            } else {
+                valid = false;
             }
-        });
+        }
+        return valid && rules.checkRules();
     }
 
     /**
-     * finalise the save action
+     * finalise the save action from backingObject to other storage (eg
+     * persistent storage)
      *
      * @return true if save was successful
      */
     public abstract boolean save();
 
+    String[] getParameters() {
+        return parameters;
+    }
+
     /**
-     * Cancel occurred - action this.
+     * Set the parameters to be returned from the fielddef (consolidated at
+     * dialog completion)
+     *
+     * @param parameters
      */
-    public abstract void cancel();
+    protected void setParameters(String... parameters) {
+        this.parameters = parameters;
+    }
 
     /**
      * Add a rule to the collection - these rules are not individual field rules
@@ -104,29 +123,27 @@ public abstract class FieldsDef implements HasInstanceDescription {
 
     /**
      * Add failure messages to the StringBuilder for each rule in the
- collection's rule setField and each individual field which is failing.
+     * collection's rule set and each individual field which is failing.
      *
      * @param sb the StringBuilder collecting failure messages
      */
     public final void addFailureMessages(StringBuilder sb) {
-        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
-            ((EditableField) f).addFailureMessages(sb);
+        fields.stream().forEach((f) -> {
+            f.addFailureMessages(sb);
         });
         rules.addFailureMessages(sb);
     }
 
     /**
-     * Check if all rules in the collection's rule setField and each individual field
- are valid.
+     * Check if all rules in the collection's rule set and each individual field
+     * are valid.
      *
      * @return true if all rules are valid
      */
     public final boolean checkRules() {
         boolean valid = true;
         for (BaseField f : fields) {
-            if (f instanceof EditableField) {
-                valid = valid && ((EditableField) f).checkRules();
-            }
+            valid = valid && f.checkRules();
         }
         return valid && rules.checkRules();
     }

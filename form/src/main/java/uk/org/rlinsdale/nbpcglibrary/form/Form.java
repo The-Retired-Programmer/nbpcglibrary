@@ -21,11 +21,15 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.JTextArea;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEFAIL;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVESUCCESS;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDATIONFAIL;
@@ -38,16 +42,20 @@ import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDAT
 @RegisterLog("nbpcglibrary.form")
 public class Form extends GridBagPanel implements HasInstanceDescription {
 
-    enum FormSaveResult {
+    public enum FormSaveResult {
+
         SAVESUCCESS,
         SAVEVALIDATIONFAIL,
-        SAVEFAIL
+        SAVEFAIL,
+        CANCELLED,
+        CLOSED
     }
-    
+
     private JTextArea failuremessages;
     private String formname;
-    private List<FieldsDef> fieldsdefs;
+    private final List<FieldsDef> fieldsdefs;
     private Rules additionalRules;
+    private final Event<SimpleEventParams> cancelEvent;
 
     /**
      * Constructor
@@ -58,6 +66,7 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
     public Form(String formname) {
         fieldsdefs = new ArrayList<>();
         this.formname = formname;
+        cancelEvent = new Event<>(instanceDescription() + "-cancel");
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this, formname);
     }
 
@@ -72,12 +81,11 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
         addFieldsdef(fieldsdef);
         finaliseForm();
     }
-    
-     @Override
-    public String instanceDescription() {
+
+    @Override
+    public final String instanceDescription() {
         return LogBuilder.instanceDescription(this, formname);
     }
-
 
     /**
      * Add a collection of fields for display on this form
@@ -88,9 +96,9 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
         if (fieldsdef != null) {
             LogBuilder.writeLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
             fieldsdefs.add(fieldsdef);
-            for (BaseField field : fieldsdef.getFields() ) {
+            fieldsdef.getFields().stream().forEach((field) -> {
                 addRow(field.getComponents());
-            }
+            });
         }
     }
 
@@ -101,6 +109,15 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
      */
     public void setAdditionalRules(Rules additionalRules) {
         this.additionalRules = additionalRules;
+    }
+
+    /**
+     * Add cancel Listener.
+     *
+     * @param listener the listener which is fired on cancel
+     */
+    public void addCancelListener(Listener<SimpleEventParams> listener) {
+        cancelEvent.addListener(listener);
     }
 
     /**
@@ -125,33 +142,44 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
         addSpannedRow(failuremessages, Color.LIGHT_GRAY);
     }
 
-
     /**
-     * do the form save actions:
-     * save the field values
-     * check the form rules are ok
-     * if ok do the form (fielddefs) save action
+     * do the form save actions: save the field values check the form rules are
+     * ok, and save to backingObject if OK if ok do the fielddefs save action
      *
-     * @return save result code 
+     * @return save result code
      */
     public FormSaveResult save() {
-        fieldsdefs.stream().forEach((f) -> {
-            f.saveFields();
-        });
-        if (checkRules()) {
-            boolean ok = true;
-            LogBuilder.writeLog("nbpcglibrary.form", this, "save");
-            failuremessages.setText("");
-            for (FieldsDef f : fieldsdefs) {
-                if (!f.save()) {
-                    ok = false;
-                }
+        boolean ok = true;
+        failuremessages.setText("");
+        LogBuilder.writeLog("nbpcglibrary.form", this, "testsave");
+        for (FieldsDef f : fieldsdefs) {
+            if (!f.testAndSaveAllFields()) {
+                ok = false;
             }
-            return ok ? SAVESUCCESS : SAVEFAIL;
-        } else {
+        }
+        if (!ok) {
             writeAllFailureMessages();
             return SAVEVALIDATIONFAIL;
         }
+        ok = true;
+        LogBuilder.writeLog("nbpcglibrary.form", this, "save");
+        for (FieldsDef f : fieldsdefs) {
+            if (!f.save()) {
+                ok = false;
+            }
+        }
+        return ok ? SAVESUCCESS : SAVEFAIL;
+    }
+    
+    List<String> getParameters() {
+        List<String> parameters = new ArrayList<>();
+        fieldsdefs.stream().forEach((f) -> {
+            String[] params = f.getParameters();
+            if (params!= null) {
+                parameters.addAll(Arrays.asList(params));
+            }
+        });
+        return parameters;
     }
 
     /**
@@ -159,20 +187,17 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
      */
     public void cancel() {
         LogBuilder.writeLog("nbpcglibrary.form", this, "cancel");
-        failuremessages.setText("");
-        fieldsdefs.stream().forEach((f) -> {
-            f.cancel();
-        });
+        cancelEvent.fire(new SimpleEventParams());
     }
 
     /**
-     * Set the values of fields in the collection.
+     * Set the values of fields in the form.
      */
-    public void set() {
-        LogBuilder.writeLog("nbpcglibrary.form", this, "set");
+    public void updateAllFieldsFromBackingObject() {
+        LogBuilder.writeLog("nbpcglibrary.form", this, "updateAllFieldsFromBackingObject");
         failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
-            f.set();
+            f.updateAllFieldsFromBackingObject();
         });
     }
 
@@ -194,7 +219,7 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
                 valid = false;
             }
         }
-        LogBuilder.writeExitingLog("nbpcglibrary.form",this, "checkRules", valid);
+        LogBuilder.writeExitingLog("nbpcglibrary.form", this, "checkRules", valid);
         return valid;
     }
 
@@ -203,14 +228,14 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
      * and field levels), and display the resulting message in the failure
      * message area of the form.
      */
-    public void writeAllFailureMessages() {
+    public final void writeAllFailureMessages() {
         StringBuilder sb = new StringBuilder();
         addFailureMessages(sb);
         if (additionalRules != null) {
             additionalRules.addFailureMessages(sb);
         }
         String t = sb.toString();
-        LogBuilder.writeExitingLog("nbpcglibrary.form",this, "writeAllFailureMessages", t.replace("\n", "; "));
+        LogBuilder.writeExitingLog("nbpcglibrary.form", this, "writeAllFailureMessages", t.replace("\n", "; "));
         failuremessages.setText(t);
     }
 

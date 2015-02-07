@@ -25,8 +25,14 @@ import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult;
+import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.CANCELLED;
+import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.CLOSED;
+import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVESUCCESS;
 
 /**
  * the Dialog Class. Dialogs are constructed with one or more panels.
@@ -36,40 +42,30 @@ import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 public class Dialog implements HasInstanceDescription {
 
     private static Dialog instance;
-    private DialogDescriptor dd;
-    private Form form;
-    private String title;
+    private final DialogDescriptor dd;
+    private final Form form;
+    private final String title;
+    private final Event<DialogCompletionEventParams> completionEvent;
 
     /**
      * Display the dialog.
      *
      * @param title the dialog title
      * @param form the form used to create the body of the dialog
-     */
-    public static void show(String title, Form form) {
-        instance = new Dialog(title, form);
-    }
-
-    /**
-     * Display the dialog.
-     *
-     * @param title the dialog title
      * @param isModal true if this to be a modal dialog
-     * @param form the form used to create the body of the dialog
+     * @param onCompletion listener for dialog completion
      */
-    public static void show(String title, boolean isModal, Form form) {
-        instance = new Dialog(title, isModal, form);
-    }
-
-    private Dialog(String title, Form form) {
-        this(title, false, form);
+    public static void show(String title, Form form, boolean isModal, Listener<DialogCompletionEventParams> onCompletion) {
+        instance = new Dialog(title, form, isModal, onCompletion);
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private Dialog(String title, boolean isModal, Form form) {
+    private Dialog(String title, Form form, boolean isModal, Listener<DialogCompletionEventParams> onCompletion) {
         this.form = form;
         this.title = title;
-        LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title, isModal, form);
+        completionEvent = new Event<>("DialogueCompletion");
+        completionEvent.addListener(onCompletion);
+        LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title, form, isModal, onCompletion);
         dd = new DialogDescriptor(
                 form,
                 title,
@@ -88,7 +84,7 @@ public class Dialog implements HasInstanceDescription {
     }
 
     private class DialogDoneListener implements ActionListener, HasInstanceDescription {
-        
+
         @Override
         public String instanceDescription() {
             return LogBuilder.instanceDescription(this);
@@ -103,6 +99,7 @@ public class Dialog implements HasInstanceDescription {
                                 .addMsg("Dialog {0}: OK response, form is valid, save() processed", title).write();
                         dd.setClosingOptions(null); // and allow closing
                         instance = null;
+                        completionEvent.fire(new DialogCompletionEventParams(SAVESUCCESS, form.getParameters()));
                         break;
                     case SAVEVALIDATIONFAIL:
                         LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "actionPerformed")
@@ -111,15 +108,12 @@ public class Dialog implements HasInstanceDescription {
                     case SAVEFAIL:
                         LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "actionPerformed")
                                 .addMsg("Dialog {0}: OK response, form is valid, save() failed", title).write();
-                        instance = null;
                         break;
                 }
             } else {
-                form.cancel();
                 LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "actionPerformed")
                         .addMsg("Dialog {0}: CANCEL response", title).write();
-                dd.setClosingOptions(null); // and allow closing
-                instance = null;
+                formCancel(CANCELLED);
             }
         }
     }
@@ -131,11 +125,16 @@ public class Dialog implements HasInstanceDescription {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
                 LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "propertyChange")
-                        .addMsg("Dialog {0}: window closed - setting CANCEL response", title).write();
-                dd.setClosingOptions(null); // and allow closing
-                form.cancel();
-                instance = null;
+                        .addMsg("Dialog {0}: window closed - setting CLOSED response", title).write();
+                formCancel(CLOSED);
             }
         }
+    }
+
+    private void formCancel(FormSaveResult completion) {
+        dd.setClosingOptions(null); // and allow closing
+        form.cancel();
+        instance = null;
+        completionEvent.fire(new DialogCompletionEventParams(completion, null));
     }
 }
