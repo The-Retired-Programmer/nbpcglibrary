@@ -34,10 +34,10 @@ public class Rules {
     /**
      * Add a rule to this Rule Set.
      *
-     * @param r the rule to add
+     * @param rule the rule to add
      */
-    public final void addRule(Rule r) {
-        rules.add(r);
+    public final void addRule(Rule rule) {
+        rules.add(rule);
     }
 
     /**
@@ -47,8 +47,8 @@ public class Rules {
      * @param sb the StringBuilder collecting failure messages
      */
     public final void addFailureMessages(StringBuilder sb) {
-        rules.stream().forEach((r) -> {
-            r.addFailureMessage(sb);
+        rules.stream().forEach((rule) -> {
+            rule.addFailureMessage(sb);
         });
     }
 
@@ -59,9 +59,10 @@ public class Rules {
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (Rule r : rules) {
-            boolean checkresult = r.check();
-            valid = valid && checkresult;
+        for (Rule rule : rules) {
+            if (!rule.check()) {
+                valid = false;
+            }
         }
         return valid;
     }
@@ -73,10 +74,11 @@ public class Rules {
      */
     public final boolean checkRulesAtLoad() {
         boolean valid = true;
-        for (Rule r : rules) {
-            if (!(r instanceof UniqueRule)) {
-                boolean checkresult = r.check();
-                valid = valid && checkresult;
+        for (Rule rule : rules) {
+            if (!(rule instanceof UniqueRule)) {
+                 if (!rule.check()) {
+                valid = false;
+            }
             }
         }
         return valid;

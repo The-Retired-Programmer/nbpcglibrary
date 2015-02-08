@@ -58,12 +58,12 @@ public abstract class Rule {
      * @return true if rule is passing
      */
     public final boolean check() {
-        boolean res = ruleCheck();
-        if (!res) {
-            LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName(this, "check")
-                    .addMsg("Rule failure: {0}", failuremessage).write();
+        if (ruleCheck()) {
+            return true;
         }
-        return res;
+        LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName(this, "check")
+                .addMsg("Rule failure: {0}", failuremessage).write();
+        return false;
     }
 
     /**
