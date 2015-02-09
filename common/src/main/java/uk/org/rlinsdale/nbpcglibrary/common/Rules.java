@@ -19,6 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.common;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,6 +39,17 @@ public class Rules {
      */
     public final void addRule(Rule rule) {
         rules.add(rule);
+    }
+    
+    /**
+     * Add  rules to this Rule Set.
+     *
+     * @param newrules the rules to add
+     */
+    public final void addRules(Rules newrules) {
+        for (Rule rule : newrules.rules){
+            rules.add(rule);
+        }
     }
 
     /**
