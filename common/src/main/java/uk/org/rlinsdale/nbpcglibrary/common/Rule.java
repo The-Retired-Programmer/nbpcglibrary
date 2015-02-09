@@ -48,7 +48,7 @@ public abstract class Rule {
     public final void addFailureMessage(StringBuilder sb) {
         if (!ruleCheck()) {
             sb.append(failuremessage);
-            sb.append('\n');
+            sb.append("; ");
         }
     }
 

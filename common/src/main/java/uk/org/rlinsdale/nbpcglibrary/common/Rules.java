@@ -40,15 +40,17 @@ public class Rules {
     public final void addRule(Rule rule) {
         rules.add(rule);
     }
-    
+
     /**
-     * Add  rules to this Rule Set.
+     * Add rules to this Rule Set.
      *
      * @param newrules the rules to add
      */
     public final void addRules(Rules newrules) {
-        for (Rule rule : newrules.rules){
-            rules.add(rule);
+        if (newrules != null) {
+            for (Rule rule : newrules.rules) {
+                rules.add(rule);
+            }
         }
     }
 
@@ -88,9 +90,9 @@ public class Rules {
         boolean valid = true;
         for (Rule rule : rules) {
             if (!(rule instanceof UniqueRule)) {
-                 if (!rule.check()) {
-                valid = false;
-            }
+                if (!rule.check()) {
+                    valid = false;
+                }
             }
         }
         return valid;
