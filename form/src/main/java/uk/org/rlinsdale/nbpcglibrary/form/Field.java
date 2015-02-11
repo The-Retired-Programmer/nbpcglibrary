@@ -105,7 +105,7 @@ public abstract class Field<T> implements HasInstanceDescription {
      *
      * @return true if all rules are valid
      */
-    boolean checkRules() {
+    public boolean checkRules() {
         boolean res = true;
         if (backingObject != null) {
             res = backingObject.checkRules();
