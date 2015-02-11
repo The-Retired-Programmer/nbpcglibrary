@@ -19,7 +19,6 @@
 package uk.org.rlinsdale.nbpcglibrary.common;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,9 +47,9 @@ public class Rules {
      */
     public final void addRules(Rules newrules) {
         if (newrules != null) {
-            for (Rule rule : newrules.rules) {
+            newrules.rules.stream().forEach((rule) -> {
                 rules.add(rule);
-            }
+            });
         }
     }
 
@@ -64,6 +63,17 @@ public class Rules {
         rules.stream().forEach((rule) -> {
             rule.addFailureMessage(sb);
         });
+    }
+    
+    /**
+     * Get failure messages for each failing rule in this rule set.
+     *
+     * @return the combined failure message.
+     */
+    public final String getErrorMessages() {
+        StringBuilder sb = new StringBuilder();
+        addFailureMessages(sb);
+        return sb.toString();
     }
 
     /**
