@@ -30,7 +30,6 @@ import javax.swing.JCheckBox;
 public class CheckboxField extends EditableField<Boolean> {
 
     private final JCheckBox checkbox;
-    private final CheckboxFieldBackingObject backingObject;
 
     /**
      * Constructor
@@ -42,11 +41,10 @@ public class CheckboxField extends EditableField<Boolean> {
         this(backingObject, label, new JCheckBox("", false));
     }
     
-    public CheckboxField(CheckboxFieldBackingObject backingObject, String label, JCheckBox checkbox) {
-        super(backingObject, label, checkbox);
+    private CheckboxField(CheckboxFieldBackingObject backingObject, String label, JCheckBox checkbox) {
+        super(backingObject, label, checkbox, null);
         this.checkbox = checkbox;
-        this.backingObject = backingObject;
-        setField(backingObject.get());
+        updateFieldFromBackingObject();
     }
 
     @Override
@@ -73,9 +71,8 @@ public class CheckboxField extends EditableField<Boolean> {
     void updateIfChange(Boolean value) {
         if (!value.equals(lastvaluesetinfield)) {
             lastvaluesetinfield = value;
-            if (checkRules()) {
-                backingObject.set(value);
-            }
+            updateBackingObjectFromField();
+            checkRules();
         }
     }
 }

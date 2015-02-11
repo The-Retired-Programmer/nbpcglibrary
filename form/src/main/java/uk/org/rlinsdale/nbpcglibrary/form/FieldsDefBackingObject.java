@@ -19,12 +19,23 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 /**
- * The backing Object interface for a basefield
- * 
+ * The backing Object interface for a field
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T> type of the data connecting to the backing Object
  */
-public interface BaseFieldBackingObject<T> {
-    
-    public T get();
+public interface FieldsDefBackingObject {
+
+    /**
+     * Check if all rules associate with this fieldsdef are valid
+     *
+     * @return true if all rules are valid
+     */
+    public boolean checkRules();
+
+    /**
+     * Get all error messages set by invalid rules
+     *
+     * @return the concatenated error messages
+     */
+    public String getErrorMessages();
 }

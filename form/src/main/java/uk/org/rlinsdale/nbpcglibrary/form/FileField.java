@@ -20,12 +20,9 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
  * A field class to get file path information.
@@ -41,11 +38,10 @@ public class FileField extends TextField {
      *
      * @param backingObject the backing object
      * @param label field label
-     * @param size size of the lastvaluesetinfield display
+     * @param size size of the field display
      */
-    public FileField(EditableFieldBackingObject<String> backingObject, String label, int size) {
-        super(backingObject, label, size);
-        addRule(new FileExistsRule());
+    public FileField(FieldBackingObject<String> backingObject, String label, int size) {
+        this(backingObject, label, size, new JButton());
     }
 
     /**
@@ -54,21 +50,16 @@ public class FileField extends TextField {
      * @param backingObject the backing object
      * @param label field label
      */
-    public FileField(EditableFieldBackingObject<String> backingObject, String label) {
+    public FileField(FieldBackingObject<String> backingObject, String label) {
         this(backingObject, label, 50);
     }
 
-    @Override
-    protected JComponent getAdditionalComponent() {
-        return fileButton();
-    }
-
-    private JButton fileButton() {
-        fileButton = new JButton();
-        fileButton.setIcon(new ImageIcon(getClass().getResource("page_find.png")));
-        fileButton.setToolTipText("Select File");
-        fileButton.addActionListener(new FileButtonListener());
-        return fileButton;
+    private FileField(FieldBackingObject<String> backingObject, String label, int size, JButton button) {
+        super(backingObject, label, size, button);
+        fileButton = button;
+        button.setIcon(new ImageIcon(getClass().getResource("page_find.png")));
+        button.setToolTipText("Select File");
+        button.addActionListener(new FileButtonListener());
     }
 
     private class FileButtonListener implements ActionListener {
@@ -82,19 +73,6 @@ public class FileField extends TextField {
                 set(filepath);
                 updateIfChange(filepath);
             }
-        }
-    }
-
-    private class FileExistsRule extends Rule {
-
-        public FileExistsRule() {
-            super(getLabel() + " - file does not exist or is a folder");
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            File file = new File(get());
-            return file.exists() && file.isFile();
         }
     }
 }

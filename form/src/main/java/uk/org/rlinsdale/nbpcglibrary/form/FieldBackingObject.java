@@ -18,49 +18,39 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.util.List;
-
 /**
+ * The backing Object interface for a field
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <T> type of the data connecting to the backing Object
  */
-public class SimpleChoiceBackingObject extends ChoiceFieldBackingObject {
-
-    private List<String> choices;
-    private String backingString;
+public interface FieldBackingObject<T> {
 
     /**
-     * Constructor
+     * Get the value from the backing Object
      *
-     * @param choices list of possible selection texts to be displayed
+     * @return the value
      */
-    public SimpleChoiceBackingObject(List<String> choices) {
-        this("", choices);
-    }
+    public T get();
 
     /**
-     * Constructor
+     * Set the value in the backing Object
      *
-     * @param initialvalue the initial value of the text variable
-     * @param choices list of possible selection texts to be displayed
+     * @param value the value
      */
-    public SimpleChoiceBackingObject(String initialvalue, List<String> choices) {
-        backingString = initialvalue;
-        this.choices = choices;
-    }
+    public void set(T value);
 
-    @Override
-    public List<String> getChoices() {
-        return choices;
-    }
+    /**
+     * Check if all rules associate with this field are valid
+     *
+     * @return true if all rules are valid
+     */
+    public boolean checkRules();
 
-    @Override
-    public void set(String value) {
-        backingString = value;
-    }
-
-    @Override
-    public String get() {
-        return backingString;
-    }
+    /**
+     * Get all error messages set by invalid rules
+     *
+     * @return the concatenated error messages
+     */
+    public String getErrorMessages();
 }

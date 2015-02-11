@@ -19,6 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
@@ -41,6 +42,15 @@ public abstract class Entity extends Rules implements HasInstanceDescription {
         entityerror = new EntityError(entityname);
         entitysave = new EntitySave(entityname);
         updateEntityRegistration();
+    }
+    /**
+     * add a rule to the entity ruleset and also to the defined field ruleset
+     * @param rules the field ruleset
+     * @param rule the rule to add
+     */
+    protected void addRule(Rules rules, Rule rule) {
+        addRule(rule);
+        rules.addRule(rule);
     }
 
     /**

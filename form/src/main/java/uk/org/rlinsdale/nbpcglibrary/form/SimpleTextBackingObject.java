@@ -18,29 +18,88 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import uk.org.rlinsdale.nbpcglibrary.common.Rule;
+import uk.org.rlinsdale.nbpcglibrary.common.Rules;
+
 /**
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class SimpleTextBackingObject implements EditableFieldBackingObject<String> {
+public class SimpleTextBackingObject implements FieldBackingObject<String> {
 
     private String backingString;
-    
+    private final String label;
+    private final Rules rules = new Rules();
+
     /**
      * Constructor
-     */
-    public SimpleTextBackingObject(){
-        this("");
-    }
-    
-    /**
-     * Constructor
+     *
+     * @param label the fields label - for reporting
      * @param initialvalue the initial value of the text variable
      */
-    public SimpleTextBackingObject(String initialvalue){
+    public SimpleTextBackingObject(String label, String initialvalue) {
         backingString = initialvalue;
+        this.label = label;
     }
-    
+
+    /**
+     * Constructor
+     *
+     * @param label the fields label - for reporting
+     * @param initialvalue the initial value of the text variable
+     * @param max the maximum entry string length
+     */
+    public SimpleTextBackingObject(String label, String initialvalue, int max) {
+        backingString = initialvalue;
+        this.label = label;
+        rules.addRule(new StringMaxRule(max));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param label the fields label - for reporting
+     * @param initialvalue the initial value of the text variable
+     * @param min the minimum entry string length
+     * @param max the maximum entry string length
+     */
+    public SimpleTextBackingObject(String label, String initialvalue, int min, int max) {
+        backingString = initialvalue;
+        this.label = label;
+        rules.addRule(new StringMinRule(min));
+        rules.addRule(new StringMaxRule(max));
+    }
+
+    /**
+     * Constructor
+     *
+     * @param label the fields label - for reporting
+     */
+    public SimpleTextBackingObject(String label) {
+        this(label, "");
+    }
+
+    /**
+     * Constructor
+     *
+     * @param label the fields label - for reporting
+     * @param max the maximum entry string length
+     */
+    public SimpleTextBackingObject(String label, int max) {
+        this(label, "", max);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param label the fields label - for reporting
+     * @param min the minimum entry string length
+     * @param max the maximum entry string length
+     */
+    public SimpleTextBackingObject(String label, int min, int max) {
+        this(label, "", min, max);
+    }
+
     @Override
     public void set(String value) {
         backingString = value;
@@ -50,5 +109,54 @@ public class SimpleTextBackingObject implements EditableFieldBackingObject<Strin
     public String get() {
         return backingString;
     }
-    
+
+    @Override
+    public boolean checkRules() {
+        return rules.checkRules();
+    }
+
+    @Override
+    public String getErrorMessages() {
+        return rules.getErrorMessages();
+    }
+
+    private class StringMinRule extends Rule {
+
+        private final int min;
+
+        /**
+         * Constructor - minimum entry length rule to this field
+         *
+         * @param min minimum number of characters to enter
+         */
+        public StringMinRule(int min) {
+            super(label + " too short");
+            this.min = min;
+        }
+
+        @Override
+        protected boolean ruleCheck() {
+            return backingString.length() >= min;
+        }
+    }
+
+    private class StringMaxRule extends Rule {
+
+        private final int max;
+
+        /**
+         * Constructor - maximum entry length rule
+         *
+         * @param max maximum number of characters to enter
+         */
+        public StringMaxRule(int max) {
+            super(label + " too long");
+            this.max = max;
+        }
+
+        @Override
+        protected boolean ruleCheck() {
+            return backingString.length() <= max;
+        }
+    }
 }

@@ -18,12 +18,9 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import uk.org.rlinsdale.nbpcglibrary.common.Rules;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.JTextArea;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -51,10 +48,8 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
         CLOSED
     }
 
-    private JTextArea failuremessages;
     private String formname;
     private final List<FieldsDef> fieldsdefs;
-    private Rules additionalRules;
     private final Event<SimpleEventParams> cancelEvent;
 
     /**
@@ -79,9 +74,8 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
     public Form(String formname, FieldsDef fieldsdef) {
         this(formname);
         addFieldsdef(fieldsdef);
-        finaliseForm();
     }
-
+    
     @Override
     public final String instanceDescription() {
         return LogBuilder.instanceDescription(this, formname);
@@ -96,19 +90,11 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
         if (fieldsdef != null) {
             LogBuilder.writeLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
             fieldsdefs.add(fieldsdef);
+            addRow(fieldsdef.getErrorMarkerRow());
             fieldsdef.getFields().stream().forEach((field) -> {
                 addRow(field.getComponents());
             });
         }
-    }
-
-    /**
-     * Set additional form level rules.
-     *
-     * @param additionalRules the additional rule set for this form
-     */
-    public void setAdditionalRules(Rules additionalRules) {
-        this.additionalRules = additionalRules;
     }
 
     /**
@@ -121,47 +107,23 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
     }
 
     /**
-     * Finalise the construction of the form.
-     */
-    public final void finaliseForm() {
-        finaliseForm(50);
-    }
-
-    /**
-     * Finalise the construction of the form.
-     *
-     * @param msgwidth the width of the failure message areas (used to display
-     * any failure messages due to rule set failures)
-     */
-    public final void finaliseForm(int msgwidth) {
-        LogBuilder.writeLog("nbpcglibrary.form", this, "finaliseForm", msgwidth);
-        failuremessages = new JTextArea(3, msgwidth);
-        failuremessages.setForeground(Color.red);
-        failuremessages.setEditable(false);
-        failuremessages.setFocusable(false);
-        addSpannedRow(failuremessages, Color.LIGHT_GRAY);
-    }
-
-    /**
-     * do the form save actions: save the field values check the form rules are
-     * ok, and save to backingObject if OK if ok do the fielddefs save action
+     * Do the form save actions: save the field values to backingObject; check the form rules are
+     * ok.  If ok do the save
      *
      * @return save result code
      */
     public FormSaveResult save() {
         boolean ok = true;
-        failuremessages.setText("");
-        LogBuilder.writeLog("nbpcglibrary.form", this, "testsave");
+        LogBuilder.writeLog("nbpcglibrary.form", this, "test");
         for (FieldsDef f : fieldsdefs) {
-            if (!f.testAndSaveAllFields()) {
+            f.updateAllBackingObjectsFromFields();
+            if (!f.checkRules()) {
                 ok = false;
             }
         }
         if (!ok) {
-            writeAllFailureMessages();
             return SAVEVALIDATIONFAIL;
         }
-        ok = true;
         LogBuilder.writeLog("nbpcglibrary.form", this, "save");
         for (FieldsDef f : fieldsdefs) {
             if (!f.save()) {
@@ -195,14 +157,13 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
      */
     public void updateAllFieldsFromBackingObject() {
         LogBuilder.writeLog("nbpcglibrary.form", this, "updateAllFieldsFromBackingObject");
-        failuremessages.setText("");
         fieldsdefs.stream().forEach((f) -> {
-            f.updateAllFieldsFromBackingObject();
+            f.updateAllFieldsFromBackingObjects();
         });
     }
 
     /**
-     * Check if all rules in the form (at form, fieldsdef and field levels) are
+     * Check if all rules in the form (fieldsdef and field levels) are
      * valid.
      *
      * @return true if all rules are valid
@@ -214,34 +175,7 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
                 valid = false;
             }
         }
-        if (additionalRules != null) {
-            if (!additionalRules.checkRules()) {
-                valid = false;
-            }
-        }
         LogBuilder.writeExitingLog("nbpcglibrary.form", this, "checkRules", valid);
         return valid;
-    }
-
-    /**
-     * Collect all failures messages from any failing rule (at form, fieldsdef
-     * and field levels), and display the resulting message in the failure
-     * message area of the form.
-     */
-    public final void writeAllFailureMessages() {
-        StringBuilder sb = new StringBuilder();
-        addFailureMessages(sb);
-        if (additionalRules != null) {
-            additionalRules.addFailureMessages(sb);
-        }
-        String t = sb.toString();
-        LogBuilder.writeExitingLog("nbpcglibrary.form", this, "writeAllFailureMessages", t.replace("\n", "; "));
-        failuremessages.setText(t);
-    }
-
-    private void addFailureMessages(StringBuilder msg) {
-        fieldsdefs.stream().forEach((f) -> {
-            f.addFailureMessages(msg);
-        });
     }
 }

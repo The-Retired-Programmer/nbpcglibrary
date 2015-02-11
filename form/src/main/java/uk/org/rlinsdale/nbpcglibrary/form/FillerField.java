@@ -23,13 +23,13 @@ package uk.org.rlinsdale.nbpcglibrary.form;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FillerField extends BaseField<String> {
+public class FillerField extends Field<String> {
 
     /**
      * Constructor
      */
     public FillerField() {
-        super(null, "");
+        super(null, "", null, null);
     }
     
     @Override

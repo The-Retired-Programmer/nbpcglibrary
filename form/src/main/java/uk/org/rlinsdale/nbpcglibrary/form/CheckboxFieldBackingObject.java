@@ -23,5 +23,5 @@ package uk.org.rlinsdale.nbpcglibrary.form;
  * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface CheckboxFieldBackingObject extends EditableFieldBackingObject<Boolean> {
+public interface CheckboxFieldBackingObject extends FieldBackingObject<Boolean> {
 }

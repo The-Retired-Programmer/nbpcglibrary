@@ -32,6 +32,7 @@ import javax.swing.border.TitledBorder;
  */
 public class GridBagPanel extends JPanel {
 
+    private static final int DEFAULTCOLUMNS = 5;
     private int row = 0;
     private int columns;
 
@@ -40,7 +41,7 @@ public class GridBagPanel extends JPanel {
      *
      */
     public GridBagPanel() {
-        this(null, 4);
+        this(null, DEFAULTCOLUMNS);
     }
 
     /**
@@ -58,7 +59,7 @@ public class GridBagPanel extends JPanel {
      * @param borderTitle the gridbag title
      */
     public GridBagPanel(String borderTitle) {
-        this(borderTitle, 4);
+        this(borderTitle, DEFAULTCOLUMNS);
     }
 
     /**

@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.lang.ref.WeakReference;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -29,23 +30,30 @@ import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type of the data connecting to the backing Object
  */
-public abstract class BaseField<T> implements HasInstanceDescription {
+public abstract class Field<T> implements HasInstanceDescription {
 
-    private final BaseFieldBackingObject<T> backingObject;
-
-    /**
-     * the label text associated with this field
-     */
+    private final FieldBackingObject<T> backingObject;
     private final String label;
+    private final JComponent labelfield;
+    private final JComponent field;
+    private final JComponent additionalfield;
+    private final ErrorMarker errorMarker = new ErrorMarker();
+    private WeakReference<FieldsDef> parent = new WeakReference<>(null);
 
     /**
      * Constructor
      *
      * @param backingObject the backingobject
      * @param label the label text for this field
+     * @param field the actual field to be used
+     * @param additionalfield optional additional field (set to null if not
+     * required)
      */
-    public BaseField(BaseFieldBackingObject<T> backingObject, String label) {
+    public Field(FieldBackingObject<T> backingObject, String label, JComponent field, JComponent additionalfield) {
         this.label = label;
+        labelfield = new JLabel(label);
+        this.field = field;
+        this.additionalfield = additionalfield;
         this.backingObject = backingObject;
     }
 
@@ -53,42 +61,9 @@ public abstract class BaseField<T> implements HasInstanceDescription {
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this, label);
     }
-
-    /**
-     * Get the label text for this field
-     *
-     * @return the label text
-     */
-    public String getLabel() {
-        return label;
-    }
-
-    /**
-     * Get the Label Component
-     *
-     * @return the label component
-     */
-    public final JComponent getLabelComponent() {
-        return new JLabel("".equals(label) ? " " : label + ":");
-    }
-
-    /**
-     * Get the Field Component
-     *
-     * @return the working component in which the value is displayed
-     */
-    JComponent getComponent() {
-        return null;
-    }
-
-    /**
-     * Get the optional additional Jomponent which is displayed to the right of
-     * the value field. This can take the form of a button or other component.
-     *
-     * @return the additional component (or null)
-     */
-    JComponent getAdditionalComponent() {
-        return null;
+    
+    void setParent(FieldsDef parent){
+        this.parent = new WeakReference<>(parent);
     }
 
     /**
@@ -98,11 +73,7 @@ public abstract class BaseField<T> implements HasInstanceDescription {
      * @return an array of components
      */
     JComponent[] getComponents() {
-        return new JComponent[]{
-            getLabelComponent(),
-            getComponent(),
-            getAdditionalComponent()
-        };
+        return new JComponent[]{labelfield, field, additionalfield, errorMarker};
     }
 
     /**
@@ -129,22 +100,26 @@ public abstract class BaseField<T> implements HasInstanceDescription {
     abstract void setField(T value);
 
     /**
-     * Check if all rules in the field's rule set are valid.
+     * Check if all rules in the field's rule set are valid, and update error
+     * markers and error messages on the form.
      *
      * @return true if all rules are valid
      */
     boolean checkRules() {
-        // a default action for a RO field - overwrite for a RW field
-        return true;
-    }
-
-    /**
-     * Add failure messages to the StringBuilder for each rule in this field's
-     * rule set which is failing.
-     *
-     * @param sb the StringBuilder collecting failure messages
-     */
-    void addFailureMessages(StringBuilder sb) {
-        // a null action for a RO field - overwrite for a RW field
+        boolean res = true;
+        if (backingObject != null) {
+            res = backingObject.checkRules();
+            if (res) {
+                errorMarker.clearError();
+            } else {
+                errorMarker.setError(backingObject.getErrorMessages());
+            }
+        }
+        // now try and do the fieldsdef check as well
+        FieldsDef fdef = parent.get();
+        if (fdef != null) {
+            fdef.checkFieldsDefRules(); // do check - will update the field defs reporting
+        }
+        return res;
     }
 }

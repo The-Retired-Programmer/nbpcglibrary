@@ -20,10 +20,9 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.Rule;
-import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
  * A collection of a setField of fields - for use in defining the fields content
@@ -33,13 +32,41 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  */
 public abstract class FieldsDef implements HasInstanceDescription {
 
-    private final List<BaseField> fields = new ArrayList<>();
-    private final Rules rules = new Rules();
+    private final List<Field> fields = new ArrayList<>();
     private String[] parameters;
+    private final ErrorMarker errorMarker = new ErrorMarker();
+    private final FieldsDefBackingObject backingObject;
+
+    /**
+     * Constructor
+     *
+     */
+    public FieldsDef() {
+        this(null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param backingObject the backingObject for the fieldsDef - used to access
+     * fieldsdef level validation.
+     */
+    public FieldsDef(FieldsDefBackingObject backingObject) {
+        this.backingObject = backingObject;
+    }
 
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
+    }
+
+    public JComponent[] getErrorMarkerRow() {
+        return new JComponent[]{
+            null,
+            null,
+            null,
+            errorMarker
+        };
     }
 
     /**
@@ -47,8 +74,9 @@ public abstract class FieldsDef implements HasInstanceDescription {
      *
      * @param f the field to add
      */
-    public final void add(BaseField f) {
+    public final void add(Field f) {
         fields.add(f);
+        f.setParent(this);
     }
 
     /**
@@ -56,36 +84,26 @@ public abstract class FieldsDef implements HasInstanceDescription {
      *
      * @return the collection of fields
      */
-    public final List<BaseField> getFields() {
+    public final List<Field> getFields() {
         return fields;
     }
 
     /**
      * Set the values of all fields.
      */
-    public final void updateAllFieldsFromBackingObject() {
+    public final void updateAllFieldsFromBackingObjects() {
         fields.stream().forEach((f) -> {
             f.updateFieldFromBackingObject();
         });
     }
 
     /**
-     * Test each field and if OK then copy its value into the backing Object,
-     * finally test any fieldsef rules and if all rules are OK then return true
-     * (ie the fieldsdef is savable).
-     *
-     * @return true if all rules are OK.
+     * Set the values of all fields into backingObjects.
      */
-    public final boolean testAndSaveAllFields() {
-        boolean valid = true;
-        for (BaseField f : fields) {
-            if (f.checkRules()) {
-                f.updateBackingObjectFromField();
-            } else {
-                valid = false;
-            }
-        }
-        return valid && rules.checkRules();
+    public final void updateAllBackingObjectsFromFields() {
+        fields.stream().forEach((f) -> {
+            f.updateBackingObjectFromField();
+        });
     }
 
     /**
@@ -96,6 +114,7 @@ public abstract class FieldsDef implements HasInstanceDescription {
      */
     public abstract boolean save();
 
+    
     String[] getParameters() {
         return parameters;
     }
@@ -111,30 +130,6 @@ public abstract class FieldsDef implements HasInstanceDescription {
     }
 
     /**
-     * Add a rule to the collection - these rules are not individual field rules
-     * (which would be added to the field), but rather more complex rules
-     * associated with the collection as a whole.
-     *
-     * @param r the rule
-     */
-    public final void addRule(Rule r) {
-        rules.addRule(r);
-    }
-
-    /**
-     * Add failure messages to the StringBuilder for each rule in the
-     * collection's rule set and each individual field which is failing.
-     *
-     * @param sb the StringBuilder collecting failure messages
-     */
-    public final void addFailureMessages(StringBuilder sb) {
-        fields.stream().forEach((f) -> {
-            f.addFailureMessages(sb);
-        });
-        rules.addFailureMessages(sb);
-    }
-
-    /**
      * Check if all rules in the collection's rule set and each individual field
      * are valid.
      *
@@ -142,9 +137,27 @@ public abstract class FieldsDef implements HasInstanceDescription {
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (BaseField f : fields) {
-            valid = valid && f.checkRules();
+        for (Field field : fields) {
+            if (!field.checkRules()) {
+                valid = false;
+            }
         }
-        return valid && rules.checkRules();
+        if (!checkFieldsDefRules()) {
+            valid = false;
+        }
+        return valid;
+    }
+
+    public boolean checkFieldsDefRules() {
+        if (backingObject != null) {
+            boolean res = backingObject.checkRules();
+            if (res) {
+                errorMarker.clearError();
+            } else {
+                errorMarker.setError(backingObject.getErrorMessages());
+            }
+            return res;
+        }
+        return true;
     }
 }

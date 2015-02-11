@@ -18,40 +18,39 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.util.List;
+import java.io.File;
+import uk.org.rlinsdale.nbpcglibrary.common.Rule;
+import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class SimpleChoiceBackingObject extends ChoiceFieldBackingObject {
+public class FileBackingObject implements FieldBackingObject<String> {
 
-    private List<String> choices;
     private String backingString;
+    private final String label;
+    private final Rules rules = new Rules();
 
     /**
      * Constructor
      *
-     * @param choices list of possible selection texts to be displayed
-     */
-    public SimpleChoiceBackingObject(List<String> choices) {
-        this("", choices);
-    }
-
-    /**
-     * Constructor
-     *
+     * @param label the fields label - for reporting
      * @param initialvalue the initial value of the text variable
-     * @param choices list of possible selection texts to be displayed
      */
-    public SimpleChoiceBackingObject(String initialvalue, List<String> choices) {
+    public FileBackingObject(String label, String initialvalue) {
         backingString = initialvalue;
-        this.choices = choices;
+        this.label = label;
+        rules.addRule(new FileExistsRule());
     }
 
-    @Override
-    public List<String> getChoices() {
-        return choices;
+    /**
+     * Constructor
+     *
+     * @param label the fields label - for reporting
+     */
+    public FileBackingObject(String label) {
+        this(label, "");
     }
 
     @Override
@@ -62,5 +61,28 @@ public class SimpleChoiceBackingObject extends ChoiceFieldBackingObject {
     @Override
     public String get() {
         return backingString;
+    }
+
+    @Override
+    public boolean checkRules() {
+        return rules.checkRules();
+    }
+
+    @Override
+    public String getErrorMessages() {
+        return rules.getErrorMessages();
+    }
+
+    private class FileExistsRule extends Rule {
+
+        public FileExistsRule() {
+            super(label + " - file does not exist or is a folder");
+        }
+
+        @Override
+        public boolean ruleCheck() {
+            File file = new File(backingString);
+            return file.exists() && file.isFile();
+        }
     }
 }

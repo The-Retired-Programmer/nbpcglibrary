@@ -37,15 +37,8 @@ public class PasswordField extends EditableStringField {
      * @param label field label
      * @param size size of the value display
      */
-    public PasswordField(EditableFieldBackingObject<String> backingObject, String label, int size) {
-        this(backingObject, label, size, new JPasswordField());
-    }
-
-    private PasswordField(EditableFieldBackingObject<String> backingObject, String label, int size, JPasswordField passwordfield) {
-        super(backingObject, label, passwordfield);
-        this.passwordfield = passwordfield;
-        this.passwordfield.setColumns(size);
-        setField(backingObject.get());
+    public PasswordField(FieldBackingObject<String> backingObject, String label, int size) {
+        this(backingObject, label, new JPasswordField(), size);
     }
 
     /**
@@ -54,10 +47,17 @@ public class PasswordField extends EditableStringField {
      * @param backingObject the backing Object
      * @param label field label
      */
-    public PasswordField(EditableFieldBackingObject<String> backingObject, String label) {
+    public PasswordField(FieldBackingObject<String> backingObject, String label) {
         this(backingObject, label, 20);
     }
-
+    
+    private PasswordField(FieldBackingObject<String> backingObject, String label, JPasswordField passwordfield, int size) {
+        super(backingObject, label, passwordfield, null);
+        this.passwordfield = passwordfield;
+        this.passwordfield.setColumns(size);
+        updateFieldFromBackingObject();
+    }
+    
     @Override
     final String get() {
         return new String(passwordfield.getPassword());

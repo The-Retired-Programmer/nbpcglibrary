@@ -61,7 +61,7 @@ public class ChoiceField extends EditableField<String> {
     }
 
     private ChoiceField(ChoiceFieldBackingObject backingObject, String label, JComboBox<String> combobox, boolean nullSelectionAllowed) {
-        super(backingObject, label, combobox);
+        super(backingObject, label, combobox, null);
         this.backingObject = backingObject;
         this.combobox = combobox;
         this.nullSelectionAllowed = nullSelectionAllowed;
@@ -69,15 +69,6 @@ public class ChoiceField extends EditableField<String> {
         updateChoicesFromBackingObject(backingObject.get());
     }
 
-    /**
-     * get the ChoiceFileBackingObject for this field
-     *
-     * @return
-     */
-    public ChoiceFieldBackingObject getBackingObject() {
-        return backingObject;
-    }
-    
     /**
      * Get the choices
      * 

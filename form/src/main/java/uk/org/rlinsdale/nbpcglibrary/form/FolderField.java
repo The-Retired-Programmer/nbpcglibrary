@@ -23,9 +23,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
  * A folder class to get file path information.
@@ -43,9 +41,8 @@ public class FolderField extends TextField {
      * @param label field label
      * @param size size of the field
      */
-    public FolderField(EditableFieldBackingObject<String> backingObject, String label, int size) {
-        super(backingObject, label, size);
-        addRule(new FolderExistsRule());
+    public FolderField(FieldBackingObject<String> backingObject, String label, int size) {
+        this(backingObject, label, size, new JButton());
     }
 
     /**
@@ -54,21 +51,16 @@ public class FolderField extends TextField {
      * @param backingObject the backing object
      * @param label field label
      */
-    public FolderField(EditableFieldBackingObject<String> backingObject, String label) {
+    public FolderField(FieldBackingObject<String> backingObject, String label) {
         this(backingObject, label, 50);
     }
 
-    @Override
-    protected JComponent getAdditionalComponent() {
-        return folderButton();
-    }
-
-    private JButton folderButton() {
-        folderButton = new JButton();
-        folderButton.setIcon(new ImageIcon(getClass().getResource("folder_find.png")));
-        folderButton.setToolTipText("Select Folder");
-        folderButton.addActionListener(new FolderButtonListener());
-        return folderButton;
+    private FolderField(FieldBackingObject<String> backingObject, String label, int size, JButton button) {
+        super(backingObject, label, size, button);
+        folderButton = button;
+        button.setIcon(new ImageIcon(getClass().getResource("folder_find.png")));
+        button.setToolTipText("Select Folder");
+        button.addActionListener(new FolderButtonListener());
     }
 
     private class FolderButtonListener implements ActionListener {
@@ -83,19 +75,6 @@ public class FolderField extends TextField {
                 set(filepath);
                 updateIfChange(filepath);
             }
-        }
-    }
-
-    private class FolderExistsRule extends Rule {
-
-        public FolderExistsRule() {
-            super(getLabel() + " - folder does not exist");
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            File folder = new File(get());
-            return folder.exists() && folder.isDirectory();
         }
     }
 }

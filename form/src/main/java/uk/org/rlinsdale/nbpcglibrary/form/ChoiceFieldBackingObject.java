@@ -22,10 +22,22 @@ import java.util.List;
 
 /**
  * The backing Object interface for an editable field
- * 
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface ChoiceFieldBackingObject extends EditableFieldBackingObject<String> {
+public abstract class ChoiceFieldBackingObject implements FieldBackingObject<String> {
+
+    public abstract List<String> getChoices();
+
+    // normally there is no need for validation on choices - provide default null implementations
     
-    public List<String>getChoices();
+    @Override
+    public boolean checkRules() {
+        return true;
+    }
+
+    @Override
+    public String getErrorMessages() {
+        return "";
+    }
 }

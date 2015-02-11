@@ -27,7 +27,7 @@ import javax.swing.JTextField;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class TextReadonlyField extends BaseField<String> {
+public class TextReadonlyField extends Field<String> {
 
     private final JTextField textfield;
    
@@ -38,12 +38,8 @@ public class TextReadonlyField extends BaseField<String> {
      * @param label field label
      * @param size size of the value display
      */
-    public TextReadonlyField(BaseFieldBackingObject<String> backingObject, String label, int size) {
-        super(backingObject, label);
-        textfield = new JTextField();
-        textfield.setColumns(size);
-        textfield.setEditable(false);
-        textfield.setForeground(Color.GRAY);
+    public TextReadonlyField(FieldBackingObject<String> backingObject, String label, int size) {
+        this(backingObject, label, new JTextField(),size);
     }
 
     /**
@@ -52,8 +48,16 @@ public class TextReadonlyField extends BaseField<String> {
      * @param backingObject the backing object
      * @param label field label
      */
-    public TextReadonlyField(BaseFieldBackingObject<String> backingObject, String label) {
+    public TextReadonlyField(FieldBackingObject<String> backingObject, String label) {
         this(backingObject, label, 20);
+    }
+    
+     private TextReadonlyField(FieldBackingObject<String> backingObject, String label, JTextField textfield, int size) {
+        super(backingObject, label, textfield, null);
+        this.textfield = textfield;
+        textfield.setColumns(size);
+        textfield.setEditable(false);
+        textfield.setForeground(Color.GRAY);
     }
 
     @Override

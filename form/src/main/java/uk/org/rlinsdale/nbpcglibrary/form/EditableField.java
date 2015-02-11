@@ -23,8 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.JComponent;
-import uk.org.rlinsdale.nbpcglibrary.common.Rule;
-import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
  * Abstract Class representing an editable Field on a Form
@@ -32,14 +30,13 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type of the data connecting to the backing Object
  */
-public abstract class EditableField<T> extends BaseField<T> {
+public abstract class EditableField<T> extends Field<T> {
 
     private final FieldActionListener actionListener = new FieldActionListener();
     private final FieldFocusListener focusListener = new FieldFocusListener();
-    private final Rules rules = new Rules();
     private final JComponent field;
     protected T lastvaluesetinfield;
-    private final EditableFieldBackingObject<T> backingObject;
+    private final FieldBackingObject<T> backingObject;
 
     /**
      * Constructor
@@ -47,18 +44,15 @@ public abstract class EditableField<T> extends BaseField<T> {
      * @param backingObject the backing object
      * @param label the label text for this field
      * @param field the swing field component
+     * @param additionalfield optional additional field (set to null if not required)
      */
-    public EditableField(EditableFieldBackingObject<T> backingObject, String label, JComponent field) {
-        super(backingObject, label);
+    public EditableField(FieldBackingObject<T> backingObject, String label, JComponent field, JComponent additionalfield) {
+        super(backingObject, label, field, additionalfield);
         this.backingObject = backingObject;
         this.field = field;
     }
-
-    @Override
-    final JComponent getComponent() {
-        return field;
-    }
-
+    
+    
     /**
      * setField an action listener for this field
      *
@@ -73,31 +67,13 @@ public abstract class EditableField<T> extends BaseField<T> {
      */
     abstract void removeActionListener(ActionListener listener);
 
-    /**
-     * Add a rule to this field's Rule Set.
-     *
-     * @param r the rule to add
-     */
-    public void addRule(Rule r) {
-        rules.addRule(r);
-    }
-
-    @Override
-    boolean checkRules() {
-        return rules.checkRules();
-    }
-
-    @Override
-    void addFailureMessages(StringBuilder sb) {
-        rules.addFailureMessages(sb);
-    }
-
     @Override
     final void setField(T value) {
         removeActionListener(actionListener);
         field.removeFocusListener(focusListener);
         this.lastvaluesetinfield = value;
         set(value);
+        checkRules();
         addActionListener(actionListener);
         field.addFocusListener(focusListener);
     }
@@ -109,6 +85,16 @@ public abstract class EditableField<T> extends BaseField<T> {
      */
     abstract void set(T value);
 
+    
+    @Override
+    public void updateFieldFromBackingObject() {
+        T value = backingObject.get();
+        if (!value.equals(lastvaluesetinfield)) {
+            lastvaluesetinfield = value;
+            setField(value);
+        }
+    }
+    
     @Override
     public void updateBackingObjectFromField() {
         backingObject.set(get());
