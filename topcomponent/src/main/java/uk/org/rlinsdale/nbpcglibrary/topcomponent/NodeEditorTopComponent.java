@@ -87,6 +87,18 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
      * @return the form
      */
     protected abstract Form getForm();
+    
+    @Override
+    public boolean canClose() {
+        return canCloseForm();
+    }
+    
+    /**
+     * Can Close the form
+     *
+     * @return true if form can be closed
+     */
+    protected abstract boolean canCloseForm();
 
     @Override
     public void componentClosed() {
