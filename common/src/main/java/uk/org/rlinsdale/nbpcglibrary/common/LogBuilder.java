@@ -68,7 +68,7 @@ public class LogBuilder {
      */
     public void write() {
         if (shouldBuild) {
-            if (ex != null) {
+            if (ex == null) {
                 log.log(level, msgbuilder.toString());
             } else {
                 log.log(level, msgbuilder.toString(), ex);
@@ -243,6 +243,19 @@ public class LogBuilder {
     public LogBuilder addException(Exception ex) {
         if (shouldBuild) {
             this.ex = ex;
+        }
+        return this;
+    }
+    
+    /**
+     * Add an exception message to the Log message
+     *
+     * @param ex the exception
+     * @return the LogBuilder
+     */
+    public LogBuilder addExceptionMessage(Exception ex) {
+        if (shouldBuild) {
+            msgbuilder.append(' ').append(ex.getMessage());
         }
         return this;
     }

@@ -127,7 +127,7 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
             return entity.checkRules() ? ImageIO.read(fi) : _addErrorToIcon(ImageIO.read(fi));
         } catch (IOException ex) {
             LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
-                .addMsg("Nodename is {0} - IOException when reading image", nodename).addException(ex).write();
+                .addMsg("Nodename is {0} - IOException when reading image", nodename).addExceptionMessage(ex).write();
             return _getIconWithError();
         }
     }

@@ -105,7 +105,7 @@ public abstract class DBDataService implements DataService {
                 conn.setAutoCommit(false);
             } catch (SQLException ex) {
                 LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "begin")
-                        .addException(ex).write();
+                        .addExceptionMessage(ex).write();
             }
             inTransaction = true;
             transactionEvent.fire(new TransactionEventParams(BEGIN));
@@ -122,7 +122,7 @@ public abstract class DBDataService implements DataService {
                 conn.commit();
             } catch (SQLException ex) {
                 LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "commit")
-                        .addException(ex).write();
+                        .addExceptionMessage(ex).write();
             }
             transactionEvent.fire(new TransactionEventParams(COMMIT));
             inTransaction = false;
@@ -141,7 +141,7 @@ public abstract class DBDataService implements DataService {
                 conn.rollback();
             } catch (SQLException ex) {
                 LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "rollback")
-                        .addException(ex).write();
+                        .addExceptionMessage(ex).write();
             }
             transactionEvent.fire(new TransactionEventParams(ROLLBACK));
             inTransaction = false;
@@ -167,7 +167,7 @@ public abstract class DBDataService implements DataService {
             conn.close();
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "disconnect")
-                    .addException(ex).write();
+                    .addExceptionMessage(ex).write();
         }
     }
 
@@ -195,7 +195,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "query", sql, parameter)
-                    .addException(ex).write();
+                    .addExceptionMessage(ex).write();
         }
         return li;
     }
@@ -218,7 +218,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "query", sql)
-                    .addException(ex).write();
+                    .addExceptionMessage(ex).write();
         }
         return li;
     }
@@ -242,7 +242,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "simpleIntQuery", sql, columnname)
-                    .addException(ex).write();
+                    .addExceptionMessage(ex).write();
         }
         return res;
     }
@@ -265,7 +265,7 @@ public abstract class DBDataService implements DataService {
             rsl.load(rs);
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "simpleQuery", sql)
-                    .addException(ex).write();
+                    .addExceptionMessage(ex).write();
         }
     }
 
@@ -292,7 +292,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "execute", sql, parameters)
-                    .addException(ex).write();
+                    .addExceptionMessage(ex).write();
         }
         return res;
     }
@@ -317,7 +317,7 @@ public abstract class DBDataService implements DataService {
             }
         } catch (SQLException ex) {
             LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "execute", sql, parameter)
-                    .addException(ex).write();
+                    .addExceptionMessage(ex).write();
         }
         return res;
     }

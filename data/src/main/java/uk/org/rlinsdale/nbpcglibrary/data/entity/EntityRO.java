@@ -359,7 +359,7 @@ public abstract class EntityRO<F> extends Entity {
                     _load(rs);
                 } catch (SQLException ex) {
                     LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", rs)
-                            .addException(ex).write();
+                            .addExceptionMessage(ex).write();
                 }
                 setState(DBENTITY);
                 fireStateChange(LOAD, oldState, DBENTITY);
