@@ -116,36 +116,44 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
             case DBENTITY:
                 return true; //we don't need to do anything as this is a straight copy of a db entity
             case INIT:
-                throw new LogicException("Should not be trying to save an entity in INIT state");
+                return false;
             case REMOVED:
-                throw new LogicException("Should not be trying to save an entity in REMOVED state");
+                return false;
             case NEW:
             case NEWEDITING:
                 if (!checkRules()) {
-                    throw new LogicException("save() on an entity which is not valid");
+                    return false;
                 }
-                map = new HashMap<>();
-                _values(map);
-                dbfields.values(map);
-                em.persistTransient((E) this, dataAccess.insert(map));
-                idChangeEvent.fire(new IdChangeEventParams());
-                setState(DBENTITY);
+                try {
+                    map = new HashMap<>();
+                    _values(map);
+                    dbfields.values(map);
+                    em.persistTransient((E) this, dataAccess.insert(map));
+                    idChangeEvent.fire(new IdChangeEventParams());
+                    setState(DBENTITY);
+                } catch (LogicException ex ){
+                    return false;
+                }
                 break;
             case DBENTITYEDITING:
                 if (!checkRules()) {
-                    throw new LogicException("save() on an entity which is not valid");
+                    return false;
                 }
-                map = new HashMap<>();
-                _diffs(map);
-                dbfields.diffs(map);
-                if (!map.isEmpty()) {
-                    dataAccess.update(getId(), map);
-                }
-                setState(DBENTITY);
+                try {
+                    map = new HashMap<>();
+                    _diffs(map);
+                    dbfields.diffs(map);
+                    if (!map.isEmpty()) {
+                        dataAccess.update(getId(), map);
+                    }
+                    setState(DBENTITY);
+                } catch (LogicException ex ){
+                    return false;
+                }    
                 break;
             default:
                 if (!checkRules()) {
-                    throw new LogicException("save() on an entity which is not valid");
+                    return false;
                 }
         }
         fireStateChange(SAVE, oldState, DBENTITY);
