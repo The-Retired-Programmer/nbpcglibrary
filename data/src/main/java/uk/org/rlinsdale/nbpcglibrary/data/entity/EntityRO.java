@@ -333,6 +333,8 @@ public abstract class EntityRO<F> extends Entity {
             dbfields.restoreState();
             fireFieldChange(ALL);
             fireStateChange(RESET, oldState, state);
+            nameListenerFire();
+            titleListenerFire();
         }
     }
 
