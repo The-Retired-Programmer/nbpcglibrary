@@ -20,6 +20,8 @@ package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.logging.Level;
 import javax.swing.BoxLayout;
+import org.openide.util.lookup.AbstractLookup;
+import org.openide.util.lookup.InstanceContent;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.form.Form;
 import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNodeRW;
@@ -46,7 +48,12 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
      * the entity being edited
      */
     protected E entity;
-
+    
+    /**
+     * the instance content for dynamic additions to lookup
+     */
+    protected InstanceContent content;
+    
     /**
      * Constructor
      *
@@ -59,6 +66,8 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
         LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, node, name, hint);
         setName(name);
         setToolTipText(hint);
+        content = new InstanceContent();
+        associateLookup(new AbstractLookup(content));
         this.name = name;
         this.node = node;
     }

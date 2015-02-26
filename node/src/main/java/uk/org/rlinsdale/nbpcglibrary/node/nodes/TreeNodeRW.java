@@ -18,22 +18,15 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.node.SaveHandler;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import org.netbeans.spi.actions.AbstractSavable;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
 
@@ -46,8 +39,6 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.Co
  */
 public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
-    private NodeSavable<E> nodeSavable;
-    private SaveHandler saveHandler;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
     private EntityNameChangeListener nameListener;
@@ -85,25 +76,10 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
     private void commonConstructor(String nodename, E e, boolean isCutDestroyEnabled) {
         this.isCutDestroyEnabled = isCutDestroyEnabled;
-        nodeSavable = new NodeSavable<>(nodename);
-        saveHandler = nodeSavable.getDefaultSaveHandler();
         String desc = e.instanceDescription();
         e.addStateListener(stateListener = new EntityStateChangeListener(desc));
         e.addFieldListener(fieldListener = new EntityFieldChangeListener(desc));
         e.addNameListener(nameListener = new EntityNameChangeListener(desc));
-        if (e.isEditing()) {
-            nodeSavable.enable(e);
-        }
-    }
-
-    /**
-     * Set a save handler for this node. If the save Handler is null then the
-     * default savehandler will be used (which does an entity save()).
-     *
-     * @param saveHandler the required savehandler or null
-     */
-    public void setSaveHandler(SaveHandler saveHandler) {
-        this.saveHandler = saveHandler == null ? nodeSavable.getDefaultSaveHandler() : saveHandler;
     }
 
     private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
@@ -116,20 +92,18 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
         public void action(EntityStateChangeEventParams p) {
             switch (p.getTransition()) {
                 case EDIT:
-                    nodeSavable.enable(getEntity());
                     iconChange();
+                    nameChange();
                     break;
                 case SAVE:
-                    nodeSavable.disable();
                     iconChange();
                     nameChange();
                     break;
                 case REMOVE:
-                    nodeSavable.disable();
                     setNoEntity();
                     break;
                 case RESET:
-                    nodeSavable.disable();
+                    nameChange();
             }
         }
     }
@@ -210,100 +184,6 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
     private void iconChange() {
         fireIconChange();
         fireOpenedIconChange();
-    }
-
-    private class NodeSavable<Z extends EntityRW> extends AbstractSavable implements Icon, HasInstanceDescription {
-
-        private final String nodename;
-        private Icon nodeicon;
-        private Z e;
-        private final SaveHandler defaultsavehandler = new DefaultSaveHandler();
-
-        public NodeSavable(String nodename) {
-            this.nodename = nodename;
-        }
-
-        @Override
-        public String instanceDescription() {
-            return LogBuilder.instanceDescription(this, nodename);
-        }
-
-        public SaveHandler getDefaultSaveHandler() {
-            return defaultsavehandler;
-        }
-
-        private class DefaultSaveHandler implements SaveHandler {
-
-            @Override
-            public void handleSave() throws IOException {
-                e.save();
-            }
-        }
-
-        public void enable(Z e) {
-            this.e = e;
-            content.add(this);
-            register();
-            LogBuilder.writeLog("nbpcglibrary.node", this, "enable");
-        }
-
-        public void disable() {
-            LogBuilder.writeLog("nbpcglibrary.node", this, "disable");
-            content.remove(this);
-            unregister();
-            e = null;
-        }
-
-        @Override
-        protected void handleSave() throws IOException {
-            LogBuilder.writeLog("nbpcglibrary.node", this, "handleSave");
-            saveHandler.handleSave();
-        }
-
-        @Override
-        protected String findDisplayName() {
-            return getDisplayTitle();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof NodeSavable) {
-                if (e == null || ((NodeSavable) obj).e == null) {
-                    return false;
-                }
-                return e.getId() == ((NodeSavable) obj).e.getId();
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return nodename.hashCode();
-        }
-
-        @Override
-        public void paintIcon(Component c, Graphics g, int x, int y) {
-            if (nodeicon == null) {
-                nodeicon = new ImageIcon(_getIcon());
-            }
-            nodeicon.paintIcon(c, g, x, y);
-        }
-
-        @Override
-        public int getIconWidth() {
-            if (nodeicon == null) {
-                nodeicon = new ImageIcon(_getIcon());
-            }
-            return nodeicon.getIconWidth();
-        }
-
-        @Override
-        public int getIconHeight() {
-            if (nodeicon == null) {
-                nodeicon = new ImageIcon(_getIcon());
-            }
-            return nodeicon.getIconHeight();
-        }
     }
 
     // CUT and PASTE source support
