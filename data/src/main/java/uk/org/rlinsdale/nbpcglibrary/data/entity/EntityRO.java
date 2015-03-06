@@ -170,7 +170,6 @@ public abstract class EntityRO<F> extends Entity {
      * @param formatOK true if the field is formatted correctly
      */
     protected final void fireFieldChange(F field, boolean formatOK) {
-        updateEntityRegistration();
         fieldEvent.fire(new EntityFieldChangeEventParams<>(field, null, formatOK));
     }
 
@@ -181,7 +180,6 @@ public abstract class EntityRO<F> extends Entity {
      * @param formatOK true if the field is formatted correctly
      */
     protected final void fireCommonFieldChange(CommonEntityField field, boolean formatOK) {
-        updateEntityRegistration();
         fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, formatOK));
     }
 
@@ -202,7 +200,6 @@ public abstract class EntityRO<F> extends Entity {
      * @param field the field Id
      */
     protected final void fireFieldChangeAtLoad(CommonEntityField field) {
-        updateEntityRegistrationAtLoad();
         fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, true));
     }
 

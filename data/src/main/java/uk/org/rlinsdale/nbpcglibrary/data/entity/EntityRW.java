@@ -188,7 +188,6 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
                 em.removeFromTransientCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
-                removeEntityRegistration();
                 return;
             case DBENTITY:
             case DBENTITYEDITING:
@@ -197,7 +196,6 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
                 em.removeFromCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
-                removeEntityRegistration();
                 return;
             default:
                 throw new LogicException("Should not be trying to remove an entity in " + oldState + " state");

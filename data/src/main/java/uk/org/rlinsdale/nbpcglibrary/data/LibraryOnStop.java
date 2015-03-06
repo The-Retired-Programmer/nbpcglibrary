@@ -19,7 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.data;
 
 import java.util.concurrent.Callable;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRegistry;
+import org.netbeans.api.actions.Savable;
 import uk.org.rlinsdale.nbpcglibrary.form.ConfirmationDialog;
 import org.openide.modules.OnStop;
 
@@ -34,8 +34,23 @@ public class LibraryOnStop implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
-        return EntityRegistry.hasErrors()
+        return hasErrors()
                 ? ConfirmationDialog.show("Close down request", "Do you want to continue with close down while you have entities with errors which cannot be saved at the present time?")
                 : true;
+    }
+    
+    @SuppressWarnings("CallToThreadYield")
+    private boolean hasErrors() {
+        return outstandingSavableRegistrations > 0 || Savable.REGISTRY.lookup(Savable.class) != null;
+    }
+    
+    private static int outstandingSavableRegistrations = 0;
+    
+    public static void incRegisterOutstanding() {
+        outstandingSavableRegistrations++;
+    }
+    
+    public static void decRegisterOutstanding() {
+        outstandingSavableRegistrations--;
     }
 }

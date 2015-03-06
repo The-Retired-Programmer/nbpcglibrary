@@ -29,9 +29,6 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rules;
  */
 public abstract class Entity extends Rules implements HasInstanceDescription {
 
-    private final EntityError entityerror;
-    private final EntitySave entitysave;
-
     /**
      * Constructor.
      *
@@ -39,10 +36,8 @@ public abstract class Entity extends Rules implements HasInstanceDescription {
      */
     public Entity(String entityname) {
         super();
-        entityerror = new EntityError(entityname);
-        entitysave = new EntitySave(entityname);
-        updateEntityRegistration();
     }
+    
     /**
      * add a rule to the entity ruleset and also to the defined field ruleset
      * @param rules the field ruleset
@@ -58,99 +53,12 @@ public abstract class Entity extends Rules implements HasInstanceDescription {
      */
     public void cancelEdit() {
         _restoreState();
-        updateEntityRegistration();
-    }
-
-    /**
-     * Update entity registration for this entity. Set entity error based on
-     * check of entity rules and set entity save state based on current entity
-     * state.
-     */
-    protected final void updateEntityRegistration() {
-        if (checkRules()) {
-            EntityRegistry.unregister(entityerror);
-            if (this instanceof EntityRO) {
-                EntityRO thisRO = (EntityRO) this;
-                if (thisRO.isEditing() || thisRO.isNew()) {
-                    EntityRegistry.register(entitysave);
-                } else {
-                    EntityRegistry.unregister(entitysave);
-                }
-            }
-        } else {
-            EntityRegistry.register(entityerror);
-            if (this instanceof EntityRO) {
-                EntityRegistry.unregister(entitysave);
-            }
-        }
-    }
-
-    /**
-     * Update entity registration for this entity at load state. Set entity
-     * error based on check of entity rules at load and set entity save state
-     * based on current entity state.
-     */
-    protected final void updateEntityRegistrationAtLoad() {
-        if (checkRulesAtLoad()) {
-            EntityRegistry.unregister(entityerror);
-        } else {
-            EntityRegistry.register(entityerror);
-        }
-        if (this instanceof EntityRO) {
-            EntityRegistry.unregister(entitysave);
-        }
-    }
-
-    /**
-     * Remove entity error and entity save registrations for this entity.
-     */
-    protected final void removeEntityRegistration() {
-        EntityRegistry.unregister(entityerror);
-        EntityRegistry.unregister(entitysave);
     }
 
     /**
      * Restore entity state.
      */
     abstract protected void _restoreState();
-
-    private class EntityError implements EntityInError {
-
-        private final String name;
-
-        public EntityError(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return (obj instanceof EntityError) && this == (((EntityError) obj));
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode();
-        }
-    }
-
-    private class EntitySave implements EntityNeedsSaving {
-
-        private final String name;
-
-        public EntitySave(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return (obj instanceof EntitySave) && this == (((EntitySave) obj));
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode();
-        }
-    }
 
     /**
      * get the string which will be used to display the name for the entity
