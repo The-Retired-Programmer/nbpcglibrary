@@ -50,15 +50,14 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
      * Constructor
      *
      * @param nodename the node name
-     * @param iconname the iconname
      * @param e the entity
      * @param cf the childfactory
      * @param emclass the entity manager class
      * @param allowedPaste allowed paste actions
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    public IconNodeRW(String nodename, String iconname, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
-        super(nodename, iconname, e, cf, emclass, allowedPaste, isCutDestroyEnabled);
+    public IconNodeRW(String nodename, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
+        super(nodename, e, cf, emclass, allowedPaste, isCutDestroyEnabled);
         this.nodename = nodename;
         imagefilefinder = getImageFileFinder(nodename);
     }
@@ -67,13 +66,12 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
      * Constructor.
      *
      * @param nodename the node name
-     * @param iconname the iconname
      * @param e the entity
      * @param emclass the entity manager class
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    protected IconNodeRW(String nodename, String iconname, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
-        super(nodename, iconname, e, emclass, isCutDestroyEnabled);
+    protected IconNodeRW(String nodename, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
+        super(nodename, e, emclass, isCutDestroyEnabled);
         this.nodename = nodename;
         imagefilefinder = getImageFileFinder(nodename);
     }
@@ -121,14 +119,14 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
         if (fi == null) {
             LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
                 .addMsg("Nodename is {0} - No image defined", nodename).write();
-            return _getIconWithError();
+            return entity.getIconWithError();
         }
         try {
-            return entity.checkRules() ? ImageIO.read(fi) : _addErrorToIcon(ImageIO.read(fi));
+            return entity.checkRules() ? ImageIO.read(fi) : entity.addErrorToIcon(ImageIO.read(fi));
         } catch (IOException ex) {
             LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
                 .addMsg("Nodename is {0} - IOException when reading image", nodename).addExceptionMessage(ex).write();
-            return _getIconWithError();
+            return entity.getIconWithError();
         }
     }
 }

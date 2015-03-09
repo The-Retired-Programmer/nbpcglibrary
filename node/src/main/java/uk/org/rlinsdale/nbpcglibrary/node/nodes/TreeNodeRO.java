@@ -18,12 +18,9 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
-import java.awt.Image;
-import uk.org.rlinsdale.nbpcglibrary.icons.SpecialIcons;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
-import org.openide.util.ImageUtilities;
 
 /**
  * Read-Only Tree Node Abstract Class
@@ -31,7 +28,7 @@ import org.openide.util.ImageUtilities;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
  */
-public abstract class TreeNodeRO<E extends EntityRO> extends RootNode<E> {
+public abstract class TreeNodeRO<E extends EntityRO> extends BasicNode<E> {
 
     private final EntityReference<E> eref;
 
@@ -39,14 +36,13 @@ public abstract class TreeNodeRO<E extends EntityRO> extends RootNode<E> {
      * Constructor.
      *
      * @param  nodename the node name
-     * @param iconname the iconname
      * @param e the entity
      * @param cf the childfactory
      * @param emclass the entity manager class
      * @param allowedPaste allowed paste actions
      */
-    protected TreeNodeRO(String nodename, String iconname, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRO> emclass, DataFlavorAndAction[] allowedPaste) {
-        super(iconname, null, cf, allowedPaste);
+    protected TreeNodeRO(String nodename, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRO> emclass, DataFlavorAndAction[] allowedPaste) {
+        super(cf, allowedPaste);
         eref = new EntityReference<>(nodename, e, emclass);
     }
 
@@ -54,12 +50,11 @@ public abstract class TreeNodeRO<E extends EntityRO> extends RootNode<E> {
      * Constructor.
      *
      * @param nodename the node name
-     * @param iconname the iconname
      * @param e the entity
      * @param emclass the entity manager class
      */
-    protected TreeNodeRO(String nodename, String iconname, E e, Class<? extends EntityManagerRO> emclass) {
-        super(iconname, null);
+    protected TreeNodeRO(String nodename, E e, Class<? extends EntityManagerRO> emclass) {
+        super();
         eref = new EntityReference<>(nodename, e, emclass);
     }
 
@@ -68,7 +63,6 @@ public abstract class TreeNodeRO<E extends EntityRO> extends RootNode<E> {
         return eref.get();
     }
 
-    @Override
     public void setNoEntity() {
         eref.set();
     }
@@ -80,27 +74,4 @@ public abstract class TreeNodeRO<E extends EntityRO> extends RootNode<E> {
      */
     public abstract String getDisplayTitle();
 
-    @Override
-    public Image getIcon(int type) {
-        return getEntity().checkRules() ? _getIcon() : _getIconWithError();
-    }
-
-    /**
-     * Get the node icon combined with an error marker.
-     * 
-     * @return the image
-     */
-    protected Image _getIconWithError() {
-        return _addErrorToIcon(_getIcon());
-    }
-
-    /**
-     * Create the node icon combined with an error marker.
-     * 
-     * @param icon the node icon image
-     * @return the node icon image combined with error marker
-     */
-    protected Image _addErrorToIcon(Image icon) {
-        return ImageUtilities.mergeImages(icon, SpecialIcons.get("errormarker"), 0, 6);
-    }
 }

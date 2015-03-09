@@ -43,12 +43,13 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
      * Constructor.
      *
      * @param entityname the entity name
+     * @param icon the icon name
      * @param id the entity Id
      * @param em the entity manager for this entity class
      * @param dbfields the entity fields
      */
-    public EntityRWIndexed(String entityname, int id, EntityManagerRW<E,P> em, DBFieldsRWIndexed<E> dbfields) {
-        super(entityname, id, em, dbfields);
+    public EntityRWIndexed(String entityname, String icon, int id, EntityManagerRW<E,P> em, DBFieldsRWIndexed<E> dbfields) {
+        super(entityname, icon, id, em, dbfields);
         this.dbfields = dbfields;
         this.dataAccess = em.getDataAccess();
     }

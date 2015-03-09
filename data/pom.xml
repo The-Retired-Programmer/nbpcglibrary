@@ -41,8 +41,17 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <artifactId>icons</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
         </dependency>
     </dependencies>
 

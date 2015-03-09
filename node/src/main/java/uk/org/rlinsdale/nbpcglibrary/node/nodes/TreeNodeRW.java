@@ -48,15 +48,14 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
      * Constructor.
      *
      * @param nodename the node name
-     * @param iconname the iconname
      * @param e the entity
      * @param cf the childfactory
      * @param emclass the entity manager class
      * @param allowedPaste allowed paste actions
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    protected TreeNodeRW(String nodename, String iconname, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
-        super(nodename, iconname, e, cf, emclass, allowedPaste);
+    protected TreeNodeRW(String nodename, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
+        super(nodename, e, cf, emclass, allowedPaste);
         commonConstructor(nodename, e, isCutDestroyEnabled);
     }
 
@@ -64,13 +63,12 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
      * Constructor.
      *
      * @param nodename the node name
-     * @param iconname the iconname
      * @param e the entity
      * @param emclass the entity manager class
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    protected TreeNodeRW(String nodename, String iconname, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
-        super(nodename, iconname, e, emclass);
+    protected TreeNodeRW(String nodename, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
+        super(nodename, e, emclass);
         commonConstructor(nodename, e, isCutDestroyEnabled);
     }
 

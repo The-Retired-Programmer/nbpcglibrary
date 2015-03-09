@@ -18,11 +18,22 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
+import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import org.netbeans.spi.actions.AbstractSavable;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
+import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
 import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
@@ -41,7 +52,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
  * @param <P> the Parent Entity Class
- * @param <F>  the Fields enum class
+ * @param <F> the Fields enum class
  */
 public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends EntityRO<F> {
 
@@ -49,25 +60,34 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
     private final DataAccessRW dataAccess;
     private final Event<IdChangeEventParams> idChangeEvent;
     private final EntityManagerRW<E, P> em;
+    private final String entityname;
+    private final EntityStateChangeListener entitystatechangelistener;
+    private final EntitySavable savable = new EntitySavable();
 
     /**
      * Constructor.
      *
      * @param entityname the entity name
+     * @param icon name of the icon graphic
      * @param id the entity Id
      * @param em the entity manager for this entity class
      * @param dbfields the entity fields
      */
-    public EntityRW(String entityname, int id, EntityManagerRW<E, P> em, DBFieldsRW<E> dbfields) {
-        this(entityname, id, em, em.getDataAccess(), dbfields);
+    public EntityRW(String entityname, String icon, int id, EntityManagerRW<E, P> em, DBFieldsRW<E> dbfields) {
+        this(entityname, icon, id, em, em.getDataAccess(), dbfields);
     }
 
-    private EntityRW(String entityname, int id, EntityManagerRW<E, P> em, DataAccessRW dataAccess, DBFieldsRW<E> dbfields) {
-        super(entityname, id, dataAccess, dbfields);
+    private EntityRW(String entityname, String icon, int id, EntityManagerRW<E, P> em, DataAccessRW dataAccess, DBFieldsRW<E> dbfields) {
+        super(entityname, icon, id, dataAccess, dbfields);
         this.em = em;
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
         idChangeEvent = new Event<>(entityname);
+        this.entityname = entityname;
+        entitystatechangelistener = new EntityStateChangeListener("entity:" + instanceDescription());
+        addStateListener(entitystatechangelistener);
+        // and as this is new it is saveable (too early to rely on listener)
+        savable.add();
     }
 
     /**
@@ -115,8 +135,6 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
         switch (oldState) {
             case DBENTITY:
                 return true; //we don't need to do anything as this is a straight copy of a db entity
-            case INIT:
-                return false;
             case REMOVED:
                 return false;
             case NEW:
@@ -131,7 +149,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
                     em.persistTransient((E) this, dataAccess.insert(map));
                     idChangeEvent.fire(new IdChangeEventParams());
                     setState(DBENTITY);
-                } catch (LogicException ex ){
+                } catch (LogicException ex) {
                     return false;
                 }
                 break;
@@ -147,9 +165,9 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
                         dataAccess.update(getId(), map);
                     }
                     setState(DBENTITY);
-                } catch (LogicException ex ){
+                } catch (LogicException ex) {
                     return false;
-                }    
+                }
                 break;
             default:
                 if (!checkRules()) {
@@ -231,4 +249,121 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
      * @param from the copy source entity
      */
     abstract protected void _copy(E from);
+
+    private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
+
+        public EntityStateChangeListener(String name) {
+            super(name);
+        }
+
+        @Override
+        public void action(EntityStateChangeEventParams p) {
+            switch (p.getTransition()) {
+                case EDIT:
+                    savable.add();
+                    break;
+                case LOAD:
+                    savable.remove();
+                    break;
+                case SAVE:
+                    break;
+                case REMOVE:
+                    savable.remove();
+                    break;
+                case RESET:
+                    savable.remove();
+            }
+        }
+    }
+
+    @Override
+    public Image getIcon() {
+        return checkRules() ? super.getIcon() : getIconWithError();
+    }
+
+    private class EntitySavable<E, P, F> extends AbstractSavable implements Icon, HasInstanceDescription {
+
+        private Icon icon;
+
+        public void add() {
+            if (getLookup().lookup(EntitySavable.class) == null) {
+                register();
+                addLookupContent(this);
+            }
+            icon = null;
+        }
+
+        public void remove() {
+            removeLookupContent(this);
+            unregister();
+        }
+
+        @Override
+        public String instanceDescription() {
+            return LogBuilder.instanceDescription(this, entityname);
+        }
+
+        @Override
+        protected void handleSave() throws IOException {
+            LogBuilder.writeLog("nbpcglibrary.data", this, "handleSave");
+            if (EntityRW.this.save()) {
+                removeLookupContent(this);
+            } else {
+                EventQueue.invokeLater(new ReRegister());
+                LibraryOnStop.incRegisterOutstanding();
+            }
+        }
+
+        private class ReRegister implements Runnable {
+
+            @Override
+            public void run() {
+                EntitySavable.this.register();
+                LibraryOnStop.decRegisterOutstanding();
+            }
+        }
+
+        @Override
+        protected String findDisplayName() {
+            return getDisplayTitle();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof EntitySavable) {
+                return entity() == ((EntitySavable) obj).entity();
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return entity().hashCode();
+        }
+
+        EntityRW entity() {
+            return EntityRW.this;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            new ImageIcon(getIcon()).paintIcon(c, g, x, y);
+        }
+
+        @Override
+        public int getIconWidth() {
+            if (icon == null) {
+                icon = new ImageIcon(getIcon());
+            }
+            return icon.getIconWidth();
+        }
+
+        @Override
+        public int getIconHeight() {
+            if (icon == null) {
+                icon = new ImageIcon(getIcon());
+            }
+            return icon.getIconHeight();
+        }
+    }
 }

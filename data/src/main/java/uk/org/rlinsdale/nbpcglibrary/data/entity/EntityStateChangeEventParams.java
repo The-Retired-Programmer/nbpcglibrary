@@ -34,7 +34,8 @@ public class EntityStateChangeEventParams implements EventParams {
     public enum EntityState {
 
         /**
-         * Init. entity created but not populated.
+         * Init. entity created but not populated (initialisation state - entity
+         * is never in this state)
          */
         INIT,
         /**
@@ -57,16 +58,13 @@ public class EntityStateChangeEventParams implements EventParams {
          * DbEntityEditiong. DBentity which has subsequently been modified.
          */
         DBENTITYEDITING,
-        /**
-         * State Id - Deleted. entity deleted from entity storage.
-         */
-        DELETED
     };
 
     public enum EntityStateChange {
 
         /**
-         * Create. entity created
+         * Create. entity created - will not be seen by listener as is fired in
+         * constructor prior to any state listeners being able to be added.
          */
         CREATE,
         /**
@@ -85,10 +83,6 @@ public class EntityStateChangeEventParams implements EventParams {
          * Reset. entity has been reset.
          */
         RESET,
-        /**
-         * Delete. entity has been deleted.
-         */
-        DELETE,
         /**
          * Remove. entity has been removed.
          */
@@ -141,6 +135,6 @@ public class EntityStateChangeEventParams implements EventParams {
 
     @Override
     public String instanceDescription() {
-        return LogBuilder.instanceDescription(this, transition + "[" + oldState + ">" + newState+"]");
+        return LogBuilder.instanceDescription(this, transition + "[" + oldState + ">" + newState + "]");
     }
 }

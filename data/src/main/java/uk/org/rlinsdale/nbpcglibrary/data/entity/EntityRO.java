@@ -68,25 +68,27 @@ public abstract class EntityRO<F> extends Entity {
      * Constructor.
      *
      * @param entityname the entity name
+     * @param icon name of the icon graphic
      * @param id the entity Id
      * @param em the entity manager for this entity class
      * @param dbfields the entity fields
      */
-    public EntityRO(String entityname, int id, EntityManagerRO em, DBFieldsRO dbfields) {
-        this(entityname, id, em.getDataAccess(), dbfields);
+    public EntityRO(String entityname, String icon, int id, EntityManagerRO em, DBFieldsRO dbfields) {
+        this(entityname, icon, id, em.getDataAccess(), dbfields);
     }
 
     /**
      * Constructor.
      *
      * @param entityname the entity name
+     * @param icon name of the icon graphic
      * @param id the entity Id
      * @param dataAccess the Data Access object for this entity class
      * @param dbfields the entity fields
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    protected EntityRO(String entityname, int id, DataAccessRO dataAccess, DBFieldsRO dbfields) {
-        super(entityname);
+    protected EntityRO(String entityname, String icon, int id, DataAccessRO dataAccess, DBFieldsRO dbfields) {
+        super(entityname, icon);
         this.id = id;
         this.dataAccess = dataAccess;
         this.dbfields = dbfields;
@@ -182,7 +184,7 @@ public abstract class EntityRO<F> extends Entity {
     protected final void fireCommonFieldChange(CommonEntityField field, boolean formatOK) {
         fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, formatOK));
     }
-
+    
     /**
      * Fire actions on all StateChange listeners.
      *
