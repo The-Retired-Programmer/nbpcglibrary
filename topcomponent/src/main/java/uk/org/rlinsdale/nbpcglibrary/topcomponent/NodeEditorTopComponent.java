@@ -24,7 +24,10 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.form.Form;
 import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNodeRW;
 import org.openide.windows.TopComponent;
+import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 
 /**
  * Editor Topcomponent which displays/edits a node.
@@ -36,6 +39,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopComponent {
 
     private final String name;
+    private boolean abandon = false;
+    private EntityStateChangeListener statechangelistener;
 
     /**
      * the node being edited
@@ -46,7 +51,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
      * the entity being edited
      */
     protected E entity;
-    
+
     /**
      * Constructor
      *
@@ -76,6 +81,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
         LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentOpened")
                 .addMsg("TopComponent is {0})", this).write();
         entity = node.getEntity();
+        entity.addStateListener(statechangelistener = new EntityStateChangeListener("TopComponent:" + entity.instanceDescription()));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(getForm());
 
@@ -87,12 +93,12 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
      * @return the form
      */
     protected abstract Form getForm();
-    
+
     @Override
     public boolean canClose() {
-        return canCloseForm();
+        return abandon ? true : canCloseForm();
     }
-    
+
     /**
      * Can Close the form
      *
@@ -120,4 +126,18 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
      */
     protected abstract Form dropForm();
 
+    private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
+
+        public EntityStateChangeListener(String name) {
+            super(name);
+        }
+
+        @Override
+        public void action(EntityStateChangeEventParams p) {
+            if (p.getTransition() == REMOVE) {
+                abandon = true;
+                NodeEditorTopComponent.this.close();
+            }
+        }
+    }
 }
