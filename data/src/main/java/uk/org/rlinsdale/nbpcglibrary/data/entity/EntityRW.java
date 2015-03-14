@@ -44,6 +44,7 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventPa
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.SAVE;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ALL;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ID;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEWEDITING;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
 
 /**
@@ -233,7 +234,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
      */
     public final void copy(E e) {
         EntityState oldState = getState();
-        if (oldState == NEW) {
+        if (oldState == NEW || oldState == NEWEDITING ) {
             _copy(e);
             dbfields.copy(e);
             ensureEditing();
