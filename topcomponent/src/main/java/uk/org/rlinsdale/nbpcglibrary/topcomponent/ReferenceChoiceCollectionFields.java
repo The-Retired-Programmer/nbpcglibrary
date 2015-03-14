@@ -46,6 +46,7 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
      *
      * @param backingObject the backingObject
      * @param label the field label
+     * @param nullSelectionAllowed true if a null selection is allowed
      */
     public ReferenceChoiceCollectionFields(ChoiceFieldBackingObject backingObject, String label, boolean nullSelectionAllowed) {
         super(backingObject, label, nullSelectionAllowed);

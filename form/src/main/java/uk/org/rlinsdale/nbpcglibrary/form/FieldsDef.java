@@ -123,7 +123,7 @@ public abstract class FieldsDef implements HasInstanceDescription {
      * Set the parameters to be returned from the fielddef (consolidated at
      * dialog completion)
      *
-     * @param parameters
+     * @param parameters the set of parameters
      */
     protected void setParameters(String... parameters) {
         this.parameters = parameters;
