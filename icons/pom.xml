@@ -5,12 +5,12 @@
     <parent>
         <groupId>uk.org.rlinsdale.poms</groupId>
         <artifactId>nb-library-module</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.2</version>
     </parent>
 
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>icons</artifactId>
-    <version>3.1.5</version>
+    <version>3.1.6</version>
     <packaging>nbm</packaging>
 
     <name>NBPCG Icons</name>
