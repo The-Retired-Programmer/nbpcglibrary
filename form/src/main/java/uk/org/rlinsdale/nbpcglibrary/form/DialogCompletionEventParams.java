@@ -19,7 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult;
 

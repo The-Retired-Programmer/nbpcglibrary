@@ -20,11 +20,12 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import com.famfamfam.www.silkicons.Icons;
 import java.awt.Image;
+import java.io.IOException;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 import uk.org.rlinsdale.nbpcglibrary.icons.SpecialIcons;
@@ -93,15 +94,17 @@ public abstract class Entity extends Rules implements HasInstanceDescription {
 
     /**
      * Cancel any changes in progress and restore state as at last save state.
+     * @throws java.io.IOException
      */
-    public void cancelEdit() {
+    public void cancelEdit() throws IOException {
         _restoreState();
     }
 
     /**
      * Restore entity state.
+     * @throws java.io.IOException
      */
-    abstract protected void _restoreState();
+    abstract protected void _restoreState() throws IOException;
 
     /**
      * get the string which will be used to display the name for the entity

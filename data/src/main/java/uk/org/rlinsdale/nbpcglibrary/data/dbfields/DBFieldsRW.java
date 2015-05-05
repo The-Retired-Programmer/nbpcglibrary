@@ -18,7 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dbfields;
 
-import java.util.Map;
+import java.io.IOException;
+import javax.json.JsonObjectBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 
 /**
@@ -33,16 +34,18 @@ public interface DBFieldsRW<E extends EntityRW> extends DBFieldsRO {
      * Get a collection of all fields (and their values), whose data values have
      * changed.
      *
-     * @param map the map of names and values
+     * @param job a JasonObjectBuilder into which names and values can be inserted
+     * @throws IOException
      */
-    public void diffs(Map<String, Object> map);
+    public void diffs(JsonObjectBuilder job) throws IOException;
 
     /**
      * Get a collection of all fields and their values.
      *
-     * @param map the map of names and values
+     * @param job a JasonObjectBuilder into which names and values can be inserted
+     * @throws java.io.IOException
      */
-    public void values(Map<String, Object> map);
+    public void values(JsonObjectBuilder job) throws IOException;
 
     /**
      * Copy data from given Entity into these entity fields.

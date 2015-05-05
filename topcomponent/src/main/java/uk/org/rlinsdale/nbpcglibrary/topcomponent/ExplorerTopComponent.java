@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
-import java.util.logging.Level;
 import javax.swing.ActionMap;
 import javax.swing.GroupLayout;
 import javax.swing.JScrollPane;
@@ -29,7 +28,7 @@ import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
 import org.openide.windows.TopComponent;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**

@@ -35,6 +35,10 @@ public abstract class EditableField<T> extends Field<T> {
     private final FieldActionListener actionListener = new FieldActionListener();
     private final FieldFocusListener focusListener = new FieldFocusListener();
     private final JComponent field;
+
+    /**
+     *
+     */
     protected T lastvaluesetinfield;
     private final FieldBackingObject<T> backingObject;
 

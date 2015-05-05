@@ -18,6 +18,10 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import org.openide.util.Exceptions;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
@@ -30,7 +34,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  */
 public abstract class BasicChildFactory<E extends EntityRO> extends RootChildFactory<E> {
 
-    private final EntityReference<E> parentref;
+    private EntityReference<E> parentref;
 
     /**
      * Constructor.
@@ -39,13 +43,25 @@ public abstract class BasicChildFactory<E extends EntityRO> extends RootChildFac
      * @param parentEntity the parent entity
      * @param emclass the parent entity manager class 
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManagerRO> emclass) {
         super(null);
-        parentref = new EntityReference<>( factoryname+">"+parentEntity.instanceDescription(), parentEntity, emclass);
+        try {
+            parentref = new EntityReference<>( factoryname+">"+parentEntity.instanceDescription(), parentEntity, emclass);
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addConstructorName(this, factoryname, parentEntity)
+                            .addExceptionMessage(ex).write();
+        }
     }
 
     @Override
     public E getParentEntity() {
-        return parentref.get();
+        try {
+            return parentref.get();
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "getParentEntity")
+                            .addExceptionMessage(ex).write();
+            return null;
+        }
     }
 }

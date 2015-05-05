@@ -18,11 +18,12 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dbfields.idandstamp;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Map;
+import java.io.IOException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRWIndexed;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
  * Handles Read-Write entity field management, for a entity which includes a Id,
@@ -49,9 +50,9 @@ public class DBFieldsRWIndexedIdandstamp<E extends EntityRWIndexed> extends DBFi
     }
 
     @Override
-    public void load(ResultSet rs) throws SQLException {
-        super.load(rs);
-        idx = rs.getInt("idx");
+    public void load(JsonObject data) throws IOException {
+        super.load(data);
+        idx = JsonUtil.getObjectKeyIntegerValue(data, "idx");
     }
 
     @Override
@@ -65,16 +66,16 @@ public class DBFieldsRWIndexedIdandstamp<E extends EntityRWIndexed> extends DBFi
     }
 
     @Override
-    public final void diffs(Map<String, Object> map) {
+    public final void diffs(JsonObjectBuilder job) throws IOException {
         if (idx != idxOriginal) {
-            map.put("idx", idx);
+            job.add("idx", idx);
         }
-        super.diffs(map);
+        super.diffs(job);
     }
 
     @Override
-    public final void values(Map<String, Object> map) {
-        map.put("idx", idx);
-        super.values(map);
+    public final void values(JsonObjectBuilder job) throws IOException {
+        job.add("idx", idx);
+        super.values(job);
     }
 }

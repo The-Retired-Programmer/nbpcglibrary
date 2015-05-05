@@ -18,8 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dbfields;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.IOException;
+import javax.json.JsonObject;
 
 /**
  * Interface for handling entity field states for a read-only entity.
@@ -39,11 +39,11 @@ public interface DBFieldsRO {
     public void saveState();
 
     /**
-     * Use the provided loader to insert the resultset data into the entity
+     * Use the Json formatted to insert the data into the entity
      * fields.
      *
-     * @param rs the resultset
-     * @throws SQLException if problems
+     * @param data the Json formatted data
+     * @throws IOException
      */
-    public void load(ResultSet rs) throws SQLException;
+    public void load(JsonObject data) throws IOException;
 }

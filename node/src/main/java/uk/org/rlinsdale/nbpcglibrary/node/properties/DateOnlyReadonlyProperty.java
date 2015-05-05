@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.properties;
 
-import uk.org.rlinsdale.nbpcglibrary.common.DateOnly;
+import uk.org.rlinsdale.nbpcglibrary.api.DateOnly;
 import org.openide.nodes.PropertySupport;
 
 /**

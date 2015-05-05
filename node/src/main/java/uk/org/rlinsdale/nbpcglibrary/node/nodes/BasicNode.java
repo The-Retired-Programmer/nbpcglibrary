@@ -42,7 +42,7 @@ import org.openide.util.datatransfer.PasteType;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
 /**
  * Root Node Abstract Class
@@ -263,22 +263,25 @@ public abstract class BasicNode<E extends Entity> extends AbstractNode implement
      * Move action - add child entity.
      *
      * @param child the entity
+     * @throws java.io.IOException
      */
-    abstract protected void _moveAddChild(Entity child);
+    abstract protected void _moveAddChild(Entity child) throws IOException;
 
     /**
      * Cut action - add child entity.
      *
      * @param child the entity
+     * @throws java.io.IOException
      */
-    abstract protected void _cutAddChild(Entity child);
+    abstract protected void _cutAddChild(Entity child) throws IOException;
 
     /**
      * Copy Action - add child entity.
      *
      * @param child the entity
+     * @throws java.io.IOException
      */
-    abstract protected void _copyAddChild(Entity child);
+    abstract protected void _copyAddChild(Entity child) throws IOException;
 
     /**
      * Reorder Action - move child entity.

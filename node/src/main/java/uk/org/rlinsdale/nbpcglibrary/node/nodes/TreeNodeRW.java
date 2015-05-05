@@ -232,11 +232,13 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
     /**
      * Cut and Paste - removal of Node action.
+     * @throws java.io.IOException
      */
-    abstract protected void _cutAndPasteRemove();
+    abstract protected void _cutAndPasteRemove()  throws IOException;
 
     /**
      * Delete - removal of Node action.
+     * @throws java.io.IOException
      */
-    abstract protected void _deleteRemove();
+    abstract protected void _deleteRemove() throws IOException;
 }

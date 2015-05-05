@@ -18,11 +18,12 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dbfields.idandstamp;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.IOException;
+import javax.json.JsonObject;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRO;
 import uk.org.rlinsdale.nbpcglibrary.common.Settings;
-import uk.org.rlinsdale.nbpcglibrary.common.Timestamp;
+import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
  * Handles Read-Only entity field management, for a entity which includes a Id and
@@ -57,11 +58,11 @@ public class DBFieldsROIdandstamp implements DBFieldsRO {
     }
 
     @Override
-    public void load(ResultSet rs) throws SQLException {
-        createdby = rs.getString("createdby");
-        createdon.setDateUsingSQLString(rs.getString("createdon"));
-        updatedby = rs.getString("updatedby");
-        updatedon.setDateUsingSQLString(rs.getString("updatedon"));
+    public void load(JsonObject data) throws IOException {
+        createdby = JsonUtil.getObjectKeyStringValue(data, "createdby");
+        createdon.setDateUsingSQLString(JsonUtil.getObjectKeyStringValue(data,"createdon" ));
+        updatedby = JsonUtil.getObjectKeyStringValue(data,"updatedby" );
+        updatedon.setDateUsingSQLString(JsonUtil.getObjectKeyStringValue(data,"updatedon" ));
     }
 
     @Override

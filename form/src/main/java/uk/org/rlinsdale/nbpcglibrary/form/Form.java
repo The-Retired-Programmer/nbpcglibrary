@@ -18,13 +18,14 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEFAIL;
@@ -39,12 +40,34 @@ import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDAT
 @RegisterLog("nbpcglibrary.form")
 public class Form extends GridBagPanel implements HasInstanceDescription {
 
+    /**
+     *
+     */
     public enum FormSaveResult {
 
+        /**
+         *
+         */
         SAVESUCCESS,
+
+        /**
+         *
+         */
         SAVEVALIDATIONFAIL,
+
+        /**
+         *
+         */
         SAVEFAIL,
+
+        /**
+         *
+         */
         CANCELLED,
+
+        /**
+         *
+         */
         CLOSED
     }
 
@@ -113,7 +136,8 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
      * @return save result code
      */
     public FormSaveResult save() {
-        boolean ok = true;
+        try {
+            boolean ok = true;
         LogBuilder.writeLog("nbpcglibrary.form", this, "test");
         for (FieldsDef f : fieldsdefs) {
             f.updateAllBackingObjectsFromFields();
@@ -131,6 +155,9 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
             }
         }
         return ok ? SAVESUCCESS : SAVEFAIL;
+        } catch (IOException ex) {
+            return SAVEFAIL;
+        }
     }
     
     List<String> getParameters() {

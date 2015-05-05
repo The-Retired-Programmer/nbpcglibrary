@@ -18,10 +18,11 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -38,7 +39,7 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
 
     private final Map<Integer, E> transientCache;
     private int nextId = -1;
-    private DataAccessRW dataAccess;
+    private EntityPersistenceManager entityPersistenceManager;
 
     /**
      * Constructor
@@ -65,10 +66,11 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
      * Create a new entity (initialised)
      *
      * @return the new entity
+     * @throws java.io.IOException
      */
-    public final synchronized E getNew() {
+    public final synchronized E getNew() throws IOException {
         LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", nextId);
-        E e = _createNewEntity(nextId);
+        E e = createNewEntity(nextId);
         e.setId(nextId);
         transientCache.put(nextId--, e);
         return e;
@@ -80,10 +82,11 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
      *
      * @param parent the parent entity
      * @return the new entity
+     * @throws java.io.IOException
      */
-    public final synchronized E getNew(P parent) {
+    public final synchronized E getNew(P parent) throws IOException {
         E e = getNew();
-        _link2parent(e, parent);
+        link2parent(e, parent);
         return e;
     }
 
@@ -92,8 +95,9 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
      *
      * @param e the child entity
      * @param rs the parent entity
+     * @throws java.io.IOException
      */
-    abstract protected void _link2parent(E e, P rs);
+    abstract protected void link2parent(E e, P rs) throws IOException;
 
     /**
      * Create a new entity, copy it's field from another entity and link it as
@@ -102,8 +106,9 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
      * @param from the copy source entity
      * @param parent the parent entity
      * @return the new entity
+     * @throws java.io.IOException
      */
-    public final synchronized E getNew(E from, P parent) {
+    public final synchronized E getNew(E from, P parent) throws IOException {
         E e = getNew(parent);
         e.copy(from);
         return e;
@@ -142,15 +147,14 @@ public abstract class EntityManagerRW<E extends EntityRW, P extends Entity> exte
         throw new LogicException("Persist Transient Failure (class=" + name + ";id=" + id + ";newid=" + newId + ")");
     }
 
-    // and the service function to provide access to the data access object for the entity class
     @Override
-    public final DataAccessRW getDataAccess() {
-        if (dataAccess == null) {
-            dataAccess = _createDataAccess();
+    public final EntityPersistenceManager getEntityPersistenceManager() {
+        if (entityPersistenceManager == null) {
+                entityPersistenceManager = createEntityPersistenceManager();
         }
-        return dataAccess;
+        return entityPersistenceManager;
     }
 
     @Override
-    abstract protected DataAccessRW _createDataAccess();
+    abstract protected EntityPersistenceManager createEntityPersistenceManager();
 }

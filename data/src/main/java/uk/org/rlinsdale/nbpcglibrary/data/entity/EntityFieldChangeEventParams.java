@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
@@ -29,9 +29,24 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  */
 public class EntityFieldChangeEventParams<F> implements EventParams {
     
+    /**
+     *
+     */
     public enum CommonEntityField {
+
+        /**
+         *
+         */
         ALL,
+
+        /**
+         *
+         */
         ID,
+
+        /**
+         *
+         */
         IDX
     };
 

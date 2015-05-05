@@ -18,9 +18,11 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
+import javax.json.JsonArray;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
@@ -29,6 +31,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import org.openide.util.Lookup;
 import uk.org.rlinsdale.nbpcglibrary.common.Event.ListenerMode;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
  * Manages the list of Entities. The list of Entities is lazy loaded when
@@ -44,7 +47,7 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      * The Entity Manager associated with the entities
      */
     protected final EntityManagerRO<E> em;
-    private final DataAccessRO dataAccess;
+    private final EntityPersistenceManager dataRowAccess;
 
     /**
      * The list of Entity References (referring to the entities)
@@ -69,11 +72,12 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
+     * @throws java.io.IOException
      */
-    public EntityReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
+    public EntityReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) throws IOException {
         this(emclass, name, field, columnname, columnvalue);
         if (columnvalue > 0) {
-            createChildList(em, dataAccess.find(columnname, columnvalue));
+            createChildList(em, dataRowAccess.find(columnname, JsonUtil.createJsonValue(columnvalue)));
         } else {
             childList = new ArrayList<>();
         }
@@ -85,10 +89,11 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      * @param name the set name (for reporting)
      * @param field field identifier
      * @param emclass the associated entity manager class
+     * @throws java.io.IOException
      */
-    public EntityReferenceSet(String name, F field, Class<? extends EntityManagerRO> emclass) {
+    public EntityReferenceSet(String name, F field, Class<? extends EntityManagerRO> emclass) throws IOException {
         this(emclass, name, field, null, 0);
-        createChildList(em, dataAccess.find());
+        createChildList(em, dataRowAccess.find());
     }
 
     private EntityReferenceSet(Class<? extends EntityManagerRO> emclass, String name, F field, String columnname, int columnvalue) {
@@ -98,14 +103,14 @@ public class EntityReferenceSet<E extends EntityRO, F> {
         em = Lookup.getDefault().lookup(emclass);
         this.columnvalue = columnvalue;
         this.columnname = columnname;
-        this.dataAccess = em.getDataAccess();
+        this.dataRowAccess = em.getEntityPersistenceManager();
     }
 
-    private void createChildList(EntityManagerRO<E> em, List<Integer> refs) {
+    private void createChildList(EntityManagerRO<E> em, JsonArray refs) throws IOException {
         childList = new ArrayList<>();
-        refs.stream().forEach((id) -> {
-            childList.add(new EntityReference<>(name, id, em));
-        });
+        for (int i = 0; i < refs.size(); i++) {
+            childList.add(new EntityReference<>(name, refs.getInt(i), em));
+        }
     }
 
     /**
@@ -148,10 +153,12 @@ public class EntityReferenceSet<E extends EntityRO, F> {
 
     /**
      * Restore state (to the entity storage state).
+     *
+     * @throws java.io.IOException
      */
-    public void restoreState() {
+    public void restoreState() throws IOException {
         // TODO - we are not removing any new entities which are not cached - so we might have a leak here.
-        createChildList(em, columnname == null ? dataAccess.find() : dataAccess.find(columnname, columnvalue));
+        createChildList(em, columnname == null ? dataRowAccess.find() : dataRowAccess.find(columnname, JsonUtil.createJsonValue(columnvalue)));
     }
 
     /**
@@ -169,12 +176,13 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      * Get the list of Entities
      *
      * @return the list of entities
+     * @throws java.io.IOException
      */
-    public List<E> get() {
+    public List<E> get() throws IOException {
         List<E> el = new ArrayList<>();
-        childList.stream().forEach((ref) -> {
+        for (EntityReference<E> ref : childList) {
             el.add(ref.get());
-        });
+        }
         return el;
     }
 
@@ -182,8 +190,9 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      * Add a new entity to the entity set
      *
      * @param e the new entity
+     * @throws java.io.IOException
      */
-    public void add(E e) {
+    public void add(E e) throws IOException {
         childList.add(new EntityReference<>(name, e, em));
         fireSetChange();
     }
@@ -193,8 +202,9 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      *
      * @param index the position to insert the new entity
      * @param e the new entity
+     * @throws java.io.IOException
      */
-    protected final void add(int index, E e) {
+    protected final void add(int index, E e) throws IOException {
         childList.add(index, new EntityReference<>(name, e, em));
         fireSetChange();
     }

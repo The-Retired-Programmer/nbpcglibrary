@@ -18,9 +18,12 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
@@ -59,7 +62,12 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
      * finish managing the choices text
      */
     public void closeChoices() {
-        removeCollectionListeners(collectionfieldListener);
+        try {
+            removeCollectionListeners(collectionfieldListener);
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.topcomponent", Level.SEVERE).addMethodName(this, "closeChoices")
+                            .addExceptionMessage(ex).write();
+        }
         removeChoicesListeners();
     }
 
@@ -78,10 +86,15 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
     @Override
     protected  List<String> getChoicesText() {
         choiceText = new ArrayList<>();
-        choices = getChoicesEntities();
-        choices.stream().forEach((e) -> {
-            choiceText.add(convertEntitytoText(e));
-        });
+        try {
+            choices = getChoicesEntities();
+            choices.stream().forEach((e) -> {
+                choiceText.add(convertEntitytoText(e));
+            });
+        } catch (IOException ex) {
+             LogBuilder.create("nbpcglibrary.topcomponent", Level.SEVERE).addMethodName(this, "getChoicesText")
+                            .addExceptionMessage(ex).write();
+        }
         return choiceText;
     }
 
@@ -89,8 +102,9 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
      * Get the set of entities.
      *
      * @return the set of entities
+     * @throws java.io.IOException
      */
-    protected abstract List<E> getChoicesEntities();
+    protected abstract List<E> getChoicesEntities() throws IOException;
 
     /**
      * Get the Choice text from an entity.
@@ -120,23 +134,30 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
      * reference choice.
      *
      * @param listener the set change listener
+     * @throws java.io.IOException
      */
-    protected abstract void addCollectionListeners(Listener<SetChangeEventParams> listener);
+    protected abstract void addCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException;
 
     /**
      * remove a given listener from all parent collections which could affect
      * this reference choice.
      *
      * @param listener the set change listener
+     * @throws java.io.IOException
      */
-    protected abstract void removeCollectionListeners(Listener<SetChangeEventParams> listener);
+    protected abstract void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException;
 
     /**
      * hook to allow actions to take place before updating a combobox
      */
     @Override
     public final void preFieldUpdateAction() {
-        removeCollectionListeners(collectionfieldListener);
+        try {
+            removeCollectionListeners(collectionfieldListener);
+        } catch (IOException ex) {
+             LogBuilder.create("nbpcglibrary.topcomponent", Level.SEVERE).addMethodName(this, "preFieldUpdateAction")
+                            .addExceptionMessage(ex).write();
+        }
         removeChoicesListeners();
     }
     
@@ -146,7 +167,12 @@ public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> ext
     @Override
     public final void postFieldUpdateAction() {
         addChoicesListeners();
-        addCollectionListeners(collectionfieldListener);
+        try {
+            addCollectionListeners(collectionfieldListener);
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.topcomponent", Level.SEVERE).addMethodName(this, "postFieldUpdateAction")
+                            .addExceptionMessage(ex).write();
+        }
     }
     
     private class CollectionFieldListener extends Listener<SetChangeEventParams> {

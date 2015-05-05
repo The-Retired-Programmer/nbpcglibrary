@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +26,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
  * Manages the list of Entities - implements a sortable entity lists
@@ -50,8 +52,9 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
+     * @throws java.io.IOException
      */
-    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) {
+    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) throws IOException {
         super(name, field, columnname, columnvalue, emclass);
         this.field = field;
         childListener = new ChildListener(name);
@@ -65,8 +68,9 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
      * @param field field identifier
      * @param comparator the comparator to be used to sort the list
      * @param emclass the associated entity manager class
+     * @throws java.io.IOException
      */
-    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, Class<? extends EntityManagerRO> emclass) {
+    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, Class<? extends EntityManagerRO> emclass) throws IOException {
         super(name, field, emclass);
         this.field = field;
         childListener = new ChildListener(name);
@@ -75,21 +79,21 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
 
     /**
      * Sort the entity List
+     * @throws java.io.IOException
      */
-    protected final void sort() {
+    protected final void sort() throws IOException {
         List<E> el = super.get();
         java.util.Collections.sort(el, comparator);
-
         childList = new ArrayList<>();
-        el.stream().forEach((e) -> {
+        for (E e : el){
             childList.add(new EntityReference<>(name, e, em));
-        });
+        }
         unsorted = false;
         fireSetChange();
     }
 
     @Override
-    public List<E> get() {
+    public List<E> get() throws IOException {
         if (unsorted) {
             sort();
             List<E> el = super.get();
@@ -102,7 +106,7 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
     }
 
     @Override
-    public final void add(E e) {
+    public final void add(E e) throws IOException {
         int index = 0;
         e.addFieldListener(childListener);
         for (E l : get()) {
@@ -125,7 +129,7 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
     }
 
     @Override
-    public void restoreState() {
+    public void restoreState() throws IOException {
         super.get().stream().forEach((e) -> {
             e.removeFieldListener(childListener);
         });
@@ -141,7 +145,11 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
 
         @Override
         public void action(EntityFieldChangeEventParams<F> p) {
-            sort();
+            try {
+                sort();
+            } catch (IOException ex) {
+                throw new LogicException("IOException trapped: "+ex.getMessage());
+            }
         }
     }
 }

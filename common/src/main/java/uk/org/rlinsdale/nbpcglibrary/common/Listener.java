@@ -18,6 +18,9 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.common;
 
+import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
+
 /**
  * A Standard Listener - defined with a generic class for use as parameters
  * passed on action.

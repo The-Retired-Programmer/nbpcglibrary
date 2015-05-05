@@ -18,7 +18,10 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
+import java.io.IOException;
+import java.util.logging.Level;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEW;
@@ -37,7 +40,7 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventPa
 public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entity, F> extends EntityRW<E, P, F> {
 
     private final DBFieldsRWIndexed<E> dbfields;
-    private final DataAccessRW dataAccess;
+    private final EntityPersistenceManager entityPersistenceManager;
 
     /**
      * Constructor.
@@ -51,7 +54,7 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
     public EntityRWIndexed(String entityname, String icon, int id, EntityManagerRW<E,P> em, DBFieldsRWIndexed<E> dbfields) {
         super(entityname, icon, id, em, dbfields);
         this.dbfields = dbfields;
-        this.dataAccess = em.getDataAccess();
+        this.entityPersistenceManager = em.getEntityPersistenceManager();
     }
 
     @Override
@@ -59,7 +62,12 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
         EntityState oldState = getState();
         if (oldState == NEW || oldState == NEWEDITING) {
             if (dbfields.getIndex() == Integer.MAX_VALUE) {
-                dbfields.setIndex(dataAccess.getNextIdx());
+                try {
+                    dbfields.setIndex(entityPersistenceManager.findNextIdx());
+                } catch (IOException ex) {
+                     LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "save")
+                            .addExceptionMessage(ex).write();
+                }
             }
         }
         return super.save();
@@ -78,8 +86,9 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
      * Set the Index Field value.
      *
      * @param i the index value
+     * @throws java.io.IOException
      */
-    public final void setIndex(int i) {
+    public final void setIndex(int i) throws IOException {
         ensureEditing();
         dbfields.setIndex(i);
         fireFieldChange(IDX);

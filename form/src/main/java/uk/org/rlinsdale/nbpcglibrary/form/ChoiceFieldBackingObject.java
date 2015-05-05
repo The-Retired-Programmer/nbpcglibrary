@@ -27,6 +27,10 @@ import java.util.List;
  */
 public abstract class ChoiceFieldBackingObject implements FieldBackingObject<String> {
 
+    /**
+     *
+     * @return
+     */
     public abstract List<String> getChoices();
 
     // normally there is no need for validation on choices - provide default null implementations

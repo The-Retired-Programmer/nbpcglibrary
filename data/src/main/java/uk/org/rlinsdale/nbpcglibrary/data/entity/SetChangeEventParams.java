@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import uk.org.rlinsdale.nbpcglibrary.common.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**

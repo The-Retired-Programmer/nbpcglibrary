@@ -10,19 +10,24 @@
     
     <groupId>uk.org.rlinsdale</groupId>
     <artifactId>nbpcglibrary</artifactId>
-    <version>3.1.6</version>
+    <version>3.1.7</version>
     <packaging>pom</packaging>
     <name>NBPCG Library</name>
     
     <modules>
+        <module>api</module>
         <module>data</module>
+        <module>localdatabaseaccess</module>
         <module>form</module>
         <module>icons</module>
         <module>mysql</module>
         <module>node</module>
         <module>common</module>
+        <module>json</module>
         <module>topcomponent</module>
         <module>annotations</module>
+        <module>remotedb</module>
+        <module>remoteclient</module>
     </modules>
     
 </project>

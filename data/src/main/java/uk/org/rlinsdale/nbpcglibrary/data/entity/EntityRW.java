@@ -23,18 +23,19 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.netbeans.spi.actions.AbstractSavable;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
-import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRW;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.DBENTITY;
@@ -58,7 +59,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
 public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends EntityRO<F> {
 
     private final DBFieldsRW<E> dbfields;
-    private final DataAccessRW dataAccess;
+    private final EntityPersistenceManager entityPersistenceManager;
     private final Event<IdChangeEventParams> idChangeEvent;
     private final EntityManagerRW<E, P> em;
     private final String entityname;
@@ -75,13 +76,13 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
      * @param dbfields the entity fields
      */
     public EntityRW(String entityname, String icon, int id, EntityManagerRW<E, P> em, DBFieldsRW<E> dbfields) {
-        this(entityname, icon, id, em, em.getDataAccess(), dbfields);
+        this(entityname, icon, id, em, em.getEntityPersistenceManager(), dbfields);
     }
 
-    private EntityRW(String entityname, String icon, int id, EntityManagerRW<E, P> em, DataAccessRW dataAccess, DBFieldsRW<E> dbfields) {
-        super(entityname, icon, id, dataAccess, dbfields);
+    private EntityRW(String entityname, String icon, int id, EntityManagerRW<E, P> em, EntityPersistenceManager entityPersistenceManager, DBFieldsRW<E> dbfields) {
+        super(entityname, icon, id, entityPersistenceManager, dbfields);
         this.em = em;
-        this.dataAccess = dataAccess;
+        this.entityPersistenceManager = entityPersistenceManager;
         this.dbfields = dbfields;
         idChangeEvent = new Event<>(entityname);
         this.entityname = entityname;
@@ -128,77 +129,76 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
     /**
      * Save this entity to entity storage.
      *
-     * @return true
+     * @return true if save is successful
      */
     public boolean save() {
-        Map<String, Object> map;
-        EntityState oldState = getState();
-        switch (oldState) {
-            case DBENTITY:
-                return true; //we don't need to do anything as this is a straight copy of a db entity
-            case REMOVED:
-                return false;
-            case NEW:
-            case NEWEDITING:
-                if (!checkRules()) {
+        try {
+            JsonObjectBuilder job = Json.createObjectBuilder();
+            EntityState oldState = getState();
+            switch (oldState) {
+                case DBENTITY:
+                    return true; //we don't need to do anything as this is a straight copy of a db entity
+                case REMOVED:
                     return false;
-                }
-                try {
-                    map = new HashMap<>();
-                    _values(map);
-                    dbfields.values(map);
-                    em.persistTransient((E) this, dataAccess.insert(map));
+                case NEW:
+                case NEWEDITING:
+                    if (!checkRules()) {
+                        return false;
+                    }
+                    _values(job);
+                    dbfields.values(job);
+                    em.persistTransient((E) this, entityPersistenceManager.insert(job.build()));
                     idChangeEvent.fire(new IdChangeEventParams());
                     setState(DBENTITY);
-                } catch (LogicException ex) {
-                    return false;
-                }
-                break;
-            case DBENTITYEDITING:
-                if (!checkRules()) {
-                    return false;
-                }
-                try {
-                    map = new HashMap<>();
-                    _diffs(map);
-                    dbfields.diffs(map);
-                    if (!map.isEmpty()) {
-                        dataAccess.update(getId(), map);
+                    break;
+                case DBENTITYEDITING:
+                    if (!checkRules()) {
+                        return false;
+                    }
+                    _diffs(job);
+                    dbfields.diffs(job);
+                    JsonObject jo = job.build();
+                    if (!jo.isEmpty()) {
+                        entityPersistenceManager.update(getId(), jo);
                     }
                     setState(DBENTITY);
-                } catch (LogicException ex) {
-                    return false;
-                }
-                break;
-            default:
-                if (!checkRules()) {
-                    return false;
-                }
+                    break;
+                default:
+                    if (!checkRules()) {
+                        return false;
+                    }
+            }
+            fireStateChange(SAVE, oldState, DBENTITY);
+            return true;
+        } catch (IOException | LogicException ex) {
+            return false;
         }
-        fireStateChange(SAVE, oldState, DBENTITY);
-        return true;
     }
 
     /**
      * Add all field values to the given map.
      *
-     * @param map the map into which field names (keys) and field values are to
-     * be inserted.
+     * @param job a JasonObjectBuilder into which field names (keys) and field
+     * values are to be inserted.
+     * @throws IOException if problem obtaining / parsing data
      */
-    abstract protected void _values(Map<String, Object> map);
+    abstract protected void _values(JsonObjectBuilder job) throws IOException;
 
     /**
      * Add any modified field values to the given map.
      *
-     * @param map the map into which field names (keys) and field values are to
-     * be inserted.
+     * @param job a JasonObjectBuilder into which field names (keys) and field
+     * values are to be inserted.
+     * @throws IOException if problem obtaining / parsing data
      */
-    abstract protected void _diffs(Map<String, Object> map);
+    abstract protected void _diffs(JsonObjectBuilder job) throws IOException;
 
     /**
      * Delete this Entity.
+     *
+     * @throws IOException if problem obtaining / parsing data
      */
-    public final void remove() {
+    public final void remove() throws IOException {
         EntityState oldState = getState();
         switch (oldState) {
             case NEW:
@@ -211,7 +211,7 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
             case DBENTITY:
             case DBENTITYEDITING:
                 _remove();
-                dataAccess.delete(getId());
+                entityPersistenceManager.delete(getId());
                 em.removeFromCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
@@ -224,24 +224,27 @@ public abstract class EntityRW<E extends EntityRW, P extends Entity, F> extends 
     /**
      * Complete any entity specific removal actions prior to entity deletion.
      * Basic use case: remove any linkage to parent entities.
+     *
+     * @throws java.io.IOException
      */
-    abstract protected void _remove();
+    abstract protected void _remove() throws IOException;
 
     /**
      * Copy entity fields into this entity.
      *
      * @param e the copy source entity
+     * @throws java.io.IOException
      */
-    public final void copy(E e) {
+    public final void copy(E e) throws IOException {
         EntityState oldState = getState();
-        if (oldState == NEW || oldState == NEWEDITING ) {
+        if (oldState == NEW || oldState == NEWEDITING) {
             _copy(e);
             dbfields.copy(e);
             ensureEditing();
             fireFieldChange(ALL);
             return;
         }
-        throw new LogicException("Should not be trying to copy an entity in " + oldState + " state");
+        throw new IOException("Should not be trying to copy an entity in " + oldState + " state");
     }
 
     /**

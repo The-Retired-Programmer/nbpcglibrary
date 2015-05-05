@@ -18,32 +18,28 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.IOException;
 import java.util.logging.Level;
+import javax.json.JsonObject;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
-import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
-import uk.org.rlinsdale.nbpcglibrary.data.dataservice.ResultSetLoader;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.DBENTITY;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.DBENTITYEDITING;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.INIT;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEW;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEWEDITING;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.*;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
+import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ALL;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.CREATE;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.EDIT;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.LOAD;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.RESET;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ALL;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
  * The Basic Read-Only (uneditable) Entity Abstract Class.
@@ -61,7 +57,7 @@ public abstract class EntityRO<F> extends Entity {
     private EntityState state = INIT;
     private int id;
     private final DBFieldsRO dbfields;
-    private final DataAccessRO dataAccess;
+    private final EntityPersistenceManager dataAccess;
     private final String entityname;
 
     /**
@@ -74,7 +70,7 @@ public abstract class EntityRO<F> extends Entity {
      * @param dbfields the entity fields
      */
     public EntityRO(String entityname, String icon, int id, EntityManagerRO em, DBFieldsRO dbfields) {
-        this(entityname, icon, id, em.getDataAccess(), dbfields);
+        this(entityname, icon, id, em.getEntityPersistenceManager(), dbfields);
     }
 
     /**
@@ -87,7 +83,7 @@ public abstract class EntityRO<F> extends Entity {
      * @param dbfields the entity fields
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    protected EntityRO(String entityname, String icon, int id, DataAccessRO dataAccess, DBFieldsRO dbfields) {
+    protected EntityRO(String entityname, String icon, int id, EntityPersistenceManager dataAccess, DBFieldsRO dbfields) {
         super(entityname, icon);
         this.id = id;
         this.dataAccess = dataAccess;
@@ -184,7 +180,7 @@ public abstract class EntityRO<F> extends Entity {
     protected final void fireCommonFieldChange(CommonEntityField field, boolean formatOK) {
         fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, formatOK));
     }
-    
+
     /**
      * Fire actions on all StateChange listeners.
      *
@@ -223,6 +219,9 @@ public abstract class EntityRO<F> extends Entity {
         nameChangeEvent.removeListener(listener);
     }
 
+    /**
+     *
+     */
     protected void nameListenerFire() {
         nameChangeEvent.fire(new SimpleEventParams());
     }
@@ -245,6 +244,9 @@ public abstract class EntityRO<F> extends Entity {
         titleChangeEvent.removeListener(listener);
     }
 
+    /**
+     *
+     */
     protected void titleListenerFire() {
         titleChangeEvent.fire(new SimpleEventParams());
     }
@@ -314,7 +316,7 @@ public abstract class EntityRO<F> extends Entity {
     abstract protected void _saveState();
 
     @Override
-    public final void cancelEdit() {
+    public final void cancelEdit() throws IOException {
         EntityState oldState = state;
         boolean wasEditing = false;
         switch (state) {
@@ -344,44 +346,41 @@ public abstract class EntityRO<F> extends Entity {
      * @param id the entity Id
      */
     protected void load(int id) {
-        dataAccess.load(id, new EntityROLoader());
+        try {
+            loader(dataAccess.get(id));
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", id)
+                    .addExceptionMessage(ex).write();
+        }
         fireFieldChangeAtLoad(ALL);
     }
 
-    private class EntityROLoader implements ResultSetLoader, HasInstanceDescription {
-
-        @Override
-        public void load(ResultSet rs) {
-            EntityState oldState = getState();
-            if (oldState == NEW) {
-                try {
-                    setId(rs.getInt("id"));
-                    dbfields.load(rs);
-                    _load(rs);
-                } catch (SQLException ex) {
-                    LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", rs)
-                            .addExceptionMessage(ex).write();
-                }
-                setState(DBENTITY);
-                fireStateChange(LOAD, oldState, DBENTITY);
-                return;
+    private void loader(JsonObject data) throws IOException {
+        LogBuilder.writeLog("nbpcglibrary.data", this, "loader", data.toString());
+        EntityState oldState = getState();
+        if (oldState == NEW) {
+            try {
+                setId(JsonUtil.getObjectKeyIntegerValue(data, "id"));
+                dbfields.load(data);
+                _load(data);
+            } catch (JsonConversionException ex) {
+                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", data.toString())
+                        .addExceptionMessage(ex).write();
             }
-            throw new LogicException("Should not be trying to load an entity in " + oldState + " state");
+            setState(DBENTITY);
+            fireStateChange(LOAD, oldState, DBENTITY);
+            return;
         }
-
-        @Override
-        public String instanceDescription() {
-            return LogBuilder.instanceDescription(this, entityname);
-        }
+        throw new IOException("Should not be trying to load an entity in " + oldState + " state");
     }
 
     /**
-     * Load a resultset into the entity fields.
+     * Load Json format data into the entity fields.
      *
-     * @param rs the resultset
-     * @throws SQLException if problems
+     * @param data the data to be inserted
+     * @throws IOException if bad data provided
      */
-    abstract protected void _load(ResultSet rs) throws SQLException;
+    abstract protected void _load(JsonObject data) throws IOException;
 
     /**
      * get the key string which will be used in when sorting this entity

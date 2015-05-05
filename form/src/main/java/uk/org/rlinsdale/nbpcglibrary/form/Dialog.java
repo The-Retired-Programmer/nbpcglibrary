@@ -27,7 +27,7 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult;
 import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.CANCELLED;

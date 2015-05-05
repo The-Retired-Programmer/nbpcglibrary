@@ -18,10 +18,11 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dbfields.idandstamp;
 
-import java.util.Map;
+import java.io.IOException;
+import javax.json.JsonObjectBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRW;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
-import uk.org.rlinsdale.nbpcglibrary.common.Timestamp;
+import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
 
 /**
  * Handles Read-Write entity field management, for a entity which includes a Id and
@@ -33,21 +34,19 @@ import uk.org.rlinsdale.nbpcglibrary.common.Timestamp;
 public class DBFieldsRWIdandstamp<E extends EntityRW> extends DBFieldsROIdandstamp implements DBFieldsRW<E> {
 
     @Override
-    public void diffs(Map<String, Object> map) {
-        if (!map.isEmpty()) {
+    public void diffs(JsonObjectBuilder job) throws IOException {
             updatedon.setDateUsingSQLString(new Timestamp().toSQLString());
-            map.put("updatedon", updatedon);
-            map.put("updatedby", updatedby);
-        }
+            job.add("updatedon", updatedon.toSQLString());
+            job.add("updatedby", updatedby);
     }
 
     @Override
-    public void values(Map<String, Object> map) {
+    public void values(JsonObjectBuilder job) throws IOException {
         updatedon.setDateUsingSQLString(new Timestamp().toSQLString());
-        map.put("updatedon", updatedon);
-        map.put("updatedby", updatedby);
-        map.put("createdon", updatedon);
-        map.put("createdby", updatedby);
+        job.add("updatedon", updatedon.toSQLString());
+        job.add("updatedby", updatedby);
+        job.add("createdon", updatedon.toSQLString());
+        job.add("createdby", updatedby);
     }
 
     @Override

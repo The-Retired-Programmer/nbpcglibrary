@@ -46,10 +46,16 @@ public class LibraryOnStop implements Callable<Boolean> {
     
     private static int outstandingSavableRegistrations = 0;
     
+    /**
+     *
+     */
     public static void incRegisterOutstanding() {
         outstandingSavableRegistrations++;
     }
     
+    /**
+     *
+     */
     public static void decRegisterOutstanding() {
         outstandingSavableRegistrations--;
     }

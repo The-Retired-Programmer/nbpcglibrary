@@ -18,11 +18,12 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
 /**
  * A collection of a setField of fields - for use in defining the fields content
@@ -60,6 +61,10 @@ public abstract class FieldsDef implements HasInstanceDescription {
         return LogBuilder.instanceDescription(this);
     }
 
+    /**
+     *
+     * @return
+     */
     public JComponent[] getErrorMarkerRow() {
         return new JComponent[]{
             null,
@@ -111,8 +116,9 @@ public abstract class FieldsDef implements HasInstanceDescription {
      * persistent storage)
      *
      * @return true if save was successful
+     * @throws java.io.IOException
      */
-    public abstract boolean save();
+    public abstract boolean save() throws IOException;
 
     
     String[] getParameters() {
@@ -148,6 +154,10 @@ public abstract class FieldsDef implements HasInstanceDescription {
         return valid;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean checkFieldsDefRules() {
         if (backingObject != null) {
             boolean res = backingObject.checkRules();

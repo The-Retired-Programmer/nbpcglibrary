@@ -18,6 +18,10 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import org.openide.util.Exceptions;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
@@ -30,7 +34,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  */
 public abstract class TreeNodeRO<E extends EntityRO> extends BasicNode<E> {
 
-    private final EntityReference<E> eref;
+    private EntityReference<E> eref;
 
     /**
      * Constructor.
@@ -41,9 +45,15 @@ public abstract class TreeNodeRO<E extends EntityRO> extends BasicNode<E> {
      * @param emclass the entity manager class
      * @param allowedPaste allowed paste actions
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     protected TreeNodeRO(String nodename, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRO> emclass, DataFlavorAndAction[] allowedPaste) {
         super(cf, allowedPaste);
-        eref = new EntityReference<>(nodename, e, emclass);
+        try {
+            eref = new EntityReference<>(nodename, e, emclass);
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addConstructorName(this, nodename, e, cf)
+                            .addExceptionMessage(ex).write();
+        }
     }
 
     /**
@@ -55,16 +65,35 @@ public abstract class TreeNodeRO<E extends EntityRO> extends BasicNode<E> {
      */
     protected TreeNodeRO(String nodename, E e, Class<? extends EntityManagerRO> emclass) {
         super();
-        eref = new EntityReference<>(nodename, e, emclass);
+        try {
+            eref = new EntityReference<>(nodename, e, emclass);
+        } catch (IOException ex) {
+           LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addConstructorName(this, nodename, e)
+                            .addExceptionMessage(ex).write();
+        }
     }
 
     @Override
     public E getEntity() {
-        return eref.get();
+        try {
+            return eref.get();
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "getEntity")
+                            .addExceptionMessage(ex).write();
+            return null;
+        }
     }
 
+    /**
+     *
+     */
     public void setNoEntity() {
-        eref.set();
+        try {
+            eref.set();
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "setNoEntity")
+                            .addExceptionMessage(ex).write();
+        }
     }
 
     /**

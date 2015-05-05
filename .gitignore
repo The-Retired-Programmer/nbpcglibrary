@@ -21,3 +21,12 @@
 /mysql/target/
 /node/target/
 /annotations/target/
+/remotedb/target/
+/localdb/target/
+/localdbIdkeyauto/target/
+/localdbidkeyauto/target/
+/json/target/
+/api/target/
+/localdatabaseaccess/target/
+/remotedbclient/target/
+/remoteclient/target/

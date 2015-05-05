@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -25,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
-import uk.org.rlinsdale.nbpcglibrary.data.dataaccess.DataAccessRO;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -64,7 +65,7 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
      * The LRU cache.
      */
     protected final LRUCache<E> lrucache;
-    private DataAccessRO dataAccess;
+    private EntityPersistenceManager entityPersistanceManager;
 
     /**
      * Constructor.
@@ -100,8 +101,9 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
      *
      * @param id the entity Id
      * @return the entity
+     * @throws java.io.IOException
      */
-    public final synchronized E get(int id) {
+    public final synchronized E get(int id) throws IOException {
         if (id <= 0) {
             throw new LogicException("Cache Get() Failure (class=" + name + ";id=" + id + ")");
         }
@@ -129,7 +131,7 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
                     .addMsg("miss on Cache").write();
         }
-        e = _createNewEntity(id);
+        e = createNewEntity(id);
         e.load(id);
         insertIntoCache(id, e);
         LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
@@ -142,8 +144,9 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
      *
      * @param id the entity id
      * @return the created entity
+     * @throws java.io.IOException
      */
-    abstract protected E _createNewEntity(int id);
+    abstract protected E createNewEntity(int id) throws IOException;
 
     private void freeReleasedEntries() {
         Reference<? extends E> r;
@@ -183,23 +186,22 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
         throw new LogicException("Remove from Cache Failure (class=" + name + ";id=" + id + ")");
     }
 
-    // and the service function to provide access to the data access object for the entity class
     /**
-     * Get the DataAccess Object for this Entity Class.
+     * Get the EntityPersistenceManager for this Entity Class.
      *
-     * @return the DataAccess object
+     * @return the EntityPersistenceManager
      */
-    public DataAccessRO getDataAccess() {
-        if (dataAccess == null) {
-            dataAccess = _createDataAccess();
+    public EntityPersistenceManager getEntityPersistenceManager() {
+        if (entityPersistanceManager == null) {
+                entityPersistanceManager = createEntityPersistenceManager();
         }
-        return dataAccess;
+        return entityPersistanceManager;
     }
 
     /**
-     * Create the DataAccess Object for this Entity Class.
+     * Create the EntityPersistenceManager for this Entity Class.
      *
-     * @return the DataAccess object
+     * @return the EntityPersistenceManager
      */
-    abstract protected DataAccessRO _createDataAccess();
+    abstract protected EntityPersistenceManager createEntityPersistenceManager();
 }

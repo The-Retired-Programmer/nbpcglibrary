@@ -22,7 +22,7 @@ import java.lang.ref.WeakReference;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
 /**
  * Abstract Class representing a Field on a Form

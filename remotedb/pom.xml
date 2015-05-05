@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>uk.org.rlinsdale.poms</groupId>
+        <artifactId>nb-library-module</artifactId>
+        <version>1.0.2</version>
+    </parent>
+
+    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+    <artifactId>remotedb</artifactId>
+    <version>3.1.7</version>
+    <packaging>jar</packaging>
+
+    <name>NBPCG Remote Database Support Library</name>
+    <description>Remote Database access modules for applications generated using the NetBeans Platform Code Generator(NBPCG)</description>
+    
+    <dependencies>
+        <dependency>
+            <artifactId>api</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>json</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.json</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>uk.org.rlinsdale.nbpcglibrary.remotedb</publicPackage>
+                    </publicPackages>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

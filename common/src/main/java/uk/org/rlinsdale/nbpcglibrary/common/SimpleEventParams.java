@@ -18,6 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.common;
 
+import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
+
 /**
  * The simplest implementation of listener parameters - an empty set; so a
  * shared static singleton is used.

@@ -18,6 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.common;
 
+import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
+import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import java.awt.EventQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -67,6 +69,7 @@ public class Event<P extends EventParams> implements HasInstanceDescription {
      *
      * @param description the listening's descriptive name
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public Event(String description) {
         this.description = description;
         LogBuilder.writeConstructorLog("nbpcglibrary.common", this, description);

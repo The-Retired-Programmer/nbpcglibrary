@@ -10,7 +10,7 @@
 
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>topcomponent</artifactId>
-    <version>3.1.6</version>
+    <version>3.1.7</version>
     <packaging>nbm</packaging>
 
     <name>NBPCG TopComponent Support Library</name>
@@ -46,6 +46,11 @@
         </dependency>
         <dependency>
             <artifactId>common</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <artifactId>api</artifactId>
             <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
             <version>${project.version}</version>
         </dependency>

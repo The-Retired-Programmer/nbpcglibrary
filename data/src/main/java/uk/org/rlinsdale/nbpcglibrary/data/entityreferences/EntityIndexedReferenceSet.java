@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
@@ -42,8 +43,9 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends Ent
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
+     * @throws java.io.IOException
      */
-    public EntityIndexedReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRW> emclass) {
+    public EntityIndexedReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRW> emclass) throws IOException {
         super(name, field, columnname, columnvalue, emclass);
     }
 
@@ -53,8 +55,9 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends Ent
      * @param name the set name (for reporting)
      * @param field field identifier
      * @param emclass the associated entity manager class
+     * @throws java.io.IOException
      */
-    public EntityIndexedReferenceSet(String name, F field, Class<? extends EntityManagerRW> emclass) {
+    public EntityIndexedReferenceSet(String name, F field, Class<? extends EntityManagerRW> emclass) throws IOException {
         super(name, field, emclass);
     }
 
@@ -93,8 +96,9 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends Ent
 
     /**
      * Persist the reordering.
+     * @throws java.io.IOException
      */
-    public void persistReorder() {
+    public void persistReorder() throws IOException {
         List<E> el = get();
         for (int i = 0; i < el.size(); i++) {
             E e = el.get(i);

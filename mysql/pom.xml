@@ -10,7 +10,7 @@
 
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>mysql</artifactId>
-    <version>3.1.6</version>
+    <version>3.1.7</version>
     <packaging>nbm</packaging>
 
     <name>NBPCG MySQL</name>
@@ -24,11 +24,16 @@
         </dependency>
         <dependency>
             <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
-            <artifactId>data</artifactId>
+            <artifactId>localdatabaseaccess</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <artifactId>common</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>api</artifactId>
             <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
             <version>${project.version}</version>
         </dependency>
@@ -40,6 +45,17 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
+        </dependency>
+        <dependency>
+            <artifactId>json</artifactId>
+            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
