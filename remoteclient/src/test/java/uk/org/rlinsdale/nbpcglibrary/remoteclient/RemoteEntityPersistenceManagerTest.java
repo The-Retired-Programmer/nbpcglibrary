@@ -52,7 +52,7 @@ public class RemoteEntityPersistenceManagerTest {
             };
             Properties p = new Properties();
             p.setProperty("key", "authentication2");
-            p.setProperty("connection", "http://localhost:8080/RemoteAuthentication2");
+            p.setProperty("connection", "http://localhost:8080/remoteauthentication2");
             p.setProperty("entitypersistencemanagertype", "remote");
             p.setProperty("dataaccessmanagertype", "remote");
             EntityPersistenceManagerManager.set(p, entitynames);
