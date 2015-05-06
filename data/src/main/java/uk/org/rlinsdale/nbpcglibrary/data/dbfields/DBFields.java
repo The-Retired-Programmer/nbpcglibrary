@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,17 +19,37 @@
 package uk.org.rlinsdale.nbpcglibrary.data.dbfields;
 
 import java.io.IOException;
+import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 
 /**
- * Interface for handling entity field states for a read-write entity.
+ * Interface for handling entity field states for an entity.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <E> the entity class
+ * @param <E> the Entity this is being applied to
  */
-public interface DBFieldsRW<E extends EntityRW> extends DBFieldsRO {
+public interface DBFields<E extends Entity> {
 
+    /**
+     * Restore the State (from the last SaveState())
+     */
+    public void restoreState();
+
+    /**
+     * Save the State.
+     */
+    public void saveState();
+
+    /**
+     * Use the Json formatted to insert the data into the entity
+     * fields.
+     *
+     * @param data the Json formatted data
+     * @throws IOException
+     */
+    public void load(JsonObject data) throws IOException;
+    
     /**
      * Get a collection of all fields (and their values), whose data values have
      * changed.

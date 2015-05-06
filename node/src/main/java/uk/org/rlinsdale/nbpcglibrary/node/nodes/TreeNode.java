@@ -20,25 +20,30 @@ package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import java.util.logging.Level;
 import org.openide.util.datatransfer.ExTransferable;
+import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
 
 /**
  * Read-Only Tree Node Abstract Class
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
- * @param <F> the Entity field enum class
+ * @param <P> the parent Entity Class
+ * @param <F> the Entity Field enum class
  */
-public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
+public abstract class TreeNode<E extends Entity, P extends CoreEntity, F> extends BasicNode<E> {
 
+    private EntityReference<E, P> eref;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
     private EntityNameChangeListener nameListener;
@@ -54,9 +59,10 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
      * @param allowedPaste allowed paste actions
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    protected TreeNodeRW(String nodename, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
-        super(nodename, e, cf, emclass, allowedPaste);
-        commonConstructor(nodename, e, isCutDestroyEnabled);
+    @SuppressWarnings("LeakingThisInConstructor")
+    protected TreeNode(String nodename, E e, BasicChildFactory<E, P> cf, Class<? extends EntityManager> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
+        super(cf, allowedPaste);
+        commonConstructor(nodename, e, emclass, isCutDestroyEnabled);
     }
 
     /**
@@ -67,17 +73,47 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
      * @param emclass the entity manager class
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    protected TreeNodeRW(String nodename, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
-        super(nodename, e, emclass);
-        commonConstructor(nodename, e, isCutDestroyEnabled);
+    protected TreeNode(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
+        super();
+        commonConstructor(nodename, e, emclass, isCutDestroyEnabled);
+        
     }
-
-    private void commonConstructor(String nodename, E e, boolean isCutDestroyEnabled) {
+    
+     private void commonConstructor(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
+         try {
+            eref = new EntityReference<>(nodename, e, emclass);
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addConstructorName(this, nodename, e)
+                    .addExceptionMessage(ex).write();
+        }
         this.isCutDestroyEnabled = isCutDestroyEnabled;
         String desc = e.instanceDescription();
         e.addStateListener(stateListener = new EntityStateChangeListener(desc));
         e.addFieldListener(fieldListener = new EntityFieldChangeListener(desc));
         e.addNameListener(nameListener = new EntityNameChangeListener(desc));
+    }
+
+    @Override
+    public E getEntity() {
+        try {
+            return eref.get();
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "getEntity")
+                    .addExceptionMessage(ex).write();
+            return null;
+        }
+    }
+
+    /**
+     *
+     */
+    public void setNoEntity() {
+        try {
+            eref.set();
+        } catch (IOException ex) {
+            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "setNoEntity")
+                    .addExceptionMessage(ex).write();
+        }
     }
 
     private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
@@ -124,7 +160,7 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
             if (f != null) {
                 _processFieldChange(f);
             }
-            CommonEntityField c = p.getCommon();
+            EntityFieldChangeEventParams.CommonEntityField c = p.getCommon();
             if (c != null) {
                 _processCommonFieldChange(c);
             }
@@ -144,20 +180,6 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
             nameChange();
         }
     }
-
-    /**
-     * Process field changes.
-     *
-     * @param field the field Id
-     */
-    protected abstract void _processFieldChange(F field);
-
-    /**
-     * Process field changes.
-     *
-     * @param field the field Id
-     */
-    protected abstract void _processCommonFieldChange(CommonEntityField field);
 
     /**
      * Fire the Property Change.
@@ -232,13 +254,37 @@ public abstract class TreeNodeRW<E extends EntityRW, F> extends TreeNodeRO<E> {
 
     /**
      * Cut and Paste - removal of Node action.
+     *
      * @throws java.io.IOException
      */
-    abstract protected void _cutAndPasteRemove()  throws IOException;
+    abstract protected void _cutAndPasteRemove() throws IOException;
 
     /**
      * Delete - removal of Node action.
+     *
      * @throws java.io.IOException
      */
     abstract protected void _deleteRemove() throws IOException;
+
+    /**
+     * Process field changes.
+     *
+     * @param field the field Id
+     */
+    protected abstract void _processFieldChange(F field);
+
+    /**
+     * Process field changes.
+     *
+     * @param field the field Id
+     */
+    protected abstract void _processCommonFieldChange(EntityFieldChangeEventParams.CommonEntityField field);
+
+    /**
+     * Get the display title for this node.
+     *
+     * @return the title
+     */
+    public abstract String getDisplayTitle();
+
 }

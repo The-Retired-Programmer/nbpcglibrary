@@ -23,8 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 import uk.org.rlinsdale.nbpcglibrary.node.ImageFileFinder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import org.openide.cookies.InstanceCookie;
@@ -33,15 +32,18 @@ import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 
 /**
  * Read-Write Icon Node Abstract Class
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
+ * @param <P> the parent Entity Class
  * @param <F> the Entity Field enum class
  */
-public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F> {
+public abstract class IconNode<E extends Entity, P extends CoreEntity, F> extends TreeNode<E, P, F> {
 
     private final ImageFileFinder<E> imagefilefinder;
     private final String nodename;
@@ -56,7 +58,7 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
      * @param allowedPaste allowed paste actions
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    public IconNodeRW(String nodename, E e, BasicChildFactory<E> cf, Class<? extends EntityManagerRW> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
+    public IconNode(String nodename, E e, BasicChildFactory<E, P> cf, Class<? extends EntityManager> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
         super(nodename, e, cf, emclass, allowedPaste, isCutDestroyEnabled);
         this.nodename = nodename;
         imagefilefinder = getImageFileFinder(nodename);
@@ -70,7 +72,7 @@ public abstract class IconNodeRW<E extends EntityRW, F> extends TreeNodeRW<E, F>
      * @param emclass the entity manager class
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
-    protected IconNodeRW(String nodename, E e, Class<? extends EntityManagerRW> emclass, boolean isCutDestroyEnabled) {
+    protected IconNode(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
         super(nodename, e, emclass, isCutDestroyEnabled);
         this.nodename = nodename;
         imagefilefinder = getImageFileFinder(nodename);

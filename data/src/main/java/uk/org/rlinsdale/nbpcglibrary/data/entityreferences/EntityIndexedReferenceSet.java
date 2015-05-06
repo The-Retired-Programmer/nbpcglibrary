@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,18 +21,20 @@ package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRW;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRWIndexed;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityIndexed;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 
 /**
  * Manages the list of Entities - implements a re-orderable entity lists
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
+ * @param <P> the parent entity
  * @param <F> the Fields enum class
  */
-public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends EntityReferenceSet<E, F> {
+public class EntityIndexedReferenceSet<E extends EntityIndexed, P extends CoreEntity, F> extends EntityReferenceSet<E, P, F> {
 
     /**
      * Constructor.
@@ -45,7 +47,7 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends Ent
      * @param emclass the associated entity manager class
      * @throws java.io.IOException
      */
-    public EntityIndexedReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRW> emclass) throws IOException {
+    public EntityIndexedReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, columnname, columnvalue, emclass);
     }
 
@@ -57,7 +59,7 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends Ent
      * @param emclass the associated entity manager class
      * @throws java.io.IOException
      */
-    public EntityIndexedReferenceSet(String name, F field, Class<? extends EntityManagerRW> emclass) throws IOException {
+    public EntityIndexedReferenceSet(String name, F field, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, emclass);
     }
 
@@ -82,7 +84,7 @@ public class EntityIndexedReferenceSet<E extends EntityRWIndexed, F> extends Ent
                 permin++;
             }
         }
-        List<EntityReference<E>> reordered = new ArrayList<>(clsize);
+        List<EntityReference<E, P>> reordered = new ArrayList<>(clsize);
         for (int i = 0; i < clsize; i++) {
             reordered.add(null);
         }

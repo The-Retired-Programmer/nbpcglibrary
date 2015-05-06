@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,17 +22,17 @@ import java.io.IOException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRWIndexed;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityIndexed;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
- * Handles Read-Write entity field management, for a entity which includes a Id,
+ * Handles Entity field management, for a entity which includes a Id,
  * ordering index field and standardised timestamp (created and updated).
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
  */
-public class DBFieldsRWIndexedIdandstamp<E extends EntityRWIndexed> extends DBFieldsRWIdandstamp<E> implements DBFieldsRWIndexed<E> {
+public class DBFieldsIndexedIdandstamp<E extends EntityIndexed> extends DBFieldsIdandstamp<E> implements DBFieldsRWIndexed<E> {
 
     private int idx = Integer.MAX_VALUE;
     private int idxOriginal;

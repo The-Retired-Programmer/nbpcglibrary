@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
-import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import org.openide.nodes.ChildFactory;
@@ -27,9 +27,9 @@ import org.openide.nodes.ChildFactory;
  * Root ChildFactory support
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <E> the Parent Entity Class
+ * @param <E> the Parent CoreEntity Class
  */
-public abstract class RootChildFactory<E extends Entity> extends ChildFactory<Entity> {
+public abstract class RootChildFactory<E extends CoreEntity> extends ChildFactory<CoreEntity> {
 
     private final E parentEntity;
 

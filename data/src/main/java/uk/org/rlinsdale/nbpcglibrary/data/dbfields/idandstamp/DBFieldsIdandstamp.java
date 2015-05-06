@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,18 +20,21 @@ package uk.org.rlinsdale.nbpcglibrary.data.dbfields.idandstamp;
 
 import java.io.IOException;
 import javax.json.JsonObject;
-import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRO;
+import javax.json.JsonObjectBuilder;
+import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFields;
 import uk.org.rlinsdale.nbpcglibrary.common.Settings;
 import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
- * Handles Read-Only entity field management, for a entity which includes a Id and
+ * Handles Entity field management, for a entity which includes a Id and
  * standardised timestamp (created and updated).
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity class
  */
-public class DBFieldsROIdandstamp implements DBFieldsRO {
+public class DBFieldsIdandstamp<E extends Entity> implements DBFields<E> {
 
     private String createdby;
     private final Timestamp createdon;
@@ -49,7 +52,7 @@ public class DBFieldsROIdandstamp implements DBFieldsRO {
     /**
      * Constructor.
      */
-    public DBFieldsROIdandstamp() {
+    public DBFieldsIdandstamp() {
         String usercode = Settings.get("Usercode", "????");
         createdon = new Timestamp();
         updatedon = new Timestamp();
@@ -71,5 +74,25 @@ public class DBFieldsROIdandstamp implements DBFieldsRO {
 
     @Override
     public void saveState() {
+    }
+    
+    @Override
+    public void diffs(JsonObjectBuilder job) throws IOException {
+            updatedon.setDateUsingSQLString(new Timestamp().toSQLString());
+            job.add("updatedon", updatedon.toSQLString());
+            job.add("updatedby", updatedby);
+    }
+
+    @Override
+    public void values(JsonObjectBuilder job) throws IOException {
+        updatedon.setDateUsingSQLString(new Timestamp().toSQLString());
+        job.add("updatedon", updatedon.toSQLString());
+        job.add("updatedby", updatedby);
+        job.add("createdon", updatedon.toSQLString());
+        job.add("createdby", updatedby);
+    }
+
+    @Override
+    public final void copy(E source) {
     }
 }

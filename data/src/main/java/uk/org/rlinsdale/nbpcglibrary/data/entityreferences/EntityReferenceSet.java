@@ -23,14 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonArray;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import org.openide.util.Lookup;
 import uk.org.rlinsdale.nbpcglibrary.common.Event.ListenerMode;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
@@ -38,21 +39,22 @@ import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
  * required.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <E> the Entity Class
+ * @param <E> the eEntity Class
+ * @param <P> the parent Entity class
  * @param <F> the Fields enum class
  */
-public class EntityReferenceSet<E extends EntityRO, F> {
+public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
 
     /**
      * The Entity Manager associated with the entities
      */
-    protected final EntityManagerRO<E> em;
+    protected final EntityManager<E, P> em;
     private final EntityPersistenceManager dataRowAccess;
 
     /**
-     * The list of Entity References (referring to the entities)
+     * The list of CoreEntity References (referring to the entities)
      */
-    protected List<EntityReference<E>> childList;
+    protected List<EntityReference<E, P>> childList;
     private final String columnname;
     private final int columnvalue;
 
@@ -74,7 +76,7 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      * @param emclass the associated entity manager class
      * @throws java.io.IOException
      */
-    public EntityReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) throws IOException {
+    public EntityReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManager> emclass) throws IOException {
         this(emclass, name, field, columnname, columnvalue);
         if (columnvalue > 0) {
             createChildList(em, dataRowAccess.find(columnname, JsonUtil.createJsonValue(columnvalue)));
@@ -91,12 +93,12 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      * @param emclass the associated entity manager class
      * @throws java.io.IOException
      */
-    public EntityReferenceSet(String name, F field, Class<? extends EntityManagerRO> emclass) throws IOException {
+    public EntityReferenceSet(String name, F field, Class<? extends EntityManager> emclass) throws IOException {
         this(emclass, name, field, null, 0);
         createChildList(em, dataRowAccess.find());
     }
 
-    private EntityReferenceSet(Class<? extends EntityManagerRO> emclass, String name, F field, String columnname, int columnvalue) {
+    private EntityReferenceSet(Class<? extends EntityManager> emclass, String name, F field, String columnname, int columnvalue) {
         this.name = name;
         this.field = field;
         setChangeEvent = new Event<>(name);
@@ -106,7 +108,7 @@ public class EntityReferenceSet<E extends EntityRO, F> {
         this.dataRowAccess = em.getEntityPersistenceManager();
     }
 
-    private void createChildList(EntityManagerRO<E> em, JsonArray refs) throws IOException {
+    private void createChildList(EntityManager<E, P> em, JsonArray refs) throws IOException {
         childList = new ArrayList<>();
         for (int i = 0; i < refs.size(); i++) {
             childList.add(new EntityReference<>(name, refs.getInt(i), em));
@@ -180,7 +182,7 @@ public class EntityReferenceSet<E extends EntityRO, F> {
      */
     public List<E> get() throws IOException {
         List<E> el = new ArrayList<>();
-        for (EntityReference<E> ref : childList) {
+        for (EntityReference<E, P> ref : childList) {
             el.add(ref.get());
         }
         return el;
@@ -212,7 +214,7 @@ public class EntityReferenceSet<E extends EntityRO, F> {
     /**
      * Remove an entity from the child entity List
      *
-     * @param e the Child Entity
+     * @param e the Child CoreEntity
      * @return true if entity removed
      */
     public boolean remove(E e) {
@@ -220,7 +222,7 @@ public class EntityReferenceSet<E extends EntityRO, F> {
     }
 
     private boolean removeById(int id) {
-        for (EntityReference<E> ref : childList) {
+        for (EntityReference<E, P> ref : childList) {
             if (ref.getId() == id) {
                 if (childList.remove(ref)) {
                     fireSetChange();

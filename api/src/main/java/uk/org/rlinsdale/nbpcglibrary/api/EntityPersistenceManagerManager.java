@@ -35,7 +35,8 @@ import org.openide.util.Lookup;
  */
 public class EntityPersistenceManagerManager {
 
-    private final static Map<String, EntityPersistenceManager> EntityPersistenceManagers = new HashMap<>();
+    private final static Map<String, EntityPersistenceManager> entityPersistenceManagers = new HashMap<>();
+    private final static Map<String, DataAccessManager> dataAccessManagers = new HashMap<>();
 
     private static final String DEFAULTUSER = "nbplatform";
     private static final String DEFAULTPASSWORD = "netbeans";
@@ -80,8 +81,9 @@ public class EntityPersistenceManagerManager {
                        DataAccessManager dam = damfactory.createDataAccessManager(props);
                         for (String entityname : entitynames) {
                             String ekey = key + "_" + entityname;
-                            EntityPersistenceManagers.put(ekey, factory.createEntityPersistenceManager(entityname, props, dam));
+                            entityPersistenceManagers.put(ekey, factory.createEntityPersistenceManager(entityname, props, dam));
                         }
+                        dataAccessManagers.put(key, dam);
                         return;
                     }
                 }
@@ -99,6 +101,14 @@ public class EntityPersistenceManagerManager {
      * @return the DataAccessManager
      */
     public static EntityPersistenceManager getEntityPersistenceManager(String key, String entityname) {
-        return EntityPersistenceManagers.get(key + "_" + entityname);
+        return entityPersistenceManagers.get(key + "_" + entityname);
+    }
+    
+    /**
+     *  Get all DataAccessManagers
+     * @return 
+     */
+    public static Collection<? extends DataAccessManager> getAllDataAccessManagers() {
+        return dataAccessManagers.values();
     }
 }

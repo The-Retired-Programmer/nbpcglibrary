@@ -30,14 +30,14 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventPa
 
 /**
  * The abstract class defining an editable Entity, with a index (orderable)
- * field.
+ field.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
- * @param <P> the Parent Entity Class
+ * @param <P> the Parent CoreEntity Class
  * @param <F> the entity field enum class
  */
-public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entity, F> extends EntityRW<E, P, F> {
+public abstract class EntityIndexed<E extends EntityIndexed, P extends CoreEntity, F> extends Entity<E, P, F> {
 
     private final DBFieldsRWIndexed<E> dbfields;
     private final EntityPersistenceManager entityPersistenceManager;
@@ -51,7 +51,7 @@ public abstract class EntityRWIndexed<E extends EntityRWIndexed, P extends Entit
      * @param em the entity manager for this entity class
      * @param dbfields the entity fields
      */
-    public EntityRWIndexed(String entityname, String icon, int id, EntityManagerRW<E,P> em, DBFieldsRWIndexed<E> dbfields) {
+    public EntityIndexed(String entityname, String icon, int id, EntityManager<E,P> em, DBFieldsRWIndexed<E> dbfields) {
         super(entityname, icon, id, em, dbfields);
         this.dbfields = dbfields;
         this.entityPersistenceManager = em.getEntityPersistenceManager();

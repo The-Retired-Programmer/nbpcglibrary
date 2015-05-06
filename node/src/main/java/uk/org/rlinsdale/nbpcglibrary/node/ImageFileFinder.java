@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.node;
 
 import java.io.File;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 
 /**
  * Interface for a Image FileFinder.
@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The entity class
  */
-public interface ImageFileFinder<E extends EntityRW> {
+public interface ImageFileFinder<E extends Entity> {
 
     /**
      * Get the image associated with this entity.

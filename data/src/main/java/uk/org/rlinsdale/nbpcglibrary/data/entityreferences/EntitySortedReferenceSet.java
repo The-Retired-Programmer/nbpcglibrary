@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,20 +22,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 
 /**
  * Manages the list of Entities - implements a sortable entity lists
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <E> the Entity Class
+ * @param <E> the CoreEntity Class
+ * @param <P> the parent CoreEntity Class
  * @param <F> the Fields enum class
  */
-public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityReferenceSet<E, F> {
+public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F> extends EntityReferenceSet<E, P, F> {
 
     private final Comparator<E> comparator;
     private boolean unsorted = true;
@@ -54,7 +56,7 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
      * @param emclass the associated entity manager class
      * @throws java.io.IOException
      */
-    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManagerRO> emclass) throws IOException {
+    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, columnname, columnvalue, emclass);
         this.field = field;
         childListener = new ChildListener(name);
@@ -70,7 +72,7 @@ public class EntitySortedReferenceSet<E extends EntityRO, F> extends EntityRefer
      * @param emclass the associated entity manager class
      * @throws java.io.IOException
      */
-    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, Class<? extends EntityManagerRO> emclass) throws IOException {
+    public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, emclass);
         this.field = field;
         childListener = new ChildListener(name);

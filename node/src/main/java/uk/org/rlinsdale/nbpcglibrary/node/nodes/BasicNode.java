@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.swing.Action;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -48,10 +48,10 @@ import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
  * Root Node Abstract Class
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <E> the Entity Class
+ * @param <E> the CoreEntity Class
  */
 @RegisterLog("nbpcglibrary.node")
-public abstract class BasicNode<E extends Entity> extends AbstractNode implements HasInstanceDescription {
+public abstract class BasicNode<E extends CoreEntity> extends AbstractNode implements HasInstanceDescription {
 
     /**
      * the local lookup
@@ -199,9 +199,9 @@ public abstract class BasicNode<E extends Entity> extends AbstractNode implement
         @Override
         public Transferable paste() throws IOException {
             LogBuilder.writeLog("nbpcglibrary.node", this, "paste");
-            Entity e;
+            CoreEntity e;
             try {
-                e = (Entity) t.getTransferData(dfa.dataflavor);
+                e = (CoreEntity) t.getTransferData(dfa.dataflavor);
             } catch (UnsupportedFlavorException ex) {
                 throw new LogicException("Unsupported Flavor Exception Raised in RootNode$AllowedPasteType:paste()");
             }
@@ -212,7 +212,7 @@ public abstract class BasicNode<E extends Entity> extends AbstractNode implement
                     if (node != null) {
                         LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                                 .addMsg("remove previous node").write();
-                        ((TreeNodeRW) node)._cutAndPasteRemove();
+                        ((TreeNode) node)._cutAndPasteRemove();
                     }
                     LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                             .addMsg("drag/drop action").write();
@@ -223,7 +223,7 @@ public abstract class BasicNode<E extends Entity> extends AbstractNode implement
                     if (node != null) {
                         LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                                 .addMsg("remove previous node").write();
-                        ((TreeNodeRW) node)._cutAndPasteRemove();
+                        ((TreeNode) node)._cutAndPasteRemove();
                     }
                     LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
                             .addMsg("cut/paste action").write();
@@ -257,47 +257,7 @@ public abstract class BasicNode<E extends Entity> extends AbstractNode implement
             }
         }
     }
-
-    // CUT and PASTE methods to be implemented
-    /**
-     * Move action - add child entity.
-     *
-     * @param child the entity
-     * @throws java.io.IOException
-     */
-    abstract protected void _moveAddChild(Entity child) throws IOException;
-
-    /**
-     * Cut action - add child entity.
-     *
-     * @param child the entity
-     * @throws java.io.IOException
-     */
-    abstract protected void _cutAddChild(Entity child) throws IOException;
-
-    /**
-     * Copy Action - add child entity.
-     *
-     * @param child the entity
-     * @throws java.io.IOException
-     */
-    abstract protected void _copyAddChild(Entity child) throws IOException;
-
-    /**
-     * Reorder Action - move child entity.
-     *
-     * @param df teh data flavour
-     * @param perm the sort indicator
-     */
-    abstract protected void _moveReorderChildByFlavor(DataFlavor df, int[] perm);
-
-    /**
-     * Get the DataFlavour.
-     *
-     * @return the data flavour
-     */
-    abstract protected DataFlavor _getDataFlavor();
-
+    
     private class ChildIndex extends Index.Support implements HasInstanceDescription {
 
         private final DataFlavorAndAction dfa;
@@ -329,4 +289,44 @@ public abstract class BasicNode<E extends Entity> extends AbstractNode implement
             }
         }
     }
+
+    // CUT and PASTE methods to be implemented
+    /**
+     * Move action - add child entity.
+     *
+     * @param child the entity
+     * @throws java.io.IOException
+     */
+    abstract protected void _moveAddChild(CoreEntity child) throws IOException;
+
+    /**
+     * Cut action - add child entity.
+     *
+     * @param child the entity
+     * @throws java.io.IOException
+     */
+    abstract protected void _cutAddChild(CoreEntity child) throws IOException;
+
+    /**
+     * Copy Action - add child entity.
+     *
+     * @param child the entity
+     * @throws java.io.IOException
+     */
+    abstract protected void _copyAddChild(CoreEntity child) throws IOException;
+
+    /**
+     * Reorder Action - move child entity.
+     *
+     * @param df teh data flavour
+     * @param perm the sort indicator
+     */
+    abstract protected void _moveReorderChildByFlavor(DataFlavor df, int[] perm);
+
+    /**
+     * Get the DataFlavour.
+     *
+     * @return the data flavour
+     */
+    abstract protected DataFlavor _getDataFlavor();
 }

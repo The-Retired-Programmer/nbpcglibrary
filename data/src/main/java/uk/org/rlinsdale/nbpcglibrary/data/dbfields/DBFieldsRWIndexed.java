@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,16 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.dbfields;
 
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 
 /**
- * Interface for handling entity field states for a read-write entity which uses
+ * Interface for handling entity field states for an entity which uses
  * a index field (integer) for ordering entities.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
  */
-public interface DBFieldsRWIndexed<E extends EntityRW> extends DBFieldsRW<E> {
+public interface DBFieldsRWIndexed<E extends Entity> extends DBFields<E> {
 
     /**
      * Get the index value.

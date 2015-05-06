@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.form.ChoiceField;
@@ -37,7 +37,7 @@ import uk.org.rlinsdale.nbpcglibrary.form.ChoiceFieldBackingObject;
  * @param <E> the entity class
  * @param <F> the entity fields enum class
  */
-public abstract class ReferenceChoiceCollectionFields<E extends EntityRO, F> extends ChoiceField {
+public abstract class ReferenceChoiceCollectionFields<E extends Entity, F> extends ChoiceField {
 
     private List<E> choices;
     private List<String> choiceText;

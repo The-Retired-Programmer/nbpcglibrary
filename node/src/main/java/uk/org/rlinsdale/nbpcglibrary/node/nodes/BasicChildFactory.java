@@ -20,10 +20,10 @@ package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
 import java.io.IOException;
 import java.util.logging.Level;
-import org.openide.util.Exceptions;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
 
 /**
@@ -31,10 +31,11 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Parent Entity Class
+ * @param <P>
  */
-public abstract class BasicChildFactory<E extends EntityRO> extends RootChildFactory<E> {
+public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> extends RootChildFactory<E> {
 
-    private EntityReference<E> parentref;
+    private EntityReference<E, P> parentref;
 
     /**
      * Constructor.
@@ -44,7 +45,7 @@ public abstract class BasicChildFactory<E extends EntityRO> extends RootChildFac
      * @param emclass the parent entity manager class 
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManagerRO> emclass) {
+    public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManager> emclass) {
         super(null);
         try {
             parentref = new EntityReference<>( factoryname+">"+parentEntity.instanceDescription(), parentEntity, emclass);

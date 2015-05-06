@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
-import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 
 /**
  * Root Node Abstract Class
@@ -26,7 +26,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class
  */
-public abstract class RootNode<E extends Entity> extends BasicNode<E> {
+public abstract class RootNode<E extends CoreEntity> extends BasicNode<E> {
 
     private final E e;
 

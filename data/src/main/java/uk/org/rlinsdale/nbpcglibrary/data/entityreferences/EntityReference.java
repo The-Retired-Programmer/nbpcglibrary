@@ -20,9 +20,8 @@ package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManagerRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRO;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
@@ -31,9 +30,10 @@ import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 
 /**
- * A reference to an Entity.
+ * A reference to an CoreEntity.
  *
  * Implemented as a weak reference, so that entities can be garbage collected if
  * unused for a period of time, the entity id is remembered so that the entity
@@ -41,8 +41,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The Entity Class
+ * @param <P> The Parent Entity Class
  */
-public class EntityReference<E extends EntityRO> implements HasInstanceDescription {
+public class EntityReference<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
 
     /**
      *
@@ -52,7 +53,7 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
     private int id;
     private int saveId;
     private WeakReference<E> entityreference = null;
-    private final EntityManagerRO<E> em;
+    private final EntityManager<E,P> em;
     private final IdListener idlistener;
     private Listener<SimpleEventParams> titleListener;
     private final Event<SimpleEventParams> changeEntityEvent;
@@ -61,10 +62,10 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      * Constructor.
      *
      * @param name the name of the entity (for reporting)
-     * @param em the associated Entity Manager
+     * @param em the associated CoreEntity Manager
      * @throws java.io.IOException
      */
-    public EntityReference(String name, EntityManagerRO<E> em) throws IOException {
+    public EntityReference(String name, EntityManager<E,P> em) throws IOException {
         this(name, NONE, null, em, null);
     }
 
@@ -72,12 +73,12 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      * Constructor.
      *
      * @param name the name of the entity (for reporting)
-     * @param em the associated Entity Manager
+     * @param em the associated CoreEntity Manager
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
      * @throws java.io.IOException
      */
-    public EntityReference(String name, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    public EntityReference(String name, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, NONE, null, em, titleChangeListener);
     }
 
@@ -86,10 +87,10 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param id the entity id
-     * @param em the associated Entity Manager
+     * @param em the associated CoreEntity Manager
      * @throws java.io.IOException
      */
-    public EntityReference(String name, int id, EntityManagerRO<E> em) throws IOException {
+    public EntityReference(String name, int id, EntityManager<E, P> em) throws IOException {
         this(name, id, null, em, null);
     }
 
@@ -98,12 +99,12 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param id the entity id
-     * @param em the associated Entity Mana
+     * @param em the associated CoreEntity Mana
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
      * @throws java.io.IOException
      */
-    public EntityReference(String name, int id, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    public EntityReference(String name, int id, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, id, null, em, titleChangeListener);
     }
 
@@ -112,10 +113,10 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param e the entity
-     * @param em the associated Entity Manager
+     * @param em the associated CoreEntity Manager
      * @throws java.io.IOException
      */
-    public EntityReference(String name, E e, EntityManagerRO<E> em) throws IOException {
+    public EntityReference(String name, E e, EntityManager<E, P> em) throws IOException {
         this(name, e.getId(), e, em, null);
     }
 
@@ -124,12 +125,12 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param e the entity
-     * @param em the associated Entity Manager
+     * @param em the associated CoreEntity Manager
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
      * @throws java.io.IOException
      */
-    public EntityReference(String name, E e, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    public EntityReference(String name, E e, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, e.getId(), e, em, titleChangeListener);
     }
 
@@ -137,10 +138,10 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      * Constructor.
      *
      * @param name the name of the entity (for reporting)
-     * @param emclass the associated Entity Manager class
+     * @param emclass the associated CoreEntity Manager class
      * @throws java.io.IOException
      */
-    public EntityReference(String name, Class<? extends EntityManagerRO> emclass) throws IOException {
+    public EntityReference(String name, Class<? extends EntityManager> emclass) throws IOException {
         this(name, NONE, null, Lookup.getDefault().lookup(emclass), null);
     }
 
@@ -148,12 +149,12 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      * Constructor.
      *
      * @param name the name of the entity (for reporting)
-     * @param emclass the associated Entity Manager class
+     * @param emclass the associated CoreEntity Manager class
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
      * @throws java.io.IOException
      */
-    public EntityReference(String name, Class<? extends EntityManagerRO> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    public EntityReference(String name, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, NONE, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
     }
 
@@ -162,10 +163,10 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param id the entity id
-     * @param emclass the associated Entity Manager class
+     * @param emclass the associated CoreEntity Manager class
      * @throws java.io.IOException
      */
-    public EntityReference(String name, int id, Class<? extends EntityManagerRO> emclass) throws IOException {
+    public EntityReference(String name, int id, Class<? extends EntityManager> emclass) throws IOException {
         this(name, id, null, Lookup.getDefault().lookup(emclass), null);
     }
 
@@ -174,12 +175,12 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param id the entity id
-     * @param emclass the associated Entity Manager class
+     * @param emclass the associated CoreEntity Manager class
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
      * @throws java.io.IOException
      */
-    public EntityReference(String name, int id, Class<? extends EntityManagerRO> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    public EntityReference(String name, int id, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, id, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
     }
 
@@ -188,10 +189,10 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param e the entity
-     * @param emclass the associated Entity Manager class
+     * @param emclass the associated CoreEntity Manager class
      * @throws java.io.IOException
      */
-    public EntityReference(String name, E e, Class<? extends EntityManagerRO> emclass) throws IOException {
+    public EntityReference(String name, E e, Class<? extends EntityManager> emclass) throws IOException {
         this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), null);
     }
 
@@ -200,16 +201,16 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
      *
      * @param name the name of the entity (for reporting)
      * @param e the entity
-     * @param emclass the associated Entity Manager class
+     * @param emclass the associated CoreEntity Manager class
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
      * @throws java.io.IOException
      */
-    public EntityReference(String name, E e, Class<? extends EntityManagerRO> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    public EntityReference(String name, E e, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), titleChangeListener);
     }
 
-    private EntityReference(String name, int id, E e, EntityManagerRO<E> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    private EntityReference(String name, int id, E e, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this.name = name;
         this.em = em;
         idlistener = new IdListener(name);
@@ -223,8 +224,8 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
             if (e == null) {
                 e = get();
             }
-            if (e != null && e instanceof EntityRW) {
-                ((EntityRW) e).addIdListener(idlistener);
+            if (e != null && e instanceof Entity) {
+                ((Entity) e).addIdListener(idlistener);
             }
         }
         saveState();
@@ -299,7 +300,7 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
                 E e = entityreference.get();
                 if (e != null) {
                     id = e.getId();
-                    ((EntityRW) e).removeIdListener(idlistener);
+                    ((Entity) e).removeIdListener(idlistener);
                     return;
                 }
             }
@@ -308,9 +309,9 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
     }
 
     /**
-     * Get the Entity Referenced.
+     * Get the CoreEntity Referenced.
      *
-     * @return the Entity
+     * @return the CoreEntity
      * @throws java.io.IOException
      */
     public final E get() throws IOException {
@@ -333,7 +334,7 @@ public class EntityReference<E extends EntityRO> implements HasInstanceDescripti
 
     /**
      * Get the Entity Referenced if it is actually directly referenced, but
-     * don't load it from db it not.
+ don't load it from db it not.
      *
      * @return the Entity
      */

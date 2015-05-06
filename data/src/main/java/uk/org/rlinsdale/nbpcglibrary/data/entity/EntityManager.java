@@ -45,8 +45,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> The Entity Class being managed
+ * @param <P> The Parent Entity Class
  */
-abstract public class EntityManagerRO<E extends EntityRO> implements HasInstanceDescription {
+abstract public class EntityManager<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
 
     private static final int MAXLRUCACHE = 10;
 
@@ -66,13 +67,15 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
      */
     protected final LRUCache<E> lrucache;
     private EntityPersistenceManager entityPersistanceManager;
+    private final Map<Integer, E> transientCache;
+    private int nextId = -1;
 
     /**
      * Constructor.
      *
      * @param name the entity name
      */
-    public EntityManagerRO(String name) {
+    public EntityManager(String name) {
         this(name, MAXLRUCACHE);
     }
 
@@ -82,12 +85,13 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
      * @param name the entity name
      * @param maxLRUcache the max size of the LRU cache (entities)
      */
-    public EntityManagerRO(String name, int maxLRUcache) {
+    public EntityManager(String name, int maxLRUcache) {
         super();
         this.name = name;
         lrucache = new LRUCache<>(name, maxLRUcache);
         cache = new HashMap<>();
         refqueue = new ReferenceQueue<>();
+        transientCache = new HashMap<>();
     }
 
     @Override
@@ -185,6 +189,83 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
         }
         throw new LogicException("Remove from Cache Failure (class=" + name + ";id=" + id + ")");
     }
+    
+    /**
+     * Create a new entity (initialised)
+     *
+     * @return the new entity
+     * @throws java.io.IOException
+     */
+    public final synchronized E getNew() throws IOException {
+        LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", nextId);
+        E e = createNewEntity(nextId);
+        e.setId(nextId);
+        transientCache.put(nextId--, e);
+        return e;
+    }
+
+    /**
+     * Create a new entity (initialised) and link it as child of a parent
+     * entity.
+     *
+     * @param parent the parent entity
+     * @return the new entity
+     * @throws java.io.IOException
+     */
+    public final synchronized E getNew(P parent) throws IOException {
+        E e = getNew();
+        link2parent(e, parent);
+        return e;
+    }
+
+    /**
+     * Create a new entity, copy it's field from another entity and link it as
+     * child of a parent entity.
+     *
+     * @param from the copy source entity
+     * @param parent the parent entity
+     * @return the new entity
+     * @throws java.io.IOException
+     */
+    public final synchronized E getNew(E from, P parent) throws IOException {
+        E e = getNew(parent);
+        e.copy(from);
+        return e;
+    }
+
+    /**
+     * Remove from Transient Cache.
+     *
+     * @param e the entity
+     */
+    protected final synchronized void removeFromTransientCache(E e) {
+        int id = e.getId();
+        if (transientCache.containsKey(id)) {
+            transientCache.remove(id);
+            LogBuilder.writeLog("nbpcglibrary.data", this, "removeFromTransientCache", id);
+            return;
+        }
+        throw new LogicException("Remove Transient Failure (class=" + name + ";id=" + id + ")");
+    }
+
+    /**
+     * Persist a Transient Cache Entity into standard persistence cache.
+     *
+     * @param e the entity
+     * @param newId the new entity Id
+     */
+    protected synchronized void persistTransient(E e, int newId) {
+        int id = e.getId();
+        if (newId > 0 && id < 0 && transientCache.containsKey(id)) {
+            transientCache.remove(id);
+            e.updateId(newId);
+            insertIntoCache(newId, e);
+            LogBuilder.writeLog("nbpcglibrary.data", this, "persistTransient", id, "as", newId);
+            return;
+        }
+        throw new LogicException("Persist Transient Failure (class=" + name + ";id=" + id + ";newid=" + newId + ")");
+    }
+
 
     /**
      * Get the EntityPersistenceManager for this Entity Class.
@@ -204,4 +285,13 @@ abstract public class EntityManagerRO<E extends EntityRO> implements HasInstance
      * @return the EntityPersistenceManager
      */
     abstract protected EntityPersistenceManager createEntityPersistenceManager();
+    
+    /**
+     * Link a child entity to its parent.
+     *
+     * @param e the child entity
+     * @param rs the parent entity
+     * @throws java.io.IOException
+     */
+    abstract protected void link2parent(E e, P rs) throws IOException;
 }

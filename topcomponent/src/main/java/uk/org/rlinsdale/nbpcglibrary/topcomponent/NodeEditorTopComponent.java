@@ -20,23 +20,25 @@ package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.logging.Level;
 import javax.swing.BoxLayout;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityRW;
 import uk.org.rlinsdale.nbpcglibrary.form.Form;
-import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNodeRW;
 import org.openide.windows.TopComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
+import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNode;
 
 /**
  * Editor Topcomponent which displays/edits a node.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
+ * @param <P> the parent entity class
  * @param <F> the entity fields enum class
  */
-public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopComponent {
+public abstract class NodeEditorTopComponent<E extends Entity, P extends CoreEntity, F> extends TopComponent {
 
     private final String name;
     private boolean abandon = false;
@@ -45,7 +47,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
     /**
      * the node being edited
      */
-    protected final TreeNodeRW<E, F> node;
+    protected final TreeNode<E, P, F> node;
 
     /**
      * the entity being edited
@@ -60,7 +62,7 @@ public abstract class NodeEditorTopComponent<E extends EntityRW, F> extends TopC
      * @param hint the topcomponent hint
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public NodeEditorTopComponent(TreeNodeRW<E, F> node, String name, String hint) {
+    public NodeEditorTopComponent(TreeNode<E, P, F> node, String name, String hint) {
         LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, node, name, hint);
         setName(name);
         setToolTipText(hint);
