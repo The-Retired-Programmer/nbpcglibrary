@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale <richard.linsdale at blueyonder.co.uk>.
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,47 +18,29 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.api;
 
-import java.io.IOException;
+import java.util.Properties;
 
 /**
- * Exception - for handling DataAccessManager Property problems.
+ * Creates a PersistenceUnitProvider.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <D> the class of the persistenceUnitProvider created
+ *
  */
-public class DataAccessManagerPropertiesException extends IOException {
+public interface PersistenceUnitProviderFactory<D extends PersistenceUnitProvider> {
 
     /**
-     * Constructor.
-     */
-    public DataAccessManagerPropertiesException() {
-        super();
-    }
-
-    /**
-     * Constructor.
+     * Get the type of persistenceUnitProvider which this Factory creates.
      *
-     * @param message the exception message text
+     * @return the type string
      */
-    public DataAccessManagerPropertiesException(String message) {
-        super(message);
-    }
+    public String getType();
 
     /**
-     * Constructor.
+     * Create a PersistenceUnitProvider.
      *
-     * @param ex the causal exception
+     * @param p the properties which define the provider configuration
+     * @return the PersistenceUnitProvider
      */
-    public DataAccessManagerPropertiesException(Exception ex) {
-        super(ex);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param message the exception message text
-     * @param ex the causal exception
-     */
-    public DataAccessManagerPropertiesException(String message, Exception ex) {
-        super(message, ex);
-    }
+    public D createPersistenceUnitProvider(Properties p);
 }

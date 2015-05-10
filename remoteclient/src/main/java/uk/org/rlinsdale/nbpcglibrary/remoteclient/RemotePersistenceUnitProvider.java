@@ -34,17 +34,18 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import uk.org.rlinsdale.nbpcglibrary.api.DataAccessManager;
+import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
- * Abstract Class implementing Data Access Manager via an Http based protocol.
+ * Abstract Class implementing ersistenceUnitProvide over an Http based
+ * protocol.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class RemoteDataAccessManager implements DataAccessManager {
+public class RemotePersistenceUnitProvider implements PersistenceUnitProvider {
 
     private final CloseableHttpClient httpclient;
     private final String url;
@@ -53,19 +54,22 @@ public class RemoteDataAccessManager implements DataAccessManager {
     /**
      * Constructor.
      *
-     * @param p the database connection parameters
+     * @param p the connection properties
      */
-    public RemoteDataAccessManager(Properties p) {
-        url = p.getProperty("connection","");
+    public RemotePersistenceUnitProvider(Properties p) {
+        url = p.getProperty("connection", "");
         httpclient = HttpClients.createDefault();
         operational = pingUrl();
     }
-    
+
     /**
+     * Execute Single Command - send a single command to executed by remote data
+     * source.
      *
-     * @param request
-     * @return
-     * @throws IOException
+     * @param request the command object
+     * @return the response object
+     * @throws IOException if problems with parsing command data or problems
+     * executing the command
      */
     public synchronized JsonObject executeSingleCommand(JsonObject request) throws IOException {
         JsonStructure res = null;
@@ -81,17 +85,20 @@ public class RemoteDataAccessManager implements DataAccessManager {
             }
         }
         if (res instanceof JsonObject) {
-                return (JsonObject) res;
+            return (JsonObject) res;
         } else {
             throw new JsonConversionException();
         }
     }
-    
+
     /**
+     * Execute Multiple Commands - send multiple commands in a single message to
+     * be executed by remote data source.
      *
-     * @param request
-     * @return
-     * @throws IOException
+     * @param request the set of command objects
+     * @return the set of response objects
+     * @throws IOException if problems with parsing command data or problems
+     * executing the command
      */
     public synchronized JsonArray executeMultipleCommands(JsonArray request) throws IOException {
         JsonStructure res = null;
@@ -107,7 +114,7 @@ public class RemoteDataAccessManager implements DataAccessManager {
             }
         }
         if (res instanceof JsonArray) {
-                return (JsonArray) res;
+            return (JsonArray) res;
         } else {
             throw new JsonConversionException();
         }
@@ -144,13 +151,13 @@ public class RemoteDataAccessManager implements DataAccessManager {
     public boolean isOperational() {
         return operational;
     }
-    
+
     @Override
     public String getName() {
         return url;
     }
 
-   @Override
+    @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this, getName());
     }

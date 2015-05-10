@@ -16,28 +16,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.api;
+package uk.org.rlinsdale.nbpcglibrary.remoteclient;
+
+import java.util.Properties;
+import org.openide.util.lookup.ServiceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProviderFactory;
 
 /**
- * Interface - defines the core functions of a DataAccessManager.
- *
+ * A Factory to create PersistenceUnitProvider for local MySQL databases.
+ * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface DataAccessManager extends HasInstanceDescription {
-
-    /**
-     * Test if DataAccessManager is operational - ie available and able to access
-     * data.
-     *
-     * @return true if operational
-     */
-    public boolean isOperational();
-
-    /**
-     * Get the name given to this DataAccessManager.
-     *
-     * @return the name
-     */
-    public String getName();
+@ServiceProvider(service = RemotePersistenceUnitProviderFactory.class)
+public class RemotePersistenceUnitProviderFactory implements PersistenceUnitProviderFactory<RemotePersistenceUnitProvider> {
     
+    @Override
+    public String getType() {
+        return "remote";
+    }
+
+    @Override
+    public RemotePersistenceUnitProvider createPersistenceUnitProvider(Properties p) {
+        return new RemotePersistenceUnitProvider(p);
+    }
 }

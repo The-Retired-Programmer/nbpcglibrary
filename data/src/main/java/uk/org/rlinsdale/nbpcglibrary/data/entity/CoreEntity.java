@@ -97,7 +97,7 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
      * @throws java.io.IOException
      */
     public void cancelEdit() throws IOException {
-        _restoreState();
+        entityRestoreState();
     }
 
     /**
@@ -132,7 +132,7 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
      * Restore entity state.
      * @throws java.io.IOException
      */
-    abstract protected void _restoreState() throws IOException;
+    abstract protected void entityRestoreState() throws IOException;
 
     /**
      * get the string which will be used to display the name for the entity

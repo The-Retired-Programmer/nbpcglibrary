@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.json.JsonArray;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
@@ -49,7 +49,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
      * The Entity Manager associated with the entities
      */
     protected final EntityManager<E, P> em;
-    private final EntityPersistenceManager dataRowAccess;
+    private final EntityPersistenceProvider dataRowAccess;
 
     /**
      * The list of CoreEntity References (referring to the entities)
@@ -105,7 +105,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
         em = Lookup.getDefault().lookup(emclass);
         this.columnvalue = columnvalue;
         this.columnname = columnname;
-        this.dataRowAccess = em.getEntityPersistenceManager();
+        this.dataRowAccess = em.getEntityPersistenceProvider();
     }
 
     private void createChildList(EntityManager<E, P> em, JsonArray refs) throws IOException {

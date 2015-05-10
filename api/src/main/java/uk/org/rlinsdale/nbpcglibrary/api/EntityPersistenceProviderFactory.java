@@ -24,23 +24,34 @@ import java.util.Properties;
  * Creates a DataAccessManager.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <D> the class of the Data Access Manager created
- * 
+ * @param <D> the type of the PersistenceUnitProvider
+ * @param <F> the type of the PersistenceUnitProviderFactory
+ *
  */
-public interface DataAccessManagerFactory <D extends DataAccessManager> {
+public interface EntityPersistenceProviderFactory<D extends PersistenceUnitProvider, F extends PersistenceUnitProviderFactory> {
 
     /**
-     * Get the type of DataAccessManager which this Factory creates.
+     * Get the type of EntityPersistenceProvider which this Factory creates.
      *
      * @return the type string
      */
     public String getType();
 
     /**
-     * Create a DataAccessManager.
+     * Get the class of the PersistenceUnitProvider associated with this
+     * EntityPersistenceProvider.
      *
-     * @param p the Connection parameters which define the connection
-     * @return the DataAccessManager
+     * @return the PersistenceUnitProvider class
      */
-    public D createDataAccessManager(Properties p);
+    public Class<F> getPersistenceUnitProviderFactoryClass();
+
+    /**
+     * Create an EntityPersistenceProvider.
+     *
+     * @param entityname the entity name to be managed
+     * @param p the properties which define the provider configuration
+     * @param persistenceUnitProvider the PersistenceUnitProvider to be used
+     * @return the EntityPersistenceProvider
+     */
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider);
 }

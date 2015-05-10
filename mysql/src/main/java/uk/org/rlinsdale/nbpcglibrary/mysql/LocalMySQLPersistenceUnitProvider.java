@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.mysql;
 
+import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -27,8 +28,7 @@ import javax.json.JsonString;
 import javax.json.JsonValue;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
-import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLDataAccessManager;
+import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLPersistenceUnitProvider;
 
 /**
  * The implementation of the DB class for MySql Database connections.
@@ -36,7 +36,7 @@ import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLDataAccessManag
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("nbpcglibrary.mysql")
-public class MySQLLocalDatabaseAccessManager extends LocalSQLDataAccessManager {
+public class LocalMySQLPersistenceUnitProvider extends LocalSQLPersistenceUnitProvider {
     
     private boolean operational = false;
     private final Properties p;
@@ -47,7 +47,7 @@ public class MySQLLocalDatabaseAccessManager extends LocalSQLDataAccessManager {
      * @param p the db connection parameters
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public MySQLLocalDatabaseAccessManager(Properties p) {
+    public LocalMySQLPersistenceUnitProvider(Properties p) {
         super("local-mysql-"+p.getProperty("key"));
         this.p = p;
         try {
@@ -69,7 +69,7 @@ public class MySQLLocalDatabaseAccessManager extends LocalSQLDataAccessManager {
     }
 
     @Override
-    protected String format(JsonValue value) {
+    protected String format(JsonValue value) throws IOException {
         switch (value.getValueType()) {
             case NULL:
                 return "NULL";
@@ -83,7 +83,7 @@ public class MySQLLocalDatabaseAccessManager extends LocalSQLDataAccessManager {
             case NUMBER:
                 return ((JsonNumber)value).toString();
             default:
-                throw new LogicException("Unknown Object type in MySQLLocalDatabaseAccessManage:format()");
+                throw new IOException("Unknown Object type in LocalMySQLPersistenceUnitProvider:format()");
         }
     }
 

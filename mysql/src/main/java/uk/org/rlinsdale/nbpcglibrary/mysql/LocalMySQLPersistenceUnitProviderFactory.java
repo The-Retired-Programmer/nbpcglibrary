@@ -16,17 +16,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess;
+package uk.org.rlinsdale.nbpcglibrary.mysql;
 
-import uk.org.rlinsdale.nbpcglibrary.api.DataAccessManager;
-import uk.org.rlinsdale.nbpcglibrary.api.DataAccessManagerFactory;
+import java.util.Properties;
+import org.openide.util.lookup.ServiceProvider;
+import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLPersistenceUnitProviderFactory;
 
 /**
- * Creates a DataAccessManager.
- *
- * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <D> the class of the Data Access Manager created
+ * A Factory to create DataAccessManager for local MySQL databases.
  * 
+ * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface LocalSQLDataAccessManagerFactory<D extends DataAccessManager> extends DataAccessManagerFactory<D> {
+@ServiceProvider(service = LocalSQLPersistenceUnitProviderFactory.class)
+public class LocalMySQLPersistenceUnitProviderFactory implements LocalSQLPersistenceUnitProviderFactory<LocalMySQLPersistenceUnitProvider> {
+
+    @Override
+    public String getType() {
+        return "mysql";
+    }
+
+    @Override
+    public LocalMySQLPersistenceUnitProvider createPersistenceUnitProvider(Properties p) {
+        return new LocalMySQLPersistenceUnitProvider(p);
+    }
 }

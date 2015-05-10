@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -66,7 +66,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      * The LRU cache.
      */
     protected final LRUCache<E> lrucache;
-    private EntityPersistenceManager entityPersistanceManager;
+    private EntityPersistenceProvider entityPersistenceProvider;
     private final Map<Integer, E> transientCache;
     private int nextId = -1;
 
@@ -268,23 +268,23 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
 
 
     /**
-     * Get the EntityPersistenceManager for this Entity Class.
+     * Get the EntityPersistenceProvider for this Entity Class.
      *
-     * @return the EntityPersistenceManager
+     * @return the EntityPersistenceProvider
      */
-    public EntityPersistenceManager getEntityPersistenceManager() {
-        if (entityPersistanceManager == null) {
-                entityPersistanceManager = createEntityPersistenceManager();
+    public EntityPersistenceProvider getEntityPersistenceProvider() {
+        if (entityPersistenceProvider == null) {
+                entityPersistenceProvider = createEntityPersistenceProvider();
         }
-        return entityPersistanceManager;
+        return entityPersistenceProvider;
     }
 
     /**
-     * Create the EntityPersistenceManager for this Entity Class.
+     * Create the EntityPersistenceProvider for this Entity Class.
      *
-     * @return the EntityPersistenceManager
+     * @return the EntityPersistenceProvider
      */
-    abstract protected EntityPersistenceManager createEntityPersistenceManager();
+    abstract protected EntityPersistenceProvider createEntityPersistenceProvider();
     
     /**
      * Link a child entity to its parent.

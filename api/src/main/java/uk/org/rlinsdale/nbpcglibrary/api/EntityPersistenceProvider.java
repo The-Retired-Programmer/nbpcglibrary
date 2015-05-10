@@ -28,7 +28,7 @@ import javax.json.JsonValue;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface EntityPersistenceManager extends HasInstanceDescription{
+public interface EntityPersistenceProvider extends HasInstanceDescription {
 
     /**
      * Get the set of entity Ids for all stored entities.
@@ -37,8 +37,8 @@ public interface EntityPersistenceManager extends HasInstanceDescription{
      * @throws IOException
      */
     public JsonArray find() throws IOException;
-    
-     /**
+
+    /**
      * Get the entity Id(s) for all stored entities.
      *
      * @param parametername the filter column name
@@ -48,7 +48,7 @@ public interface EntityPersistenceManager extends HasInstanceDescription{
      */
     public JsonArray find(String parametername, JsonValue parametervalue) throws IOException;
 
-     /**
+    /**
      * Get entity Id for a single entity - using selected by an column filter.
      *
      * @param parametername the filter column name
@@ -57,7 +57,7 @@ public interface EntityPersistenceManager extends HasInstanceDescription{
      * @throws IOException
      */
     public JsonValue findOne(String parametername, JsonValue parametervalue) throws IOException;
-    
+
     /**
      * Get the set of entity for all stored entities.
      *
@@ -65,9 +65,10 @@ public interface EntityPersistenceManager extends HasInstanceDescription{
      * @throws IOException
      */
     public JsonArray get() throws IOException;
-    
+
     /**
-     * Get entity data for a many (0 to many) entities - using selected by an column filter.
+     * Get entity data for a many (0 to many) entities - using selected by an
+     * column filter.
      *
      * @param parametername the filter column name
      * @param parametervalue the filter value
@@ -100,10 +101,10 @@ public interface EntityPersistenceManager extends HasInstanceDescription{
      *
      * @param id the entity Id
      * @return the JsonObject containing field values
-     * @throws IOException 
+     * @throws IOException
      */
     public JsonObject get(int id) throws IOException;
-    
+
     /**
      * Insert a new entity (set of values) into entity storage.
      *

@@ -20,16 +20,18 @@ package uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess;
 
 import java.util.Properties;
 import org.openide.util.lookup.ServiceProvider;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManagerFactory;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderFactory;
 
 /**
- * A Factory to create DataServices for local SQL datasources.
+ * A Factory to create EntityPersistenceProviders for local SQL datasources.
  * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@ServiceProvider(service = EntityPersistenceManagerFactory.class)
-public class LocalSQLEntityPersistenceManagerFactory implements EntityPersistenceManagerFactory<LocalSQLDataAccessManager, LocalSQLDataAccessManagerFactory> {
+@RegisterLog("nbpcglib.localSQLPersistenceUnitProvider")
+@ServiceProvider(service = EntityPersistenceProviderFactory.class)
+public class LocalSQLEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<LocalSQLPersistenceUnitProvider, LocalSQLPersistenceUnitProviderFactory> {
 
     @Override
     public String getType() {
@@ -37,12 +39,12 @@ public class LocalSQLEntityPersistenceManagerFactory implements EntityPersistenc
     }
     
     @Override
-    public Class<LocalSQLDataAccessManagerFactory> getDataAccessFactoryClass() {
-        return LocalSQLDataAccessManagerFactory.class;
+    public Class<LocalSQLPersistenceUnitProviderFactory> getPersistenceUnitProviderFactoryClass() {
+        return LocalSQLPersistenceUnitProviderFactory.class;
     }
 
     @Override
-    public EntityPersistenceManager createEntityPersistenceManager(String entityname, Properties p, LocalSQLDataAccessManager dam) {
-            return new LocalSQLEntityPersistenceManager(entityname, p, dam);
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalSQLPersistenceUnitProvider pup) {
+            return new LocalSQLEntityPersistenceProvider(entityname, p, pup);
     }
 }

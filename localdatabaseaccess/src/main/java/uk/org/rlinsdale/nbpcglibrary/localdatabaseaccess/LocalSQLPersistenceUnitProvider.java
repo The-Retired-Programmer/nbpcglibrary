@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -36,7 +37,7 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
 import javax.json.JsonValue.ValueType;
 import static javax.json.JsonValue.ValueType.STRING;
-import uk.org.rlinsdale.nbpcglibrary.api.DataAccessManager;
+import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -47,11 +48,11 @@ import static uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.TransactionEvent
 import static uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.TransactionEventParams.TransactionRequest.ROLLBACK;
 
 /**
- * Abstract Class implementing Database access using JDBC.
+ * Abstract Class implementing Local Database access using JDBC.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class LocalSQLDataAccessManager implements DataAccessManager {
+public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnitProvider {
 
     private Connection conn;
     private final Event<TransactionEventParams> transactionEvent;
@@ -63,15 +64,15 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      *
      * @param name the dataservice name
      */
-    public LocalSQLDataAccessManager(String name) {
+    public LocalSQLPersistenceUnitProvider(String name) {
         transactionEvent = new Event<>("transactions:" + name);
     }
 
     /**
-     * Set the JDBC connection to be used for this dataservice.
+     * Set the JDBC connection to be used for this PersistenceUnitProvider.
      *
      * @param conn the JDBC connection
-     * @throws java.sql.SQLException
+     * @throws SQLException
      */
     protected final void setConnection(Connection conn) throws SQLException {
         this.conn = conn;
@@ -112,14 +113,14 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      * Mark the start of a Transaction unit.
      */
     public void begin() {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "begin");
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "begin");
         if (inTransaction) {
             throw new LogicException("begin() failed - already in transaction");
         } else {
             try {
                 conn.setAutoCommit(false);
             } catch (SQLException ex) {
-                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "begin")
+                LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "begin")
                         .addExceptionMessage(ex).write();
             }
             inTransaction = true;
@@ -131,12 +132,12 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      * Mark the end of a transaction unit, commit all changes.
      */
     public void commit() {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "commit");
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "commit");
         if (inTransaction) {
             try {
                 conn.commit();
             } catch (SQLException ex) {
-                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "commit")
+                LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "commit")
                         .addExceptionMessage(ex).write();
             }
             transactionEvent.fire(new TransactionEventParams(COMMIT));
@@ -150,12 +151,12 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      * Mark the end of a transaction unit, rollback all changes.
      */
     public void rollback() {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "rollback");
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "rollback");
         if (inTransaction) {
             try {
                 conn.rollback();
             } catch (SQLException ex) {
-                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "rollback")
+                LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "rollback")
                         .addExceptionMessage(ex).write();
             }
             transactionEvent.fire(new TransactionEventParams(ROLLBACK));
@@ -181,7 +182,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
         try {
             conn.close();
         } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "disconnect")
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "disconnect")
                     .addExceptionMessage(ex).write();
         }
     }
@@ -208,8 +209,8 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
                     jab.add(rs.getInt("id"));
                 }
             }
-        } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "query", sql, parameter)
+        } catch (SQLException | IOException ex) {
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "query", sql, parameter)
                     .addExceptionMessage(ex).write();
         }
         return jab.build();
@@ -223,7 +224,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      */
     public synchronized JsonArray query(String sql) {
         JsonArrayBuilder jab = Json.createArrayBuilder();
-        LogBuilder.writeLog("nbpcglibrary.data", this, "query", sql);
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "query", sql);
         try {
             try (Statement stat = conn.createStatement()) {
                 ResultSet rs = stat.executeQuery(sql);
@@ -232,7 +233,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
                 }
             }
         } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "query", sql)
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "query", sql)
                     .addExceptionMessage(ex).write();
         }
         return jab.build();
@@ -248,7 +249,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      */
     public synchronized int simpleIntQuery(String sql, String columnname) {
         int res = 0;
-        LogBuilder.writeLog("nbpcglibrary.data", this, "simpleIntQuery", sql, columnname);
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "simpleIntQuery", sql, columnname);
         try {
             try (Statement stat = conn.createStatement()) {
                 ResultSet rs = stat.executeQuery(sql);
@@ -256,7 +257,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
                 res = rs.getInt(columnname);
             }
         } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "simpleIntQuery", sql, columnname)
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "simpleIntQuery", sql, columnname)
                     .addExceptionMessage(ex).write();
         }
         return res;
@@ -271,7 +272,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      * @return the returned database record (in Json format)
      */
     public synchronized JsonObject simpleQuery(String tablename, String sql) {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "simpleQuery", sql);
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "simpleQuery", sql);
         JsonObjectBuilder job = Json.createObjectBuilder();
         try {
             try (Statement stat = conn.createStatement()) {
@@ -282,7 +283,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
                 buildJsonRecord(tablename, rs, job);
             }
         } catch (SQLException | JsonConversionException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "simpleQuery", sql)
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "simpleQuery", sql)
                     .addExceptionMessage(ex).write();
         }
         return job.build();
@@ -297,7 +298,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      * @return the returned database record (in Json format)
      */
     public synchronized JsonArray multiQuery(String tablename, String sql) {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "simpleQuery", sql);
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "simpleQuery", sql);
         JsonArrayBuilder jab = Json.createArrayBuilder();
         try {
             try (Statement stat = conn.createStatement()) {
@@ -309,13 +310,13 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
                 }
             }
         } catch (SQLException | JsonConversionException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "multiQuery", sql)
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "multiQuery", sql)
                     .addExceptionMessage(ex).write();
         }
         return jab.build();
     }
-    
-     /**
+
+    /**
      * Execute a select query and insert the values from the each row returned
      * into a JsonArray of JsonObjects.
      *
@@ -325,7 +326,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      * @return the returned database record (in Json format)
      */
     public synchronized JsonArray multiQuery(String tablename, String sql, JsonValue parameter) {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "simpleQuery", sql);
+        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "simpleQuery", sql);
         JsonArrayBuilder jab = Json.createArrayBuilder();
         try {
             try (Statement stat = conn.createStatement()) {
@@ -336,8 +337,8 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
                     jab.add(job.build());
                 }
             }
-        } catch (SQLException | JsonConversionException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "multiQuery", sql)
+        } catch (SQLException | IOException ex) {
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "multiQuery", sql)
                     .addExceptionMessage(ex).write();
         }
         return jab.build();
@@ -418,8 +419,8 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
             try (Statement stat = conn.createStatement()) {
                 res = stat.executeUpdate(buildsql(sql, parameters));
             }
-        } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "execute", sql, parameters)
+        } catch (SQLException | IOException ex) {
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "execute", sql, parameters)
                     .addExceptionMessage(ex).write();
         }
         return res;
@@ -443,14 +444,14 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
             try (Statement stat = conn.createStatement()) {
                 res = stat.executeUpdate(buildsql(sql, parameter));
             }
-        } catch (SQLException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "execute", sql, parameter)
+        } catch (SQLException | IOException ex) {
+            LogBuilder.create("nbpcglib.localSQLPersistenceUnitProvider", Level.SEVERE).addMethodName(this, "execute", sql, parameter)
                     .addExceptionMessage(ex).write();
         }
         return res;
     }
 
-    private String buildsql(String sql, JsonObject parameters) {
+    private String buildsql(String sql, JsonObject parameters) throws IOException {
         if (sql.contains("{$KEYLIST}") || sql.contains("{$VALUELIST}") || sql.contains("{$KEYVALUELIST}")) {
             // special code to generate and substitute keylists and valuelists
             String keylist = "";
@@ -471,14 +472,14 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
         for (Map.Entry<String, JsonValue> parameter : parameters.entrySet()) {
             sql = sql.replace("{" + parameter.getKey() + "}", format(parameter.getValue()));
         }
-        LogBuilder.writeExitingLog("nbpcglibrary.data", this, "buildsql", sql);
+        LogBuilder.writeExitingLog("nbpcglib.localSQLPersistenceUnitProvider", this, "buildsql", sql);
         return sql;
     }
 
-    private String buildsql(String sql, JsonValue parameter) {
-        sql = sql.replace("{P}", format(parameter));
-        LogBuilder.writeExitingLog("nbpcglibrary.data", this, "buildsql", sql);
-        return sql;
+    private String buildsql(String sql, JsonValue parameter) throws IOException {
+            sql = sql.replace("{P}", format(parameter));
+            LogBuilder.writeExitingLog("nbpcglib.localSQLPersistenceUnitProvider", this, "buildsql", sql);
+            return sql;
     }
 
     /**
@@ -489,6 +490,7 @@ public abstract class LocalSQLDataAccessManager implements DataAccessManager {
      *
      * @param value the data value
      * @return the string formated data value
+     * @throws IOException
      */
-    protected abstract String format(JsonValue value);
+    protected abstract String format(JsonValue value) throws IOException;
 }

@@ -20,7 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import java.io.IOException;
 import java.util.logging.Level;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
@@ -30,7 +30,7 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventPa
 
 /**
  * The abstract class defining an editable Entity, with a index (orderable)
- field.
+ * field.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
@@ -40,7 +40,7 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventPa
 public abstract class EntityIndexed<E extends EntityIndexed, P extends CoreEntity, F> extends Entity<E, P, F> {
 
     private final DBFieldsRWIndexed<E> dbfields;
-    private final EntityPersistenceManager entityPersistenceManager;
+    private final EntityPersistenceProvider entityPersistenceProvider;
 
     /**
      * Constructor.
@@ -51,10 +51,10 @@ public abstract class EntityIndexed<E extends EntityIndexed, P extends CoreEntit
      * @param em the entity manager for this entity class
      * @param dbfields the entity fields
      */
-    public EntityIndexed(String entityname, String icon, int id, EntityManager<E,P> em, DBFieldsRWIndexed<E> dbfields) {
+    public EntityIndexed(String entityname, String icon, int id, EntityManager<E, P> em, DBFieldsRWIndexed<E> dbfields) {
         super(entityname, icon, id, em, dbfields);
         this.dbfields = dbfields;
-        this.entityPersistenceManager = em.getEntityPersistenceManager();
+        this.entityPersistenceProvider = em.getEntityPersistenceProvider();
     }
 
     @Override
@@ -63,9 +63,9 @@ public abstract class EntityIndexed<E extends EntityIndexed, P extends CoreEntit
         if (oldState == NEW || oldState == NEWEDITING) {
             if (dbfields.getIndex() == Integer.MAX_VALUE) {
                 try {
-                    dbfields.setIndex(entityPersistenceManager.findNextIdx());
+                    dbfields.setIndex(entityPersistenceProvider.findNextIdx());
                 } catch (IOException ex) {
-                     LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "save")
+                    LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "save")
                             .addExceptionMessage(ex).write();
                 }
             }

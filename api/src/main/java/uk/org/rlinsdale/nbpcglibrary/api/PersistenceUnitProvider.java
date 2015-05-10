@@ -16,27 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.remoteclient;
-
-import java.util.Properties;
-import org.openide.util.lookup.ServiceProvider;
-import uk.org.rlinsdale.nbpcglibrary.api.DataAccessManagerFactory;
+package uk.org.rlinsdale.nbpcglibrary.api;
 
 /**
- * A Factory to create DataServices for MySQL databases.
- * 
+ * Interface - defines the core functions of a DataAccessManager.
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@ServiceProvider(service = RemoteDataAccessManagerFactory.class)
-public class RemoteDataAccessManagerFactory implements DataAccessManagerFactory<RemoteDataAccessManager> {
-    
-    @Override
-    public String getType() {
-        return "remote";
-    }
+public interface PersistenceUnitProvider extends HasInstanceDescription {
 
-    @Override
-    public RemoteDataAccessManager createDataAccessManager(Properties p) {
-        return new RemoteDataAccessManager(p);
-    }
+    /**
+     * Test if DataAccessManager is operational - ie available and able to access
+     * data.
+     *
+     * @return true if operational
+     */
+    public boolean isOperational();
+
+    /**
+     * Get the name given to this DataAccessManager.
+     *
+     * @return the name
+     */
+    public String getName();
+    
 }

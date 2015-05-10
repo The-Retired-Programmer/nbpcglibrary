@@ -36,7 +36,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
 import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFields;
@@ -74,10 +74,10 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     private EntityState state = INIT;
     private int id;
     private final DBFields dbfields;
-    private final EntityPersistenceManager dataAccess;
+    private final EntityPersistenceProvider dataAccess;
     private final String entityname;
 
-    private final EntityPersistenceManager entityPersistenceManager;
+    private final EntityPersistenceProvider entityPersistenceManager;
     private final Event<IdChangeEventParams> idChangeEvent;
     private final EntityManager<E, P> em;
     private final EntityStateChangeListener entitystatechangelistener;
@@ -93,7 +93,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * @param dbfields the entity fields
      */
     public Entity(String entityname, String icon, int id, EntityManager<E, P> em, DBFields dbfields) {
-        this(entityname, icon, id, em, em.getEntityPersistenceManager(), dbfields);
+        this(entityname, icon, id, em, em.getEntityPersistenceProvider(), dbfields);
     }
 
     /**
@@ -107,7 +107,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * @param dbfields the entity fields
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    protected Entity(String entityname, String icon, int id, EntityManager<E, P> em, EntityPersistenceManager dataAccess, DBFields dbfields) {
+    protected Entity(String entityname, String icon, int id, EntityManager<E, P> em, EntityPersistenceProvider dataAccess, DBFields dbfields) {
         super(entityname, icon);
         this.id = id;
         this.dataAccess = dataAccess;
@@ -325,13 +325,13 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
             case DBENTITYEDITING:
                 return;
             case NEW:
-                _saveState();
+                entitySaveState();
                 dbfields.saveState();
                 state = NEWEDITING;
                 fireStateChange(EDIT, oldState, state);
                 return;
             case DBENTITY:
-                _saveState();
+                entitySaveState();
                 dbfields.saveState();
                 state = DBENTITYEDITING;
                 fireStateChange(EDIT, oldState, state);
@@ -356,7 +356,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
                 break;
         }
         if (wasEditing) {
-            _restoreState();
+            entityRestoreState();
             dbfields.restoreState();
             fireFieldChange(ALL);
             fireStateChange(RESET, oldState, state);
@@ -388,7 +388,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
             try {
                 setId(JsonUtil.getObjectKeyIntegerValue(data, "id"));
                 dbfields.load(data);
-                _load(data);
+                entityLoad(data);
             } catch (JsonConversionException ex) {
                 LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", data.toString())
                         .addExceptionMessage(ex).write();
@@ -453,7 +453,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
                     if (!checkRules()) {
                         return false;
                     }
-                    _values(job);
+                    entityValues(job);
                     dbfields.values(job);
                     em.persistTransient((E) this, entityPersistenceManager.insert(job.build()));
                     idChangeEvent.fire(new IdChangeEventParams());
@@ -463,7 +463,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
                     if (!checkRules()) {
                         return false;
                     }
-                    _diffs(job);
+                    entityDiffs(job);
                     dbfields.diffs(job);
                     JsonObject jo = job.build();
                     if (!jo.isEmpty()) {
@@ -493,14 +493,14 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
         switch (oldState) {
             case NEW:
             case NEWEDITING:
-                _remove();
+                entityRemove();
                 em.removeFromTransientCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
                 return;
             case DBENTITY:
             case DBENTITYEDITING:
-                _remove();
+                entityRemove();
                 entityPersistenceManager.delete(getId());
                 em.removeFromCache((E) this);
                 setState(REMOVED);
@@ -520,7 +520,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     public final void copy(E e) throws IOException {
         EntityState oldState = getState();
         if (oldState == NEW || oldState == NEWEDITING) {
-            _copy(e);
+            entityCopy(e);
             dbfields.copy(e);
             ensureEditing();
             fireFieldChange(ALL);
@@ -650,7 +650,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * Locally save the state of this entity (so that entity can be
      * reset/cancelled).
      */
-    abstract protected void _saveState();
+    abstract protected void entitySaveState();
     
     /**
      * Load Json format data into the entity fields.
@@ -658,7 +658,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * @param data the data to be inserted
      * @throws IOException if bad data provided
      */
-    abstract protected void _load(JsonObject data) throws IOException;
+    abstract protected void entityLoad(JsonObject data) throws IOException;
 
     /**
      * get the key string which will be used in when sorting this entity
@@ -676,22 +676,22 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     public abstract String getDisplayTitle();
     
     /**
-     * Add all field values to the given map.
+     * Add all field values to the given JsonObject.
      *
-     * @param job a JasonObjectBuilder into which field names (keys) and field
+     * @param job a JsonObjectBuilder into which field names (keys) and field
      * values are to be inserted.
      * @throws IOException if problem obtaining / parsing data
      */
-    abstract protected void _values(JsonObjectBuilder job) throws IOException;
+    abstract protected void entityValues(JsonObjectBuilder job) throws IOException;
 
     /**
-     * Add any modified field values to the given map.
+     * Add any modified field values to the given JsonObject.
      *
-     * @param job a JasonObjectBuilder into which field names (keys) and field
+     * @param job a JsonObjectBuilder into which field names (keys) and field
      * values are to be inserted.
      * @throws IOException if problem obtaining / parsing data
      */
-    abstract protected void _diffs(JsonObjectBuilder job) throws IOException;
+    abstract protected void entityDiffs(JsonObjectBuilder job) throws IOException;
 
     /**
      * Complete any entity specific removal actions prior to entity deletion.
@@ -699,14 +699,14 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      *
      * @throws java.io.IOException
      */
-    abstract protected void _remove() throws IOException;
+    abstract protected void entityRemove() throws IOException;
     
     /**
      * Field Copy actions - copy entity fields into this entity.
      *
      * @param from the copy source entity
      */
-    abstract protected void _copy(E from);
+    abstract protected void entityCopy(E from);
 
 
 }

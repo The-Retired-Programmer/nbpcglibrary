@@ -25,12 +25,12 @@ import java.io.IOException;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class EntityPersistenceManagerPropertiesException extends IOException {
+public class EntityPersistenceProviderManagerException extends IOException {
 
     /**
      * Constructor.
      */
-    public EntityPersistenceManagerPropertiesException() {
+    public EntityPersistenceProviderManagerException() {
         super();
     }
 
@@ -39,7 +39,7 @@ public class EntityPersistenceManagerPropertiesException extends IOException {
      *
      * @param message the exception message text
      */
-    public EntityPersistenceManagerPropertiesException(String message) {
+    public EntityPersistenceProviderManagerException(String message) {
         super(message);
     }
 
@@ -48,7 +48,7 @@ public class EntityPersistenceManagerPropertiesException extends IOException {
      *
      * @param ex the causal exception
      */
-    public EntityPersistenceManagerPropertiesException(Exception ex) {
+    public EntityPersistenceProviderManagerException(Exception ex) {
         super(ex);
     }
 
@@ -58,7 +58,7 @@ public class EntityPersistenceManagerPropertiesException extends IOException {
      * @param message the exception message text
      * @param ex the causal exception
      */
-    public EntityPersistenceManagerPropertiesException(String message, Exception ex) {
+    public EntityPersistenceProviderManagerException(String message, Exception ex) {
         super(message, ex);
     }
 }

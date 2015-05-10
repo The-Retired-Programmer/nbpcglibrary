@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.remoteclient;
+package uk.org.rlinsdale.nbpcglibrary.mysql;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -29,37 +29,36 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManager;
-import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceManagerManager;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class RemoteEntityPersistenceManagerTest {
+public class LocalSQLEntityPersistenceProviderTest {
     
-    private static EntityPersistenceManager instance;
+    private static EntityPersistenceProvider instance;
     
-    public RemoteEntityPersistenceManagerTest() {
+    public LocalSQLEntityPersistenceProviderTest() {
     }
     
     @BeforeClass
-    public static void setUpClass() {
-        try {
-            String[] entitynames = new String[] {
+    public static void setUpClass() throws IOException {
+        
+        String[] entitynames = new String[] {
                 "Application", "Role", "Permission", "User", "UserRole", "Userpermission"
             };
-            Properties p = new Properties();
-            p.setProperty("key", "authentication2");
-            p.setProperty("connection", "http://localhost:8080/remoteauthentication2");
-            p.setProperty("entitypersistencemanagertype", "remote");
-            p.setProperty("dataaccessmanagertype", "remote");
-            EntityPersistenceManagerManager.set(p, entitynames);
-            instance = EntityPersistenceManagerManager.getEntityPersistenceManager("authentication2", "Application");
-        } catch (IOException ex) {
-            //???? should never happen as I am defining the key properly
-        }
+        Properties p = new Properties();
+        p.setProperty("key", "authentication2");
+        p.setProperty("connection", "jdbc:mysql://localhost:3306/authentication2");
+        p.setProperty("entitypersistenceprovidertype", "localsql");
+        p.setProperty("persistenceunitprovidertype", "mysql");
+        p.setProperty("user", "developer");
+        p.setProperty("password", "dev");
+        EntityPersistenceProviderManager.set(p, entitynames);
+        instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("authentication2", "Application");
     }
     
     @AfterClass
@@ -75,18 +74,18 @@ public class RemoteEntityPersistenceManagerTest {
     }
 
     /**
-     * Test of instanceDescription method, of class RemoteEntityPersistenceManager.
+     * Test of instanceDescription method, of class LocalSQLEntityPersistenceProvider.
      */
     @Test
     public void testInstanceDescription() {
         System.out.println("instanceDescription");
-        String expResult = "RemoteEntityPersistenceManager[RemoteDataAccessManager-Application]";
+        String expResult = "LocalSQLEntityPersistenceProvider[LocalMySQLPersistenceUnitProvider-Application]";
         String result = instance.instanceDescription();
         assertEquals(expResult, result);
     }
 
     /**
-     * Test of get method, of class RemoteEntityPersistenceManager.
+     * Test of get method, of class LocalSQLEntityPersistenceProvider.
      * @throws java.lang.Exception
      */
     @Test
@@ -103,7 +102,7 @@ public class RemoteEntityPersistenceManagerTest {
     }
 
     /**
-     * Test of find method, of class RemoteEntityPersistenceManager.
+     * Test of find method, of class LocalSQLEntityPersistenceProvider.
      * @throws java.lang.Exception
      */
     @Test
@@ -115,7 +114,7 @@ public class RemoteEntityPersistenceManagerTest {
     }
 
     /**
-     * Test of get method, of class RemoteEntityPersistenceManager.
+     * Test of get method, of class LocalSQLEntityPersistenceProvider.
      * @throws java.lang.Exception
      */
     @Test
@@ -131,7 +130,7 @@ public class RemoteEntityPersistenceManagerTest {
     }
 
     /**
-     * Test of getOne method, of class RemoteEntityPersistenceManager.
+     * Test of getOne method, of class LocalSQLEntityPersistenceProvider.
      * @throws java.lang.Exception
      */
     @Test
@@ -144,7 +143,7 @@ public class RemoteEntityPersistenceManagerTest {
     }
 
     /**
-     * Test of findNextIdx method, of class RemoteEntityPersistenceManager.
+     * Test of findNextIdx method, of class LocalSQLEntityPersistenceProvider.
      * @throws java.lang.Exception
      */
     @Test(expected = IOException.class)
@@ -153,5 +152,4 @@ public class RemoteEntityPersistenceManagerTest {
         int result = instance.findNextIdx();
         fail("Exception should have been thrown in this case.");
     }
-    
 }

@@ -16,27 +16,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.mysql;
+package uk.org.rlinsdale.nbpcglibrary.remoteclient;
 
 import java.util.Properties;
 import org.openide.util.lookup.ServiceProvider;
-import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLDataAccessManagerFactory;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderFactory;
 
 /**
- * A Factory to create DataAccessManager for local MySQL databases.
- * 
+ * A Factory to create EntityPersistenceProviders for remote datasources.
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@ServiceProvider(service = LocalSQLDataAccessManagerFactory.class)
-public class MySQLLocalDatabaseAccessManagerFactory implements LocalSQLDataAccessManagerFactory<MySQLLocalDatabaseAccessManager> {
+@RegisterLog("nbpcglib.RemoteEntityPersistenceProvider")
+@ServiceProvider(service = EntityPersistenceProviderFactory.class)
+public class RemoteEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<RemotePersistenceUnitProvider, RemotePersistenceUnitProviderFactory> {
 
     @Override
     public String getType() {
-        return "mysql";
+        return "remote";
     }
 
     @Override
-    public MySQLLocalDatabaseAccessManager createDataAccessManager(Properties p) {
-        return new MySQLLocalDatabaseAccessManager(p);
+    public Class<RemotePersistenceUnitProviderFactory> getPersistenceUnitProviderFactoryClass() {
+        return RemotePersistenceUnitProviderFactory.class;
+    }
+
+    @Override
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, RemotePersistenceUnitProvider pup) {
+        return new RemoteEntityPersistenceProvider(entityname, p, pup);
     }
 }
