@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.api;
 
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -52,6 +53,7 @@ public interface EntityPersistenceProviderFactory<D extends PersistenceUnitProvi
      * @param p the properties which define the provider configuration
      * @param persistenceUnitProvider the PersistenceUnitProvider to be used
      * @return the EntityPersistenceProvider
+     * @throws java.io.IOException
      */
-    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider);
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider) throws IOException ;
 }

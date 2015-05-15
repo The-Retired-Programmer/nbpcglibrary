@@ -25,6 +25,7 @@
                     <publicPackages>
                         <publicPackage>uk.org.rlinsdale.nbpcglibrary.json</publicPackage>
                         <publicPackage>javax.json</publicPackage>
+                        <publicPackage>javax.json.stream</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

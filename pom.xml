@@ -18,6 +18,7 @@
         <module>api</module>
         <module>data</module>
         <module>localdatabaseaccess</module>
+        <module>localjsonaccess</module>
         <module>form</module>
         <module>icons</module>
         <module>mysql</module>
