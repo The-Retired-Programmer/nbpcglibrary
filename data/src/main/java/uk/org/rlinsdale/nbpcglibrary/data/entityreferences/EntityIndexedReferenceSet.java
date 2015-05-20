@@ -45,7 +45,7 @@ public class EntityIndexedReferenceSet<E extends EntityIndexed, P extends CoreEn
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
-     * @throws java.io.IOException
+     * @throws IOException if problem in creating the set
      */
     public EntityIndexedReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, columnname, columnvalue, emclass);
@@ -57,7 +57,7 @@ public class EntityIndexedReferenceSet<E extends EntityIndexed, P extends CoreEn
      * @param name the set name (for reporting)
      * @param field field identifier
      * @param emclass the associated entity manager class
-     * @throws java.io.IOException
+     * @throws IOException if problem in creating the set
      */
     public EntityIndexedReferenceSet(String name, F field, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, emclass);
@@ -98,7 +98,8 @@ public class EntityIndexedReferenceSet<E extends EntityIndexed, P extends CoreEn
 
     /**
      * Persist the reordering.
-     * @throws java.io.IOException
+     *
+     * @throws IOException if problems in completing this action.
      */
     public void persistReorder() throws IOException {
         List<E> el = get();

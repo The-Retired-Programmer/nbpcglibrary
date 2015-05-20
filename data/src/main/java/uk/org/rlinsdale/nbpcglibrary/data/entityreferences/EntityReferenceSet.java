@@ -74,7 +74,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
-     * @throws java.io.IOException
+     * @throws IOException if problems when creating reference set
      */
     public EntityReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManager> emclass) throws IOException {
         this(emclass, name, field, columnname, columnvalue);
@@ -91,7 +91,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
      * @param name the set name (for reporting)
      * @param field field identifier
      * @param emclass the associated entity manager class
-     * @throws java.io.IOException
+     * @throws IOException if problems when creating reference set
      */
     public EntityReferenceSet(String name, F field, Class<? extends EntityManager> emclass) throws IOException {
         this(emclass, name, field, null, 0);
@@ -156,7 +156,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
     /**
      * Restore state (to the entity storage state).
      *
-     * @throws java.io.IOException
+     * @throws IOException if problems in restoring state
      */
     public void restoreState() throws IOException {
         // TODO - we are not removing any new entities which are not cached - so we might have a leak here.
@@ -178,7 +178,8 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
      * Get the list of Entities
      *
      * @return the list of entities
-     * @throws java.io.IOException
+     * @throws IOException if problems in reading any of the required entity
+     * data from persistent storage
      */
     public List<E> get() throws IOException {
         List<E> el = new ArrayList<>();
@@ -192,7 +193,8 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
      * Add a new entity to the entity set
      *
      * @param e the new entity
-     * @throws java.io.IOException
+     * @throws IOException if problems in reading any of the required entity
+     * data from persistent storage
      */
     public void add(E e) throws IOException {
         childList.add(new EntityReference<>(name, e, em));
@@ -204,7 +206,8 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity, F> {
      *
      * @param index the position to insert the new entity
      * @param e the new entity
-     * @throws java.io.IOException
+     * @throws IOException if problems in reading any of the required entity
+     * data from persistent storage
      */
     protected final void add(int index, E e) throws IOException {
         childList.add(index, new EntityReference<>(name, e, em));

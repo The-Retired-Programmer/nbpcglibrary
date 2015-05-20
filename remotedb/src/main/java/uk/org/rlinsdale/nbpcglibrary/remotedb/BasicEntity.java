@@ -23,44 +23,51 @@ import javax.json.stream.JsonGenerator;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 
 /**
+ * The basic Entity interface. This is incremental to the standards setters and
+ * getters which are normally required (for JPA for example).
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T>
+ * @param <T> the entity class
  */
 public interface BasicEntity<T extends BasicEntity> {
 
     /**
+     * set a field.
      *
-     * @param key
-     * @param value
-     * @throws JsonConversionException
+     * @param key the name of the field
+     * @param value the value to insert
+     * @throws JsonConversionException if parsing problems
      */
     public void setField(String key, JsonValue value) throws JsonConversionException;
 
     /**
+     * Write a field to the JsonObject
      *
-     * @param generator
-     * @param key
-     * @throws JsonConversionException
+     * @param generator the JsonGenerator being used to build the JsonObject
+     * @param key the name of the field
+     * @throws JsonConversionException if parsing problems
      */
     public void writeField(JsonGenerator generator, String key) throws JsonConversionException;
 
     /**
+     * Write the primary Key value to the JsonArray
      *
-     * @param generator
+     * @param generator the JsonGenerator being used to build the JsonArray
      */
     public void writePK(JsonGenerator generator);
 
     /**
+     * Write the primary Key name and value to the JsonObject
      *
-     * @param generator
+     * @param generator the JsonGenerator being used to build the JsonObject
      */
     public void writePKwithkey(JsonGenerator generator);
 
     /**
+     * Write all fields as a jsonObject
      *
-     * @param generator
-     * @param label
+     * @param generator the JsonGenerator being used to build the JsonObject
+     * @param label the JsonObject's label
      */
     public void writeAllFields(JsonGenerator generator, String label);
 }

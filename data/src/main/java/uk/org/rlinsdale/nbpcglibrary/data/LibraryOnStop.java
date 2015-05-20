@@ -24,8 +24,8 @@ import uk.org.rlinsdale.nbpcglibrary.form.ConfirmationDialog;
 import org.openide.modules.OnStop;
 
 /**
- * The Standard On Stop action - tests if forms have error entries and dialogs
- * with user to check if close is to continue.
+ * The Standard On Stop action - tests if forms have error, and dialogs with
+ * user to check if close is to continue.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
@@ -38,23 +38,23 @@ public class LibraryOnStop implements Callable<Boolean> {
                 ? ConfirmationDialog.show("Close down request", "Do you want to continue with close down while you have entities with errors which cannot be saved at the present time?")
                 : true;
     }
-    
+
     @SuppressWarnings("CallToThreadYield")
     private boolean hasErrors() {
         return outstandingSavableRegistrations > 0 || Savable.REGISTRY.lookup(Savable.class) != null;
     }
-    
+
     private static int outstandingSavableRegistrations = 0;
-    
+
     /**
-     *
+     * Increment the saveables outstanding
      */
     public static void incRegisterOutstanding() {
         outstandingSavableRegistrations++;
     }
-    
+
     /**
-     *
+     * Decrement the saveables outstanding
      */
     public static void decRegisterOutstanding() {
         outstandingSavableRegistrations--;

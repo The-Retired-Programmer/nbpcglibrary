@@ -19,39 +19,46 @@
 package uk.org.rlinsdale.nbpcglibrary.remotedb;
 
 /**
+ * The Additional interface needed for an entity which is implements a standard
+ * Id and timeStamp fields.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T>
+ * @param <T> the entity class
  */
 public interface IdandstampEntity<T extends IdandstampEntity> extends BasicEntity<T> {
 
     /**
+     * Get the entity Id (primary key value)
      *
-     * @return
+     * @return the entity Id
      */
     public Integer getId();
 
     /**
+     * Set the createdby field
      *
-     * @param usercode
+     * @param usercode the value
      */
     public void setCreatedby(String usercode);
 
     /**
+     * set the updatedby field
      *
-     * @param usercode
+     * @param usercode the value
      */
     public void setUpdatedby(String usercode);
 
     /**
+     * set the createdon field
      *
-     * @param timestamp
+     * @param timestamp the value
      */
     public void setCreatedon(String timestamp);
 
     /**
+     * set the updatedon field
      *
-     * @param timestamp
+     * @param timestamp the value
      */
     public void setUpdatedon(String timestamp);
 }

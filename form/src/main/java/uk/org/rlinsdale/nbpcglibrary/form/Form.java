@@ -41,32 +41,32 @@ import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDAT
 public class Form extends GridBagPanel implements HasInstanceDescription {
 
     /**
-     *
+     * The Result code from a Form save action
      */
     public enum FormSaveResult {
 
         /**
-         *
+         * Save was successful
          */
         SAVESUCCESS,
 
         /**
-         *
+         * Save failed due to validation 
          */
         SAVEVALIDATIONFAIL,
 
         /**
-         *
+         * Save action failed
          */
         SAVEFAIL,
 
         /**
-         *
+         * Save action was cancelled by user
          */
         CANCELLED,
 
         /**
-         *
+         * Save action failed as user closed dialog
          */
         CLOSED
     }
@@ -138,23 +138,23 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
     public FormSaveResult save() {
         try {
             boolean ok = true;
-        LogBuilder.writeLog("nbpcglibrary.form", this, "test");
-        for (FieldsDef f : fieldsdefs) {
-            f.updateAllBackingObjectsFromFields();
-            if (!f.checkRules()) {
-                ok = false;
+            LogBuilder.writeLog("nbpcglibrary.form", this, "test");
+            for (FieldsDef f : fieldsdefs) {
+                f.updateAllBackingObjectsFromFields();
+                if (!f.checkRules()) {
+                    ok = false;
+                }
             }
-        }
-        if (!ok) {
-            return SAVEVALIDATIONFAIL;
-        }
-        LogBuilder.writeLog("nbpcglibrary.form", this, "save");
-        for (FieldsDef f : fieldsdefs) {
-            if (!f.save()) {
-                ok = false;
+            if (!ok) {
+                return SAVEVALIDATIONFAIL;
             }
-        }
-        return ok ? SAVESUCCESS : SAVEFAIL;
+            LogBuilder.writeLog("nbpcglibrary.form", this, "save");
+            for (FieldsDef f : fieldsdefs) {
+                if (!f.save()) {
+                    ok = false;
+                }
+            }
+            return ok ? SAVESUCCESS : SAVEFAIL;
         } catch (IOException ex) {
             return SAVEFAIL;
         }

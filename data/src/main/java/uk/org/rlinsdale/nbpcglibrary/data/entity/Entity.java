@@ -252,7 +252,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     }
 
     /**
-     *
+     * Fire Listeners if name changes.
      */
     protected void nameListenerFire() {
         nameChangeEvent.fire(new SimpleEventParams());
@@ -277,7 +277,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     }
 
     /**
-     *
+     * Fire Listeners if title changes.
      */
     protected void titleListenerFire() {
         titleChangeEvent.fire(new SimpleEventParams());
@@ -515,7 +515,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * Copy entity fields into this entity.
      *
      * @param e the copy source entity
-     * @throws java.io.IOException
+     * @throws IOException if entity in illegal state.
      */
     public final void copy(E e) throws IOException {
         EntityState oldState = getState();
@@ -645,13 +645,13 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
             return icon.getIconHeight();
         }
     }
-    
+
     /**
      * Locally save the state of this entity (so that entity can be
      * reset/cancelled).
      */
     abstract protected void entitySaveState();
-    
+
     /**
      * Load Json format data into the entity fields.
      *
@@ -674,7 +674,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * @return the title string
      */
     public abstract String getDisplayTitle();
-    
+
     /**
      * Add all field values to the given JsonObject.
      *
@@ -697,16 +697,14 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * Complete any entity specific removal actions prior to entity deletion.
      * Basic use case: remove any linkage to parent entities.
      *
-     * @throws java.io.IOException
+     * @throws IOException if problem occurs while completing this action
      */
     abstract protected void entityRemove() throws IOException;
-    
+
     /**
      * Field Copy actions - copy entity fields into this entity.
      *
      * @param from the copy source entity
      */
     abstract protected void entityCopy(E from);
-
-
 }

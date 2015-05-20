@@ -105,7 +105,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      *
      * @param id the entity Id
      * @return the entity
-     * @throws java.io.IOException
+     * @throws IOException if problems in obtaining the entity data
      */
     public final synchronized E get(int id) throws IOException {
         if (id <= 0) {
@@ -148,7 +148,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      *
      * @param id the entity id
      * @return the created entity
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the entity
      */
     abstract protected E createNewEntity(int id) throws IOException;
 
@@ -194,7 +194,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      * Create a new entity (initialised)
      *
      * @return the new entity
-     * @throws java.io.IOException
+     * @throws IOException  if problems in creating the entity data
      */
     public final synchronized E getNew() throws IOException {
         LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", nextId);
@@ -210,7 +210,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      *
      * @param parent the parent entity
      * @return the new entity
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the entity data
      */
     public final synchronized E getNew(P parent) throws IOException {
         E e = getNew();
@@ -225,7 +225,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      * @param from the copy source entity
      * @param parent the parent entity
      * @return the new entity
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the entity data
      */
     public final synchronized E getNew(E from, P parent) throws IOException {
         E e = getNew(parent);
@@ -291,7 +291,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      *
      * @param e the child entity
      * @param rs the parent entity
-     * @throws java.io.IOException
+     * @throws IOException if problems in linking the entity
      */
     abstract protected void link2parent(E e, P rs) throws IOException;
 }

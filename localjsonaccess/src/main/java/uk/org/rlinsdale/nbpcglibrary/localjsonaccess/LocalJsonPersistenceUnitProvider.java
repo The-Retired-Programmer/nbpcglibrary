@@ -59,7 +59,7 @@ public class LocalJsonPersistenceUnitProvider implements PersistenceUnitProvider
      *
      * @param tablename the table name
      * @return the table data
-     * @throws java.io.IOException
+     * @throws IOException if problems reading or parsing data
      */
     public JsonObject load(String tablename) throws IOException {
         dbfile = new File(databasefolder, tablename);
@@ -78,10 +78,10 @@ public class LocalJsonPersistenceUnitProvider implements PersistenceUnitProvider
     }
 
     /**
+     * Persist in-memory table into file store (json)
      *
-     *
-     * @param tableobject
-     * @throws java.io.IOException
+     * @param tableobject the table object
+     * @throws IOException if problem writing the data
      */
     public void persist(JsonObject tableobject) throws IOException {
         try (JsonWriter jsonWriter = Json.createWriter(new FileWriter(dbfile))) {

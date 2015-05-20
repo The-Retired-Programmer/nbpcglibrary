@@ -295,7 +295,7 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
      * Move action - add child entity.
      *
      * @param child the entity
-     * @throws java.io.IOException
+     * @throws IOException if problem
      */
     abstract protected void _moveAddChild(CoreEntity child) throws IOException;
 
@@ -303,7 +303,7 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
      * Cut action - add child entity.
      *
      * @param child the entity
-     * @throws java.io.IOException
+     * @throws IOException if problem
      */
     abstract protected void _cutAddChild(CoreEntity child) throws IOException;
 
@@ -311,7 +311,7 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
      * Copy Action - add child entity.
      *
      * @param child the entity
-     * @throws java.io.IOException
+     * @throws IOException if problem
      */
     abstract protected void _copyAddChild(CoreEntity child) throws IOException;
 

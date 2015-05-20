@@ -34,22 +34,31 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
+ * The test package for the LocalMySqlEntityPersistenceProvider
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class LocalSQLEntityPersistenceProviderTest {
-    
+
     private static EntityPersistenceProvider instance;
-    
+
+    /**
+     * Constructore
+     */
     public LocalSQLEntityPersistenceProviderTest() {
     }
-    
+
+    /**
+     * Setup class
+     *
+     * @throws IOException if problems
+     */
     @BeforeClass
     public static void setUpClass() throws IOException {
-        
-        String[] entitynames = new String[] {
-                "Application", "Role", "Permission", "User", "UserRole", "Userpermission"
-            };
+
+        String[] entitynames = new String[]{
+            "Application", "Role", "Permission", "User", "UserRole", "Userpermission"
+        };
         Properties p = new Properties();
         p.setProperty("key", "authentication2");
         p.setProperty("connection", "jdbc:mysql://localhost:3306/authentication2");
@@ -60,21 +69,31 @@ public class LocalSQLEntityPersistenceProviderTest {
         EntityPersistenceProviderManager.set(p, entitynames);
         instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("authentication2", "Application");
     }
-    
+
+    /**
+     * tear down class
+     */
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
+    /**
+     * setup test
+     */
     @Before
     public void setUp() {
     }
-    
+
+    /**
+     * tear down test
+     */
     @After
     public void tearDown() {
     }
 
     /**
-     * Test of instanceDescription method, of class LocalSQLEntityPersistenceProvider.
+     * Test of instanceDescription method, of class
+     * LocalSQLEntityPersistenceProvider.
      */
     @Test
     public void testInstanceDescription() {
@@ -86,12 +105,13 @@ public class LocalSQLEntityPersistenceProviderTest {
 
     /**
      * Test of get method, of class LocalSQLEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testGet_int() throws Exception {
         System.out.println("get");
-       int id = 48;
+        int id = 48;
         JsonObject result = instance.get(id);
         assertEquals("RL12", result.getString("updatedby"));
         assertEquals("RL12", result.getString("createdby"));
@@ -103,7 +123,8 @@ public class LocalSQLEntityPersistenceProviderTest {
 
     /**
      * Test of find method, of class LocalSQLEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testFind() throws Exception {
@@ -115,7 +136,8 @@ public class LocalSQLEntityPersistenceProviderTest {
 
     /**
      * Test of get method, of class LocalSQLEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testGet_String_JsonValue() throws Exception {
@@ -125,26 +147,28 @@ public class LocalSQLEntityPersistenceProviderTest {
         JsonArray result = instance.get(parametername, parametervalue);
         System.out.println(result.toString());
         assertEquals(1, result.size());
-        JsonObject job = (JsonObject)result.get(0);
+        JsonObject job = (JsonObject) result.get(0);
         assertEquals(46, job.getInt("id"));
     }
 
     /**
      * Test of getOne method, of class LocalSQLEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testGetOne() throws Exception {
         System.out.println("getOne");
         String parametername = "application";
-        JsonValue parametervalue =JsonUtil.createJsonValue("JsonApp83");
+        JsonValue parametervalue = JsonUtil.createJsonValue("JsonApp83");
         JsonObject result = instance.getOne(parametername, parametervalue);
         assertEquals(46, result.getInt("id"));
     }
 
     /**
      * Test of findNextIdx method, of class LocalSQLEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test(expected = IOException.class)
     public void testFindNextIdx() throws Exception {

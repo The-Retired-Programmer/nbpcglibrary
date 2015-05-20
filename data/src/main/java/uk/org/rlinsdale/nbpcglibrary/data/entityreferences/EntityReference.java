@@ -33,7 +33,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 
 /**
- * A reference to an CoreEntity.
+ * A reference to an Entity.
  *
  * Implemented as a weak reference, so that entities can be garbage collected if
  * unused for a period of time, the entity id is remembered so that the entity
@@ -53,7 +53,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
     private int id;
     private int saveId;
     private WeakReference<E> entityreference = null;
-    private final EntityManager<E,P> em;
+    private final EntityManager<E, P> em;
     private final IdListener idlistener;
     private Listener<SimpleEventParams> titleListener;
     private final Event<SimpleEventParams> changeEntityEvent;
@@ -62,10 +62,10 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * Constructor.
      *
      * @param name the name of the entity (for reporting)
-     * @param em the associated CoreEntity Manager
-     * @throws java.io.IOException
+     * @param em the associated Entity Manager
+     * @throws IOException if problems in creating the reference
      */
-    public EntityReference(String name, EntityManager<E,P> em) throws IOException {
+    public EntityReference(String name, EntityManager<E, P> em) throws IOException {
         this(name, NONE, null, em, null);
     }
 
@@ -73,10 +73,10 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * Constructor.
      *
      * @param name the name of the entity (for reporting)
-     * @param em the associated CoreEntity Manager
+     * @param em the associated Entity Manager
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, NONE, null, em, titleChangeListener);
@@ -88,7 +88,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param name the name of the entity (for reporting)
      * @param id the entity id
      * @param em the associated CoreEntity Manager
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, int id, EntityManager<E, P> em) throws IOException {
         this(name, id, null, em, null);
@@ -102,7 +102,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param em the associated CoreEntity Mana
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, int id, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, id, null, em, titleChangeListener);
@@ -114,7 +114,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param name the name of the entity (for reporting)
      * @param e the entity
      * @param em the associated CoreEntity Manager
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, E e, EntityManager<E, P> em) throws IOException {
         this(name, e.getId(), e, em, null);
@@ -128,7 +128,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param em the associated CoreEntity Manager
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, E e, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, e.getId(), e, em, titleChangeListener);
@@ -139,7 +139,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      *
      * @param name the name of the entity (for reporting)
      * @param emclass the associated CoreEntity Manager class
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, Class<? extends EntityManager> emclass) throws IOException {
         this(name, NONE, null, Lookup.getDefault().lookup(emclass), null);
@@ -152,7 +152,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param emclass the associated CoreEntity Manager class
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, NONE, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
@@ -164,7 +164,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param name the name of the entity (for reporting)
      * @param id the entity id
      * @param emclass the associated CoreEntity Manager class
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, int id, Class<? extends EntityManager> emclass) throws IOException {
         this(name, id, null, Lookup.getDefault().lookup(emclass), null);
@@ -178,7 +178,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param emclass the associated CoreEntity Manager class
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, int id, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, id, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
@@ -190,7 +190,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param name the name of the entity (for reporting)
      * @param e the entity
      * @param emclass the associated CoreEntity Manager class
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, E e, Class<? extends EntityManager> emclass) throws IOException {
         this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), null);
@@ -204,7 +204,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @param emclass the associated CoreEntity Manager class
      * @param titleChangeListener a listener to call if the reference entities'
      * title changes (due to either entity change or entity content change.
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference
      */
     public EntityReference(String name, E e, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
         this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), titleChangeListener);
@@ -240,7 +240,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * Set the reference to "Null".
      *
      * @return true if referenced entity is different (ie Id has changed)
-     * @throws java.io.IOException
+     * @throws IOException if problems in completing the action
      */
     public boolean set() throws IOException {
         return set(NONE, null);
@@ -251,7 +251,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      *
      * @param id the entity id
      * @return true if referenced entity is different (ie Id has changed)
-     * @throws java.io.IOException
+     * @throws IOException if problems in completing the action
      */
     public boolean set(int id) throws IOException {
         return set(id, null);
@@ -262,7 +262,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      *
      * @param e the entity
      * @return true if referenced entity is different (ie Id has changed)
-     * @throws java.io.IOException
+     * @throws IOException if problems in completing the action
      */
     public boolean set(E e) throws IOException {
         return set(e == null ? NONE : e.getId(), e);
@@ -309,10 +309,10 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
     }
 
     /**
-     * Get the CoreEntity Referenced.
+     * Get the Entity Referenced.
      *
-     * @return the CoreEntity
-     * @throws java.io.IOException
+     * @return theEntity
+     * @throws IOException if problems in completing the action
      */
     public final E get() throws IOException {
         if (entityreference != null) {
@@ -334,7 +334,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
 
     /**
      * Get the Entity Referenced if it is actually directly referenced, but
- don't load it from db it not.
+     * don't load it from db it not.
      *
      * @return the Entity
      */
@@ -371,7 +371,8 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
 
     /**
      * Restore the state of this entity (from the last saved State).
-     * @throws java.io.IOException
+     *
+     * @throws IOException if problems in completing the action
      */
     public final void restoreState() throws IOException {
         if (isDirty()) {

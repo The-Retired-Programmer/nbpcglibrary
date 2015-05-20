@@ -19,25 +19,28 @@
 package uk.org.rlinsdale.nbpcglibrary.api;
 
 /**
- * Interface - defines the core functions of a DataAccessManager.
+ * Defines the core functions of a PersistenceUnitProvider.
+ *
+ * A Persistence Unit is a unit of commonally accessable entity's data. So can
+ * be thought to be equivalent to a database.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public interface PersistenceUnitProvider extends HasInstanceDescription {
 
     /**
-     * Test if DataAccessManager is operational - ie available and able to access
-     * data.
+     * Test if PersistenceUnitProvider is operational - ie available and able to
+     * access data.
      *
      * @return true if operational
      */
     public boolean isOperational();
 
     /**
-     * Get the name given to this DataAccessManager.
+     * Get the name given to this PersistenceUnitProvider.
      *
      * @return the name
      */
     public String getName();
-    
+
 }

@@ -102,7 +102,7 @@ public abstract class ReferenceChoiceCollectionFields<E extends Entity, F> exten
      * Get the set of entities.
      *
      * @return the set of entities
-     * @throws java.io.IOException
+     * @throws IOException if problems
      */
     protected abstract List<E> getChoicesEntities() throws IOException;
 
@@ -134,7 +134,7 @@ public abstract class ReferenceChoiceCollectionFields<E extends Entity, F> exten
      * reference choice.
      *
      * @param listener the set change listener
-     * @throws java.io.IOException
+     * @throws IOException if problems
      */
     protected abstract void addCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException;
 
@@ -143,7 +143,7 @@ public abstract class ReferenceChoiceCollectionFields<E extends Entity, F> exten
      * this reference choice.
      *
      * @param listener the set change listener
-     * @throws java.io.IOException
+     * @throws IOException if problems
      */
     protected abstract void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException;
 

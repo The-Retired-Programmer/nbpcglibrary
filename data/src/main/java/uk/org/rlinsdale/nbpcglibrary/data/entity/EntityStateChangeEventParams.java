@@ -34,7 +34,7 @@ public class EntityStateChangeEventParams implements EventParams {
     public enum EntityState {
 
         /**
-         * Init. entity created but not populated (initialisation state - entity
+         * Init. Entity created but not populated (initialisation state - entity
          * is never in this state)
          */
         INIT,
@@ -61,7 +61,7 @@ public class EntityStateChangeEventParams implements EventParams {
     };
 
     /**
-     *
+     * Entity State Changes
      */
     public enum EntityStateChange {
 

@@ -94,7 +94,7 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
 
     /**
      * Cancel any changes in progress and restore state as at last save state.
-     * @throws java.io.IOException
+     * @throws IOException if restore state fails
      */
     public void cancelEdit() throws IOException {
         entityRestoreState();
@@ -130,7 +130,7 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
     
     /**
      * Restore entity state.
-     * @throws java.io.IOException
+     * @throws IOException if restore fails
      */
     abstract protected void entityRestoreState() throws IOException;
 

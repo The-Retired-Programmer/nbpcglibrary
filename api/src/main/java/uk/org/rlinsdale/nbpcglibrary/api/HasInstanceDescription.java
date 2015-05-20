@@ -19,14 +19,15 @@
 package uk.org.rlinsdale.nbpcglibrary.api;
 
 /**
+ * the Marker for a class which as an InstanceDescription
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public interface HasInstanceDescription {
-    
+
     /**
      *
-     * @return
+     * @return the descriptive string which represents this instance.
      */
     public String instanceDescription();
 }

@@ -29,6 +29,8 @@ import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
+ * Command Processor for incoming command(s), process commands and return
+ * response(s)
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> the type of entity class
@@ -36,56 +38,63 @@ import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 public abstract class BasicCommandProcessor<T extends BasicEntity> {
 
     /**
-     *
+     * the Class of the entity being processed
      */
     protected final Class<T> clazz;
 
     /**
+     * Constructor
      *
-     * @param clazz
+     * @param clazz the entity class
      */
     public BasicCommandProcessor(Class<T> clazz) {
         this.clazz = clazz;
     }
 
     /**
+     * Get the entity manager for this entity class
      *
-     * @return
+     * @return the entity manager
      */
     protected abstract EntityManager getEntityManager();
 
     /**
+     * Create a new entity
      *
-     * @return
+     * @return the entity
      */
     protected abstract T getNewEntity();
 
     /**
+     * Get the name of the Primary Key field
      *
-     * @return
+     * @return the name of the Primary Key
      */
     protected abstract String getPKname();
 
     /**
+     * Query the data using a field/value as the filter
      *
-     * @param field
-     * @param value
-     * @return
-     * @throws JsonConversionException
+     * @param field the field name
+     * @param value the filter value
+     * @return a set of matching entities
+     * @throws JsonConversionException if parsing/creation problems
      */
     protected abstract List<T> queryByName(JsonValue field, JsonValue value) throws JsonConversionException;
 
     /**
+     * Query the data and get all entities
      *
-     * @return
-     * @throws JsonConversionException
+     * @return a set of all the entities
+     * @throws JsonConversionException if parsing/creation problems
      */
     protected abstract List<T> queryAll() throws JsonConversionException;
 
     /**
+     * Command processor - processes a single command.
      *
-     * @param command
-     * @param generator
+     * @param command the command.
+     * @param generator the JsonGenerator to be used to build the response
      */
     public void processCommand(JsonObject command, JsonGenerator generator) {
         String action = command.getString("action", "");
@@ -155,19 +164,23 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
     }
 
     /**
+     * An extension point for use by sub-types, to make any changes to the
+     * response after the entity has been created and populated, but prior to
+     * persisting it.
      *
-     * @param generator
-     * @param command
-     * @param entity
-     * @return
+     * @param generator the JsonGenerator to be used to build the response
+     * @param command the command.
+     * @param entity the entity
+     * @return true if the insert is to continue, false to abort the insert
      */
     protected boolean createInsertFieldsHook(JsonGenerator generator, JsonObject command, T entity) {
         return true;
     }
 
     /**
+     * Update the entity (NO YET IMPLEMENTED!!)
      *
-     * @param entity
+     * @param entity the entity
      */
     protected void update(BasicEntity entity) {
         //services.getEntityManager().merge(entity);
@@ -185,10 +198,12 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
     }
 
     /**
+     * An extension point for use by subtypes, to override the default delete
+     * action.
      *
-     * @param generator
-     * @param pkname
-     * @param id
+     * @param generator the JsonGenerator to be used to build the response
+     * @param pkname the primary key name
+     * @param id the primary key value
      */
     protected void deleteHook(JsonGenerator generator, String pkname, JsonValue id) {
         try {
@@ -243,10 +258,12 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
     }
 
     /**
+     * An extension point for use by subclasses, to override the default get
+     * action.
      *
-     * @param id
-     * @return
-     * @throws JsonConversionException
+     * @param id the entity Id (primary key value)
+     * @return the entity
+     * @throws JsonConversionException if problems
      */
     protected T getHook(JsonValue id) throws JsonConversionException {
         return this.getEntityManager().find(clazz, JsonUtil.getValue(id));

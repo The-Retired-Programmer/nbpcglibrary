@@ -30,22 +30,22 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 public class EntityFieldChangeEventParams<F> implements EventParams {
     
     /**
-     *
+     * Entity field changes - common to all entities. 
      */
     public enum CommonEntityField {
 
         /**
-         *
+         * All fields have/ may have been changed.
          */
         ALL,
 
         /**
-         *
+         * The Id (primary key) field has changed
          */
         ID,
 
         /**
-         *
+         * The index (ordering inndex) field has changed
          */
         IDX
     };

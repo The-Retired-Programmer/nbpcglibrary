@@ -24,12 +24,12 @@ import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProviderFactory;
 
 /**
  * A Factory to create PersistenceUnitProvider for local MySQL databases.
- * 
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @ServiceProvider(service = RemotePersistenceUnitProviderFactory.class)
 public class RemotePersistenceUnitProviderFactory implements PersistenceUnitProviderFactory<RemotePersistenceUnitProvider> {
-    
+
     @Override
     public String getType() {
         return "remote";

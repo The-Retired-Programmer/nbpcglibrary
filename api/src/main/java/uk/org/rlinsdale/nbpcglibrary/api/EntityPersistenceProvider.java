@@ -24,7 +24,7 @@ import javax.json.JsonObject;
 import javax.json.JsonValue;
 
 /**
- * Data Access Interface - for a Read-Only Entity.
+ * Provider of a EntityPersistence Service for a particular entity
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
@@ -34,17 +34,20 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * Get the set of entity Ids for all stored entities.
      *
      * @return the set of entity Ids
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public JsonArray find() throws IOException;
 
     /**
-     * Get the entity Id(s) for all stored entities.
+     * Get the entity Id(s) for a many (0 to many) entities - using selected by an
+     * column filter.
      *
      * @param parametername the filter column name
      * @param parametervalue the filter value
      * @return the set of entity Ids - using selected by an column filter.
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public JsonArray find(String parametername, JsonValue parametervalue) throws IOException;
 
@@ -54,7 +57,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * @param parametername the filter column name
      * @param parametervalue the filter value
      * @return the entity object representation
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public JsonValue findOne(String parametername, JsonValue parametervalue) throws IOException;
 
@@ -62,7 +66,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * Get the set of entity for all stored entities.
      *
      * @return the set of entities
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public JsonArray get() throws IOException;
 
@@ -73,7 +78,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * @param parametername the filter column name
      * @param parametervalue the filter value
      * @return the array of entity data objects
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public JsonArray get(String parametername, JsonValue parametervalue) throws IOException;
 
@@ -83,7 +89,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * @param parametername the filter column name
      * @param parametervalue the filter value
      * @return the entity object representation
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public JsonObject getOne(String parametername, JsonValue parametervalue) throws IOException;
 
@@ -92,7 +99,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * column defined.
      *
      * @return the next index value
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public int findNextIdx() throws IOException;
 
@@ -101,7 +109,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      *
      * @param id the entity Id
      * @return the JsonObject containing field values
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public JsonObject get(int id) throws IOException;
 
@@ -110,7 +119,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      *
      * @param values the set of values
      * @return the new entity Id
-     * @throws java.io.IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public int insert(JsonObject values) throws IOException;
 
@@ -119,7 +129,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      *
      * @param id the new entity Id
      * @param diff the set of values to be updated
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public void update(int id, JsonObject diff) throws IOException;
 
@@ -127,7 +138,8 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * Delete an entity from entity storage.
      *
      * @param id the entity Id
-     * @throws IOException
+     * @throws IOException in cases of problems when obtaining, parsing or
+     * creating data
      */
     public void delete(int id) throws IOException;
 }

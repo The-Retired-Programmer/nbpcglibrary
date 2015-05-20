@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.api;
 import java.io.IOException;
 
 /**
- * Exception - for handling EntityPersistenceManager Property problems.
+ * Exception - for handling EntityPersistenceProviderManager property problems.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */

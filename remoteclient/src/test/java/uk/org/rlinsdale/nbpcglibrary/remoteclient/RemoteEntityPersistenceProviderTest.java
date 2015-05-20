@@ -34,45 +34,64 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
+ * Test for RemoteEntityPersistenceProvider
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class RemoteEntityPersistenceProviderTest {
-    
+
     private static EntityPersistenceProvider instance;
-    
+
+    /**
+     * Constructor
+     */
     public RemoteEntityPersistenceProviderTest() {
     }
-    
+
+    /**
+     * Setup class
+     *
+     * @throws IOException if problems
+     */
     @BeforeClass
     public static void setUpClass() throws IOException {
-            String[] entitynames = new String[] {
-                "Application", "Role", "Permission", "User", "UserRole", "Userpermission"
-            };
-            Properties p = new Properties();
-            p.setProperty("key", "authentication2");
-            p.setProperty("connection", "http://localhost:8080/remoteauthentication2");
-            p.setProperty("entitypersistenceprovidertype", "remote");
-            p.setProperty("persistenceunitprovidertype", "remote");
-            EntityPersistenceProviderManager.set(p, entitynames);
-            instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("authentication2", "Application");
-            assertNotNull(instance);
+        String[] entitynames = new String[]{
+            "Application", "Role", "Permission", "User", "UserRole", "Userpermission"
+        };
+        Properties p = new Properties();
+        p.setProperty("key", "authentication2");
+        p.setProperty("connection", "http://localhost:8080/remoteauthentication2");
+        p.setProperty("entitypersistenceprovidertype", "remote");
+        p.setProperty("persistenceunitprovidertype", "remote");
+        EntityPersistenceProviderManager.set(p, entitynames);
+        instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("authentication2", "Application");
+        assertNotNull(instance);
     }
-    
+
+    /**
+     * Tear down class
+     */
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
+    /**
+     * Setup test
+     */
     @Before
     public void setUp() {
     }
-    
+
+    /**
+     * tear down test
+     */
     @After
     public void tearDown() {
     }
 
     /**
-     * Test of instanceDescription method, of class RemoteEntityPersistenceProvider.
+     * Test of instanceDescription method, of class
+     * RemoteEntityPersistenceProvider.
      */
     @Test
     public void testInstanceDescription() {
@@ -84,12 +103,13 @@ public class RemoteEntityPersistenceProviderTest {
 
     /**
      * Test of get method, of class RemoteEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testGet_int() throws Exception {
         System.out.println("get");
-       int id = 48;
+        int id = 48;
         JsonObject result = instance.get(id);
         assertEquals("RL12", result.getString("updatedby"));
         assertEquals("RL12", result.getString("createdby"));
@@ -101,7 +121,8 @@ public class RemoteEntityPersistenceProviderTest {
 
     /**
      * Test of find method, of class RemoteEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testFind() throws Exception {
@@ -113,7 +134,8 @@ public class RemoteEntityPersistenceProviderTest {
 
     /**
      * Test of get method, of class RemoteEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testGet_String_JsonValue() throws Exception {
@@ -123,26 +145,28 @@ public class RemoteEntityPersistenceProviderTest {
         JsonArray result = instance.get(parametername, parametervalue);
         System.out.println(result.toString());
         assertEquals(1, result.size());
-        JsonObject job = (JsonObject)result.get(0);
+        JsonObject job = (JsonObject) result.get(0);
         assertEquals(46, job.getInt("id"));
     }
 
     /**
      * Test of getOne method, of class RemoteEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test
     public void testGetOne() throws Exception {
         System.out.println("getOne");
         String parametername = "application";
-        JsonValue parametervalue =JsonUtil.createJsonValue("JsonApp83");
+        JsonValue parametervalue = JsonUtil.createJsonValue("JsonApp83");
         JsonObject result = instance.getOne(parametername, parametervalue);
         assertEquals(46, result.getInt("id"));
     }
 
     /**
      * Test of findNextIdx method, of class RemoteEntityPersistenceProvider.
-     * @throws java.lang.Exception
+     *
+     * @throws Exception if problems
      */
     @Test(expected = IOException.class)
     public void testFindNextIdx() throws Exception {
@@ -150,5 +174,5 @@ public class RemoteEntityPersistenceProviderTest {
         int result = instance.findNextIdx();
         fail("Exception should have been thrown in this case.");
     }
-    
+
 }

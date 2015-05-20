@@ -48,7 +48,7 @@ import static uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.TransactionEvent
 import static uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.TransactionEventParams.TransactionRequest.ROLLBACK;
 
 /**
- * Abstract Class implementing Local Database access using JDBC.
+ * PersistenceUnit Provider for any local SQL database.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
@@ -62,17 +62,17 @@ public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnit
     /**
      * Constructor.
      *
-     * @param name the dataservice name
+     * @param name the PersistenceUnitProvider name
      */
     public LocalSQLPersistenceUnitProvider(String name) {
         transactionEvent = new Event<>("transactions:" + name);
     }
 
     /**
-     * Set the JDBC connection to be used for this PersistenceUnitProvider.
+     * Set the database connection being used for this PersistenceUnitProvider.
      *
      * @param conn the JDBC connection
-     * @throws SQLException
+     * @throws SQLException if problems in accessing database
      */
     protected final void setConnection(Connection conn) throws SQLException {
         this.conn = conn;
@@ -267,7 +267,7 @@ public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnit
      * Execute a select query and insert the values from the first row returned
      * into an JsonObject.
      *
-     * @param tablename
+     * @param tablename the tablename being queried
      * @param sql the SQL for the query
      * @return the returned database record (in Json format)
      */
@@ -293,7 +293,7 @@ public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnit
      * Execute a select query and insert the values from the each row returned
      * into a JsonArray of JsonObjects.
      *
-     * @param tablename
+     * @param tablename the tablename being queried
      * @param sql the SQL for the query
      * @return the returned database record (in Json format)
      */
@@ -320,7 +320,7 @@ public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnit
      * Execute a select query and insert the values from the each row returned
      * into a JsonArray of JsonObjects.
      *
-     * @param tablename
+     * @param tablename the tablename being queried
      * @param sql the SQL for the query
      * @param parameter the single parameter used in the query
      * @return the returned database record (in Json format)
@@ -477,9 +477,9 @@ public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnit
     }
 
     private String buildsql(String sql, JsonValue parameter) throws IOException {
-            sql = sql.replace("{P}", format(parameter));
-            LogBuilder.writeExitingLog("nbpcglib.localSQLPersistenceUnitProvider", this, "buildsql", sql);
-            return sql;
+        sql = sql.replace("{P}", format(parameter));
+        LogBuilder.writeExitingLog("nbpcglib.localSQLPersistenceUnitProvider", this, "buildsql", sql);
+        return sql;
     }
 
     /**
@@ -490,7 +490,7 @@ public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnit
      *
      * @param value the data value
      * @return the string formated data value
-     * @throws IOException
+     * @throws IOException if any formatting problems or data type problems
      */
     protected abstract String format(JsonValue value) throws IOException;
 }

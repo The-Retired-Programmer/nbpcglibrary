@@ -43,19 +43,24 @@ public class LocalJsonEntityPersistenceProvider implements EntityPersistenceProv
      * @param tablename the entity table name in entity storage
      * @param properties the properties used for configuration
      * @param pup the PersistenceUnitProvider
-     * @throws java.io.IOException
+     * @throws IOException if problem with reading or parsing the json data
      */
     public LocalJsonEntityPersistenceProvider(String tablename, Properties properties, LocalJsonPersistenceUnitProvider pup) throws IOException {
         this.pup = pup;
         this.table = new Table(pup.load(tablename));
     }
-    
+
+    /**
+     * Persist the in-memory data (to json file)
+     *
+     * @throws IOException if problem with writing or parsing the json data
+     */
     public void persist() throws IOException {
-       table.persist(pup);
+        table.persist(pup);
     }
 
     @Override
-    public String instanceDescription() {        
+    public String instanceDescription() {
         return LogBuilder.instanceDescription(this, pup.instanceDescription() + "," + table.getname());
     }
 
@@ -89,7 +94,7 @@ public class LocalJsonEntityPersistenceProvider implements EntityPersistenceProv
     public final JsonObject getOne(String parametername, JsonValue parametervalue) throws IOException {
         return table.getOne(parametername, parametervalue);
     }
-    
+
     @Override
     public final JsonValue findOne(String parametername, JsonValue parametervalue) throws IOException {
         return table.findOne(parametername, parametervalue);

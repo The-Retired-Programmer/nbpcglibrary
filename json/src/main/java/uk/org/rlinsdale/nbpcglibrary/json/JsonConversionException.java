@@ -21,16 +21,18 @@ package uk.org.rlinsdale.nbpcglibrary.json;
 import java.io.IOException;
 
 /**
+ * Exception used to throw an error when processing Json Data - caused by
+ * serialisation or deserialisation failure.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class JsonConversionException extends IOException {
-    
+
     /**
-     *
+     * Constructor
      */
     public JsonConversionException() {
         super("Context error when processing JsonValue Object");
     }
-    
+
 }

@@ -54,7 +54,7 @@ public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F>
      * @param columnvalue the column value for use in the selection equality
      * filter
      * @param emclass the associated entity manager class
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference set
      */
     public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, String columnname, int columnvalue, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, columnname, columnvalue, emclass);
@@ -70,7 +70,7 @@ public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F>
      * @param field field identifier
      * @param comparator the comparator to be used to sort the list
      * @param emclass the associated entity manager class
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the reference set
      */
     public EntitySortedReferenceSet(String name, F field, Comparator<E> comparator, Class<? extends EntityManager> emclass) throws IOException {
         super(name, field, emclass);
@@ -81,7 +81,7 @@ public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F>
 
     /**
      * Sort the entity List
-     * @throws java.io.IOException
+     * @throws IOException if problems in completing the action
      */
     protected final void sort() throws IOException {
         List<E> el = super.get();

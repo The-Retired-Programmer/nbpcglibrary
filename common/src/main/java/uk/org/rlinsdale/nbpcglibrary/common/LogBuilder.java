@@ -421,8 +421,35 @@ public class LogBuilder {
     public static void writeExitingLog(String logname, Object className, String methodName, HasInstanceDescription result) {
         new LogBuilder(logname, Level.FINEST).addMsg("Exiting").addMethodName(className, methodName).addMsg("with result {0}", result.instanceDescription()).write();
     }
-
-
+    
+    /**
+     * Convenience method - write a standard log message for exception reporting
+     * (level is SEVERE)
+     *
+     * @param logname the log name
+     * @param ex the exception
+     * @param className the class name
+     * @param methodName the method name
+     * @param parameters the method parameters
+     */
+    public static void writeExceptionLog(String logname, Exception ex, HasInstanceDescription className, String methodName, Object... parameters){
+        new LogBuilder(logname, Level.SEVERE).addMethodName(className, methodName, parameters).addExceptionMessage(ex).write();
+    }
+    
+    /**
+     * Convenience method - write a standard log message for exception reporting
+     * (level is SEVERE)
+     *
+     * @param logname the log name
+     * @param ex the exception
+     * @param className the class name
+     * @param methodName the method name
+     * @param parameters the method parameters
+     */
+    public static void writeExceptionLog(String logname, Exception ex, Object className, String methodName, Object... parameters){
+        new LogBuilder(logname, Level.SEVERE).addMethodName(className, methodName, parameters).addExceptionMessage(ex).write();
+    }
+    
     private static final String defaultleveltext = "MINIMUM";
     private static final String[] choiceofLevelText = new String[]{"ALL", "Omit FINEST", "Omit FINEST and FINER", "MINIMUM"};
     private static final LogRegistry registry = new LogRegistry();

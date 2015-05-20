@@ -86,7 +86,7 @@ public abstract class EntityIndexed<E extends EntityIndexed, P extends CoreEntit
      * Set the Index Field value.
      *
      * @param i the index value
-     * @throws java.io.IOException
+     * @throws IOException if problem while setting this index
      */
     public final void setIndex(int i) throws IOException {
         ensureEditing();

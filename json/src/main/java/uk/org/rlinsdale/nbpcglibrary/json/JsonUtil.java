@@ -28,71 +28,83 @@ import static javax.json.JsonValue.ValueType.*;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * A Set of methods to process Json Objects/Arrays in a typesafe manner.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class JsonUtil {
 
     /**
+     * Extract a jsonValue from a JsonObject, which is associated with a
+     * particular key.
      *
-     * @param values
-     * @param key
-     * @return
-     * @throws JsonConversionException
+     * @param values the JsonObject
+     * @param key the key
+     * @return the value associated with the key
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static JsonValue getObjectKeyValue(JsonObject values, String key) throws JsonConversionException {
         return values.get(key);
     }
 
     /**
+     * Extract a string value from a JsonObject, which is associated with a
+     * particular key.
      *
-     * @param values
-     * @param key
-     * @return
-     * @throws JsonConversionException
+     * @param values the JsonObject
+     * @param key the key
+     * @return the value associated with the key
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static String getObjectKeyStringValue(JsonObject values, String key) throws JsonConversionException {
         return getStringValue(values.get(key));
     }
 
     /**
+     * Extract an integer value from a JsonObject, which is associated with a
+     * particular key.
      *
-     * @param values
-     * @param key
-     * @return
-     * @throws JsonConversionException
+     * @param values the JsonObject
+     * @param key the key
+     * @return the value associated with the key
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static Integer getObjectKeyIntegerValue(JsonObject values, String key) throws JsonConversionException {
         return getIntegerValue(values.get(key));
     }
 
     /**
+     * Extract a boolean value from a JsonObject, which is associated with a
+     * particular key.
      *
-     * @param values
-     * @param key
-     * @return
-     * @throws JsonConversionException
+     * @param values the JsonObject
+     * @param key the key
+     * @return the value associated with the key
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static Boolean getObjectKeyBooleanValue(JsonObject values, String key) throws JsonConversionException {
         return getBooleanValue(values.get(key));
     }
 
     /**
+     * Extract a JsonArray from a JsonObject, which is associated with a
+     * particular key.
      *
-     * @param values
-     * @param key
-     * @return
-     * @throws JsonConversionException
+     * @param values the JsonObject
+     * @param key the key
+     * @return the JsonArray associated with the key
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static JsonArray getObjectKeyArrayValue(JsonObject values, String key) throws JsonConversionException {
         return getArrayValue(values.get(key));
     }
 
     /**
+     * Extract the first JsonObject from a JsonArray.
      *
-     * @param array
-     * @return
-     * @throws JsonConversionException
+     * @param array the JsonArray
+     * @return the JsonObject
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static JsonObject getObjectFromArray(JsonArray array) throws JsonConversionException {
         return getObjectFromArray(array, 0);
@@ -100,11 +112,12 @@ public class JsonUtil {
     }
 
     /**
+     * Extract the n'th JsonObject from a JsonArray.
      *
-     * @param array
-     * @param index
-     * @return
-     * @throws JsonConversionException
+     * @param array the JsonArray
+     * @param index the index (0 based)
+     * @return the JsonObject
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static JsonObject getObjectFromArray(JsonArray array, int index) throws JsonConversionException {
         JsonValue job = array.get(index);
@@ -115,10 +128,11 @@ public class JsonUtil {
     }
 
     /**
+     * Convert a JsonValue into a equivalent Java Object or datatype.
      *
-     * @param value
-     * @return
-     * @throws JsonConversionException
+     * @param value the JsonValue
+     * @return the resulting java Object
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static Object getValue(JsonValue value) throws JsonConversionException {
         switch (value.getValueType()) {
@@ -138,10 +152,11 @@ public class JsonUtil {
     }
 
     /**
+     * Convert a JsonValue into a equivalent Java String.
      *
-     * @param value
-     * @return
-     * @throws JsonConversionException
+     * @param value the JsonValue
+     * @return the resulting java String
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static String getStringValue(JsonValue value) throws JsonConversionException {
         if (value.getValueType() == STRING) {
@@ -151,29 +166,32 @@ public class JsonUtil {
     }
 
     /**
+     * Write a String value into a JsonObject.
      *
-     * @param generator
-     * @param key
-     * @param value
+     * @param generator the Json Generator being used to create the Json object
+     * @param key the key to be used
+     * @param value the value to be used
      */
     public static void writeStringValue(JsonGenerator generator, String key, String value) {
         generator.write(key, value);
     }
 
     /**
+     * Write a String value into a JsonArray.
      *
-     * @param generator
-     * @param value
+     * @param generator the Json Generator being used to create the Json array
+     * @param value the value to be inserted
      */
     public static void writeStringValue(JsonGenerator generator, String value) {
         generator.write(value);
     }
 
     /**
+     * Convert a JsonValue into a equivalent Java Integer.
      *
-     * @param value
-     * @return
-     * @throws JsonConversionException
+     * @param value the JsonValue
+     * @return the resulting java Integer
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static Integer getIntegerValue(JsonValue value) throws JsonConversionException {
         if (value.getValueType() == NUMBER) {
@@ -183,29 +201,32 @@ public class JsonUtil {
     }
 
     /**
+     * Write an integer value into a JsonObject.
      *
-     * @param generator
-     * @param key
-     * @param value
+     * @param generator the Json Generator being used to create the Json object
+     * @param key the key to be used
+     * @param value the value to be used
      */
     public static void writeIntegerValue(JsonGenerator generator, String key, int value) {
         generator.write(key, value);
     }
 
     /**
+     * Write an integer value into a JsonArray.
      *
-     * @param generator
-     * @param value
+     * @param generator the Json Generator being used to create the Json array
+     * @param value the value to be inserted
      */
     public static void writeIntegerValue(JsonGenerator generator, int value) {
         generator.write(value);
     }
 
     /**
+     * Convert a JsonValue into a equivalent Java Boolean.
      *
-     * @param value
-     * @return
-     * @throws JsonConversionException
+     * @param value the JsonValue
+     * @return the resulting java Boolean
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static Boolean getBooleanValue(JsonValue value) throws JsonConversionException {
         switch (value.getValueType()) {
@@ -219,29 +240,33 @@ public class JsonUtil {
     }
 
     /**
+     * Write a boolean value into a JsonObject.
      *
-     * @param generator
-     * @param key
-     * @param value
+     * @param generator the Json Generator being used to create the Json object
+     * @param key the key to be used
+     * @param value the value to be used
      */
     public static void writeBooleanValue(JsonGenerator generator, String key, boolean value) {
         generator.write(key, value ? JsonValue.TRUE : JsonValue.FALSE);
     }
 
     /**
+     * Write a boolean value into a JsonArray.
      *
-     * @param generator
-     * @param value
+     * @param generator the Json Generator being used to create the Json array
+     * @param value the value to be inserted
      */
     public static void writeBooleanValue(JsonGenerator generator, boolean value) {
         generator.write(value ? JsonValue.TRUE : JsonValue.FALSE);
     }
 
     /**
+     * Convert a JsonValue into a equivalent Reference (foriegn key) java
+     * Integer / null.
      *
-     * @param value
-     * @return
-     * @throws JsonConversionException
+     * @param value the JsonValue
+     * @return the resulting java Integer or null
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static Integer getReferenceValue(JsonValue value) throws JsonConversionException {
         switch (value.getValueType()) {
@@ -255,10 +280,11 @@ public class JsonUtil {
     }
 
     /**
+     * Write a reference value (integer or null) into a JsonObject.
      *
-     * @param generator
-     * @param key
-     * @param value
+     * @param generator the Json Generator being used to create the Json object
+     * @param key the key to be used
+     * @param value the value to be used
      */
     public static void writeReferenceValue(JsonGenerator generator, String key, Integer value) {
         if (value == null) {
@@ -268,6 +294,12 @@ public class JsonUtil {
         }
     }
 
+    /**
+     * Write a reference value (integer or null) into a JsonArray.
+     *
+     * @param generator the Json Generator being used to create the Json array
+     * @param value the value to be inserted
+     */
     public static void writeReferenceValue(JsonGenerator generator, Integer value) {
         if (value == null) {
             generator.write(JsonValue.NULL);
@@ -277,10 +309,11 @@ public class JsonUtil {
     }
 
     /**
+     * Convert a JsonValue into a equivalent JsonArray.
      *
-     * @param value
-     * @return
-     * @throws JsonConversionException
+     * @param value the JsonValue
+     * @return the resulting JsonArray
+     * @throws JsonConversionException if any conversion error or type failure
      */
     public static JsonArray getArrayValue(JsonValue value) throws JsonConversionException {
         if (value.getValueType() == ARRAY) {
@@ -290,31 +323,30 @@ public class JsonUtil {
     }
 
     // horrible bit of code!! - but is does work
-
     /**
+     * Create a JsonValue using a String
      *
-     * @param string
-     * @return
+     * @param string the String
+     * @return the equivalent JsonValue
      */
-        public static JsonValue createJsonValue(String string) {
+    public static JsonValue createJsonValue(String string) {
         return Json.createObjectBuilder()
                 .add("value", string)
                 .build()
                 .getJsonString("value");
     }
-    
-    // horrible bit of code!! - but is does work
 
+    // horrible bit of code!! - but is does work
     /**
+     * Create a JsonValue using an integer
      *
-     * @param value
-     * @return
+     * @param value the integer value
+     * @return the equivalent JsonValue
      */
-        public static JsonValue createJsonValue(int value) {
+    public static JsonValue createJsonValue(int value) {
         return Json.createObjectBuilder()
                 .add("value", value)
                 .build()
                 .getJsonNumber("value");
     }
-
 }

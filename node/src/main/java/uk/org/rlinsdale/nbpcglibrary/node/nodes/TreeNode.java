@@ -255,14 +255,14 @@ public abstract class TreeNode<E extends Entity, P extends CoreEntity, F> extend
     /**
      * Cut and Paste - removal of Node action.
      *
-     * @throws java.io.IOException
+     * @throws IOException if problem
      */
     abstract protected void _cutAndPasteRemove() throws IOException;
 
     /**
      * Delete - removal of Node action.
      *
-     * @throws java.io.IOException
+     * @throws IOException if problem
      */
     abstract protected void _deleteRemove() throws IOException;
 

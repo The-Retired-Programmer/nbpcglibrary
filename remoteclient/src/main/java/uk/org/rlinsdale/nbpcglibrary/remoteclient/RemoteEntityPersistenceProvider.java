@@ -39,7 +39,7 @@ public class RemoteEntityPersistenceProvider implements EntityPersistenceProvide
     private final String entityname;
     private final RemotePersistenceUnitProvider persistenceUnitProvider;
     private final String idx;
-    
+
     /**
      * Constructor.
      *
@@ -66,7 +66,7 @@ public class RemoteEntityPersistenceProvider implements EntityPersistenceProvide
         this.persistenceUnitProvider = pup;
         this.idx = null;
     }
-    
+
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this, LogBuilder.instanceDescription(persistenceUnitProvider) + "-" + entityname);
@@ -144,7 +144,7 @@ public class RemoteEntityPersistenceProvider implements EntityPersistenceProvide
                         .build()
                 ).getJsonArray("entities");
     }
-    
+
     @Override
     public final synchronized JsonArray find(String parametername, JsonValue parametervalue) throws IOException {
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "find", parametername, parametervalue.toString());
@@ -194,7 +194,7 @@ public class RemoteEntityPersistenceProvider implements EntityPersistenceProvide
         }
         return response.getJsonArray("entities").getJsonObject(0);
     }
-    
+
     @Override
     public final synchronized JsonValue findOne(String parametername, JsonValue parametervalue) throws IOException {
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "findOne", parametername, parametervalue.toString());
@@ -230,7 +230,7 @@ public class RemoteEntityPersistenceProvider implements EntityPersistenceProvide
         }
         return Integer.MAX_VALUE; // temporary 
     }
-    
+
     @Override
     public final synchronized int insert(JsonObject values) throws IOException {
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "insert", values.toString());

@@ -36,71 +36,84 @@ import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class LibraryTest {
-    
+
+    /**
+     * Constructor
+     */
     public LibraryTest() {
     }
-    
+
+    /**
+     * Setup the Class
+     */
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
+    /**
+     * Tear down the class
+     */
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
+    /**
+     * Setup the test
+     */
     @Before
     public void setUp() {
     }
-    
+
+    /**
+     * Tear down the test
+     */
     @After
     public void tearDown() {
     }
 
     /**
+     * A basic test of the functionality of the module - not a true unit test.
      */
     @Test
     public void testLibrary() {
         System.out.println("Test Json Access Library");
         try {
-            String[] entitynames = new String[] {
+            String[] entitynames = new String[]{
                 "Data"
             };
-        Properties p = new Properties();
-        p.put("connection","/home/richard/Documents/JsonTestDB");
-        p.setProperty("key", "jsondata");
-        p.setProperty("entitypersistenceprovidertype", "local-json");
-        p.setProperty("persistenceunitprovidertype", "local-json");
-        EntityPersistenceProviderManager.set(p, entitynames);
-        LocalJsonEntityPersistenceProvider epp = (LocalJsonEntityPersistenceProvider) EntityPersistenceProviderManager.getEntityPersistenceProvider("jsondata", "Data");
-        //LocalJsonPersistenceUnitProvider pup = new LocalJsonPersistenceUnitProvider(p);
-//        System.out.println(pup.getName()+ " is "+(pup.isOperational()?"Operational":"Non operational"));
-//        System.out.println("Instance Description: "+instance.instanceDescription());
+            Properties p = new Properties();
+            p.put("connection", "/home/richard/Documents/JsonTestDB");
+            p.setProperty("key", "jsondata");
+            p.setProperty("entitypersistenceprovidertype", "local-json");
+            p.setProperty("persistenceunitprovidertype", "local-json");
+            EntityPersistenceProviderManager.set(p, entitynames);
+            LocalJsonEntityPersistenceProvider epp = (LocalJsonEntityPersistenceProvider) EntityPersistenceProviderManager.getEntityPersistenceProvider("jsondata", "Data");
             //
-            System.out.println("Instance Description: "+epp.instanceDescription());
-            System.out.println("get(): "+epp.get().toString());
-            System.out.println("get(1): "+epp.get(1).toString());
-            System.out.println("get(\"id\",1): "+epp.get("id",JsonUtil.createJsonValue(1)).toString());
-            System.out.println("getOne(\"id\",1): "+epp.getOne("id",JsonUtil.createJsonValue(1)).toString());
-            System.out.println("find(): "+epp.find().toString());
-            System.out.println("find(\"id\",1): "+epp.find("id",JsonUtil.createJsonValue(1)).toString());
-            System.out.println("findOne(\"id\",1): "+epp.findOne("id",JsonUtil.createJsonValue(1)).toString());
+            System.out.println("Instance Description: " + epp.instanceDescription());
+            System.out.println("get(): " + epp.get().toString());
+            System.out.println("get(1): " + epp.get(1).toString());
+            System.out.println("get(\"id\",1): " + epp.get("id", JsonUtil.createJsonValue(1)).toString());
+            System.out.println("getOne(\"id\",1): " + epp.getOne("id", JsonUtil.createJsonValue(1)).toString());
+            System.out.println("find(): " + epp.find().toString());
+            System.out.println("find(\"id\",1): " + epp.find("id", JsonUtil.createJsonValue(1)).toString());
+            System.out.println("findOne(\"id\",1): " + epp.findOne("id", JsonUtil.createJsonValue(1)).toString());
             //
             JsonObjectBuilder job = Json.createObjectBuilder();
             job.add("description", "my first insert");
             int newid = epp.insert(job.build());
-            System.out.println("insert(...) returns "+newid);
-            System.out.println("get(): "+epp.get().toString());
-            System.out.println("get(newid): "+epp.get(newid).toString());
+            System.out.println("insert(...) returns " + newid);
+            System.out.println("get(): " + epp.get().toString());
+            System.out.println("get(newid): " + epp.get(newid).toString());
             //
             JsonObjectBuilder job2 = Json.createObjectBuilder();
             job2.add("description", "my first insert - updated");
             epp.update(newid, job2.build());
             //
-            epp.delete(newid-1);
+            epp.delete(newid - 1);
             epp.persist();
-            assert(true);
+            assert (true);
             System.out.println("Test Json Access Library completed");
-            
+
         } catch (IOException ex) {
             fail(ex.getMessage());
         }

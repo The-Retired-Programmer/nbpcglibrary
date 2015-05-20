@@ -31,7 +31,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Parent Entity Class
- * @param <P>
+ * @param <P> The Parent of Parent Entity Class
  */
 public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> extends RootChildFactory<E> {
 
@@ -39,19 +39,19 @@ public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> 
 
     /**
      * Constructor.
-     * 
+     *
      * @param factoryname the factory name
      * @param parentEntity the parent entity
-     * @param emclass the parent entity manager class 
+     * @param emclass the parent entity manager class
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManager> emclass) {
         super(null);
         try {
-            parentref = new EntityReference<>( factoryname+">"+parentEntity.instanceDescription(), parentEntity, emclass);
+            parentref = new EntityReference<>(factoryname + ">" + parentEntity.instanceDescription(), parentEntity, emclass);
         } catch (IOException ex) {
             LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addConstructorName(this, factoryname, parentEntity)
-                            .addExceptionMessage(ex).write();
+                    .addExceptionMessage(ex).write();
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> 
             return parentref.get();
         } catch (IOException ex) {
             LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "getParentEntity")
-                            .addExceptionMessage(ex).write();
+                    .addExceptionMessage(ex).write();
             return null;
         }
     }

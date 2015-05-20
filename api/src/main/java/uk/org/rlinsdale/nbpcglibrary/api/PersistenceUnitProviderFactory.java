@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.api;
 import java.util.Properties;
 
 /**
- * Creates a PersistenceUnitProvider.
+ * A Factory to creates instances of PersistenceUnitProviders.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <D> the class of the persistenceUnitProvider created

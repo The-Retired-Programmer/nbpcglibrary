@@ -26,8 +26,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
 /**
- * A collection of a setField of fields - for use in defining the fields content
- * of a form segment.
+ * A collection of fields - for use in defining the fields content of a form
+ * segment.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
@@ -62,8 +62,9 @@ public abstract class FieldsDef implements HasInstanceDescription {
     }
 
     /**
+     * Get a row of components used to mark an error
      *
-     * @return
+     * @return the set of components
      */
     public JComponent[] getErrorMarkerRow() {
         return new JComponent[]{
@@ -116,11 +117,10 @@ public abstract class FieldsDef implements HasInstanceDescription {
      * persistent storage)
      *
      * @return true if save was successful
-     * @throws java.io.IOException
+     * @throws IOException id problems occurred during save
      */
     public abstract boolean save() throws IOException;
 
-    
     String[] getParameters() {
         return parameters;
     }
@@ -155,8 +155,9 @@ public abstract class FieldsDef implements HasInstanceDescription {
     }
 
     /**
+     * Check the rules defined for the field backingobject.
      *
-     * @return
+     * @return true if the rules are obeyed (ie OK)
      */
     public boolean checkFieldsDefRules() {
         if (backingObject != null) {

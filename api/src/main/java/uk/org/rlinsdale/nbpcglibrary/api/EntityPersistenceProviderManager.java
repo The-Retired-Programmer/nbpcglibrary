@@ -27,9 +27,9 @@ import java.util.Properties;
 import org.openide.util.Lookup;
 
 /**
- * EntityPersistenceManager Manager.
+ * EntityPersistenceProvider Manager.
  *
- * Store of all required EntityPersistenceManagers and their associated
+ * Store of all required EntityPersistenceProviders and their associated
  * PersistenceUnitProviders
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
@@ -99,9 +99,9 @@ public class EntityPersistenceProviderManager {
     /**
      * Get an EntityPersistenceProvider.
      *
-     * @param key the EntityPersistenceprovider key.
+     * @param key the EntityPersistenceUnitProvider key.
      * @param entityname the entity name
-     * @return the DataAccessManager
+     * @return the EntityPersistenceProvider
      */
     public static EntityPersistenceProvider getEntityPersistenceProvider(String key, String entityname) {
         return entityPersistenceProviders.get(key + "_" + entityname);
@@ -110,7 +110,7 @@ public class EntityPersistenceProviderManager {
     /**
      * Get all PersistenceUnitProviders
      *
-     * @return
+     * @return the set of all PersistenceUnitProviders
      */
     public static Collection<? extends PersistenceUnitProvider> getAllPersistenceUnitProviders() {
         return persistenceUnitProviders.values();

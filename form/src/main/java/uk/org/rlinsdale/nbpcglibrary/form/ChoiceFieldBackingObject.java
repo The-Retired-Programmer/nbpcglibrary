@@ -28,8 +28,8 @@ import java.util.List;
 public abstract class ChoiceFieldBackingObject implements FieldBackingObject<String> {
 
     /**
-     *
-     * @return
+     * Get a set of Choice Strings
+     * @return the set of choice strings
      */
     public abstract List<String> getChoices();
 

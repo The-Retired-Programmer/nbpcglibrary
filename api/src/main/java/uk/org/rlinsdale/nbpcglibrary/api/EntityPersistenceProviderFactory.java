@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Creates a DataAccessManager.
+ * Creates a EntityPersistenceProvider.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <D> the type of the PersistenceUnitProvider
@@ -53,7 +53,7 @@ public interface EntityPersistenceProviderFactory<D extends PersistenceUnitProvi
      * @param p the properties which define the provider configuration
      * @param persistenceUnitProvider the PersistenceUnitProvider to be used
      * @return the EntityPersistenceProvider
-     * @throws java.io.IOException
+     * @throws IOException in cases of problems of creating the provider
      */
-    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider) throws IOException ;
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider) throws IOException;
 }

@@ -46,7 +46,7 @@ public interface DBFields<E extends Entity> {
      * fields.
      *
      * @param data the Json formatted data
-     * @throws IOException
+     * @throws IOException if problems in parsing the json object
      */
     public void load(JsonObject data) throws IOException;
     
@@ -55,7 +55,7 @@ public interface DBFields<E extends Entity> {
      * changed.
      *
      * @param job a JasonObjectBuilder into which names and values can be inserted
-     * @throws IOException
+     * @throws IOException if problems in creating the json  object
      */
     public void diffs(JsonObjectBuilder job) throws IOException;
 
@@ -63,7 +63,7 @@ public interface DBFields<E extends Entity> {
      * Get a collection of all fields and their values.
      *
      * @param job a JasonObjectBuilder into which names and values can be inserted
-     * @throws java.io.IOException
+     * @throws IOException if problems in creating the json  object
      */
     public void values(JsonObjectBuilder job) throws IOException;
 

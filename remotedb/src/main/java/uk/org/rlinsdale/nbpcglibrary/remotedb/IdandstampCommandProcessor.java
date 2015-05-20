@@ -23,15 +23,18 @@ import javax.json.stream.JsonGenerator;
 import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
 
 /**
+ * The Command processor of an entity which includes standard Id and
+ * TimeStamping fields
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T>
+ * @param <T> The entity class
  */
 public abstract class IdandstampCommandProcessor<T extends IdandstampEntity> extends BasicCommandProcessor<T> {
-    
+
     /**
+     * Constructor
      *
-     * @param clazz
+     * @param clazz the class of the entity
      */
     public IdandstampCommandProcessor(Class<T> clazz) {
         super(clazz);
