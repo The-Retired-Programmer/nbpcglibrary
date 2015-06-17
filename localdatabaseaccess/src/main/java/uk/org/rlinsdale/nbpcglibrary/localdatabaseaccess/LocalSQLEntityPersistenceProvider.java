@@ -18,48 +18,52 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess;
 
-import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
-import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
  * EntityPersistenceProvider Class for access localSQL databases
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the Primary Key Class
  */
-public class LocalSQLEntityPersistenceProvider implements EntityPersistenceProvider {
+@RegisterLog("nbpcglib.localdatabaseaccess")
+public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPersistenceProvider<K> {
 
-    private final String tablename;
-    private final LocalSQLPersistenceUnitProvider persistenceUnitProvider;
-    private final String idx;
+    private String tablename;
+    private LocalSQLPersistenceUnitProvider persistenceUnitProvider;
+    private String idx;
 
     /**
-     * Constructor.
+     * Initialise the provider
      *
      * @param tablename the entity table name in entity storage
      * @param properties the properties used for configuration
      * @param pup the PersistenceUnitProvider
      */
-    public LocalSQLEntityPersistenceProvider(String tablename, Properties properties, LocalSQLPersistenceUnitProvider pup) {
+    public void init(String tablename, Properties properties, LocalSQLPersistenceUnitProvider pup) {
         this.tablename = tablename;
         this.persistenceUnitProvider = pup;
         this.idx = null;
     }
 
     /**
-     * Constructor.
+     * Initialise the provider
      *
      * @param tablename the entity table name in entity storage
      * @param idx the index field - used to order the returned entities
      * @param properties the properties used for configuration
      * @param pup the PersistenceUnitProvider
      */
-    public LocalSQLEntityPersistenceProvider(String tablename, String idx, Properties properties, LocalSQLPersistenceUnitProvider pup) {
+    public void init(String tablename, String idx, Properties properties, LocalSQLPersistenceUnitProvider pup) {
         this.tablename = tablename;
         this.persistenceUnitProvider = pup;
         this.idx = idx;
@@ -71,84 +75,222 @@ public class LocalSQLEntityPersistenceProvider implements EntityPersistenceProvi
     }
 
     @Override
-    public JsonObject get(int id) {
-        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "load", id);
-        return persistenceUnitProvider.simpleQuery(tablename, "SELECT * from " + tablename + " where id=" + id);
-    }
-
-    @Override
-    public final JsonArray get() {
-        return idx == null
-                ? persistenceUnitProvider.multiQuery(tablename, "SELECT * from " + tablename)
-                : persistenceUnitProvider.multiQuery(tablename, "SELECT * from " + tablename + " ORDER BY " + idx);
-    }
-
-    @Override
-    public final JsonArray find() {
-        return idx == null
-                ? persistenceUnitProvider.query("SELECT id from " + tablename)
-                : persistenceUnitProvider.query("SELECT id from " + tablename + " ORDER BY " + idx);
-    }
-
-    @Override
-    public final JsonArray get(String parametername, JsonValue parametervalue) {
-        return idx == null
-                ? persistenceUnitProvider.multiQuery(tablename, "SELECT * from " + tablename + " where " + parametername + "={P}", parametervalue)
-                : persistenceUnitProvider.multiQuery(tablename, "SELECT * from " + tablename + " where " + parametername + "={P} ORDER BY " + idx, parametervalue);
-    }
-
-    @Override
-    public final JsonArray find(String parametername, JsonValue parametervalue) {
-        return idx == null
-                ? persistenceUnitProvider.query("SELECT id from " + tablename + " where " + parametername + "={P}", parametervalue)
-                : persistenceUnitProvider.query("SELECT id from " + tablename + " where " + parametername + "={P} ORDER BY " + idx, parametervalue);
-    }
-
-    @Override
-    public final JsonObject getOne(String parametername, JsonValue parametervalue) throws IOException {
-        JsonArray get = persistenceUnitProvider.multiQuery(tablename, "SELECT * from " + tablename + " where " + parametername + "={P}", parametervalue);
-        if (get.size() != 1) {
-            throw new IOException("Single row expected");
+    public EntityFields get(K pkey) {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "get", pkey);
+        try {
+            List<EntityFields> response = persistenceUnitProvider.query(buildsql("SELECT * from " + tablename + " WHERE id={P}", pkey));
+            if (response.size() != 1) {
+                throw new LogicException("Single row expected");
+            }
+            return response.get(0);
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "get", pkey);
+            throw new LogicException(ex.getMessage());
         }
-        return get.getJsonObject(0);
     }
 
     @Override
-    public final JsonValue findOne(String parametername, JsonValue parametervalue) throws IOException {
-        JsonArray find = persistenceUnitProvider.query("SELECT id from " + tablename + " where " + parametername + "={P}", parametervalue);
-        if (find.size() != 1) {
-            throw new IOException("Single row expected");
+    public final List<EntityFields> get() {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "get");
+        String sql = idx == null
+                ? "SELECT * from " + tablename
+                : "SELECT * from " + tablename + " ORDER BY " + idx;
+        try {
+            return persistenceUnitProvider.query(sql);
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "get");
+            throw new LogicException(ex.getMessage());
         }
-        return find.get(0);
     }
 
     @Override
-    public final int findNextIdx() throws IOException {
-        if (idx == null) {
-            throw new IOException("findNextIdx() should not be called if the entity is not ordered");
+    public final List<K> find() {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "find");
+        String sql = idx == null
+                ? "SELECT id from " + tablename
+                : "SELECT id from " + tablename + " ORDER BY " + idx;
+        List<K> result = new ArrayList<>();
+        try {
+            List<EntityFields> response = persistenceUnitProvider.query(sql);
+            for (EntityFields ef : response) {
+                result.add((K) ef.get("id"));
+            }
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "find");
+            throw new LogicException(ex.getMessage());
         }
-        return persistenceUnitProvider.simpleIntQuery("SELECT max(" + idx + ")+1 as nextidx from " + tablename, "nextidx");
+        return result;
     }
 
     @Override
-    public final int insert(JsonObject values) {
-        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "insert", values);
-        persistenceUnitProvider.execute("INSERT INTO " + tablename + " ({$KEYLIST}) VALUES ({$VALUELIST})", values);
-        int id = persistenceUnitProvider.simpleIntQuery("SELECT LAST_INSERT_ID() as id", "id");
-        LogBuilder.writeExitingLog("nbpcglib.localSQLPersistenceUnitProvider", this, "insert", id);
-        return id;
+    public final List<EntityFields> get(String parametername, Object parametervalue) {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "get", parametername, parametervalue);
+        String sql = idx == null
+                ? buildsql("SELECT * from " + tablename + " where " + parametername + "={P}", parametervalue)
+                : buildsql("SELECT * from " + tablename + " where " + parametername + "={P} ORDER BY " + idx, parametervalue);
+        try {
+            return persistenceUnitProvider.query(sql);
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "get", parametername, parametervalue);
+            throw new LogicException(ex.getMessage());
+        }
     }
 
     @Override
-    public final void update(int id, JsonObject diff) {
-        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "update", id, diff);
-        persistenceUnitProvider.execute("UPDATE " + tablename + " SET {$KEYVALUELIST} WHERE id=" + id, diff);
-        LogBuilder.writeExitingLog("nbpcglib.localSQLPersistenceUnitProvider", this, "update");
+    public final List<K> find(String parametername, Object parametervalue) {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "find", parametername, parametervalue);
+        String sql = idx == null
+                ? buildsql("SELECT id from " + tablename + " where " + parametername + "={P}", parametervalue)
+                : buildsql("SELECT id from " + tablename + " where " + parametername + "={P} ORDER BY " + idx, parametervalue);
+        List<K> result = new ArrayList<>();
+        try {
+            List<EntityFields> response = persistenceUnitProvider.query(sql);
+            for (EntityFields ef : response) {
+                result.add((K) ef.get("id"));
+            }
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "find", parametername, parametervalue);
+            throw new LogicException(ex.getMessage());
+        }
+        return result;
     }
 
     @Override
-    public final void delete(int id) {
-        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "delete", id);
-        persistenceUnitProvider.execute("DELETE from " + tablename + " WHERE id = {P}", JsonUtil.createJsonValue(id));
+    public final EntityFields getOne(String parametername, Object parametervalue) {
+        try {
+            List<EntityFields> get = persistenceUnitProvider.query(buildsql("SELECT * from " + tablename + " where " + parametername + "={P}", parametervalue));
+            if (get.size() != 1) {
+                throw new LogicException("Single row expected");
+            }
+            return get.get(0);
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "getOne", parametername, parametervalue);
+            throw new LogicException(ex.getMessage());
+        }
     }
+
+    @Override
+    public final K findOne(String parametername, Object parametervalue) {
+        try {
+            List<EntityFields> find = persistenceUnitProvider.query(buildsql("SELECT id from " + tablename + " where " + parametername + "={P}", parametervalue));
+            if (find.size() != 1) {
+                throw new LogicException("Single row expected");
+            }
+            return (K) find.get(0).get("id");
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "findOne", parametername, parametervalue);
+            throw new LogicException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public final int findNextIdx() {
+        try {
+            if (idx == null) {
+                throw new LogicException("findNextIdx() should not be called if the entity is not ordered");
+            }
+            List<EntityFields> findidx = persistenceUnitProvider.query("SELECT max(" + idx + ")+1 as nextidx from " + tablename);
+            if (findidx.size() != 1) {
+                throw new LogicException("Single row expected");
+            }
+            EntityFields idxrec = findidx.get(0);
+            return (Integer) idxrec.get("id");
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "findNextIdx");
+            throw new LogicException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public final EntityFields insert(EntityFields values) {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "insert", values);
+        try {
+            persistenceUnitProvider.execute(buildsql("INSERT INTO " + tablename + " ({$KEYLIST}) VALUES ({$VALUELIST})", values));
+            List<EntityFields> findpkey = persistenceUnitProvider.query("SELECT LAST_INSERT_ID() as id");
+            if (findpkey.size() != 1) {
+                throw new LogicException("Single row expected");
+            }
+            EntityFields pkeyrec = findpkey.get(0);
+            K pkey = (K) pkeyrec.get("id");
+            List<EntityFields> updated = persistenceUnitProvider.query(buildsql("SELECT * FROM " + tablename + "WHERE id = ", pkey));
+            if (updated.size() != 1) {
+                throw new LogicException("Single row expected");
+            }
+            LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "insert", updated);
+            return updated.get(0);
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "insert", values);
+            throw new LogicException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public final EntityFields update(K pkey, EntityFields diff) {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "update", pkey, diff);
+        try {
+            persistenceUnitProvider.execute(buildsql(buildsql("UPDATE " + tablename + " SET {$KEYVALUELIST} WHERE id=", pkey), diff));
+            List<EntityFields> updated = persistenceUnitProvider.query(buildsql("SELECT * FROM " + tablename + "WHERE id = ", pkey));
+            if (updated.size() != 1) {
+                throw new LogicException("Single row expected");
+            }
+            LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "update", updated);
+            return updated.get(0);
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "update", pkey, diff);
+            throw new LogicException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public final void delete(K pkey) {
+        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "delete", pkey);
+        try {
+            persistenceUnitProvider.execute(buildsql("DELETE from " + tablename + " WHERE id = {P}", pkey));
+        } catch (SQLException ex) {
+            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "delete", pkey);
+            throw new LogicException(ex.getMessage());
+        }
+    }
+
+    private String buildsql(String sql, EntityFields parameters) {
+        if (sql.contains("{$KEYLIST}") || sql.contains("{$VALUELIST}") || sql.contains("{$KEYVALUELIST}")) {
+            // special code to generate and substitute keylists and valuelists
+            String keylist = "";
+            String valuelist = "";
+            String keyvaluelist = "";
+            String prefix = "";
+            for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+                String fp = format(parameter.getValue());
+                keylist += (prefix + parameter.getKey());
+                valuelist += (prefix + fp);
+                keyvaluelist += (prefix + parameter.getKey() + "=" + fp);
+                prefix = ",";
+            }
+            sql = sql.replace("{$KEYLIST}", keylist);
+            sql = sql.replace("{$VALUELIST}", valuelist);
+            sql = sql.replace("{$KEYVALUELIST}", keyvaluelist);
+        }
+        for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+            sql = sql.replace("{" + parameter.getKey() + "}", format(parameter.getValue()));
+        }
+        LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "buildsql", sql);
+        return sql;
+    }
+
+    private String buildsql(String sql, Object parameter) {
+        sql = sql.replace("{P}", format(parameter));
+        LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "buildsql", sql);
+        return sql;
+    }
+
+    /**
+     * Format a data value for insertion into an SQL string.
+     *
+     * Handles quoting, escaping and specific formated keyword (eg true false
+     * etc)
+     *
+     * @param value the data value
+     * @return the string formated data value
+     */
+    protected abstract String format(Object value);
 }

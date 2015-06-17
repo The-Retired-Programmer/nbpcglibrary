@@ -34,11 +34,12 @@ import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNode;
  * Editor Topcomponent which displays/edits a node.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the primary Key class for this entity
  * @param <E> the entity class
  * @param <P> the parent entity class
- * @param <F> the entity fields enum class
+ * @param <F> the fields enum for this entity
  */
-public abstract class NodeEditorTopComponent<E extends Entity, P extends CoreEntity, F> extends TopComponent {
+public abstract class NodeEditorTopComponent<K, E extends Entity<K,E,P,F>, P extends CoreEntity, F> extends TopComponent {
 
     private final String name;
     private boolean abandon = false;
@@ -47,7 +48,7 @@ public abstract class NodeEditorTopComponent<E extends Entity, P extends CoreEnt
     /**
      * the node being edited
      */
-    protected final TreeNode<E, P, F> node;
+    protected final TreeNode<K, E, P, F> node;
 
     /**
      * the entity being edited
@@ -62,7 +63,7 @@ public abstract class NodeEditorTopComponent<E extends Entity, P extends CoreEnt
      * @param hint the topcomponent hint
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public NodeEditorTopComponent(TreeNode<E, P, F> node, String name, String hint) {
+    public NodeEditorTopComponent(TreeNode<K, E, P, F> node, String name, String hint) {
         LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, node, name, hint);
         setName(name);
         setToolTipText(hint);

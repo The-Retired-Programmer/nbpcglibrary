@@ -20,15 +20,15 @@ package uk.org.rlinsdale.nbpcglibrary.mysql;
 
 import java.util.Properties;
 import org.openide.util.lookup.ServiceProvider;
-import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLPersistenceUnitProviderFactory;
+import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProviderFactory;
 
 /**
  * A Factory to create DataAccessManager for local MySQL databases.
  * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@ServiceProvider(service = LocalSQLPersistenceUnitProviderFactory.class)
-public class LocalMySQLPersistenceUnitProviderFactory implements LocalSQLPersistenceUnitProviderFactory<LocalMySQLPersistenceUnitProvider> {
+@ServiceProvider(service = LocalMySQLPersistenceUnitProviderFactory.class)
+public class LocalMySQLPersistenceUnitProviderFactory implements PersistenceUnitProviderFactory<LocalMySQLPersistenceUnitProvider> {
 
     @Override
     public String getType() {

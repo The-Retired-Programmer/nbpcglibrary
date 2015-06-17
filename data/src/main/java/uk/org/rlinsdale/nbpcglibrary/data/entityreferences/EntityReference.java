@@ -18,14 +18,12 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
-import org.openide.util.Lookup;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
@@ -36,199 +34,111 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
  * A reference to an Entity.
  *
  * Implemented as a weak reference, so that entities can be garbage collected if
- * unused for a period of time, the entity id is remembered so that the entity
- * can be reloaded if required.
+ * unused for a period of time, the entity primary key is remembered so that the
+ * entity can be reloaded if required.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the primary Key class for the entity
  * @param <E> The Entity Class
  * @param <P> The Parent Entity Class
  */
-public class EntityReference<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
+public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> implements HasInstanceDescription {
 
-    /**
-     *
-     */
-    public final static int NONE = 0;
     private final String name;
-    private int id;
-    private int saveId;
+    private K pk;
+    private K savePK;
     private WeakReference<E> entityreference = null;
-    private final EntityManager<E, P> em;
-    private final IdListener idlistener;
-    private Listener<SimpleEventParams> titleListener;
-    private final Event<SimpleEventParams> changeEntityEvent;
+    private final EntityManager<K, E, P> em;
+    private final PrimaryKeyListener pkListener;
+    private Listener<SimpleEventParams> titleListener = null;
 
     /**
      * Constructor.
      *
      * @param name the name of the entity (for reporting)
      * @param em the associated Entity Manager
-     * @throws IOException if problems in creating the reference
      */
-    public EntityReference(String name, EntityManager<E, P> em) throws IOException {
-        this(name, NONE, null, em, null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param em the associated Entity Manager
-     * @param titleChangeListener a listener to call if the reference entities'
-     * title changes (due to either entity change or entity content change.
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
-        this(name, NONE, null, em, titleChangeListener);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param id the entity id
-     * @param em the associated CoreEntity Manager
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, int id, EntityManager<E, P> em) throws IOException {
-        this(name, id, null, em, null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param id the entity id
-     * @param em the associated CoreEntity Mana
-     * @param titleChangeListener a listener to call if the reference entities'
-     * title changes (due to either entity change or entity content change.
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, int id, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
-        this(name, id, null, em, titleChangeListener);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param e the entity
-     * @param em the associated CoreEntity Manager
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, E e, EntityManager<E, P> em) throws IOException {
-        this(name, e.getId(), e, em, null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param e the entity
-     * @param em the associated CoreEntity Manager
-     * @param titleChangeListener a listener to call if the reference entities'
-     * title changes (due to either entity change or entity content change.
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, E e, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
-        this(name, e.getId(), e, em, titleChangeListener);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param emclass the associated CoreEntity Manager class
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, Class<? extends EntityManager> emclass) throws IOException {
-        this(name, NONE, null, Lookup.getDefault().lookup(emclass), null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param emclass the associated CoreEntity Manager class
-     * @param titleChangeListener a listener to call if the reference entities'
-     * title changes (due to either entity change or entity content change.
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
-        this(name, NONE, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param id the entity id
-     * @param emclass the associated CoreEntity Manager class
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, int id, Class<? extends EntityManager> emclass) throws IOException {
-        this(name, id, null, Lookup.getDefault().lookup(emclass), null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param id the entity id
-     * @param emclass the associated CoreEntity Manager class
-     * @param titleChangeListener a listener to call if the reference entities'
-     * title changes (due to either entity change or entity content change.
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, int id, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
-        this(name, id, null, Lookup.getDefault().lookup(emclass), titleChangeListener);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param e the entity
-     * @param emclass the associated CoreEntity Manager class
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, E e, Class<? extends EntityManager> emclass) throws IOException {
-        this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the name of the entity (for reporting)
-     * @param e the entity
-     * @param emclass the associated CoreEntity Manager class
-     * @param titleChangeListener a listener to call if the reference entities'
-     * title changes (due to either entity change or entity content change.
-     * @throws IOException if problems in creating the reference
-     */
-    public EntityReference(String name, E e, Class<? extends EntityManager> emclass, Listener<SimpleEventParams> titleChangeListener) throws IOException {
-        this(name, e.getId(), e, Lookup.getDefault().lookup(emclass), titleChangeListener);
-    }
-
-    private EntityReference(String name, int id, E e, EntityManager<E, P> em, Listener<SimpleEventParams> titleChangeListener) throws IOException {
+    public EntityReference(String name, EntityManager<K, E, P> em) {
         this.name = name;
         this.em = em;
-        idlistener = new IdListener(name);
-        changeEntityEvent = new Event<>("EntityRefChange:" + name);
-        if (titleChangeListener != null) {
-            titleListener = titleChangeListener;
-            changeEntityEvent.addListener(titleChangeListener);
-        }
-        set(id, e);
-        if (id < 0) {
-            if (e == null) {
-                e = get();
-            }
-            if (e != null && e instanceof Entity) {
-                ((Entity) e).addIdListener(idlistener);
-            }
+        this.pk = null;
+        this.entityreference = null;
+        pkListener = null;
+        saveState();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param em the associated Entity Manager
+     * @param listener a listener to receive title change actions
+     */
+    public EntityReference(String name, EntityManager<K, E, P> em, Listener<SimpleEventParams> listener) {
+        this(name, em);
+        titleListener = listener;
+    }
+
+    
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param pk the primary key
+     * @param em the associated Entity Manager
+     */
+    public EntityReference(String name, K pk, EntityManager<K, E, P> em) {
+        this.name = name;
+        this.em = em;
+        this.pk = pk;
+        this.entityreference = null;
+        pkListener = null;
+        saveState();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param pk the primary key
+     * @param em the associated Entity Manager
+     * @param listener a listener to receive title change actions
+     */
+    public EntityReference(String name, K pk, EntityManager<K, E, P> em, Listener<SimpleEventParams> listener) {
+        this(name, pk, em);
+        titleListener = listener;
+    }
+    
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param e the entity
+     * @param em the associated Entity Manager
+     */
+    public EntityReference(String name, E e, EntityManager<K, E, P> em) {
+        this.name = name;
+        this.em = em;
+        pkListener = new PrimaryKeyListener(name);
+        this.pk = e.getPK();
+        if (!e.isPersistent()) {
+            e.addPrimaryKeyListener(pkListener);
         }
         saveState();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name the name of the entity (for reporting)
+     * @param e the entity
+     * @param em the associated Entity Manager
+     * @param listener a listener to receive title change actions
+     */
+    public EntityReference(String name, E e, EntityManager<K, E, P> em, Listener<SimpleEventParams> listener) {
+        this(name, e, em);
+        titleListener = listener;
+        e.addTitleListener(listener);
     }
 
     @Override
@@ -239,72 +149,70 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
     /**
      * Set the reference to "Null".
      *
-     * @return true if referenced entity is different (ie Id has changed)
-     * @throws IOException if problems in completing the action
+     * @return true if referenced entity is different (ie primary key has
+     * changed)
      */
-    public boolean set() throws IOException {
-        return set(NONE, null);
+    public boolean set() {
+        if (pk != null) {
+            LogBuilder.writeLog("nbpcglibrary.data", this, "set");
+            E old = get();
+            if (old != null && titleListener != null) {
+                old.removeTitleListener(titleListener);
+                Event.fireSimpleEventParamsListener(titleListener);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
-     * Set the reference by entity Id.
+     * Set the reference by entity primary key.
      *
-     * @param id the entity id
-     * @return true if referenced entity is different (ie Id has changed)
-     * @throws IOException if problems in completing the action
+     * @param pk the primary key
+     * @return true if referenced entity is different (ie primary key has
+     * changed)
      */
-    public boolean set(int id) throws IOException {
-        return set(id, null);
-    }
-
-    /**
-     * Set the reference by entity.
-     *
-     * @param e the entity
-     * @return true if referenced entity is different (ie Id has changed)
-     * @throws IOException if problems in completing the action
-     */
-    public boolean set(E e) throws IOException {
-        return set(e == null ? NONE : e.getId(), e);
-    }
-
-    private boolean set(int id, E e) throws IOException {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "set", id, e);
-        boolean updated = this.id != id;
+    public boolean set(K pk) {
+        LogBuilder.writeLog("nbpcglibrary.data", this, "set", pk);
+        if (pk == null) {
+            return set();
+        }
+            boolean updated = (this.pk == null || !this.pk.equals(pk));
         if (updated) {
             E old = get();
             if (old != null && titleListener != null) {
                 old.removeTitleListener(titleListener);
             }
-            this.id = id;
+            this.pk = pk;
+            E e = em.get(pk);
             this.entityreference = e == null ? null : new WeakReference<>(e);
             if (titleListener != null) {
                 if (e != null) {
                     e.addTitleListener(titleListener);
                 }
-                changeEntityEvent.fire(new SimpleEventParams());
+                Event.fireSimpleEventParamsListener(titleListener);
             }
         }
         return updated;
     }
 
-    private class IdListener extends Listener<IdChangeEventParams> {
+    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams> {
 
-        public IdListener(String name) {
+        public PrimaryKeyListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(IdChangeEventParams p) {
+        public void action(PrimaryKeyChangeEventParams p) {
             if (entityreference != null) {
                 E e = entityreference.get();
                 if (e != null) {
-                    id = e.getId();
-                    ((Entity) e).removeIdListener(idlistener);
+                    pk = e.getPK();
+                    e.removePrimaryKeyListener(pkListener);
                     return;
                 }
             }
-            throw new LogicException("Can't find entity in EntityReference:IdListener()");
+            throw new LogicException("Can't find entity in EntityReference:PrimaryKeyListener()");
         }
     }
 
@@ -312,19 +220,18 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * Get the Entity Referenced.
      *
      * @return theEntity
-     * @throws IOException if problems in completing the action
      */
-    public final E get() throws IOException {
+    public final E get() {
         if (entityreference != null) {
             E e = entityreference.get();
             if (e != null) {
                 return e;
             }
         }
-        if (id == NONE) {
+        if (pk == null) {
             return null;
         }
-        E e = em.get(id);
+        E e = em.get(pk);
         this.entityreference = e == null ? null : new WeakReference<>(e);
         if (e != null) {
             e.addTitleListener(titleListener);
@@ -343,12 +250,12 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
     }
 
     /**
-     * Get The Entity Id.
+     * Get The Entity primary key.
      *
-     * @return the entity Id
+     * @return the entity primary key
      */
-    public final int getId() {
-        return id;
+    public final K getPK() {
+        return pk;
     }
 
     /**
@@ -359,29 +266,28 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * @return true if changed
      */
     public boolean isDirty() {
-        return id != saveId;
+        return !pk.equals(savePK);
     }
 
     /**
      * Save the State of this entity.
      */
     public final void saveState() {
-        saveId = id;
+        savePK = pk;
     }
 
     /**
      * Restore the state of this entity (from the last saved State).
      *
-     * @throws IOException if problems in completing the action
      */
-    public final void restoreState() throws IOException {
+    public final void restoreState() {
         if (isDirty()) {
             E dirtyE = get();
             if (dirtyE != null) {
                 dirtyE.removeTitleListener(titleListener);
             }
             entityreference = null;
-            id = saveId;
+            pk = savePK;
         }
     }
 
@@ -402,7 +308,7 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
 
         @Override
         public boolean ruleCheck() {
-            return id != NONE;
+            return pk != null;
         }
     }
 }

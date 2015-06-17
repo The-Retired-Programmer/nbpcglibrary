@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,17 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess;
+package uk.org.rlinsdale.nbpcglibrary.api;
 
-import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
-import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProviderFactory;
+import java.util.HashMap;
 
 /**
- * Creates a DataAccessManager.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <D> the class of the Data Access Manager created
- *
  */
-public interface LocalSQLPersistenceUnitProviderFactory<D extends PersistenceUnitProvider> extends PersistenceUnitProviderFactory<D> {
+public class EntityFields extends HashMap<String, Object>{
 }

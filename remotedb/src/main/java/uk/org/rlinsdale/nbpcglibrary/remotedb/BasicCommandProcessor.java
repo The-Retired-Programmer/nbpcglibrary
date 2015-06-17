@@ -33,9 +33,10 @@ import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
  * response(s)
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> Primary Key Class
  * @param <T> the type of entity class
  */
-public abstract class BasicCommandProcessor<T extends BasicEntity> {
+public abstract class BasicCommandProcessor<K, T extends BasicEntity> {
 
     /**
      * the Class of the entity being processed
@@ -78,9 +79,8 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
      * @param field the field name
      * @param value the filter value
      * @return a set of matching entities
-     * @throws JsonConversionException if parsing/creation problems
      */
-    protected abstract List<T> queryByName(JsonValue field, JsonValue value) throws JsonConversionException;
+    protected abstract List<T> queryByName(String field, Object value);
 
     /**
      * Query the data and get all entities
@@ -131,7 +131,7 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
     }
 
     private void create(JsonGenerator generator, JsonObject command) {
-        JsonObject fields = command.getJsonObject("fields");
+        JsonObject fields = command.getJsonObject("entity");
         T newentity = getNewEntity();
         for (Map.Entry<String, JsonValue> kv : fields.entrySet()) {
             String name = kv.getKey();
@@ -160,7 +160,7 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
             return;
         }
         generator.write("success", true);
-        newentity.writePKwithkey(generator);
+        newentity.writePKwithkey(generator); // TOBE FIXED - also add entity 
     }
 
     /**
@@ -187,37 +187,43 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
     }
 
     private void delete(JsonGenerator generator, JsonObject command) {
-        String pkname = getPKname();
-        JsonValue id = command.get(pkname);
-        if (id == null) {
+        K pkey = getPK(command);
+        if (pkey == null) {
             generator.write("success", false)
-                    .write("message", pkname + " undefined");
+                    .write("message", "pkey undefined");
         } else {
-            deleteHook(generator, pkname, id);
+            deleteHook(generator, pkey);
         }
     }
+
+    /**
+     * Get Primary Key value
+     *
+     * @param command the received command object
+     * @return the primary key (java object)
+     */
+    protected abstract K getPK(JsonObject command);
 
     /**
      * An extension point for use by subtypes, to override the default delete
      * action.
      *
      * @param generator the JsonGenerator to be used to build the response
-     * @param pkname the primary key name
-     * @param id the primary key value
+     * @param pkey the primary key value
      */
-    protected void deleteHook(JsonGenerator generator, String pkname, JsonValue id) {
+    protected void deleteHook(JsonGenerator generator, K pkey) {
         try {
-            T entity = getHook(id);
+            T entity = getHook(pkey);
             if (entity != null) {
                 System.out.println("entity found");
                 this.getEntityManager().remove(entity);
                 System.out.println("entity removed");
-                generator.write("success", true)
-                        .write(pkname, id);
+                generator.write("success", true);
+                writePK(generator, pkey);
             } else {
                 generator.write("success", false)
-                        .write("message", "entity does not exist")
-                        .write(pkname, id);
+                        .write("message", "entity does not exist");
+                writePK(generator, pkey);
             }
         } catch (IllegalArgumentException | TransactionRequiredException | JsonConversionException e) {
             generator.write("success", false)
@@ -229,22 +235,30 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
         }
     }
 
+    /**
+     * Write the Primary key to the json response generator
+     *
+     * @param generator the generator
+     * @param pkey the primary key
+     */
+    protected abstract void writePK(JsonGenerator generator, K pkey);
+
     private void get(JsonGenerator generator, JsonObject command) {
-        String pkname = getPKname();
-        JsonValue id = command.get(pkname);
-        if (id == null) {
+        K pkey = getPK(command);
+        if (pkey == null) {
             generator.write("success", false)
-                    .write("message", pkname + " undefined");
+                    .write("message", "pkey is undefined");
         } else {
             try {
-                T entity = getHook(id);
+                T entity = getHook(pkey);
                 if (entity == null) {
                     generator.write("success", false)
-                            .write("message", "entity does not exist")
-                            .write(pkname, id);
+                            .write("message", "entity does not exist");
+                            writePK(generator, pkey);
                 } else {
-                    generator.write("success", true).write(pkname, id);
-                    entity.writeAllFields(generator, "fields");
+                    generator.write("success", true);
+                    writePK(generator, pkey);
+                    entity.writeAllFields(generator, "entity");
                 }
             } catch (Exception e) {
                 generator.write("success", false)
@@ -261,16 +275,16 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
      * An extension point for use by subclasses, to override the default get
      * action.
      *
-     * @param id the entity Id (primary key value)
+     * @param pkey the entity Id (primary key value)
      * @return the entity
      * @throws JsonConversionException if problems
      */
-    protected T getHook(JsonValue id) throws JsonConversionException {
-        return this.getEntityManager().find(clazz, JsonUtil.getValue(id));
+    protected T getHook(K pkey) throws JsonConversionException {
+        return this.getEntityManager().find(clazz, pkey);
     }
 
     private void getbyfield(JsonGenerator generator, JsonObject command) {
-        JsonValue field = command.get("field");
+        String field = command.getString("field");
         if (field == null) {
             generator.write("success", false)
                     .write("message", "field undefined");
@@ -281,8 +295,8 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
                         .write("message", "value undefined");
             } else {
                 try {
-                    List<T> entities = queryByName(field, value);
-                    generator.write("success", true).write(JsonUtil.getStringValue(field), value).write("count", entities.size());
+                    List<T> entities = queryByName(field, JsonUtil.getValue(value));
+                    generator.write("success", true).write(field, value).write("count", entities.size());
                     generator.writeStartArray("entities");
                     entities.stream().forEach((entity) -> {
                         entity.writeAllFields(generator, null);
@@ -320,7 +334,7 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
     }
 
     private void findbyfield(JsonGenerator generator, JsonObject command) {
-        JsonValue field = command.get("field");
+        String field = command.getString("field");
         if (field == null) {
             generator.write("success", false)
                     .write("message", "field undefined");
@@ -331,9 +345,9 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
                         .write("message", "value undefined");
             } else {
                 try {
-                    List<T> entities = queryByName(field, value);
-                    generator.write("success", true).write(JsonUtil.getStringValue(field), value).write("count", entities.size());
-                    generator.writeStartArray("ids");
+                    List<T> entities = queryByName(field, JsonUtil.getValue(value));
+                    generator.write("success", true).write(field, value).write("count", entities.size());
+                    generator.writeStartArray("pkeys");
                     entities.stream().forEach((entity) -> {
                         entity.writePK(generator);
                     });
@@ -365,7 +379,7 @@ public abstract class BasicCommandProcessor<T extends BasicEntity> {
         }
         generator.write("success", true);
         generator.write("count", entities.size());
-        generator.writeStartArray("ids");
+        generator.writeStartArray("pkeys");
         entities.stream().forEach((entity) -> {
             entity.writePK(generator);
         });

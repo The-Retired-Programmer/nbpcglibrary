@@ -237,7 +237,7 @@ public class Event<P extends EventParams> implements HasInstanceDescription {
         }
     }
 
-    private class FireEventQueueListener<P extends EventParams> implements Runnable {
+    private static class FireEventQueueListener<P extends EventParams> implements Runnable {
 
         private final P p;
         private final Listener<P> al;
@@ -251,5 +251,9 @@ public class Event<P extends EventParams> implements HasInstanceDescription {
         public void run() {
             al.actionPerformed(p);
         }
+    }
+    
+    public static void fireSimpleEventParamsListener(Listener<SimpleEventParams> listener){
+         EventQueue.invokeLater(new FireEventQueueListener<>(listener, new SimpleEventParams()));
     }
 }

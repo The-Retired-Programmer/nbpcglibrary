@@ -19,33 +19,32 @@
 package uk.org.rlinsdale.nbpcglibrary.mysql;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
-import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
  * The test package for the LocalMySqlEntityPersistenceProvider
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class LocalSQLEntityPersistenceProviderTest {
+public class LocalMySQLEntityPersistenceProviderTest {
 
-    private static EntityPersistenceProvider instance;
+    private static EntityPersistenceProvider<Integer> instance;
 
     /**
-     * Constructore
+     * Constructor
      */
-    public LocalSQLEntityPersistenceProviderTest() {
+    public LocalMySQLEntityPersistenceProviderTest() {
     }
 
     /**
@@ -62,7 +61,7 @@ public class LocalSQLEntityPersistenceProviderTest {
         Properties p = new Properties();
         p.setProperty("key", "authentication2");
         p.setProperty("connection", "jdbc:mysql://localhost:3306/authentication2");
-        p.setProperty("entitypersistenceprovidertype", "localsql");
+        p.setProperty("entitypersistenceprovidertype", "local-mysql");
         p.setProperty("persistenceunitprovidertype", "mysql");
         p.setProperty("user", "developer");
         p.setProperty("password", "dev");
@@ -98,7 +97,7 @@ public class LocalSQLEntityPersistenceProviderTest {
     @Test
     public void testInstanceDescription() {
         System.out.println("instanceDescription");
-        String expResult = "LocalSQLEntityPersistenceProvider[LocalMySQLPersistenceUnitProvider-Application]";
+        String expResult = "LocalMySQLAutoIDEntityPersistenceProvider[LocalMySQLPersistenceUnitProvider-Application]";
         String result = instance.instanceDescription();
         assertEquals(expResult, result);
     }
@@ -112,13 +111,13 @@ public class LocalSQLEntityPersistenceProviderTest {
     public void testGet_int() throws Exception {
         System.out.println("get");
         int id = 48;
-        JsonObject result = instance.get(id);
-        assertEquals("RL12", result.getString("updatedby"));
-        assertEquals("RL12", result.getString("createdby"));
-        assertEquals("20150422213408", result.getString("updatedon"));
-        assertEquals("20150422213408", result.getString("createdon"));
-        assertEquals(48, result.getInt("id"));
-        assertEquals("JsonApp60", result.getString("application"));
+        EntityFields result = instance.get(id);
+        assertEquals("RL12", result.get("updatedby"));
+        assertEquals("RL12", result.get("createdby"));
+        assertEquals("20150422213408", result.get("updatedon"));
+        assertEquals("20150422213408", result.get("createdon"));
+        assertEquals(id, result.get("id"));
+        assertEquals("JsonApp60", result.get("application"));
     }
 
     /**
@@ -129,8 +128,7 @@ public class LocalSQLEntityPersistenceProviderTest {
     @Test
     public void testFind() throws Exception {
         System.out.println("find");
-        JsonArray result = instance.find();
-        System.out.println(result.toString());
+        List<Integer> result = instance.find();
         assertEquals(28, result.size());
     }
 
@@ -142,13 +140,9 @@ public class LocalSQLEntityPersistenceProviderTest {
     @Test
     public void testGet_String_JsonValue() throws Exception {
         System.out.println("get");
-        String parametername = "application";
-        JsonValue parametervalue = JsonUtil.createJsonValue("JsonApp83");
-        JsonArray result = instance.get(parametername, parametervalue);
-        System.out.println(result.toString());
+        List<EntityFields> result = instance.get("application", "JsonApp83");
         assertEquals(1, result.size());
-        JsonObject job = (JsonObject) result.get(0);
-        assertEquals(46, job.getInt("id"));
+        assertEquals(46, result.get(0).get("id"));
     }
 
     /**
@@ -159,10 +153,8 @@ public class LocalSQLEntityPersistenceProviderTest {
     @Test
     public void testGetOne() throws Exception {
         System.out.println("getOne");
-        String parametername = "application";
-        JsonValue parametervalue = JsonUtil.createJsonValue("JsonApp83");
-        JsonObject result = instance.getOne(parametername, parametervalue);
-        assertEquals(46, result.getInt("id"));
+        EntityFields result = instance.getOne("application", "JsonApp83");
+        assertEquals(46, result.get("id"));
     }
 
     /**
@@ -170,7 +162,7 @@ public class LocalSQLEntityPersistenceProviderTest {
      *
      * @throws Exception if problems
      */
-    @Test(expected = IOException.class)
+    @Test(expected = LogicException.class)
     public void testFindNextIdx() throws Exception {
         System.out.println("findNextIdx");
         int result = instance.findNextIdx();

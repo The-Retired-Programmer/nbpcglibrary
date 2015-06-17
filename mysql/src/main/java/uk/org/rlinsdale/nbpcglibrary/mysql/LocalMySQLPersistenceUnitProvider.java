@@ -18,16 +18,13 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.mysql;
 
-import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.logging.Level;
-import javax.json.JsonNumber;
-import javax.json.JsonString;
-import javax.json.JsonValue;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLPersistenceUnitProvider;
 
 /**
@@ -38,9 +35,6 @@ import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLPersistenceUnit
 @RegisterLog("nbpcglibrary.mysql")
 public class LocalMySQLPersistenceUnitProvider extends LocalSQLPersistenceUnitProvider {
     
-    private boolean operational = false;
-    private final Properties p;
-
     /**
      * Constructor
      * 
@@ -49,51 +43,18 @@ public class LocalMySQLPersistenceUnitProvider extends LocalSQLPersistenceUnitPr
     @SuppressWarnings("LeakingThisInConstructor")
     public LocalMySQLPersistenceUnitProvider(Properties p) {
         super("local-mysql-"+p.getProperty("key"));
-        this.p = p;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException ex) {
-            LogBuilder.create("nbpcglibrary.mysql", Level.SEVERE).addConstructorName(this, p)
-                .addExceptionMessage(ex).write();
-        }
-        try {
             setConnection(DriverManager.getConnection(p.getProperty("connection"), p.getProperty("user"), p.getProperty("password")));
-            operational = true;
-        } catch (SQLException ex) {
+            setOperational();
+        } catch (ClassNotFoundException | SQLException ex) {
+             LogBuilder.create("nbpcglibrary.mysql", Level.SEVERE).addConstructorName(this, p)
+                .addExceptionMessage(ex).write();
         }
     }
     
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this, getName());
-    }
-
-    @Override
-    protected String format(JsonValue value) throws IOException {
-        switch (value.getValueType()) {
-            case NULL:
-                return "NULL";
-            case TRUE:
-                return "true";
-            case FALSE:
-                return "false";
-            case STRING:
-                String v = ((JsonString)value).getString();
-            return "'" + v.replace("\\", "\\\\").replace("'", "\\'").replace("\n","\\n") + "'";
-            case NUMBER:
-                return ((JsonNumber)value).toString();
-            default:
-                throw new IOException("Unknown Object type in LocalMySQLPersistenceUnitProvider:format()");
-        }
-    }
-
-    @Override
-    public boolean isOperational() {
-        return operational;
-    }
-    
-    @Override
-    public String getName() {
-        return "local-mysql-"+p.getProperty("key");
     }
 }

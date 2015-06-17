@@ -28,9 +28,11 @@ import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
  * Simple implementation of an LRU cache
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the Type of the Primary Key
  * @param <E> The entity Class being managed
+ * 
  */
-public class LRUCache<E> extends LinkedHashMap<Integer, E> implements HasInstanceDescription {
+public class LRUCache<K, E> extends LinkedHashMap<K, E> implements HasInstanceDescription {
 
     private static final float LOADFACTOR = (float) 0.9;
     private final int maxcache;
@@ -56,7 +58,7 @@ public class LRUCache<E> extends LinkedHashMap<Integer, E> implements HasInstanc
     }
 
     @Override
-    protected boolean removeEldestEntry(Map.Entry<Integer, E> eldest) {
+    protected boolean removeEldestEntry(Map.Entry<K, E> eldest) {
         if (size() > maxcache) {
             LogBuilder.create("nbpcglibrary.data", Level.FINER).addMethodName(this, "removeEldestEntry")
                 .addMsg("frees {0}", eldest.getKey()).write();

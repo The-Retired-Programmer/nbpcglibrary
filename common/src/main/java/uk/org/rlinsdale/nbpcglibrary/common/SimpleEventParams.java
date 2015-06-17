@@ -32,10 +32,4 @@ public class SimpleEventParams implements EventParams {
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
     }
-    
-    @Override
-    public String toString() {
-        return "Simple(Empty)";
-    }
-
 }

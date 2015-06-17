@@ -105,15 +105,15 @@ public abstract class CPServlet extends HttpServlet {
     }
 
     private String processCommand(JsonObject command) {
-        String entity = command.getString("entity", "");
+        String entityname = command.getString("entityname", "");
         StringWriter reply = new StringWriter();
         JsonGenerator generator = Json.createGenerator(reply);
-        generator.writeStartObject().write("entity", entity);
-        if ("".equals(entity)) {
-            generator.write("success", false).write("message", "No entity defined");
+        generator.writeStartObject().write("entityname", entityname);
+        if ("".equals(entityname)) {
+            generator.write("success", false).write("message", "No entityname defined");
         } else {
-            if (!switchCommandProcessor(entity, command, generator)) {
-                generator.write("success", false).write("message", "Unknown entity requested");
+            if (!switchCommandProcessor(entityname, command, generator)) {
+                generator.write("success", false).write("message", "Unknown entityname requested");
             }
         }
         generator.writeEnd().close();
@@ -123,13 +123,13 @@ public abstract class CPServlet extends HttpServlet {
     /**
      * Select and call the correct Command processor for this entity class.
      *
-     * @param entity the entity
+     * @param entityname the entityname
      * @param command the command
-     * @param generator tyhe JsonGenerator for this response
+     * @param generator the JsonGenerator for this response
      * @return true if command processor was selected, otherwise false if entity
      * class not recognised
      */
-    protected abstract boolean switchCommandProcessor(String entity, JsonObject command, JsonGenerator generator);
+    protected abstract boolean switchCommandProcessor(String entityname, JsonObject command, JsonGenerator generator);
 
     /**
      * Handles the HTTP <code>GET</code> method.

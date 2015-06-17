@@ -32,7 +32,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderFactory;
  */
 @RegisterLog("nbpcglib.localJsonPersistenceUnitProvider")
 @ServiceProvider(service = EntityPersistenceProviderFactory.class)
-public class LocalJsonEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<LocalJsonPersistenceUnitProvider, LocalJsonPersistenceUnitProviderFactory> {
+public class LocalJsonEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<Integer ,LocalJsonPersistenceUnitProvider, LocalJsonPersistenceUnitProviderFactory> {
 
     @Override
     public String getType() {
@@ -46,6 +46,8 @@ public class LocalJsonEntityPersistenceProviderFactory implements EntityPersiste
 
     @Override
     public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalJsonPersistenceUnitProvider pup) throws IOException {
-            return new LocalJsonEntityPersistenceProvider(entityname, p, pup);
+            LocalJsonAutoIDEntityPersistenceProvider epp = new LocalJsonAutoIDEntityPersistenceProvider();
+            epp.init(entityname, p, pup);
+            return epp;
     }
 }

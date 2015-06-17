@@ -20,7 +20,6 @@ package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
 import com.famfamfam.www.silkicons.Icons;
 import java.awt.Image;
-import java.io.IOException;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
@@ -94,9 +93,8 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
 
     /**
      * Cancel any changes in progress and restore state as at last save state.
-     * @throws IOException if restore state fails
      */
-    public void cancelEdit() throws IOException {
+    public void cancelEdit() {
         entityRestoreState();
     }
 
@@ -130,9 +128,8 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
     
     /**
      * Restore entity state.
-     * @throws IOException if restore fails
      */
-    abstract protected void entityRestoreState() throws IOException;
+    abstract protected void entityRestoreState();
 
     /**
      * get the string which will be used to display the name for the entity

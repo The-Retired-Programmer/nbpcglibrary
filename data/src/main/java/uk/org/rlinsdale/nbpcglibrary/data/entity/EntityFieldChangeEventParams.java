@@ -37,17 +37,7 @@ public class EntityFieldChangeEventParams<F> implements EventParams {
         /**
          * All fields have/ may have been changed.
          */
-        ALL,
-
-        /**
-         * The Id (primary key) field has changed
-         */
-        ID,
-
-        /**
-         * The index (ordering inndex) field has changed
-         */
-        IDX
+        ALL
     };
 
     private final F field;

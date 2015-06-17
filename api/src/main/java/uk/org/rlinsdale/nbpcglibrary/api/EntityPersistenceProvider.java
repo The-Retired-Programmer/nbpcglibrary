@@ -18,58 +18,49 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.api;
 
-import java.io.IOException;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import java.util.List;
 
 /**
  * Provider of a EntityPersistence Service for a particular entity
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * 
+ * @param <K> the Primary Key type
  */
-public interface EntityPersistenceProvider extends HasInstanceDescription {
+public interface EntityPersistenceProvider<K> extends HasInstanceDescription {
 
     /**
-     * Get the set of entity Ids for all stored entities.
+     * Get the set of entity Primary Keys for all stored entities.
      *
-     * @return the set of entity Ids
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
+     * @return the set of entity primary keys.
      */
-    public JsonArray find() throws IOException;
+    public List<K> find();
 
     /**
-     * Get the entity Id(s) for a many (0 to many) entities - using selected by an
+     * Get the entity primary keys for a many (0 to many) entities - using selected by an
      * column filter.
      *
      * @param parametername the filter column name
      * @param parametervalue the filter value
-     * @return the set of entity Ids - using selected by an column filter.
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
+     * @return the set of entity primary keys - using selected by an column filter.
      */
-    public JsonArray find(String parametername, JsonValue parametervalue) throws IOException;
+    public List<K> find(String parametername, Object parametervalue);
 
     /**
-     * Get entity Id for a single entity - using selected by an column filter.
+     * Get entity primary key for a single entity - using selected by an column filter.
      *
      * @param parametername the filter column name
      * @param parametervalue the filter value
-     * @return the entity object representation
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
+     * @return the entity primary key
      */
-    public JsonValue findOne(String parametername, JsonValue parametervalue) throws IOException;
+    public K findOne(String parametername, Object parametervalue);
 
-    /**
+   /**
      * Get the set of entity for all stored entities.
      *
      * @return the set of entities
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
      */
-    public JsonArray get() throws IOException;
+    public List<EntityFields> get();
 
     /**
      * Get entity data for a many (0 to many) entities - using selected by an
@@ -78,68 +69,55 @@ public interface EntityPersistenceProvider extends HasInstanceDescription {
      * @param parametername the filter column name
      * @param parametervalue the filter value
      * @return the array of entity data objects
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
      */
-    public JsonArray get(String parametername, JsonValue parametervalue) throws IOException;
-
+    public List<EntityFields> get(String parametername, Object parametervalue);
+    
     /**
      * Get entity data for a single entity - using selected by an column filter.
      *
      * @param parametername the filter column name
      * @param parametervalue the filter value
      * @return the entity object representation
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
      */
-    public JsonObject getOne(String parametername, JsonValue parametervalue) throws IOException;
+    public EntityFields getOne(String parametername, Object parametervalue);
 
     /**
      * Get the next index value for entities which have an explicit ordering
      * column defined.
      *
      * @return the next index value
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
      */
-    public int findNextIdx() throws IOException;
+    public int findNextIdx();
 
     /**
-     * Get entity data - using PK lookup
+     * Get entity data - using primary key
      *
-     * @param id the entity Id
-     * @return the JsonObject containing field values
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
+     * @param pk the entity primary key
+     * @return the Object containing field values
      */
-    public JsonObject get(int id) throws IOException;
+    public EntityFields get(K pk);
 
     /**
      * Insert a new entity (set of values) into entity storage.
      *
      * @param values the set of values
-     * @return the new entity Id
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
+     * @return the full set of entity fields
      */
-    public int insert(JsonObject values) throws IOException;
+    public EntityFields insert(EntityFields values);
 
     /**
      * Update an existing entity in entity storage with a new set of values.
      *
-     * @param id the new entity Id
+     * @param pk the entity primary key
      * @param diff the set of values to be updated
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
+     * @return the full set of entity fields
      */
-    public void update(int id, JsonObject diff) throws IOException;
+    public EntityFields update(K pk, EntityFields diff);
 
     /**
      * Delete an entity from entity storage.
      *
-     * @param id the entity Id
-     * @throws IOException in cases of problems when obtaining, parsing or
-     * creating data
+     * @param pk the entity primary key
      */
-    public void delete(int id) throws IOException;
+    public void delete(K pk) ;
 }

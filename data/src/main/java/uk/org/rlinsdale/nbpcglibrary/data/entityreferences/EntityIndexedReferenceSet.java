@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityIndexed;
@@ -30,37 +29,20 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
  * Manages the list of Entities - implements a re-orderable entity lists
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the primary key class
  * @param <E> the Entity Class
  * @param <P> the parent entity
- * @param <F> the Fields enum class
  */
-public class EntityIndexedReferenceSet<E extends EntityIndexed, P extends CoreEntity, F> extends EntityReferenceSet<E, P, F> {
+public class EntityIndexedReferenceSet<K, E extends EntityIndexed<K, E, P, ?>, P extends CoreEntity> extends EntityReferenceSet<K, E, P> {
 
     /**
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param field field identifier
-     * @param columnname the column name for use in selection equality filter
-     * @param columnvalue the column value for use in the selection equality
-     * filter
      * @param emclass the associated entity manager class
-     * @throws IOException if problem in creating the set
      */
-    public EntityIndexedReferenceSet(String name, F field, String columnname, int columnvalue, Class<? extends EntityManager> emclass) throws IOException {
-        super(name, field, columnname, columnvalue, emclass);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param name the set name (for reporting)
-     * @param field field identifier
-     * @param emclass the associated entity manager class
-     * @throws IOException if problem in creating the set
-     */
-    public EntityIndexedReferenceSet(String name, F field, Class<? extends EntityManager> emclass) throws IOException {
-        super(name, field, emclass);
+    public EntityIndexedReferenceSet(String name, Class<? extends EntityManager> emclass) {
+        super(name, emclass);
     }
 
     /**
@@ -84,7 +66,7 @@ public class EntityIndexedReferenceSet<E extends EntityIndexed, P extends CoreEn
                 permin++;
             }
         }
-        List<EntityReference<E, P>> reordered = new ArrayList<>(clsize);
+        List<EntityReference<K, E, P>> reordered = new ArrayList<>(clsize);
         for (int i = 0; i < clsize; i++) {
             reordered.add(null);
         }
@@ -98,10 +80,8 @@ public class EntityIndexedReferenceSet<E extends EntityIndexed, P extends CoreEn
 
     /**
      * Persist the reordering.
-     *
-     * @throws IOException if problems in completing this action.
      */
-    public void persistReorder() throws IOException {
+    public void persistReorder() {
         List<E> el = get();
         for (int i = 0; i < el.size(); i++) {
             E e = el.get(i);

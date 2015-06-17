@@ -29,7 +29,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> The entity class
  */
-public abstract class IdandstampCommandProcessor<T extends IdandstampEntity> extends BasicCommandProcessor<T> {
+public abstract class IdandstampCommandProcessor<T extends IdandstampEntity> extends BasicCommandProcessor<Integer,T> {
 
     /**
      * Constructor

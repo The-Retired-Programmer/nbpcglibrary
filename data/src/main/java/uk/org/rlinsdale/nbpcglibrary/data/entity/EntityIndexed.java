@@ -18,56 +18,57 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import java.io.IOException;
-import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFieldsRWIndexed;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEW;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.NEWEDITING;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.IDX;
 
 /**
  * The abstract class defining an editable Entity, with a index (orderable)
  * field.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the primary key type
  * @param <E> the entity class
  * @param <P> the Parent CoreEntity Class
  * @param <F> the entity field enum class
  */
-public abstract class EntityIndexed<E extends EntityIndexed, P extends CoreEntity, F> extends Entity<E, P, F> {
+public abstract class EntityIndexed<K, E extends EntityIndexed<K, E, P, F>, P extends CoreEntity, F> extends Entity<K, E, P, F> {
 
-    private final DBFieldsRWIndexed<E> dbfields;
-    private final EntityPersistenceProvider entityPersistenceProvider;
+    private final EntityPersistenceProvider epp;
 
     /**
      * Constructor.
      *
      * @param entityname the entity name
      * @param icon the icon name
-     * @param id the entity Id
      * @param em the entity manager for this entity class
-     * @param dbfields the entity fields
      */
-    public EntityIndexed(String entityname, String icon, int id, EntityManager<E, P> em, DBFieldsRWIndexed<E> dbfields) {
-        super(entityname, icon, id, em, dbfields);
-        this.dbfields = dbfields;
-        this.entityPersistenceProvider = em.getEntityPersistenceProvider();
+    public EntityIndexed(String entityname, String icon, EntityManager<K, E, P> em) {
+        super(entityname, icon, em);
+        this.epp = em.getEntityPersistenceProvider();
     }
+
+    /**
+     * Get the index value.
+     *
+     * @return the index value
+     */
+    protected abstract int getIndexValue();
+
+    /**
+     * Set the index value.
+     *
+     * @param idx the index value
+     */
+    protected abstract void setIndexValue(int idx);
 
     @Override
     public final boolean save() {
         EntityState oldState = getState();
         if (oldState == NEW || oldState == NEWEDITING) {
-            if (dbfields.getIndex() == Integer.MAX_VALUE) {
-                try {
-                    dbfields.setIndex(entityPersistenceProvider.findNextIdx());
-                } catch (IOException ex) {
-                    LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "save")
-                            .addExceptionMessage(ex).write();
-                }
+            if (getIndexValue() == Integer.MAX_VALUE) {
+                setIndexValue(epp.findNextIdx());
             }
         }
         return super.save();
@@ -79,18 +80,18 @@ public abstract class EntityIndexed<E extends EntityIndexed, P extends CoreEntit
      * @return the index value
      */
     public int getIndex() {
-        return dbfields.getIndex();
+        return getIndexValue();
     }
 
     /**
      * Set the Index Field value.
      *
      * @param i the index value
-     * @throws IOException if problem while setting this index
      */
-    public final void setIndex(int i) throws IOException {
+    public final void setIndex(int i) {
         ensureEditing();
-        dbfields.setIndex(i);
-        fireFieldChange(IDX);
+        setIndexValue(i);
+        // TODO no fire on index change
+        //fireFieldChange(IDX);
     }
 }

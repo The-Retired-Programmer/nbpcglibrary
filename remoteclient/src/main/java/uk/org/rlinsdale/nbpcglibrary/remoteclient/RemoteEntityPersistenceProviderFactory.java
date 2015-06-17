@@ -31,7 +31,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderFactory;
  */
 @RegisterLog("nbpcglib.RemoteEntityPersistenceProvider")
 @ServiceProvider(service = EntityPersistenceProviderFactory.class)
-public class RemoteEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<RemotePersistenceUnitProvider, RemotePersistenceUnitProviderFactory> {
+public class RemoteEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<Integer,RemotePersistenceUnitProvider, RemotePersistenceUnitProviderFactory> {
 
     @Override
     public String getType() {
@@ -45,6 +45,8 @@ public class RemoteEntityPersistenceProviderFactory implements EntityPersistence
 
     @Override
     public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, RemotePersistenceUnitProvider pup) {
-        return new RemoteEntityPersistenceProvider(entityname, p, pup);
+          RemoteAutoIDEntityPersistenceProvider epp = new  RemoteAutoIDEntityPersistenceProvider();
+            epp.init(entityname, p, pup);
+            return epp;
     }
 }

@@ -20,11 +20,10 @@ package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
-import java.util.logging.Level;
+import org.openide.util.Lookup;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
@@ -37,13 +36,14 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  * Read-Only Tree Node Abstract Class
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the Primary Key class for entity
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
  * @param <F> the Entity Field enum class
  */
-public abstract class TreeNode<E extends Entity, P extends CoreEntity, F> extends BasicNode<E> {
+public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends BasicNode<E> {
 
-    private EntityReference<E, P> eref;
+    private EntityReference<K, E, P> eref;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
     private EntityNameChangeListener nameListener;
@@ -60,7 +60,7 @@ public abstract class TreeNode<E extends Entity, P extends CoreEntity, F> extend
      * @param isCutDestroyEnabled true if delete/cut is allowed
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    protected TreeNode(String nodename, E e, BasicChildFactory<E, P> cf, Class<? extends EntityManager> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
+    protected TreeNode(String nodename, E e, BasicChildFactory<K, E, P> cf, Class<? extends EntityManager> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
         super(cf, allowedPaste);
         commonConstructor(nodename, e, emclass, isCutDestroyEnabled);
     }
@@ -76,16 +76,12 @@ public abstract class TreeNode<E extends Entity, P extends CoreEntity, F> extend
     protected TreeNode(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
         super();
         commonConstructor(nodename, e, emclass, isCutDestroyEnabled);
-        
+
     }
-    
-     private void commonConstructor(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
-         try {
-            eref = new EntityReference<>(nodename, e, emclass);
-        } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addConstructorName(this, nodename, e)
-                    .addExceptionMessage(ex).write();
-        }
+
+    private void commonConstructor(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
+        EntityManager<K, E, P> em = Lookup.getDefault().lookup(emclass);
+        eref = new EntityReference<>(nodename, e, em);
         this.isCutDestroyEnabled = isCutDestroyEnabled;
         String desc = e.instanceDescription();
         e.addStateListener(stateListener = new EntityStateChangeListener(desc));
@@ -95,25 +91,14 @@ public abstract class TreeNode<E extends Entity, P extends CoreEntity, F> extend
 
     @Override
     public E getEntity() {
-        try {
-            return eref.get();
-        } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "getEntity")
-                    .addExceptionMessage(ex).write();
-            return null;
-        }
+        return eref.get();
     }
 
     /**
-     *
+     * Set node/entity association to null.
      */
     public void setNoEntity() {
-        try {
-            eref.set();
-        } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "setNoEntity")
-                    .addExceptionMessage(ex).write();
-        }
+        eref.set();
     }
 
     private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {

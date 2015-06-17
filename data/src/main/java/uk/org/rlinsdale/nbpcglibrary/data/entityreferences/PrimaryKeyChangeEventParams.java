@@ -16,26 +16,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.data.entity;
+package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
 import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
- * The Parameter Class for a SetChange listener.
+ * The Listener Parameter Object - used to transfer state when listener is
+ * fired.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class SetChangeEventParams implements EventParams {
-
-
-    /**
-     * Constructor.
-     *
-     */
-    public SetChangeEventParams() {
-    }
-
+public class PrimaryKeyChangeEventParams implements EventParams {
 
     @Override
     public String instanceDescription() {

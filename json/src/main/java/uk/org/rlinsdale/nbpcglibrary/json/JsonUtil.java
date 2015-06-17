@@ -18,10 +18,12 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.json;
 
+import java.math.BigDecimal;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 import static javax.json.JsonValue.ValueType.*;
@@ -149,6 +151,55 @@ public class JsonUtil {
             default:
                 throw new JsonConversionException();
         }
+    }
+
+    /**
+     * Insert Java Object into a JsonObject as a key/value pair.
+     *
+     * @param job the ObjectBuilder into which the key/value pair is inserted
+     * @param key the key
+     * @param value the value to be inserted
+     * @throws JsonConversionException if any conversion error or type failure
+     */
+    public static void insertValue(JsonObjectBuilder job, String key, Object value) throws JsonConversionException {
+        if (value == null) {
+            job.add(key, JsonValue.NULL);
+            return;
+        }
+        if (value instanceof String) {
+            job.add(key, (String) value);
+            return;
+        }
+        if (value instanceof Integer) {
+            job.add(key, (Integer) value);
+            return;
+        }
+        if (value instanceof Long) {
+            job.add(key, (Long) value);
+            return;
+        }
+        if (value instanceof Boolean) {
+            job.add(key, (Boolean) value);
+            return;
+        }
+        throw new JsonConversionException();
+    }
+
+    /**
+     * Convert a JsonValue into a equivalent Java String.
+     *
+     * @param value the JsonValue (either String or Number)
+     * @return the resulting java String
+     * @throws JsonConversionException if any conversion error or type failure
+     */
+    public static String getValueToString(JsonValue value) throws JsonConversionException {
+        if (value.getValueType() == STRING) {
+            return ((JsonString) value).getString();
+        }
+        if (value.getValueType() == NUMBER) {
+            return Integer.toString(((JsonNumber) value).intValue());
+        }
+        throw new JsonConversionException();
     }
 
     /**

@@ -18,9 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import org.openide.util.Lookup;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
@@ -30,12 +28,13 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  * Extended ChildFactory support
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the Parent Primary Key Class
  * @param <E> the Parent Entity Class
  * @param <P> The Parent of Parent Entity Class
  */
-public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> extends RootChildFactory<E> {
+public abstract class BasicChildFactory<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends RootChildFactory<E> {
 
-    private EntityReference<E, P> parentref;
+    private final EntityReference<K, E, P> parentref;
 
     /**
      * Constructor.
@@ -47,22 +46,12 @@ public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> 
     @SuppressWarnings("LeakingThisInConstructor")
     public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManager> emclass) {
         super(null);
-        try {
-            parentref = new EntityReference<>(factoryname + ">" + parentEntity.instanceDescription(), parentEntity, emclass);
-        } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addConstructorName(this, factoryname, parentEntity)
-                    .addExceptionMessage(ex).write();
-        }
+        EntityManager<K, E, P> em = Lookup.getDefault().lookup(emclass);
+        parentref = new EntityReference<>(factoryname + ">" + parentEntity.instanceDescription(), parentEntity, em);
     }
 
     @Override
     public E getParentEntity() {
-        try {
-            return parentref.get();
-        } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.node", Level.SEVERE).addMethodName(this, "getParentEntity")
-                    .addExceptionMessage(ex).write();
-            return null;
-        }
+        return parentref.get();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,30 +16,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.data.dbfields;
+package uk.org.rlinsdale.nbpcglibrary.remoteclient;
 
-import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
- * Interface for handling entity field states for an entity which uses
- * a index field (integer) for ordering entities.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <E> the entity class
  */
-public interface DBFieldsRWIndexed<E extends Entity> extends DBFields<E> {
+public class RemoteAutoIDEntityPersistenceProvider extends RemoteEntityPersistenceProvider<Integer> {
+    
+    @Override
+    protected Integer getPK(JsonValue v) {
+        try {
+            return JsonUtil.getIntegerValue(v);
+        } catch (JsonConversionException ex) {
+            throw new LogicException("getPK(jsonvalue) failed: non integer type presented");
+        }
+    }
 
-    /**
-     * Get the index value.
-     *
-     * @return the index value
-     */
-    public int getIndex();
-
-    /**
-     * Set the index value.
-     *
-     * @param idx the index value
-     */
-    public void setIndex(int idx);
+    @Override
+    protected void addPK(JsonObjectBuilder job, Integer pkey) {
+        job.add("pkey", pkey);
+    }
 }

@@ -40,7 +40,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
  * @param <E> the eEntity Class
  * @param <P> the parent Entity class
  */
-public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEntity> {
+public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> {
 
     /**
      * The Entity Manager associated with the entities
@@ -52,6 +52,8 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      * The list of Entity References
      */
     protected List<EntityReference<K, E, P>> childList;
+    private final String columnname;
+    private final Object columnvalue;
 
     /**
      * The name of the Set (for reporting purposes)
@@ -63,15 +65,21 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      * Constructor.
      *
      * @param name the set name (for reporting)
+     * @param columnname the column name for use in selection equality filter
+     * @param columnvalue the column value for use in the selection equality
+     * filter
      * @param emclass the associated entity manager class
      */
-    public EntityReferenceSet(String name,  Class<? extends EntityManager> emclass) {
+    @SuppressWarnings("LeakingThisInConstructor")
+    public EntityReferenceFilterSet(String name, String columnname, Object columnvalue, Class<? extends EntityManager> emclass) {
         this.name = name;
         setChangeEvent = new Event<>(name);
         em = Lookup.getDefault().lookup(emclass);
+        this.columnvalue = columnvalue;
+        this.columnname = columnname;
         this.epp = em.getEntityPersistenceProvider();
         childList = new ArrayList<>();
-        epp.find().stream().forEach((ref) -> {
+        epp.find(columnname, columnvalue).stream().forEach((ref) -> {
             childList.add(new EntityReference<>(name, ref, em));
         });
     }
@@ -119,10 +127,9 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      */
     public void restoreState() {
         childList = new ArrayList<>();
-        epp.find().stream().forEach((ref) -> {
+        epp.find(columnname, columnvalue).stream().forEach((ref) -> {
             childList.add(new EntityReference<>(name, ref, em));
         });
-        fireSetChange();
     }
 
     /**
@@ -154,7 +161,7 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      *
      * @param e the new entity
      */
-    public void add(E e)  {
+    public void add(E e) {
         childList.add(new EntityReference<>(name, e, em));
         fireSetChange();
     }
@@ -165,7 +172,7 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      * @param index the position to insert the new entity
      * @param e the new entity
      */
-    protected final void add(int index, E e)  {
+    protected final void add(int index, E e) {
         childList.add(index, new EntityReference<>(name, e, em));
         fireSetChange();
     }
@@ -173,12 +180,12 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
     /**
      * Remove an entity from the child entity List
      *
-     * @param e the Child Entity
+     * @param e the Child CoreEntity
      * @return true if entity removed
      */
     public boolean remove(E e) {
         K pk = e.getPK();
-        for (EntityReference<K,E, P> ref : childList) {
+        for (EntityReference<K, E, P> ref : childList) {
             if (ref.getPK().equals(pk)) {
                 if (childList.remove(ref)) {
                     fireSetChange();

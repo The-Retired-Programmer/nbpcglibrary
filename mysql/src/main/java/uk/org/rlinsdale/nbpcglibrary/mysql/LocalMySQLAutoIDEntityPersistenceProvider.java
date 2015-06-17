@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,26 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
-
-import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+package uk.org.rlinsdale.nbpcglibrary.mysql;
 
 /**
- * The Listener Parameter Object - used to transfer state when listener is
- * fired.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class IdChangeEventParams implements EventParams {
-
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this);
-    }
+public class LocalMySQLAutoIDEntityPersistenceProvider extends LocalMySQLEntityPersistenceProvider<Integer> {
     
-    @Override
-    public String toString() {
-        return "IdChangeEventParams";
-    }
 }

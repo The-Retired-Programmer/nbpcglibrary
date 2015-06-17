@@ -23,10 +23,6 @@ import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
-import java.util.logging.Level;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.netbeans.spi.actions.AbstractSavable;
@@ -37,14 +33,13 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
-import uk.org.rlinsdale.nbpcglibrary.data.dbfields.DBFields;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.*;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ALL;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ID;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.CREATE;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.EDIT;
@@ -52,48 +47,42 @@ import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventPa
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.RESET;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.SAVE;
-import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.IdChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
-import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
+import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.PrimaryKeyChangeEventParams;
 
 /**
  * The Entity Abstract Class.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> th etype of the primary Key
  * @param <E> the entity class
  * @param <P> the Parent Entity Class
- * @param <F> the Fields enum class
+ * @param <F> the entity field types
  */
 @RegisterLog("nbpcglibrary.data")
-public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends CoreEntity {
+public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends CoreEntity {
 
     private final Event<EntityStateChangeEventParams> stateEvent;
     private final Event<EntityFieldChangeEventParams<F>> fieldEvent;
     private Event<SimpleEventParams> titleChangeEvent;
     private Event<SimpleEventParams> nameChangeEvent;
     private EntityState state = INIT;
-    private int id;
-    private final DBFields dbfields;
-    private final EntityPersistenceProvider dataAccess;
     private final String entityname;
-
-    private final EntityPersistenceProvider entityPersistenceManager;
-    private final Event<IdChangeEventParams> idChangeEvent;
-    private final EntityManager<E, P> em;
+    private final EntityPersistenceProvider<K> epp;
+    private final Event<PrimaryKeyChangeEventParams> primaryKeyChangeEvent;
+    private final EntityManager<K, E, P> em;
     private final EntityStateChangeListener entitystatechangelistener;
     private final EntitySavable savable = new EntitySavable();
+    private boolean persistent = false;
 
     /**
      * Constructor.
      *
      * @param entityname the entity name
      * @param icon name of the icon graphic
-     * @param id the entity Id
      * @param em the entity manager for this entity class
-     * @param dbfields the entity fields
      */
-    public Entity(String entityname, String icon, int id, EntityManager<E, P> em, DBFields dbfields) {
-        this(entityname, icon, id, em, em.getEntityPersistenceProvider(), dbfields);
+    public Entity(String entityname, String icon, EntityManager<K, E, P> em) {
+        this(entityname, icon, em, em.getEntityPersistenceProvider());
     }
 
     /**
@@ -101,19 +90,15 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      *
      * @param entityname the entity name
      * @param icon name of the icon graphic
-     * @param id the entity Id
      * @param em the entity manager for this entity class
-     * @param dataAccess the Data Access object for this entity class
-     * @param dbfields the entity fields
+     * @param epp the Data Access object for this entity class
      */
-    @SuppressWarnings("LeakingThisInConstructor")
-    protected Entity(String entityname, String icon, int id, EntityManager<E, P> em, EntityPersistenceProvider dataAccess, DBFields dbfields) {
+    protected Entity(String entityname, String icon, EntityManager<K, E, P> em, EntityPersistenceProvider<K> epp) {
         super(entityname, icon);
-        this.id = id;
-        this.dataAccess = dataAccess;
-        this.dbfields = dbfields;
+        this.epp = epp;
         this.entityname = entityname;
-        String name = LogBuilder.instanceDescription(this, Integer.toString(id));
+        @SuppressWarnings({"OverridableMethodCallInConstructor", "LeakingThisInConstructor"})
+        String name = LogBuilder.instanceDescription(this, getPK().toString());
         stateEvent = new Event<>("statechange:" + name);
         fieldEvent = new Event<>("fieldchange:" + name);
         nameChangeEvent = new Event<>("namechange:" + name);
@@ -123,13 +108,28 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
         fireStateChange(CREATE, oldState, state);
         //
         this.em = em;
-        this.entityPersistenceManager = dataAccess;
-        idChangeEvent = new Event<>(entityname);
+        primaryKeyChangeEvent = new Event<>(entityname);
         entitystatechangelistener = new EntityStateChangeListener("entity:" + instanceDescription());
         addStateListener(entitystatechangelistener);
         // and as this is new it is saveable (too early to rely on listener)
         savable.add();
     }
+
+    /**
+     * Test persistent status
+     *
+     * @return true if entity has been persisted.
+     */
+    public boolean isPersistent() {
+        return persistent;
+    }
+
+    /**
+     * Get the entity primary key.
+     *
+     * @return the entity primary key
+     */
+    public abstract K getPK();
 
     final void setState(EntityState state) {
         this.state = state;
@@ -284,19 +284,6 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     }
 
     /**
-     * Get the entity Id.
-     *
-     * @return the entity id
-     */
-    public final int getId() {
-        return id;
-    }
-
-    final void setId(int id) {
-        this.id = id;
-    }
-
-    /**
      * Test if state is New.
      *
      * @return true if new
@@ -326,13 +313,11 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
                 return;
             case NEW:
                 entitySaveState();
-                dbfields.saveState();
                 state = NEWEDITING;
                 fireStateChange(EDIT, oldState, state);
                 return;
             case DBENTITY:
                 entitySaveState();
-                dbfields.saveState();
                 state = DBENTITYEDITING;
                 fireStateChange(EDIT, oldState, state);
                 return;
@@ -342,7 +327,7 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     }
 
     @Override
-    public final void cancelEdit() throws IOException {
+    public final void cancelEdit() {
         EntityState oldState = state;
         boolean wasEditing = false;
         switch (state) {
@@ -357,7 +342,6 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
         }
         if (wasEditing) {
             entityRestoreState();
-            dbfields.restoreState();
             fireFieldChange(ALL);
             fireStateChange(RESET, oldState, state);
             nameListenerFire();
@@ -369,69 +353,49 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * Load Data from entity storage into this entity and fire the field change
      * at load listeners.
      *
-     * @param id the entity Id
+     * @param pk the entity primary key
      */
-    protected void load(int id) {
-        try {
-            loader(dataAccess.get(id));
-        } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", id)
-                    .addExceptionMessage(ex).write();
-        }
+    protected void load(K pk) {
+        loader(epp.get(pk));
         fireFieldChangeAtLoad(ALL);
     }
 
-    private void loader(JsonObject data) throws IOException {
+    private void loader(EntityFields data) {
         LogBuilder.writeLog("nbpcglibrary.data", this, "loader", data.toString());
         EntityState oldState = getState();
-        if (oldState == NEW) {
-            try {
-                setId(JsonUtil.getObjectKeyIntegerValue(data, "id"));
-                dbfields.load(data);
-                entityLoad(data);
-            } catch (JsonConversionException ex) {
-                LogBuilder.create("nbpcglibrary.data", Level.SEVERE).addMethodName(this, "load", data.toString())
-                        .addExceptionMessage(ex).write();
-            }
-            setState(DBENTITY);
-            fireStateChange(LOAD, oldState, DBENTITY);
-            return;
-        }
-        throw new IOException("Should not be trying to load an entity in " + oldState + " state");
+        entityLoad(data);
+        persistent = true;
+        setState(DBENTITY);
+        fireStateChange(LOAD, oldState, DBENTITY);
     }
 
     /**
-     * Add an Id Listener to this entity.
+     * Add a Primary Key Listener to this entity.
      *
      * @param listener the listener
      */
-    public final void addIdListener(Listener<IdChangeEventParams> listener) {
-        idChangeEvent.addListener(listener);
+    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams> listener) {
+        primaryKeyChangeEvent.addListener(listener);
     }
 
     /**
-     * Remove an Id listener from this entity.
+     * Remove a Primary Key listener from this entity.
      *
      * @param listener the listener
      */
-    public final void removeIdListener(Listener<IdChangeEventParams> listener) {
-        idChangeEvent.removeListener(listener);
+    public final void removePrimaryKeyListener(Listener<PrimaryKeyChangeEventParams> listener) {
+        primaryKeyChangeEvent.removeListener(listener);
     }
 
     /**
-     * Add an Id Listener to this entity.
+     * Add a Primary Key Listener to this entity.
      *
      * @param listener the listener
      * @param mode the indicators of listener action (on current thread or on
      * event queue; priority/normal)
      */
-    public final void addIdListener(Listener<IdChangeEventParams> listener, Event.ListenerMode mode) {
-        idChangeEvent.addListener(listener, mode);
-    }
-
-    final void updateId(int id) {
-        setId(id);
-        fireFieldChange(ID);
+    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams> listener, Event.ListenerMode mode) {
+        primaryKeyChangeEvent.addListener(listener, mode);
     }
 
     /**
@@ -440,68 +404,60 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * @return true if save is successful
      */
     public boolean save() {
-        try {
-            JsonObjectBuilder job = Json.createObjectBuilder();
-            EntityState oldState = getState();
-            switch (oldState) {
-                case DBENTITY:
-                    return true; //we don't need to do anything as this is a straight copy of a db entity
-                case REMOVED:
+        EntityFields ef = new EntityFields();
+        EntityState oldState = getState();
+        switch (oldState) {
+            case DBENTITY:
+                return true; //we don't need to do anything as this is a straight copy of a db entity
+            case REMOVED:
+                return false;
+            case NEW:
+            case NEWEDITING:
+                if (!checkRules()) {
                     return false;
-                case NEW:
-                case NEWEDITING:
-                    if (!checkRules()) {
-                        return false;
-                    }
-                    entityValues(job);
-                    dbfields.values(job);
-                    em.persistTransient((E) this, entityPersistenceManager.insert(job.build()));
-                    idChangeEvent.fire(new IdChangeEventParams());
-                    setState(DBENTITY);
-                    break;
-                case DBENTITYEDITING:
-                    if (!checkRules()) {
-                        return false;
-                    }
-                    entityDiffs(job);
-                    dbfields.diffs(job);
-                    JsonObject jo = job.build();
-                    if (!jo.isEmpty()) {
-                        entityPersistenceManager.update(getId(), jo);
-                    }
-                    setState(DBENTITY);
-                    break;
-                default:
-                    if (!checkRules()) {
-                        return false;
-                    }
-            }
-            fireStateChange(SAVE, oldState, DBENTITY);
-            return true;
-        } catch (IOException | LogicException ex) {
-            return false;
+                }
+                entityValues(ef);
+                em.removeFromCache((E) this);
+                loader(epp.insert(ef));
+                primaryKeyChangeEvent.fire(new PrimaryKeyChangeEventParams());
+                setState(DBENTITY);
+                break;
+            case DBENTITYEDITING:
+                if (!checkRules()) {
+                    return false;
+                }
+                entityDiffs(ef);
+                if (!ef.isEmpty()) {
+                    loader(epp.update(getPK(), ef));
+                }
+                setState(DBENTITY);
+                break;
+            default:
+                if (!checkRules()) {
+                    return false;
+                }
         }
+        fireStateChange(SAVE, oldState, DBENTITY);
+        return true;
     }
 
     /**
      * Delete this Entity.
-     *
-     * @throws IOException if problem obtaining / parsing data
      */
-    public final void remove() throws IOException {
+    public final void remove() {
         EntityState oldState = getState();
         switch (oldState) {
             case NEW:
             case NEWEDITING:
                 entityRemove();
-                em.removeFromTransientCache((E) this);
+                em.removeFromCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
                 return;
             case DBENTITY:
             case DBENTITYEDITING:
                 entityRemove();
-                entityPersistenceManager.delete(getId());
+                epp.delete(getPK());
                 em.removeFromCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
@@ -515,18 +471,16 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
      * Copy entity fields into this entity.
      *
      * @param e the copy source entity
-     * @throws IOException if entity in illegal state.
      */
-    public final void copy(E e) throws IOException {
+    public final void copy(E e) {
         EntityState oldState = getState();
         if (oldState == NEW || oldState == NEWEDITING) {
             entityCopy(e);
-            dbfields.copy(e);
             ensureEditing();
             fireFieldChange(ALL);
             return;
         }
-        throw new IOException("Should not be trying to copy an entity in " + oldState + " state");
+        throw new LogicException("Should not be trying to copy an entity in " + oldState + " state");
     }
 
     private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
@@ -653,15 +607,14 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     abstract protected void entitySaveState();
 
     /**
-     * Load Json format data into the entity fields.
+     * Load the entity field data into the entity fields.
      *
      * @param data the data to be inserted
-     * @throws IOException if bad data provided
      */
-    abstract protected void entityLoad(JsonObject data) throws IOException;
+    abstract protected void entityLoad(EntityFields data);
 
     /**
-     * get the key string which will be used in when sorting this entity
+     * Get the key string which will be used in when sorting this entity
      *
      * @return the sort key
      */
@@ -676,30 +629,24 @@ public abstract class Entity<E extends Entity, P extends CoreEntity, F> extends 
     public abstract String getDisplayTitle();
 
     /**
-     * Add all field values to the given JsonObject.
+     * Add all field values to the given Entity Fields Object
      *
-     * @param job a JsonObjectBuilder into which field names (keys) and field
-     * values are to be inserted.
-     * @throws IOException if problem obtaining / parsing data
+     * @param ef the entityfields object
      */
-    abstract protected void entityValues(JsonObjectBuilder job) throws IOException;
+    abstract protected void entityValues(EntityFields ef);
 
     /**
-     * Add any modified field values to the given JsonObject.
+     * Add any modified field values to the given Entity Fields Object
      *
-     * @param job a JsonObjectBuilder into which field names (keys) and field
-     * values are to be inserted.
-     * @throws IOException if problem obtaining / parsing data
+     * @param ef the entityfields object
      */
-    abstract protected void entityDiffs(JsonObjectBuilder job) throws IOException;
+    abstract protected void entityDiffs(EntityFields ef);
 
     /**
      * Complete any entity specific removal actions prior to entity deletion.
      * Basic use case: remove any linkage to parent entities.
-     *
-     * @throws IOException if problem occurs while completing this action
      */
-    abstract protected void entityRemove() throws IOException;
+    abstract protected void entityRemove();
 
     /**
      * Field Copy actions - copy entity fields into this entity.

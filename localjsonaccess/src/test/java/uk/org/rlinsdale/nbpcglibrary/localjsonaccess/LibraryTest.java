@@ -20,16 +20,14 @@ package uk.org.rlinsdale.nbpcglibrary.localjsonaccess;
 
 import java.io.IOException;
 import java.util.Properties;
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
-import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 
 /**
  *
@@ -87,29 +85,32 @@ public class LibraryTest {
             p.setProperty("entitypersistenceprovidertype", "local-json");
             p.setProperty("persistenceunitprovidertype", "local-json");
             EntityPersistenceProviderManager.set(p, entitynames);
-            LocalJsonEntityPersistenceProvider epp = (LocalJsonEntityPersistenceProvider) EntityPersistenceProviderManager.getEntityPersistenceProvider("jsondata", "Data");
+            LocalJsonAutoIDEntityPersistenceProvider epp = (LocalJsonAutoIDEntityPersistenceProvider) EntityPersistenceProviderManager.getEntityPersistenceProvider("jsondata", "Data");
             //
             System.out.println("Instance Description: " + epp.instanceDescription());
             System.out.println("get(): " + epp.get().toString());
             System.out.println("get(1): " + epp.get(1).toString());
-            System.out.println("get(\"id\",1): " + epp.get("id", JsonUtil.createJsonValue(1)).toString());
-            System.out.println("getOne(\"id\",1): " + epp.getOne("id", JsonUtil.createJsonValue(1)).toString());
+            System.out.println("get(\"id\",1): " + epp.get("id", 1).toString());
+            System.out.println("getOne(\"id\",1): " + epp.getOne("id", 1).toString());
             System.out.println("find(): " + epp.find().toString());
-            System.out.println("find(\"id\",1): " + epp.find("id", JsonUtil.createJsonValue(1)).toString());
-            System.out.println("findOne(\"id\",1): " + epp.findOne("id", JsonUtil.createJsonValue(1)).toString());
+            System.out.println("find(\"id\",1): " + epp.find("id", 1).toString());
+            System.out.println("findOne(\"id\",1): " + epp.findOne("id", 1).toString());
             //
-            JsonObjectBuilder job = Json.createObjectBuilder();
-            job.add("description", "my first insert");
-            int newid = epp.insert(job.build());
-            System.out.println("insert(...) returns " + newid);
+            EntityFields ef = new EntityFields();
+            ef.put("description", "my first insert");
+            EntityFields res = epp.insert(ef);
+            int newid = (Integer) res.get("id");
+            System.out.println("insert(...) returns " + res);
             System.out.println("get(): " + epp.get().toString());
             System.out.println("get(newid): " + epp.get(newid).toString());
             //
-            JsonObjectBuilder job2 = Json.createObjectBuilder();
-            job2.add("description", "my first insert - updated");
-            epp.update(newid, job2.build());
+            EntityFields ef2 = new EntityFields();
+            ef2.put("description", "my first insert - updated");
+            res = epp.update(newid, ef2);
+            System.out.println("update(...) returns " + res);
             //
             epp.delete(newid - 1);
+            System.out.println("after delete: " + epp.get().toString());
             epp.persist();
             assert (true);
             System.out.println("Test Json Access Library completed");

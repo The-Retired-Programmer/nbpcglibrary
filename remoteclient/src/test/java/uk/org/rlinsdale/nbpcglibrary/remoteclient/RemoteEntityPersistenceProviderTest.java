@@ -19,19 +19,18 @@
 package uk.org.rlinsdale.nbpcglibrary.remoteclient;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
-import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
  * Test for RemoteEntityPersistenceProvider
@@ -96,7 +95,7 @@ public class RemoteEntityPersistenceProviderTest {
     @Test
     public void testInstanceDescription() {
         System.out.println("instanceDescription");
-        String expResult = "RemoteEntityPersistenceProvider[RemotePersistenceUnitProvider-Application]";
+        String expResult = "RemoteAutoIDEntityPersistenceProvider[RemotePersistenceUnitProvider-Application]";
         String result = instance.instanceDescription();
         assertEquals(expResult, result);
     }
@@ -109,14 +108,14 @@ public class RemoteEntityPersistenceProviderTest {
     @Test
     public void testGet_int() throws Exception {
         System.out.println("get");
-        int id = 48;
-        JsonObject result = instance.get(id);
-        assertEquals("RL12", result.getString("updatedby"));
-        assertEquals("RL12", result.getString("createdby"));
-        assertEquals("20150422213408", result.getString("updatedon"));
-        assertEquals("20150422213408", result.getString("createdon"));
-        assertEquals(48, result.getInt("id"));
-        assertEquals("JsonApp60", result.getString("application"));
+        int pkey = 48;
+        EntityFields result = instance.get(pkey);
+        assertEquals("RL12", result.get("updatedby"));
+        assertEquals("RL12", result.get("createdby"));
+        assertEquals("20150422213408", result.get("updatedon"));
+        assertEquals("20150422213408", result.get("createdon"));
+        assertEquals(48, result.get("id"));
+        assertEquals("JsonApp60", result.get("application"));
     }
 
     /**
@@ -127,7 +126,7 @@ public class RemoteEntityPersistenceProviderTest {
     @Test
     public void testFind() throws Exception {
         System.out.println("find");
-        JsonArray result = instance.find();
+        List<Integer> result = instance.find();
         System.out.println(result.toString());
         assertEquals(28, result.size());
     }
@@ -140,13 +139,11 @@ public class RemoteEntityPersistenceProviderTest {
     @Test
     public void testGet_String_JsonValue() throws Exception {
         System.out.println("get");
-        String parametername = "application";
-        JsonValue parametervalue = JsonUtil.createJsonValue("JsonApp83");
-        JsonArray result = instance.get(parametername, parametervalue);
+        List<EntityFields> result = instance.get("application", "JsonApp83");
         System.out.println(result.toString());
         assertEquals(1, result.size());
-        JsonObject job = (JsonObject) result.get(0);
-        assertEquals(46, job.getInt("id"));
+        EntityFields ef = result.get(0);
+        assertEquals(46, ef.get("id"));
     }
 
     /**
@@ -157,10 +154,8 @@ public class RemoteEntityPersistenceProviderTest {
     @Test
     public void testGetOne() throws Exception {
         System.out.println("getOne");
-        String parametername = "application";
-        JsonValue parametervalue = JsonUtil.createJsonValue("JsonApp83");
-        JsonObject result = instance.getOne(parametername, parametervalue);
-        assertEquals(46, result.getInt("id"));
+        EntityFields result = instance.getOne("application", "JsonApp83");
+        assertEquals(46, result.get("id"));
     }
 
     /**
@@ -168,7 +163,7 @@ public class RemoteEntityPersistenceProviderTest {
      *
      * @throws Exception if problems
      */
-    @Test(expected = IOException.class)
+    @Test(expected = LogicException.class)
     public void testFindNextIdx() throws Exception {
         System.out.println("findNextIdx");
         int result = instance.findNextIdx();

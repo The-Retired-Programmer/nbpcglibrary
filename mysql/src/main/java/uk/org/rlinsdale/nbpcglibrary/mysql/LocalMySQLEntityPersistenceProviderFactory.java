@@ -16,8 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess;
+package uk.org.rlinsdale.nbpcglibrary.mysql;
 
+import java.io.IOException;
 import java.util.Properties;
 import org.openide.util.lookup.ServiceProvider;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
@@ -25,26 +26,28 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderFactory;
 
 /**
- * A Factory to create EntityPersistenceProviders for local SQL datasources.
+ * A Factory to create EntityPersistenceProviders for local MySQL datasources.
  * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@RegisterLog("nbpcglib.localSQLPersistenceUnitProvider")
+@RegisterLog("nbpcglib.localJsonPersistenceUnitProvider")
 @ServiceProvider(service = EntityPersistenceProviderFactory.class)
-public class LocalSQLEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<LocalSQLPersistenceUnitProvider, LocalSQLPersistenceUnitProviderFactory> {
+public class LocalMySQLEntityPersistenceProviderFactory implements EntityPersistenceProviderFactory<Integer ,LocalMySQLPersistenceUnitProvider, LocalMySQLPersistenceUnitProviderFactory> {
 
     @Override
     public String getType() {
-        return "localsql";
+        return "local-mysql";
     }
     
     @Override
-    public Class<LocalSQLPersistenceUnitProviderFactory> getPersistenceUnitProviderFactoryClass() {
-        return LocalSQLPersistenceUnitProviderFactory.class;
+    public Class<LocalMySQLPersistenceUnitProviderFactory> getPersistenceUnitProviderFactoryClass() {
+        return LocalMySQLPersistenceUnitProviderFactory.class;
     }
 
     @Override
-    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalSQLPersistenceUnitProvider pup) {
-            return new LocalSQLEntityPersistenceProvider(entityname, p, pup);
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalMySQLPersistenceUnitProvider pup) throws IOException {
+            LocalMySQLAutoIDEntityPersistenceProvider epp = new LocalMySQLAutoIDEntityPersistenceProvider();
+            epp.init(entityname, p, pup);
+            return epp;
     }
 }

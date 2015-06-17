@@ -25,11 +25,12 @@ import java.util.Properties;
  * Creates a EntityPersistenceProvider.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the Primary Key Class
  * @param <D> the type of the PersistenceUnitProvider
  * @param <F> the type of the PersistenceUnitProviderFactory
  *
  */
-public interface EntityPersistenceProviderFactory<D extends PersistenceUnitProvider, F extends PersistenceUnitProviderFactory> {
+public interface EntityPersistenceProviderFactory<K, D extends PersistenceUnitProvider, F extends PersistenceUnitProviderFactory<D>> {
 
     /**
      * Get the type of EntityPersistenceProvider which this Factory creates.
@@ -55,5 +56,5 @@ public interface EntityPersistenceProviderFactory<D extends PersistenceUnitProvi
      * @return the EntityPersistenceProvider
      * @throws IOException in cases of problems of creating the provider
      */
-    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider) throws IOException;
+    public EntityPersistenceProvider<K> createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider) throws IOException;
 }

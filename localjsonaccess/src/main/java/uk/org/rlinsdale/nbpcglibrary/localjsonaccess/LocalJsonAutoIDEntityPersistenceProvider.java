@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,29 +16,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.data.entity;
+package uk.org.rlinsdale.nbpcglibrary.localjsonaccess;
 
-import uk.org.rlinsdale.nbpcglibrary.api.EventParams;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 
 /**
- * The Parameter Class for a SetChange listener.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class SetChangeEventParams implements EventParams {
-
-
-    /**
-     * Constructor.
-     *
-     */
-    public SetChangeEventParams() {
+public class LocalJsonAutoIDEntityPersistenceProvider extends LocalJsonEntityPersistenceProvider<Integer> {
+    
+    @Override
+    protected Integer getPK(EntityFields ef) {
+        return (Integer) ef.get("id");
     }
 
-
     @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this);
+    protected void autoGenPrimaryKeyHook(EntityFields ef) {
+        autoGenPrimaryKeyAction(ef); // create a generated primary key
     }
 }

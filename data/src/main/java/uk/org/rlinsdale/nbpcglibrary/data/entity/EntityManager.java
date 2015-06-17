@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entity;
 
-import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -28,7 +27,6 @@ import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
  * Entity Manager for an Entity Class.
@@ -44,10 +42,11 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
  * reads by holding references to those recently touched objects.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the type of the Primary Key
  * @param <E> The Entity Class being managed
  * @param <P> The Parent Entity Class
  */
-abstract public class EntityManager<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
+abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> implements HasInstanceDescription {
 
     private static final int MAXLRUCACHE = 10;
 
@@ -59,16 +58,15 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
     /**
      * The entity cache.
      */
-    protected final Map<Integer, SoftReference<E>> cache;
+    protected final Map<K, SoftReference<E>> cache;
     private final ReferenceQueue<E> refqueue;
 
     /**
      * The LRU cache.
      */
-    protected final LRUCache<E> lrucache;
-    private EntityPersistenceProvider entityPersistenceProvider;
-    private final Map<Integer, E> transientCache;
-    private int nextId = -1;
+    protected final LRUCache<K, E> lrucache;
+    private EntityPersistenceProvider<K> entityPersistenceProvider;
+    private final Map<K, E> transientCache;
 
     /**
      * Constructor.
@@ -103,74 +101,78 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      * Get an Entity. Lookup caches and if not present then create a new entity
      * and load it using data obtained from entity storage.
      *
-     * @param id the entity Id
+     * @param pk the primary key value
      * @return the entity
-     * @throws IOException if problems in obtaining the entity data
      */
-    public final synchronized E get(int id) throws IOException {
-        if (id <= 0) {
-            throw new LogicException("Cache Get() Failure (class=" + name + ";id=" + id + ")");
-        }
+    public final synchronized E get(K pk) {
         freeReleasedEntries();
-        E e = lrucache.get(id);
+        E e = lrucache.get(pk);
         if (e != null) {
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
                     .addMsg("hit on LRUCache for {0}", e.instanceDescription()).write();
             return e;
         }
         // not in lru cache - now look up the entity in the cache
-        SoftReference<E> ref = cache.get(id);
+        SoftReference<E> ref = cache.get(pk);
         if (ref != null) {
             e = ref.get();
             if (e != null) {
-                lrucache.put(id, e); // insert object into LRU cache
-                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
+                lrucache.put(pk, e); // insert object into LRU cache
+                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
                         .addMsg("hit on Cache (& reinserted into LRU cache) for {0}", e.instanceDescription()).write();
                 return e;
             } else {
-                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
+                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
                         .addMsg("miss on Cache (SoftReference clear)").write();
             }
         } else {
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
                     .addMsg("miss on Cache").write();
         }
-        e = createNewEntity(id);
-        e.load(id);
-        insertIntoCache(id, e);
-        LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", id)
+        e = createNewEntity(pk);
+        e.load(pk);
+        insertIntoCache(pk, e);
+        LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
                 .addMsg("create new Entity {0} (and insert into Cache)", e.instanceDescription()).write();
         return e;
     }
 
     /**
-     * Create a new Entity. Does not load entity data into the entity.
+     * Create a new Entity. Does not load entity data into the entity. this will
+     * be a transient entity initially until it is persisted.
      *
-     * @param id the entity id
      * @return the created entity
-     * @throws IOException if problems in creating the entity
      */
-    abstract protected E createNewEntity(int id) throws IOException;
+    abstract protected E createNewEntity();
+
+    /**
+     * Create an Entity. Does not load entity data into the entity. this will be
+     * initialise with its primary key initially.
+     *
+     * @param pk the primary key for this entity
+     * @return the created entity
+     */
+    abstract protected E createNewEntity(K pk);
 
     private void freeReleasedEntries() {
         Reference<? extends E> r;
         while ((r = (Reference<? extends E>) refqueue.poll()) != null) {
-            int id = r.get().getId();
-            cache.remove(id);
+            K pk = r.get().getPK();
+            cache.remove(pk);
             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "freeReleasedEntries")
-                    .addMsg("Cache Free ({0}) (SoftReference cache)", id).write();
+                    .addMsg("Cache Free ({0}) (SoftReference cache)", pk).write();
         }
     }
 
     /**
      * Insert an entity into the caches.
      *
-     * @param id the entity Id
+     * @param pk the primary key
      * @param e the entity
      */
-    protected void insertIntoCache(int id, E e) {
-        lrucache.put(id, e);
-        cache.put(id, new SoftReference<>(e));
+    protected void insertIntoCache(K pk, E e) {
+        lrucache.put(pk, e);
+        cache.put(pk, new SoftReference<>(e));
     }
 
     /**
@@ -179,28 +181,29 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      * @param e the entity
      */
     protected synchronized void removeFromCache(E e) {
-        int id = e.getId();
-        if (id > 0) {
-            lrucache.remove(id);
-            cache.remove(id);
+        K pk = e.getPK();
+        if (e.isPersistent()) {
+            lrucache.remove(pk);
+            cache.remove(pk);
             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "removeFromCache", e)
                     .addMsg("Cache Remove {0}", e.instanceDescription()).write();
-            return;
+        } else {
+            transientCache.remove(pk);
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "removeFromCache", e)
+                    .addMsg("Transient Cache Remove {0}", e.instanceDescription()).write();
         }
-        throw new LogicException("Remove from Cache Failure (class=" + name + ";id=" + id + ")");
     }
-    
+
     /**
      * Create a new entity (initialised)
      *
      * @return the new entity
-     * @throws IOException  if problems in creating the entity data
      */
-    public final synchronized E getNew() throws IOException {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", nextId);
-        E e = createNewEntity(nextId);
-        e.setId(nextId);
-        transientCache.put(nextId--, e);
+    public final synchronized E getNew() {
+        E e = createNewEntity();
+        K pk = e.getPK();
+        LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", pk);
+        transientCache.put(pk, e);
         return e;
     }
 
@@ -210,9 +213,8 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      *
      * @param parent the parent entity
      * @return the new entity
-     * @throws IOException if problems in creating the entity data
      */
-    public final synchronized E getNew(P parent) throws IOException {
+    public final synchronized E getNew(P parent) {
         E e = getNew();
         link2parent(e, parent);
         return e;
@@ -225,56 +227,21 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      * @param from the copy source entity
      * @param parent the parent entity
      * @return the new entity
-     * @throws IOException if problems in creating the entity data
      */
-    public final synchronized E getNew(E from, P parent) throws IOException {
+    public final synchronized E getNew(E from, P parent) {
         E e = getNew(parent);
         e.copy(from);
         return e;
     }
 
     /**
-     * Remove from Transient Cache.
-     *
-     * @param e the entity
-     */
-    protected final synchronized void removeFromTransientCache(E e) {
-        int id = e.getId();
-        if (transientCache.containsKey(id)) {
-            transientCache.remove(id);
-            LogBuilder.writeLog("nbpcglibrary.data", this, "removeFromTransientCache", id);
-            return;
-        }
-        throw new LogicException("Remove Transient Failure (class=" + name + ";id=" + id + ")");
-    }
-
-    /**
-     * Persist a Transient Cache Entity into standard persistence cache.
-     *
-     * @param e the entity
-     * @param newId the new entity Id
-     */
-    protected synchronized void persistTransient(E e, int newId) {
-        int id = e.getId();
-        if (newId > 0 && id < 0 && transientCache.containsKey(id)) {
-            transientCache.remove(id);
-            e.updateId(newId);
-            insertIntoCache(newId, e);
-            LogBuilder.writeLog("nbpcglibrary.data", this, "persistTransient", id, "as", newId);
-            return;
-        }
-        throw new LogicException("Persist Transient Failure (class=" + name + ";id=" + id + ";newid=" + newId + ")");
-    }
-
-
-    /**
      * Get the EntityPersistenceProvider for this Entity Class.
      *
      * @return the EntityPersistenceProvider
      */
-    public EntityPersistenceProvider getEntityPersistenceProvider() {
+    public EntityPersistenceProvider<K> getEntityPersistenceProvider() {
         if (entityPersistenceProvider == null) {
-                entityPersistenceProvider = createEntityPersistenceProvider();
+            entityPersistenceProvider = createEntityPersistenceProvider();
         }
         return entityPersistenceProvider;
     }
@@ -284,14 +251,13 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
      *
      * @return the EntityPersistenceProvider
      */
-    abstract protected EntityPersistenceProvider createEntityPersistenceProvider();
-    
+    abstract protected EntityPersistenceProvider<K> createEntityPersistenceProvider();
+
     /**
      * Link a child entity to its parent.
      *
      * @param e the child entity
-     * @param rs the parent entity
-     * @throws IOException if problems in linking the entity
+     * @param p the parent entity
      */
-    abstract protected void link2parent(E e, P rs) throws IOException;
+    abstract protected void link2parent(E e, P p);
 }
