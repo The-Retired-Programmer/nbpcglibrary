@@ -67,7 +67,7 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
             this.nextidx = JsonUtil.getObjectKeyIntegerValue(tableJson, "nextidx");
             this.name = JsonUtil.getObjectKeyStringValue(tableJson, "name");
             //
-            JsonArray records = JsonUtil.getObjectKeyArrayValue(tableJson, "records");
+            JsonArray records = JsonUtil.getObjectKeyArrayValue(tableJson, "entities");
             for (JsonValue record : records) {
                 JsonObject rec = (JsonObject) record;
                 EntityFields ef = makeEntityFields(rec);
@@ -113,7 +113,7 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
                         throw new LogicException("Illegal Java Object presented as field value");
                     }
                 });
-                job.add("records", rab.build());
+                job.add("entities", rab.build());
                 pup.persist(job.build());
                 dirty = false;
             } catch (IOException ex) {
