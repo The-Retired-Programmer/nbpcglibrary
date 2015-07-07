@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
+import java.awt.datatransfer.DataFlavor;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 
 /**
@@ -35,10 +36,10 @@ public abstract class RootNode<E extends CoreEntity> extends BasicNode<E> {
      *
      * @param e the entity
      * @param cf the childfactory
-     * @param allowedPaste allowed paste actions
+     * @param allowedDataFlavors allowed paste actions
      */
-    protected RootNode(E e, RootChildFactory<E> cf, DataFlavorAndAction[] allowedPaste) {
-        super(cf, allowedPaste);
+    protected RootNode(E e, RootChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
+        super(cf, allowedDataFlavors);
         this.e = e;
     }
 

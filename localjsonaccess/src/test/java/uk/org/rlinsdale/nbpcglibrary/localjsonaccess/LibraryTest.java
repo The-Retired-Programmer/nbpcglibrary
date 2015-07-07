@@ -23,8 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Properties;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -32,9 +30,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Utilities;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
 
@@ -77,13 +73,13 @@ public class LibraryTest {
                 dbdir.mkdir();
             }
         try {
-            InputStream in = getClass().getResourceAsStream("/uk/org/rlinsdale/nbpcglibrary/localjsonaccess/Data");
-            assert (in != null);
-            OutputStream out = new FileOutputStream(new File(dbdir,"Data"));
-            assert (out != null);
-            FileUtil.copy(in,out);
-            in.close();
-            out.close();
+                try (OutputStream out = new FileOutputStream(new File(dbdir,"Data"))) {
+                    assert (out != null);
+                    try (InputStream in = getClass().getResourceAsStream("/uk/org/rlinsdale/nbpcglibrary/localjsonaccess/Data")) {
+                        assert (in != null);
+                        FileUtil.copy(in,out);
+                    }
+                }
         } catch (IOException ex) {
             fail("Could not copy test database - "+ ex.getMessage());
         }

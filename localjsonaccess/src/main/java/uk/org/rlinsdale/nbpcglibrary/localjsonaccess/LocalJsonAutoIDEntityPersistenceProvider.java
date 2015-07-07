@@ -19,13 +19,15 @@
 package uk.org.rlinsdale.nbpcglibrary.localjsonaccess;
 
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
+import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
+import uk.org.rlinsdale.nbpcglibrary.common.Settings;
 
 /**
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class LocalJsonAutoIDEntityPersistenceProvider extends LocalJsonEntityPersistenceProvider<Integer> {
-    
+
     @Override
     protected Integer getPK(EntityFields ef) {
         return (Integer) ef.get("id");
@@ -34,5 +36,23 @@ public class LocalJsonAutoIDEntityPersistenceProvider extends LocalJsonEntityPer
     @Override
     protected void autoGenPrimaryKeyHook(EntityFields ef) {
         autoGenPrimaryKeyAction(ef); // create a generated primary key
+    }
+
+    @Override
+    protected void addTimestampInfo(EntityFields ef) {
+        String user = Settings.get("Usercode", "????");
+        String when = (new Timestamp()).toSQLString();
+        ef.put("createdby", user);
+        ef.put("createdon", when);
+        ef.put("updatedby", user);
+        ef.put("updatedon", when);
+    }
+
+    @Override
+    protected void updateTimestampInfo(EntityFields ef) {
+        String user = Settings.get("Usercode", "????");
+        String when = (new Timestamp()).toSQLString();
+        ef.put("updatedby", user);
+        ef.put("updatedon", when);
     }
 }

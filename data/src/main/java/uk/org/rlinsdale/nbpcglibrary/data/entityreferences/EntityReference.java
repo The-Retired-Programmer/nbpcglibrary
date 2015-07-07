@@ -22,7 +22,6 @@ import java.lang.ref.WeakReference;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -196,23 +195,16 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         return updated;
     }
 
-    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams> {
+    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams<K>> {
 
         public PrimaryKeyListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(PrimaryKeyChangeEventParams p) {
-            if (entityreference != null) {
-                E e = entityreference.get();
-                if (e != null) {
-                    pk = e.getPK();
-                    e.removePrimaryKeyListener(pkListener);
-                    return;
-                }
-            }
-            throw new LogicException("Can't find entity in EntityReference:PrimaryKeyListener()");
+        public void action(PrimaryKeyChangeEventParams<K> p) {
+            pk = p.getNewPKey();
+            saveState();
         }
     }
 

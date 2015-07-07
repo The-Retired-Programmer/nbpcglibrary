@@ -57,26 +57,26 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
      * the local lookup
      */
     protected InstanceContent content;
-    private DataFlavorAndAction[] allowedPaste;
+    private DataFlavor[] allowedDataFlavors;
 
     /**
      * Constructor
      *
      * @param cf the childfactory
-     * @param allowedPaste allowed paste actions
+     * @param allowedDataFlavors allowed dataflavours that can be pasted
      */
-    protected BasicNode(RootChildFactory<E> cf, DataFlavorAndAction[] allowedPaste) {
-        this(new InstanceContent(), cf, allowedPaste);
+    protected BasicNode(RootChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
+        this(new InstanceContent(), cf, allowedDataFlavors);
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private BasicNode(InstanceContent content, RootChildFactory<E> cf, DataFlavorAndAction[] allowedPaste) {
+    private BasicNode(InstanceContent content, RootChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
         super(Children.create(cf, true), new AbstractLookup(content));
         this.content = content;
-        this.allowedPaste = allowedPaste;
+        this.allowedDataFlavors = allowedDataFlavors;
         content.add(this);
-        for (DataFlavorAndAction dfa : allowedPaste) {
-            content.add(new ChildIndex(dfa));
+        for (DataFlavor df : allowedDataFlavors) {
+            content.add(new ChildIndex(df));
         }
     }
 
@@ -165,30 +165,28 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
         return result;
     }
 
-    // CUT and PASTE target support
+    // DND target support
     @Override
     public final PasteType getDropType(final Transferable t, int action, int index) {
-        LogBuilder.writeLog("nbpcglibrary.node", this, "getDropType");
-        if (allowedPaste != null) {
-            for (DataFlavorAndAction dfa : allowedPaste) {
-                if (t.isDataFlavorSupported(dfa.dataflavor) && ((action & (dfa.action)) != 0)) {
-                    return new AllowedPasteType(t, dfa, action);
+        LogBuilder.writeLog("nbpcglibrary.node", this, "getDropType", action, index);
+        if (allowedDataFlavors != null) {
+            for (DataFlavor df : allowedDataFlavors) {
+                if (t.isDataFlavorSupported(df)) {
+                    return new DNDPasteType(t, df);
                 }
             }
         }
         return null;
     }
 
-    private class AllowedPasteType extends PasteType implements HasInstanceDescription {
+    private class DNDPasteType extends PasteType implements HasInstanceDescription {
 
         private final Transferable t;
-        private final DataFlavorAndAction dfa;
-        private final int action;
+        private final DataFlavor df;
 
-        public AllowedPasteType(final Transferable t, final DataFlavorAndAction dfa, int action) {
+        public DNDPasteType(final Transferable t, final DataFlavor df) {
             this.t = t;
-            this.dfa = dfa;
-            this.action = action;
+            this.df = df;
         }
 
         @Override
@@ -198,72 +196,76 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
 
         @Override
         public Transferable paste() throws IOException {
-            LogBuilder.writeLog("nbpcglibrary.node", this, "paste");
-            CoreEntity e;
-            try {
-                e = (CoreEntity) t.getTransferData(dfa.dataflavor);
-            } catch (UnsupportedFlavorException ex) {
-                throw new LogicException("Unsupported Flavor Exception Raised in RootNode$AllowedPasteType:paste()");
+            BasicNode node = (BasicNode) NodeTransfer.node(t, NodeTransfer.MOVE);
+            if (node != null) {
+                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
+                        .addMsg("DND-move").write();
+                nodeCutPaste(node);
+                return null;
             }
-            final Node node;
-            switch (action) {
-                case DataFlavorAndAction.MOVE:
-                    node = NodeTransfer.node(t, action);
-                    if (node != null) {
-                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
-                                .addMsg("remove previous node").write();
-                        ((TreeNode) node)._cutAndPasteRemove();
-                    }
-                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
-                            .addMsg("drag/drop action").write();
-                    _moveAddChild(e);
-                    break;
-                case DataFlavorAndAction.CUT:
-                    node = NodeTransfer.node(t, action);
-                    if (node != null) {
-                        LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
-                                .addMsg("remove previous node").write();
-                        ((TreeNode) node)._cutAndPasteRemove();
-                    }
-                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
-                            .addMsg("cut/paste action").write();
-                    _cutAddChild(e);
-                    break;
-                case DataFlavorAndAction.COPY:
-                    LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
-                            .addMsg("copy/paste action").write();
-                    _copyAddChild(e);
-                    break;
-                default:
-                    throw new LogicException("illegal action in ExtendedNode$AllowPasteType:paste()");
+            node = (BasicNode) NodeTransfer.node(t, NodeTransfer.COPY);
+            if (node != null) {
+                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
+                        .addMsg("DND-copy").write();
+                nodeCopyPaste(node);
             }
             return null;
         }
     }
 
+    // CUT / COPY target support
     @Override
     protected final void createPasteTypes(Transferable t, List<PasteType> s) {
-        createPT(t, s, DataFlavorAndAction.MOVE);
-        createPT(t, s, DataFlavorAndAction.CUT);
-        createPT(t, s, DataFlavorAndAction.COPY);
         super.createPasteTypes(t, s);
-    }
-
-    private void createPT(Transferable t, List<PasteType> s, int action) {
-        if (NodeTransfer.node(t, action) != null) {
-            PasteType pt = getDropType(t, action, -1);
-            if (null != pt) {
-                s.add(pt);
+        if (allowedDataFlavors != null) {
+            for (DataFlavor df : allowedDataFlavors) {
+                if (t.isDataFlavorSupported(df)) {
+                    s.add(new AllowedPasteType(t, df));
+                }
             }
         }
     }
-    
+
+    private class AllowedPasteType extends PasteType implements HasInstanceDescription {
+
+        private final Transferable t;
+        private final DataFlavor df;
+
+        public AllowedPasteType(final Transferable t, final DataFlavor df) {
+            this.t = t;
+            this.df = df;
+        }
+
+        @Override
+        public String instanceDescription() {
+            return LogBuilder.instanceDescription(this);
+        }
+
+        @Override
+        public Transferable paste() throws IOException {
+            BasicNode node = (BasicNode) NodeTransfer.node(t, NodeTransfer.MOVE);
+            if (node != null) {
+                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
+                        .addMsg("cut/paste action").write();
+                nodeCutPaste(node);
+                return null;
+            }
+            node = (BasicNode) NodeTransfer.node(t, NodeTransfer.COPY);
+            if (node != null) {
+                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "paste")
+                        .addMsg("copy/paste action").write();
+                nodeCopyPaste(node);
+            }
+            return null;
+        }
+    }
+
     private class ChildIndex extends Index.Support implements HasInstanceDescription {
 
-        private final DataFlavorAndAction dfa;
+        private final DataFlavor df;
 
-        public ChildIndex(DataFlavorAndAction dfa) {
-            this.dfa = dfa;
+        public ChildIndex(DataFlavor df) {
+            this.df = df;
         }
 
         @Override
@@ -283,50 +285,40 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
 
         @Override
         public void reorder(int[] perm) {
-            if ((dfa.action & DataFlavorAndAction.MOVE) != 0) {
-                LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "reorder").write();
-                _moveReorderChildByFlavor(dfa.dataflavor, perm);
-            }
+            LogBuilder.create("nbpcglibrary.node", Level.FINER).addMethodName(this, "reorder").write();
+            nodeReorderChildByFlavor(df, perm);
         }
     }
 
-    // CUT and PASTE methods to be implemented
+    // DND, COPY, CUT and PASTE methods to be implemented
     /**
-     * Move action - add child entity.
+     * Cut and Paste action.
      *
      * @param child the entity
      * @throws IOException if problem
      */
-    abstract protected void _moveAddChild(CoreEntity child) throws IOException;
+    abstract protected void nodeCutPaste(BasicNode child) throws IOException;
 
     /**
-     * Cut action - add child entity.
+     * Copy and Paste action.
      *
      * @param child the entity
      * @throws IOException if problem
      */
-    abstract protected void _cutAddChild(CoreEntity child) throws IOException;
-
-    /**
-     * Copy Action - add child entity.
-     *
-     * @param child the entity
-     * @throws IOException if problem
-     */
-    abstract protected void _copyAddChild(CoreEntity child) throws IOException;
+    abstract protected void nodeCopyPaste(BasicNode child) throws IOException;
 
     /**
      * Reorder Action - move child entity.
      *
-     * @param df teh data flavour
+     * @param df the data flavor
      * @param perm the sort indicator
      */
-    abstract protected void _moveReorderChildByFlavor(DataFlavor df, int[] perm);
+    abstract protected void nodeReorderChildByFlavor(DataFlavor df, int[] perm);
 
     /**
      * Get the DataFlavour.
      *
      * @return the data flavour
      */
-    abstract protected DataFlavor _getDataFlavor();
+    abstract protected DataFlavor nodeGetDataFlavor();
 }

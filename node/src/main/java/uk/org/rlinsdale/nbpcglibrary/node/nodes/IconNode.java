@@ -19,6 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
 import java.awt.Image;
+import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -44,7 +45,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
  * @param <P> the parent Entity Class
  * @param <F> the Entity Field enum class
  */
-public abstract class IconNode<K, E extends Entity<K,E,P,F>, P extends CoreEntity, F> extends TreeNode<K, E, P, F> {
+public abstract class IconNode<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends TreeNode<K, E, P, F> {
 
     private final ImageFileFinder<E> imagefilefinder;
     private final String nodename;
@@ -56,11 +57,11 @@ public abstract class IconNode<K, E extends Entity<K,E,P,F>, P extends CoreEntit
      * @param e the entity
      * @param cf the childfactory
      * @param emclass the entity manager class
-     * @param allowedPaste allowed paste actions
-     * @param isCutDestroyEnabled true if delete/cut is allowed
+     * @param allowedDataFlavors allowed paste actions
+     * @param operationsEnabled set for copy , cut and delete enabled
      */
-    public IconNode(String nodename, E e, BasicChildFactory<K, E, P> cf, Class<? extends EntityManager> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
-        super(nodename, e, cf, emclass, allowedPaste, isCutDestroyEnabled);
+    public IconNode(String nodename, E e, BasicChildFactory<K, E, P> cf, Class<? extends EntityManager> emclass, DataFlavor[] allowedDataFlavors, int operationsEnabled) {
+        super(nodename, e, cf, emclass, allowedDataFlavors, operationsEnabled);
         this.nodename = nodename;
         imagefilefinder = getImageFileFinder(nodename);
     }
@@ -71,10 +72,10 @@ public abstract class IconNode<K, E extends Entity<K,E,P,F>, P extends CoreEntit
      * @param nodename the node name
      * @param e the entity
      * @param emclass the entity manager class
-     * @param isCutDestroyEnabled true if delete/cut is allowed
+     * @param operationsEnabled set for copy , cut and delete enabled
      */
-    protected IconNode(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
-        super(nodename, e, emclass, isCutDestroyEnabled);
+    protected IconNode(String nodename, E e, Class<? extends EntityManager> emclass, int operationsEnabled) {
+        super(nodename, e, emclass, operationsEnabled);
         this.nodename = nodename;
         imagefilefinder = getImageFileFinder(nodename);
     }
@@ -121,14 +122,14 @@ public abstract class IconNode<K, E extends Entity<K,E,P,F>, P extends CoreEntit
         File fi = imagefilefinder.getFile(entity);
         if (fi == null) {
             LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
-                .addMsg("Nodename is {0} - No image defined", nodename).write();
+                    .addMsg("Nodename is {0} - No image defined", nodename).write();
             return entity.getIconWithError();
         }
         try {
             return entity.checkRules() ? ImageIO.read(fi) : entity.addErrorToIcon(ImageIO.read(fi));
         } catch (IOException ex) {
             LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
-                .addMsg("Nodename is {0} - IOException when reading image", nodename).addExceptionMessage(ex).write();
+                    .addMsg("Nodename is {0} - IOException when reading image", nodename).addExceptionMessage(ex).write();
             return entity.getIconWithError();
         }
     }

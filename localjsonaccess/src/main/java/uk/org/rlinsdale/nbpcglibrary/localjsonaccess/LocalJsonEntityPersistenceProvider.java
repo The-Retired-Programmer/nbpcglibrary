@@ -211,6 +211,7 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
         EntityFields entity = new EntityFields();
         entity.putAll(values);
         autoGenPrimaryKeyHook(entity);
+        addTimestampInfo(entity);
         tablerecords.put(getPK(entity), entity);
         return copy(entity);
     }
@@ -221,6 +222,13 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
      * @param ef the entity fields into which the new primary key can be added
      */
     protected abstract void autoGenPrimaryKeyHook(EntityFields ef);
+    
+    /**
+     * Add the timestamp info for this entity
+     * 
+     * @param ef the entity fields
+     */
+    protected abstract void addTimestampInfo(EntityFields ef);
 
     /**
      * Action to create an auto generated primary key
@@ -237,8 +245,16 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
         dirty = true;
         EntityFields entity = tablerecords.get(pkey);
         entity.putAll(diffs);
+        updateTimestampInfo(entity);
         return copy(entity);
     }
+    
+    /**
+     * Update the timestamp info for this entity
+     * 
+     * @param ef the entity fields
+     */
+    protected abstract void updateTimestampInfo(EntityFields ef);
 
     @Override
     public final void delete(K pkey) {

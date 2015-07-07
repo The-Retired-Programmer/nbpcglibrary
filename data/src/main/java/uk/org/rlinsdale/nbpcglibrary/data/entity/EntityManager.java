@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
  * Entity Manager for an Entity Class.
@@ -105,36 +106,46 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @return the entity
      */
     public final synchronized E get(K pk) {
-        freeReleasedEntries();
-        E e = lrucache.get(pk);
-        if (e != null) {
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                    .addMsg("hit on LRUCache for {0}", e.instanceDescription()).write();
-            return e;
-        }
-        // not in lru cache - now look up the entity in the cache
-        SoftReference<E> ref = cache.get(pk);
-        if (ref != null) {
-            e = ref.get();
+        if (isPersistent(pk)) {
+            freeReleasedEntries();
+            E e = lrucache.get(pk);
             if (e != null) {
-                lrucache.put(pk, e); // insert object into LRU cache
                 LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                        .addMsg("hit on Cache (& reinserted into LRU cache) for {0}", e.instanceDescription()).write();
+                        .addMsg("hit on LRUCache for {0}", e.instanceDescription()).write();
                 return e;
+            }
+            // not in lru cache - now look up the entity in the cache
+            SoftReference<E> ref = cache.get(pk);
+            if (ref != null) {
+                e = ref.get();
+                if (e != null) {
+                    lrucache.put(pk, e); // insert object into LRU cache
+                    LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
+                            .addMsg("hit on Cache (& reinserted into LRU cache) for {0}", e.instanceDescription()).write();
+                    return e;
+                } else {
+                    LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
+                            .addMsg("miss on Cache (SoftReference clear)").write();
+                }
             } else {
                 LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                        .addMsg("miss on Cache (SoftReference clear)").write();
+                        .addMsg("miss on Cache").write();
             }
-        } else {
+            e = createNewEntity(pk);
+            e.load(pk);
+            insertIntoCache(pk, e);
             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                    .addMsg("miss on Cache").write();
+                    .addMsg("create new Entity {0} (and insert into Cache)", e.instanceDescription()).write();
+            return e;
+        } else {
+            E e = transientCache.get(pk);
+            if (e == null) {
+                throw new LogicException("Can't find transient entry in cache");
+            }
+            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
+                    .addMsg("hit on Transient Cache for {0}", e.instanceDescription()).write();
+            return e;
         }
-        e = createNewEntity(pk);
-        e.load(pk);
-        insertIntoCache(pk, e);
-        LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                .addMsg("create new Entity {0} (and insert into Cache)", e.instanceDescription()).write();
-        return e;
     }
 
     /**
@@ -144,7 +155,15 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @return the created entity
      */
     abstract protected E createNewEntity();
-
+    
+    /**
+     * Test if given primary key is transient or persistent
+     * 
+     * @param pkey the primary key value
+     * @return true if persistent primary key
+     */
+    abstract protected boolean isPersistent(K pkey);
+    
     /**
      * Create an Entity. Does not load entity data into the entity. this will be
      * initialise with its primary key initially.

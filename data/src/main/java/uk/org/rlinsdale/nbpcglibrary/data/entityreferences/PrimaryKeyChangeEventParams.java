@@ -26,11 +26,21 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * fired.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <K> the primary key class
  */
-public class PrimaryKeyChangeEventParams implements EventParams {
+public class PrimaryKeyChangeEventParams<K> implements EventParams {
 
+    private K pkey;
+    
+    public PrimaryKeyChangeEventParams(K pkey){
+        this.pkey = pkey;
+    }
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
+    }
+    
+    public K getNewPKey() {
+        return pkey;
     }
 }

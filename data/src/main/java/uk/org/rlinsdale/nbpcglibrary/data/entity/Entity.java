@@ -68,11 +68,10 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     private EntityState state = INIT;
     private final String entityname;
     private final EntityPersistenceProvider<K> epp;
-    private final Event<PrimaryKeyChangeEventParams> primaryKeyChangeEvent;
+    private final Event<PrimaryKeyChangeEventParams<K>> primaryKeyChangeEvent;
     private final EntityManager<K, E, P> em;
     private final EntityStateChangeListener entitystatechangelistener;
     private final EntitySavable savable = new EntitySavable();
-    private boolean persistent = false;
 
     /**
      * Constructor.
@@ -120,9 +119,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      *
      * @return true if entity has been persisted.
      */
-    public boolean isPersistent() {
-        return persistent;
-    }
+    public abstract boolean isPersistent();
 
     /**
      * Get the entity primary key.
@@ -356,17 +353,18 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @param pk the entity primary key
      */
     protected void load(K pk) {
-        loader(epp.get(pk));
-        fireFieldChangeAtLoad(ALL);
+        if (isPersistent()) {
+            loader(epp.get(pk));
+        }
     }
 
     private void loader(EntityFields data) {
         LogBuilder.writeLog("nbpcglibrary.data", this, "loader", data.toString());
         EntityState oldState = getState();
         entityLoad(data);
-        persistent = true;
         setState(DBENTITY);
         fireStateChange(LOAD, oldState, DBENTITY);
+        fireFieldChangeAtLoad(ALL);
     }
 
     /**
@@ -374,7 +372,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      *
      * @param listener the listener
      */
-    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams> listener) {
+    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<K>> listener) {
         primaryKeyChangeEvent.addListener(listener);
     }
 
@@ -383,7 +381,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      *
      * @param listener the listener
      */
-    public final void removePrimaryKeyListener(Listener<PrimaryKeyChangeEventParams> listener) {
+    public final void removePrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<K>> listener) {
         primaryKeyChangeEvent.removeListener(listener);
     }
 
@@ -394,7 +392,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @param mode the indicators of listener action (on current thread or on
      * event queue; priority/normal)
      */
-    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams> listener, Event.ListenerMode mode) {
+    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<K>> listener, Event.ListenerMode mode) {
         primaryKeyChangeEvent.addListener(listener, mode);
     }
 
@@ -419,7 +417,9 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 entityValues(ef);
                 em.removeFromCache((E) this);
                 loader(epp.insert(ef));
-                primaryKeyChangeEvent.fire(new PrimaryKeyChangeEventParams());
+                K newPK = getPK();
+                em.insertIntoCache(newPK, (E) this);
+                primaryKeyChangeEvent.fire(new PrimaryKeyChangeEventParams<>(newPK));
                 setState(DBENTITY);
                 break;
             case DBENTITYEDITING:

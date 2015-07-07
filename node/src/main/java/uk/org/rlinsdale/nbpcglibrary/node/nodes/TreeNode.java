@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import org.openide.util.Lookup;
@@ -31,9 +32,10 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
+import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.PrimaryKeyChangeEventParams;
 
 /**
- * Read-Only Tree Node Abstract Class
+ * Tree Node Abstract Class
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <K> the Primary Key class for entity
@@ -43,11 +45,24 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  */
 public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends BasicNode<E> {
 
+    /**
+     * Copy Allowed - for OperationsEnabled
+     */
+    public static final int CAN_COPY = 1;
+    /**
+     * Cut Allowed - for OperationsEnabled
+     */
+    public static final int CAN_CUT = 1;
+    /**
+     * Delete Allowed - for OperationsEnabled
+     */
+    public static final int CAN_DELETE = 4;
+    ;
     private EntityReference<K, E, P> eref;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
     private EntityNameChangeListener nameListener;
-    private boolean isCutDestroyEnabled;
+    private int operationsEnabled;
 
     /**
      * Constructor.
@@ -56,13 +71,13 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      * @param e the entity
      * @param cf the childfactory
      * @param emclass the entity manager class
-     * @param allowedPaste allowed paste actions
-     * @param isCutDestroyEnabled true if delete/cut is allowed
+     * @param allowedDataFlavors allowed paste actions
+     * @param operationsEnabled set for copy , cut and delete enabled
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    protected TreeNode(String nodename, E e, BasicChildFactory<K, E, P> cf, Class<? extends EntityManager> emclass, DataFlavorAndAction[] allowedPaste, boolean isCutDestroyEnabled) {
-        super(cf, allowedPaste);
-        commonConstructor(nodename, e, emclass, isCutDestroyEnabled);
+    protected TreeNode(String nodename, E e, BasicChildFactory<K, E, P> cf, Class<? extends EntityManager> emclass, DataFlavor[] allowedDataFlavors, int operationsEnabled) {
+        super(cf, allowedDataFlavors);
+        commonConstructor(nodename, e, emclass, operationsEnabled);
     }
 
     /**
@@ -71,22 +86,25 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      * @param nodename the node name
      * @param e the entity
      * @param emclass the entity manager class
-     * @param isCutDestroyEnabled true if delete/cut is allowed
+     * @param operationsEnabled set for copy , cut and delete enabled
      */
-    protected TreeNode(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
+    protected TreeNode(String nodename, E e, Class<? extends EntityManager> emclass, int operationsEnabled) {
         super();
-        commonConstructor(nodename, e, emclass, isCutDestroyEnabled);
+        commonConstructor(nodename, e, emclass, operationsEnabled);
 
     }
 
-    private void commonConstructor(String nodename, E e, Class<? extends EntityManager> emclass, boolean isCutDestroyEnabled) {
+    private void commonConstructor(String nodename, E e, Class<? extends EntityManager> emclass, int operationsEnabled) {
         EntityManager<K, E, P> em = Lookup.getDefault().lookup(emclass);
         eref = new EntityReference<>(nodename, e, em);
-        this.isCutDestroyEnabled = isCutDestroyEnabled;
+        this.operationsEnabled = operationsEnabled;
         String desc = e.instanceDescription();
         e.addStateListener(stateListener = new EntityStateChangeListener(desc));
         e.addFieldListener(fieldListener = new EntityFieldChangeListener(desc));
         e.addNameListener(nameListener = new EntityNameChangeListener(desc));
+        if (!e.isPersistent()) {
+            e.addPrimaryKeyListener(new PrimaryKeyListener(desc));
+        }
     }
 
     @Override
@@ -99,6 +117,18 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      */
     public void setNoEntity() {
         eref.set();
+    }
+
+    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams<K>> {
+
+        public PrimaryKeyListener(String name) {
+            super(name);
+        }
+
+        @Override
+        public void action(PrimaryKeyChangeEventParams<K> p) {
+
+        }
     }
 
     private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
@@ -143,11 +173,11 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
         public void action(EntityFieldChangeEventParams<F> p) {
             F f = p.get();
             if (f != null) {
-                _processFieldChange(f);
+                nodeProcessFieldChange(f);
             }
             EntityFieldChangeEventParams.CommonEntityField c = p.getCommon();
             if (c != null) {
-                _processCommonFieldChange(c);
+                nodeProcessCommonFieldChange(c);
             }
             // TODO make decision about the Icon changes (based on changes to error state)
             iconChange(); // temporary - do always (just in case!)
@@ -193,19 +223,24 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
 
     // CUT and PASTE source support
     @Override
+    public final boolean canCopy() {
+        return (operationsEnabled & CAN_COPY) != 0;
+    }
+
+    @Override
     public final boolean canCut() {
-        return isCutDestroyEnabled;
+        return (operationsEnabled & CAN_CUT) != 0;
     }
 
     @Override
     public final boolean canDestroy() {
-        return isCutDestroyEnabled;
+        return (operationsEnabled & CAN_DELETE) != 0;
     }
 
     @Override
     public final void destroy() throws IOException {
         LogBuilder.writeLog("nbpcglibrary.node", this, "destroy");
-        _deleteRemove();
+        nodeDelete();
     }
 
     @Override
@@ -227,7 +262,7 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
     private class ExTransfer extends ExTransferable.Single {
 
         public ExTransfer() {
-            super(_getDataFlavor());
+            super(nodeGetDataFlavor());
         }
 
         @Override
@@ -238,32 +273,25 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
     }
 
     /**
-     * Cut and Paste - removal of Node action.
-     *
-     * @throws IOException if problem
-     */
-    abstract protected void _cutAndPasteRemove() throws IOException;
-
-    /**
      * Delete - removal of Node action.
      *
      * @throws IOException if problem
      */
-    abstract protected void _deleteRemove() throws IOException;
+    abstract protected void nodeDelete() throws IOException;
 
     /**
      * Process field changes.
      *
      * @param field the field Id
      */
-    protected abstract void _processFieldChange(F field);
+    protected abstract void nodeProcessFieldChange(F field);
 
     /**
      * Process field changes.
      *
      * @param field the field Id
      */
-    protected abstract void _processCommonFieldChange(EntityFieldChangeEventParams.CommonEntityField field);
+    protected abstract void nodeProcessCommonFieldChange(EntityFieldChangeEventParams.CommonEntityField field);
 
     /**
      * Get the display title for this node.
