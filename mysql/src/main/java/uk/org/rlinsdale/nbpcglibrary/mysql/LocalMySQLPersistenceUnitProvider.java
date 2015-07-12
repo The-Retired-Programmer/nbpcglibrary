@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLPersistenceUnitProvider;
 
 /**

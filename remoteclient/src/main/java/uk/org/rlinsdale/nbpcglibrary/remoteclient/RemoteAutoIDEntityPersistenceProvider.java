@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.remoteclient;
 
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
@@ -42,5 +43,22 @@ public class RemoteAutoIDEntityPersistenceProvider extends RemoteEntityPersisten
     @Override
     protected void addPK(JsonObjectBuilder job, Integer pkey) {
         job.add("pkey", pkey);
+    }
+
+    @Override
+    public Integer getPK(EntityFields ef) {
+        return null;
+    }
+
+    @Override
+    public void autoGenPrimaryKeyHook(EntityFields ef) {
+    }
+
+    @Override
+    public void addTimestampInfo(EntityFields ef) {
+    }
+
+    @Override
+    public void updateTimestampInfo(EntityFields ef) {
     }
 }

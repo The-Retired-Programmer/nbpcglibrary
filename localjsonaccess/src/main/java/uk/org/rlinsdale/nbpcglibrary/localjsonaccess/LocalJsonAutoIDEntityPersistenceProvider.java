@@ -29,17 +29,17 @@ import uk.org.rlinsdale.nbpcglibrary.common.Settings;
 public class LocalJsonAutoIDEntityPersistenceProvider extends LocalJsonEntityPersistenceProvider<Integer> {
 
     @Override
-    protected Integer getPK(EntityFields ef) {
+    public Integer getPK(EntityFields ef) {
         return (Integer) ef.get("id");
     }
 
     @Override
-    protected void autoGenPrimaryKeyHook(EntityFields ef) {
+    public void autoGenPrimaryKeyHook(EntityFields ef) {
         autoGenPrimaryKeyAction(ef); // create a generated primary key
     }
 
     @Override
-    protected void addTimestampInfo(EntityFields ef) {
+    public void addTimestampInfo(EntityFields ef) {
         String user = Settings.get("Usercode", "????");
         String when = (new Timestamp()).toSQLString();
         ef.put("createdby", user);
@@ -49,7 +49,7 @@ public class LocalJsonAutoIDEntityPersistenceProvider extends LocalJsonEntityPer
     }
 
     @Override
-    protected void updateTimestampInfo(EntityFields ef) {
+    public void updateTimestampInfo(EntityFields ef) {
         String user = Settings.get("Usercode", "????");
         String when = (new Timestamp()).toSQLString();
         ef.put("updatedby", user);

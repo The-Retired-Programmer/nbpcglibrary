@@ -53,10 +53,25 @@ public abstract class IdandstampCommandProcessor<T extends IdandstampEntity> ext
                     .write("message", "user undefined");
             return false;
         }
+        entity.setId(0);
         entity.setCreatedby(user);
         entity.setUpdatedby(user);
         String when = (new Timestamp()).toSQLString();
         entity.setCreatedon(when);
+        entity.setUpdatedon(when);
+        return true;
+    }
+    
+    @Override
+    protected boolean createUpdateFieldsHook(JsonGenerator generator, JsonObject command, T entity) {
+        String user = command.getString("user", "");
+        if ("".equals(user)) {
+            generator.write("success", false)
+                    .write("message", "user undefined");
+            return false;
+        }
+        entity.setUpdatedby(user);
+        String when = (new Timestamp()).toSQLString();
         entity.setUpdatedon(when);
         return true;
     }

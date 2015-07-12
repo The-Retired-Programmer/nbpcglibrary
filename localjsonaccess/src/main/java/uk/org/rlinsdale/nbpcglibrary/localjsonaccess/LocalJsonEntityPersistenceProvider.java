@@ -33,6 +33,7 @@ import javax.json.JsonValue;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
@@ -48,20 +49,17 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
 
     private LocalJsonPersistenceUnitProvider pup;
     private String name;
+    private String idx;
     private int nextid;
     private int nextidx;
     private final Map<K, EntityFields> tablerecords = new HashMap<>();
     private boolean dirty = false;
 
-    /**
-     * @param tablename the entity table name in entity storage
-     * @param properties the properties used for configuration
-     * @param pup the PersistenceUnitProvider
-     * @throws IOException if problem with reading or parsing the json data
-     */
-    public void init(String tablename, Properties properties, LocalJsonPersistenceUnitProvider pup) throws IOException {
-        this.pup = pup;
-        JsonObject tableJson = pup.load(tablename);
+    @Override
+    public void init(String tablename, Properties properties, PersistenceUnitProvider pup) throws IOException {
+        this.idx = null;
+        this.pup = (LocalJsonPersistenceUnitProvider) pup;
+        JsonObject tableJson = this.pup.load(tablename);
         try {
             this.nextid = JsonUtil.getObjectKeyIntegerValue(tableJson, "nextid");
             this.nextidx = JsonUtil.getObjectKeyIntegerValue(tableJson, "nextidx");
@@ -78,15 +76,18 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
             throw new LogicException("Illegal Json Format data  - should never happen");
         }
     }
-
-    /**
-     * Get the primary key from a entity described by entityfields
-     *
-     * @param ef the entity fields
-     * @return the primary Key
-     */
-    protected abstract K getPK(EntityFields ef);
-
+    
+    @Override
+    public void init(String tablename, String idx, Properties properties, PersistenceUnitProvider pup) throws IOException {
+        this.idx = idx;
+        this.init(tablename, properties, pup);
+    }
+    
+    @Override
+    public void close() {
+        persist();
+    }
+    
     private EntityFields makeEntityFields(JsonObject record) throws JsonConversionException {
         EntityFields entity = new EntityFields();
         for (Map.Entry<String, JsonValue> field : record.entrySet()) {
@@ -137,7 +138,7 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
 
     @Override
     public EntityFields get(K pkey) {
-        LogBuilder.writeLog("nbpcglib.localSQLPersistenceUnitProvider", this, "get", pkey);
+        LogBuilder.writeLog("nbpcglib.localJsonPersistenceUnitProvider", this, "get", pkey);
         return tablerecords.get(pkey);
     }
 
@@ -217,20 +218,6 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
     }
 
     /**
-     * Hook to create an auto generated primary key if required
-     *
-     * @param ef the entity fields into which the new primary key can be added
-     */
-    protected abstract void autoGenPrimaryKeyHook(EntityFields ef);
-    
-    /**
-     * Add the timestamp info for this entity
-     * 
-     * @param ef the entity fields
-     */
-    protected abstract void addTimestampInfo(EntityFields ef);
-
-    /**
      * Action to create an auto generated primary key
      *
      * @param ef the entity fields into which the new primary key is added
@@ -249,13 +236,6 @@ public abstract class LocalJsonEntityPersistenceProvider<K> implements EntityPer
         return copy(entity);
     }
     
-    /**
-     * Update the timestamp info for this entity
-     * 
-     * @param ef the entity fields
-     */
-    protected abstract void updateTimestampInfo(EntityFields ef);
-
     @Override
     public final void delete(K pkey) {
         dirty = true;

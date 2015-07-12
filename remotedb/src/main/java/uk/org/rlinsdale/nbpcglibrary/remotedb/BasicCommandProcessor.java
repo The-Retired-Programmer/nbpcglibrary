@@ -103,6 +103,9 @@ public abstract class BasicCommandProcessor<K, T extends BasicEntity> {
             case "create":
                 create(generator, command);
                 break;
+            case "update":
+                update(generator, command);
+                break;
             case "delete":
                 delete(generator, command);
                 break;
@@ -146,7 +149,6 @@ public abstract class BasicCommandProcessor<K, T extends BasicEntity> {
         if (!createInsertFieldsHook(generator, command, newentity)) {
             return;
         }
-
         try {
             this.getEntityManager().persist(newentity);
             this.getEntityManager().flush();
@@ -160,7 +162,8 @@ public abstract class BasicCommandProcessor<K, T extends BasicEntity> {
             return;
         }
         generator.write("success", true);
-        newentity.writePKwithkey(generator); // TOBE FIXED - also add entity 
+        newentity.writePKwithkey(generator);
+        newentity.writeAllFields(generator, "entity");
     }
 
     /**
@@ -177,15 +180,62 @@ public abstract class BasicCommandProcessor<K, T extends BasicEntity> {
         return true;
     }
 
-    /**
-     * Update the entity (NO YET IMPLEMENTED!!)
-     *
-     * @param entity the entity
-     */
-    protected void update(BasicEntity entity) {
+    private void update(JsonGenerator generator, JsonObject command) {
         //services.getEntityManager().merge(entity);
+        K pkey = getPK(command);
+        if (pkey == null) {
+            generator.write("success", false)
+                    .write("message", "pkey undefined");
+        } else {
+            JsonObject fields = command.getJsonObject("entity");
+            try {
+                T entity = getHook(pkey);
+                if (entity != null) {
+                    for (Map.Entry<String, JsonValue> kv : fields.entrySet()) {
+                        String name = kv.getKey();
+                        try {
+                            entity.setField(name, kv.getValue());
+                        } catch (JsonConversionException ex) {
+                            generator.write("success", false)
+                                    .write("message", name + " is not an entity field");
+                            return;
+                        }
+                    }
+                    if (!createUpdateFieldsHook(generator, command, entity)) {
+                        return;
+                    }
+                    generator.write("success", true);
+                    writePK(generator, pkey);
+                    entity.writeAllFields(generator, "entity");
+                } else {
+                    generator.write("success", false)
+                            .write("message", "entity does not exist");
+                    writePK(generator, pkey);
+                }
+            } catch (Exception e) {
+                generator.write("success", false)
+                        .write("message", "update operation failed -" + e.getClass().getSimpleName());
+                String message = e.getMessage();
+                if (message != null) {
+                    generator.write("exceptionmessage", message);
+                }
+            }
+        }
     }
-
+    
+    /**
+     * An extension point for use by sub-types, to make any changes to the
+     * response after the entity has been updated.
+     *
+     * @param generator the JsonGenerator to be used to build the response
+     * @param command the command.
+     * @param entity the entity
+     * @return true if the update is to continue, false to abort the update
+     */
+    protected boolean createUpdateFieldsHook(JsonGenerator generator, JsonObject command, T entity) {
+        return true;
+    }
+    
     private void delete(JsonGenerator generator, JsonObject command) {
         K pkey = getPK(command);
         if (pkey == null) {

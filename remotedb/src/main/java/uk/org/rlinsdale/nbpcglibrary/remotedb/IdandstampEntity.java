@@ -33,6 +33,13 @@ public interface IdandstampEntity<T extends IdandstampEntity> extends BasicEntit
      * @return the entity Id
      */
     public Integer getId();
+    
+    /**
+     * Set the entity Id (primary key value)
+     *
+     * @param id the entity Id
+     */
+    public void setId(Integer id);
 
     /**
      * Set the createdby field

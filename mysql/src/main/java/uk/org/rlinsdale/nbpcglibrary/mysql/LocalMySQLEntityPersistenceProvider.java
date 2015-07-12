@@ -26,7 +26,7 @@ import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLEntityPersisten
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <K> the primary key class
  */
-public class LocalMySQLEntityPersistenceProvider<K> extends LocalSQLEntityPersistenceProvider<K> {
+public abstract class LocalMySQLEntityPersistenceProvider<K> extends LocalSQLEntityPersistenceProvider<K> {
     
     @Override
     protected String format(Object value) {

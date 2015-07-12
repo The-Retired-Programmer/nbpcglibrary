@@ -157,6 +157,38 @@ public class RemoteEntityPersistenceProviderTest {
         EntityFields result = instance.getOne("application", "JsonApp83");
         assertEquals(46, result.get("id"));
     }
+    
+    /**
+     * Test of Insert, Update and Delete methods, of class RemoteEntityPersistenceProvider.
+     *
+     * @throws Exception if problems
+     */
+    @Test
+    public void testInsertUpdateDelete() throws Exception {
+        System.out.println("Insert/Update/Delete");
+        EntityFields insert = new EntityFields();
+        insert.put("application", "inserted");
+        EntityFields result = instance.insert(insert);
+        assertEquals("inserted", result.get("application"));
+        int id = (Integer) result.get("id");
+        EntityFields update = new EntityFields();
+        update.put("application", "updated");
+        EntityFields result2 = instance.update(id, update);
+        assertEquals("updated", result2.get("application"));
+        instance.delete(id);
+    }
+    
+    /** test of get method with bad pkey, of class RemoteEntityPersistenceProvider.
+     *
+     * @throws Exception if problems
+     */
+    @Test(expected = LogicException.class)
+    public void testBadGet() throws Exception {
+        System.out.println("Bad Get");
+        int pkey = 999;
+        EntityFields result = instance.get(pkey);
+        fail("Exception should have been thrown in this case.");
+    }
 
     /**
      * Test of findNextIdx method, of class RemoteEntityPersistenceProvider.

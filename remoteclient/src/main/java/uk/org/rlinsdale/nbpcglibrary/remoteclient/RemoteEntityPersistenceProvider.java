@@ -32,6 +32,7 @@ import javax.json.JsonValue;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Settings;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
@@ -49,31 +50,22 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
     private RemotePersistenceUnitProvider persistenceUnitProvider;
     private String idx;
 
-    /**
-     * Initialise this persistence provider.
-     *
-     * @param entityname the entity table name in entity storage
-     * @param properties the properties used for configuration
-     * @param pup the data access manager to use to access the data
-     */
-    public void init(String entityname, Properties properties, RemotePersistenceUnitProvider pup) {
+    @Override
+    public void init(String entityname, Properties properties, PersistenceUnitProvider pup) {
         this.entityname = entityname;
-        this.persistenceUnitProvider = pup;
+        this.persistenceUnitProvider = (RemotePersistenceUnitProvider) pup;
         idx = null;
     }
 
-    /**
-     * Initialise this persistence provider.
-     *
-     * @param entityname the entity table name in entity storage
-     * @param idx the index field - used to order the returned entities
-     * @param properties the properties used for configuration
-     * @param pup the data access manager to use to access the data
-     */
-    public void init(String entityname, String idx, Properties properties, RemotePersistenceUnitProvider pup) {
+    @Override
+    public void init(String entityname, String idx, Properties properties, PersistenceUnitProvider pup) {
         this.entityname = entityname;
-        this.persistenceUnitProvider = pup;
-        this.idx = null;
+        this.persistenceUnitProvider = (RemotePersistenceUnitProvider) pup;
+        this.idx = idx;
+    }
+
+    @Override
+    public void close() {
     }
 
     @Override
@@ -92,7 +84,11 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            for (JsonValue j : persistenceUnitProvider.executeSingleCommand(job.build()).getJsonArray("entities")) {
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote get() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
+            for (JsonValue j : reply.getJsonArray("entities")) {
                 list.add(makeEntityFields((JsonObject) j));
             }
             return list;
@@ -109,7 +105,11 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
                     .add("action", "get")
                     .add("entityname", entityname);
             addPK(job, pkey);
-            return makeEntityFields(persistenceUnitProvider.executeSingleCommand(job.build()).getJsonObject("entity"));
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote get(pkey) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
+            return makeEntityFields(reply.getJsonObject("entity"));
         } catch (IOException ex) {
             throw new LogicException("Remote get(pkey) failed: " + ex.getMessage());
         }
@@ -134,9 +134,13 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            for (JsonValue j : persistenceUnitProvider.executeSingleCommand(job.build()).getJsonArray("pkeys")) {
-                list.add(getPK(j));
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote find() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
+            reply.getJsonArray("pkeys").stream().forEach((j) -> {
+                list.add(getPK(j));
+            });
             return list;
         } catch (IOException ex) {
             throw new LogicException("Remote find() failed: " + ex.getMessage());
@@ -164,7 +168,11 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            for (JsonValue j : persistenceUnitProvider.executeSingleCommand(job.build()).getJsonArray("entities")) {
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote get(field,value) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
+            for (JsonValue j : reply.getJsonArray("entities")) {
                 list.add(makeEntityFields((JsonObject) j));
             }
             return list;
@@ -186,12 +194,16 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            for (JsonValue j : persistenceUnitProvider.executeSingleCommand(job.build()).getJsonArray("pkeys")) {
-                list.add(getPK(j));
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote find(field, value) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
+            reply.getJsonArray("pkeys").stream().forEach((j) -> {
+                list.add(getPK(j));
+            });
             return list;
         } catch (IOException ex) {
-            throw new LogicException("Remote find() failed: " + ex.getMessage());
+            throw new LogicException("Remote find(field,value) failed: " + ex.getMessage());
         }
     }
 
@@ -207,7 +219,11 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            JsonArray entities = persistenceUnitProvider.executeSingleCommand(job.build()).getJsonArray("entities");
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote getOne(field,value) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
+            JsonArray entities = reply.getJsonArray("entities");
             if (entities.size() != 1) {
                 throw new LogicException("Remote getOne(field,value) failed: Single row expected");
             }
@@ -258,7 +274,11 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
                     .add("entityname", entityname)
                     .add("user", Settings.get("Usercode", "????"));
             addEntity(job, values);
-            EntityFields res = makeEntityFields(persistenceUnitProvider.executeSingleCommand(job.build()).getJsonObject("entity"));
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote insert(values) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
+            EntityFields res = makeEntityFields(reply.getJsonObject("entity"));
             LogBuilder.writeExitingLog("nbpcglib.RemoteEntityPersistenceProvider", this, "insert", res);
             return res;
         } catch (IOException ex) {
@@ -292,7 +312,11 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
                     .add("user", Settings.get("Usercode", "????"));
             addPK(job, pkey);
             addEntity(job, diff);
-            EntityFields res = makeEntityFields(persistenceUnitProvider.executeSingleCommand(job.build()).getJsonObject("entity"));
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote update(pkey,values) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
+            EntityFields res = makeEntityFields(reply.getJsonObject("entity"));
             LogBuilder.writeExitingLog("nbpcglib.RemoteEntityPersistenceProvider", this, "update", res);
             return res;
         } catch (IOException ex) {
@@ -308,7 +332,10 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
                     .add("action", "delete")
                     .add("entityname", entityname);
             addPK(job, pkey);
-            persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote delete() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
         } catch (IOException ex) {
             throw new LogicException("Remote delete(pkey) failed: " + ex.getMessage());
         }

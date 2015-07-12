@@ -42,5 +42,4 @@ public interface PersistenceUnitProvider extends HasInstanceDescription {
      * @return the name
      */
     public String getName();
-
 }

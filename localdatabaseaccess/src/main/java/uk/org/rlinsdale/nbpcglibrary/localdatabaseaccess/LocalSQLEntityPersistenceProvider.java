@@ -27,6 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
+import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
 import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
 
 /**
@@ -42,31 +43,22 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
     private LocalSQLPersistenceUnitProvider persistenceUnitProvider;
     private String idx;
 
-    /**
-     * Initialise the provider
-     *
-     * @param tablename the entity table name in entity storage
-     * @param properties the properties used for configuration
-     * @param pup the PersistenceUnitProvider
-     */
-    public void init(String tablename, Properties properties, LocalSQLPersistenceUnitProvider pup) {
+    @Override
+    public void init(String tablename, Properties properties, PersistenceUnitProvider pup) {
         this.tablename = tablename;
-        this.persistenceUnitProvider = pup;
+        this.persistenceUnitProvider = (LocalSQLPersistenceUnitProvider) pup;
         this.idx = null;
     }
 
-    /**
-     * Initialise the provider
-     *
-     * @param tablename the entity table name in entity storage
-     * @param idx the index field - used to order the returned entities
-     * @param properties the properties used for configuration
-     * @param pup the PersistenceUnitProvider
-     */
-    public void init(String tablename, String idx, Properties properties, LocalSQLPersistenceUnitProvider pup) {
+    @Override
+    public void init(String tablename, String idx, Properties properties, PersistenceUnitProvider pup) {
         this.tablename = tablename;
-        this.persistenceUnitProvider = pup;
+        this.persistenceUnitProvider = (LocalSQLPersistenceUnitProvider) pup;
         this.idx = idx;
+    }
+    
+    @Override
+    public void close(){
     }
 
     @Override
@@ -111,10 +103,9 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
                 : "SELECT id from " + tablename + " ORDER BY " + idx;
         List<K> result = new ArrayList<>();
         try {
-            List<EntityFields> response = persistenceUnitProvider.query(sql);
-            for (EntityFields ef : response) {
+            persistenceUnitProvider.query(sql).stream().forEach((ef) -> {
                 result.add((K) ef.get("id"));
-            }
+            });
         } catch (SQLException ex) {
             LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "find");
             throw new LogicException(ex.getMessage());
@@ -144,10 +135,9 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
                 : buildsql("SELECT id from " + tablename + " where " + parametername + "={P} ORDER BY " + idx, parametervalue);
         List<K> result = new ArrayList<>();
         try {
-            List<EntityFields> response = persistenceUnitProvider.query(sql);
-            for (EntityFields ef : response) {
+            persistenceUnitProvider.query(sql).stream().forEach((ef) -> {
                 result.add((K) ef.get("id"));
-            }
+            });
         } catch (SQLException ex) {
             LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "find", parametername, parametervalue);
             throw new LogicException(ex.getMessage());
@@ -204,6 +194,7 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
     @Override
     public final EntityFields insert(EntityFields values) {
         LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "insert", values);
+        addTimestampInfo(values);
         try {
             persistenceUnitProvider.execute(buildsql("INSERT INTO " + tablename + " ({$KEYLIST}) VALUES ({$VALUELIST})", values));
             List<EntityFields> findpkey = persistenceUnitProvider.query("SELECT LAST_INSERT_ID() as id");
@@ -212,7 +203,7 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
             }
             EntityFields pkeyrec = findpkey.get(0);
             K pkey = (K) pkeyrec.get("id");
-            List<EntityFields> updated = persistenceUnitProvider.query(buildsql("SELECT * FROM " + tablename + "WHERE id = ", pkey));
+            List<EntityFields> updated = persistenceUnitProvider.query(buildsql("SELECT * FROM " + tablename + " WHERE id = {P}", pkey));
             if (updated.size() != 1) {
                 throw new LogicException("Single row expected");
             }
@@ -227,9 +218,10 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
     @Override
     public final EntityFields update(K pkey, EntityFields diff) {
         LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "update", pkey, diff);
+        updateTimestampInfo(diff);
         try {
-            persistenceUnitProvider.execute(buildsql(buildsql("UPDATE " + tablename + " SET {$KEYVALUELIST} WHERE id=", pkey), diff));
-            List<EntityFields> updated = persistenceUnitProvider.query(buildsql("SELECT * FROM " + tablename + "WHERE id = ", pkey));
+            persistenceUnitProvider.execute(buildsql(buildsql("UPDATE " + tablename + " SET {$KEYVALUELIST} WHERE id= {P}", pkey), diff));
+            List<EntityFields> updated = persistenceUnitProvider.query(buildsql("SELECT * FROM " + tablename + " WHERE id = {P}", pkey));
             if (updated.size() != 1) {
                 throw new LogicException("Single row expected");
             }

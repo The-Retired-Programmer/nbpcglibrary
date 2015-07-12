@@ -18,7 +18,9 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.api;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Provider of a EntityPersistence Service for a particular entity
@@ -28,7 +30,62 @@ import java.util.List;
  * @param <K> the Primary Key type
  */
 public interface EntityPersistenceProvider<K> extends HasInstanceDescription {
+    
+    /**
+     * Initialise this provider.
+     * 
+     * @param tablename the entity table name in entity storage
+     * @param properties the properties used for configuration
+     * @param pup the PersistenceUnitProvider
+     * @throws IOException if problem
+     */
+    public void init(String tablename, Properties properties, PersistenceUnitProvider pup) throws IOException;
+    
+    /**
+     * Initialise the provider
+     *
+     * @param tablename the entity table name in entity storage
+     * @param idx the index field - used to order the returned entities
+     * @param properties the properties used for configuration
+     * @param pup the PersistenceUnitProvider
+     * @throws IOException if problem
+     */
+    public void init(String tablename, String idx, Properties properties, PersistenceUnitProvider pup) throws IOException;
 
+    /**
+     * Close down the provider.
+     */
+    public void close();
+    
+    /**
+     * Get the primary key from a entity described by entityfields
+     *
+     * @param ef the entity fields
+     * @return the primary Key
+     */
+    public K getPK(EntityFields ef);
+    
+    /**
+     * create an auto generated primary key (if required)
+     *
+     * @param ef the entity fields into which the new primary key can be added
+     */
+    public void autoGenPrimaryKeyHook(EntityFields ef);
+    
+    /**
+     * Add the timestamp info for this entity
+     * 
+     * @param ef the entity fields
+     */
+    public void addTimestampInfo(EntityFields ef);
+    
+    /**
+     * Update the timestamp info for this entity
+     * 
+     * @param ef the entity fields
+     */
+    public void updateTimestampInfo(EntityFields ef);
+            
     /**
      * Get the set of entity Primary Keys for all stored entities.
      *

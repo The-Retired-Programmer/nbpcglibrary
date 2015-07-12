@@ -18,10 +18,41 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.mysql;
 
+import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
+import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
+import uk.org.rlinsdale.nbpcglibrary.common.Settings;
+
 /**
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 public class LocalMySQLAutoIDEntityPersistenceProvider extends LocalMySQLEntityPersistenceProvider<Integer> {
+
     
+    @Override
+    public Integer getPK(EntityFields ef) {
+        return (Integer) ef.get("id");
+    }
+
+    @Override
+    public void autoGenPrimaryKeyHook(EntityFields ef) {
+    }
+
+    @Override
+    public void addTimestampInfo(EntityFields ef) {
+        String user = Settings.get("Usercode", "????");
+        String when = (new Timestamp()).toSQLString();
+        ef.put("createdby", user);
+        ef.put("createdon", when);
+        ef.put("updatedby", user);
+        ef.put("updatedon", when);
+    }
+
+    @Override
+    public void updateTimestampInfo(EntityFields ef) {
+        String user = Settings.get("Usercode", "????");
+        String when = (new Timestamp()).toSQLString();
+        ef.put("updatedby", user);
+        ef.put("updatedon", when);
+    }
 }
