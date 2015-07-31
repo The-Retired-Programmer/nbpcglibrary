@@ -46,12 +46,14 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      * The Entity Manager associated with the entities
      */
     protected final EntityManager<K, E, P> em;
-    private final EntityPersistenceProvider<K> epp;
-
+    /**
+     * The Entity Persistence Provider for this entity set
+     */
+    protected final EntityPersistenceProvider<K> epp;
     /**
      * The list of Entity References
      */
-    protected List<EntityReference<K, E, P>> childList;
+    protected final List<EntityReference<K, E, P>> childList;
 
     /**
      * The name of the Set (for reporting purposes)
@@ -71,9 +73,23 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
         em = Lookup.getDefault().lookup(emclass);
         this.epp = em.getEntityPersistenceProvider();
         childList = new ArrayList<>();
-        epp.find().stream().forEach((ref) -> {
+    }
+    
+    /**
+     * Load the set with all required entity references.
+     */
+    public void load(){
+        getPrimaryKeySet().stream().forEach((ref) -> {
             childList.add(new EntityReference<>(name, ref, em));
         });
+    }
+    
+    /**
+     * Get the set of primary keys for this entity set.
+     * @return  the set of primary keys
+     */
+    protected List<K> getPrimaryKeySet() {
+        return epp.find();
     }
 
     /**
@@ -118,10 +134,8 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      * Restore state (to the entity storage state).
      */
     public void restoreState() {
-        childList = new ArrayList<>();
-        epp.find().stream().forEach((ref) -> {
-            childList.add(new EntityReference<>(name, ref, em));
-        });
+        childList.clear();
+        load();
         fireSetChange();
     }
 

@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
@@ -61,7 +60,7 @@ public class EntitySortedReferenceSet<K, E extends Entity<K, E, P, F>, P extends
     protected final void sort() {
         List<E> el = super.get();
         java.util.Collections.sort(el, comparator);
-        childList = new ArrayList<>();
+        childList.clear();
         el.stream().forEach((e) -> {
             childList.add(new EntityReference<>(name, e, em));
         });

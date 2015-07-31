@@ -354,7 +354,7 @@ public abstract class BasicCommandProcessor<K, T extends BasicEntity> {
                     generator.writeEnd();
                 } catch (Exception e) {
                     generator.write("success", false)
-                            .write("message", "getbyname operation failed");
+                            .write("message", "getbyfield operation failed");
                     String message = e.getMessage();
                     if (message != null) {
                         generator.write("exceptionmessage", message);
@@ -404,7 +404,7 @@ public abstract class BasicCommandProcessor<K, T extends BasicEntity> {
                     generator.writeEnd();
                 } catch (Exception e) {
                     generator.write("success", false)
-                            .write("message", "findbyname operation failed");
+                            .write("message", "findbyfield operation failed");
                     String message = e.getMessage();
                     if (message != null) {
                         generator.write("exceptionmessage", message);

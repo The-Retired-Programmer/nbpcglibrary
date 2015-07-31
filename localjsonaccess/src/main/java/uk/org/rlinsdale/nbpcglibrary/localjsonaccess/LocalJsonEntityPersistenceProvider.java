@@ -34,7 +34,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 

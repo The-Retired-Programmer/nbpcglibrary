@@ -33,7 +33,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.Settings;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
@@ -262,7 +262,18 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         if (idx == null) {
             throw new LogicException("findNextIdx() should not be called if the entity is not ordered");
         }
-        return Integer.MAX_VALUE; // temporary 
+        try {
+            JsonObjectBuilder job = Json.createObjectBuilder()
+                    .add("action", "findnextidx")
+                    .add("entityname", entityname);
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            if (!reply.getBoolean("success")) {
+                throw new LogicException("Remote findNextIdx() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
+            }
+            return reply.getInt("nextidx");
+        } catch (IOException ex) {
+            throw new LogicException("Remote findNextIdx() failed: " + ex.getMessage());
+        }
     }
 
     @Override

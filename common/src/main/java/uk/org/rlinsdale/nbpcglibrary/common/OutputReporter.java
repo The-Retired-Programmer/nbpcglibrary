@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.common;
 
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import java.io.IOException;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;

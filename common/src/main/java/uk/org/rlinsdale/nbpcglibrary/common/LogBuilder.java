@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.common;
 
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import java.text.MessageFormat;
 import java.util.ArrayList;

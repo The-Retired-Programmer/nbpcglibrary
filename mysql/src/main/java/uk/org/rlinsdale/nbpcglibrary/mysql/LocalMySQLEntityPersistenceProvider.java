@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.mysql;
 
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLEntityPersistenceProvider;
 
 /**

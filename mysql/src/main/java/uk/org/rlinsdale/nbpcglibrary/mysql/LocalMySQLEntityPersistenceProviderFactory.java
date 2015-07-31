@@ -38,16 +38,18 @@ public class LocalMySQLEntityPersistenceProviderFactory implements EntityPersist
     public String getType() {
         return "local-mysql";
     }
-    
-    @Override
-    public Class<LocalMySQLPersistenceUnitProviderFactory> getPersistenceUnitProviderFactoryClass() {
-        return LocalMySQLPersistenceUnitProviderFactory.class;
-    }
 
     @Override
     public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalMySQLPersistenceUnitProvider pup) throws IOException {
             LocalMySQLAutoIDEntityPersistenceProvider epp = new LocalMySQLAutoIDEntityPersistenceProvider();
             epp.init(entityname, p, pup);
+            return epp;
+    }
+    
+    @Override
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalMySQLPersistenceUnitProvider pup, String idx) throws IOException {
+             LocalMySQLAutoIDEntityPersistenceProvider epp = new  LocalMySQLAutoIDEntityPersistenceProvider();
+            epp.init(entityname, idx, p, pup);
             return epp;
     }
 }

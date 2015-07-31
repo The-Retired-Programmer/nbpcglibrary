@@ -20,9 +20,9 @@ package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityIndexed;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 
 /**
@@ -33,7 +33,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
  * @param <E> the Entity Class
  * @param <P> the parent entity
  */
-public class EntityIndexedReferenceSet<K, E extends EntityIndexed<K, E, P, ?>, P extends CoreEntity> extends EntityReferenceSet<K, E, P> {
+public class EntityIndexedReferenceSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends EntityReferenceSet<K, E, P> {
 
     /**
      * Constructor.
@@ -85,8 +85,8 @@ public class EntityIndexedReferenceSet<K, E extends EntityIndexed<K, E, P, ?>, P
         List<E> el = get();
         for (int i = 0; i < el.size(); i++) {
             E e = el.get(i);
-            if (i != e.getIndex()) {
-                e.setIndex(i);
+            if (i != e.getIdx()) {
+                e.setIdx(i);
             }
         }
     }

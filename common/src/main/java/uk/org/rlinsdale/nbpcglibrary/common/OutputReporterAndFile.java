@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.common;
 
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;

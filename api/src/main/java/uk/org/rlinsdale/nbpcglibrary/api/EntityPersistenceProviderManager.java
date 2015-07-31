@@ -36,8 +36,8 @@ import org.openide.util.Lookup;
  */
 public class EntityPersistenceProviderManager {
 
-    private final static Map<String, EntityPersistenceProvider> entityPersistenceProviders = new HashMap<>();
     private final static Map<String, PersistenceUnitProvider> persistenceUnitProviders = new HashMap<>();
+    private final static Map<String, Properties> dbproperties = new HashMap<>();
 
     private static final String DEFAULTUSER = "nbplatform";
     private static final String DEFAULTPASSWORD = "netbeans";
@@ -46,28 +46,24 @@ public class EntityPersistenceProviderManager {
      * Setup EntityPersistenceProviders and associated PersistenceUnitProviders.
      *
      * @param in the configuration properties file
-     * @param entitynames list of all entity names in this PersistenceUnit
-     * @throws IOException if problems with processing properties or creating
-     * required Providers
+     * @throws IOException if problems with property file content
      */
-    public static void set(InputStream in, String[] entitynames) throws IOException {
+    public static void init(InputStream in) throws IOException {
         Properties props = new Properties();
         props.load(in);
-        set(props, entitynames);
+        init(props);
     }
 
     /**
      * Setup EntityPersistenceProviders and associated PersistenceUnitProviders.
      *
      * @param props the configuration properties
-     * @param entitynames list of all entity names in this PersistenceUnit
-     * @throws IOException if problems with processing properties or creating
-     * required Providers
+     * @throws IOException if dbkey missing from properties or requested Persistence Unit Provider does not exist
      */
-    public static void set(Properties props, String[] entitynames) throws IOException {
-        String key = props.getProperty("key", "");
-        if ("".equals(key)) {
-            throw new EntityPersistenceProviderManagerException("Persistence Properties - key not defined");
+    public static void init(Properties props) throws IOException {
+        String dbkey = props.getProperty("key", "");
+        if ("".equals(dbkey)) {
+            throw new IOException("Persistence Properties - key not defined");
         }
         if (!props.containsKey("user")) {
             props.setProperty("user", DEFAULTUSER);
@@ -75,36 +71,88 @@ public class EntityPersistenceProviderManager {
         if (!props.containsKey("password")) {
             props.setProperty("password", DEFAULTPASSWORD);
         }
-        Collection<? extends EntityPersistenceProviderFactory> eppfactories = Lookup.getDefault().lookupResult(EntityPersistenceProviderFactory.class).allInstances();
-        for (EntityPersistenceProviderFactory eppfactory : eppfactories) {
-            if (eppfactory.getType().equals(props.getProperty("entitypersistenceprovidertype"))) {
-                Collection<? extends PersistenceUnitProviderFactory> pupfactories = Lookup.getDefault().lookupResult(eppfactory.getPersistenceUnitProviderFactoryClass()).allInstances();
-                for (PersistenceUnitProviderFactory pupfactory : pupfactories) {
-                    if (pupfactory.getType().equals(props.getProperty("persistenceunitprovidertype"))) {
-                        PersistenceUnitProvider pup = pupfactory.createPersistenceUnitProvider(props);
-                        for (String entityname : entitynames) {
-                            String ekey = key + "_" + entityname;
-                            entityPersistenceProviders.put(ekey, eppfactory.createEntityPersistenceProvider(entityname, props, pup));
-                        }
-                        persistenceUnitProviders.put(key, pup);
-                        return;
-                    }
-                }
-                throw new EntityPersistenceProviderManagerException("Unknown PersistenceUnitProvider type used in Persistence Properties");
+        dbproperties.put(dbkey, props);
+        String puptype = props.getProperty("persistenceunitprovidertype");
+        Collection<? extends PersistenceUnitProviderFactory> pupfactories = Lookup.getDefault().lookupResult(PersistenceUnitProviderFactory.class).allInstances();
+        for (PersistenceUnitProviderFactory pupfactory : pupfactories) {
+            if (pupfactory.getType().equals(puptype)) {
+                PersistenceUnitProvider pup = pupfactory.createPersistenceUnitProvider(props);
+                persistenceUnitProviders.put(dbkey, pup);
+                return;
             }
         }
-        throw new EntityPersistenceProviderManagerException("Unknown EntityPersistenceProvider type used in Persistence Properties");
+        throw new LogicException("Unknown PersistenceUnitProvider requested in Persistence Properties");
     }
 
     /**
-     * Get an EntityPersistenceProvider.
+     * Get the required Persistence Unit Provider. The provider for a particular
+     * dbkey is a singleton and is cached in this module.
      *
-     * @param key the EntityPersistenceUnitProvider key.
+     * @param dbkey the database key
+     * @return the persistence unit provider
+     * cannot be found.
+     */
+    private static PersistenceUnitProvider getPersistenceUnitProvider(String dbkey) {
+        PersistenceUnitProvider pup = persistenceUnitProviders.get(dbkey);
+        if (pup != null) {
+            return pup;
+        }
+        throw new LogicException("Unknown PersistenceUnitProvider type used in Persistence Properties");
+    }
+
+    /**
+     * Get an Entity Persistence Provider.
+     *
+     * @param dbkey the EntityPersistenceUnitProvider key.
      * @param entityname the entity name
      * @return the EntityPersistenceProvider
+     * cannot be found.
      */
-    public static EntityPersistenceProvider getEntityPersistenceProvider(String key, String entityname) {
-        return entityPersistenceProviders.get(key + "_" + entityname);
+    public static EntityPersistenceProvider getEntityPersistenceProvider(String dbkey, String entityname) {
+        Properties props = dbproperties.get(dbkey);
+        if (props == null) {
+            throw new LogicException("Properties for " + dbkey + " are not available");
+        }
+        String puptype = props.getProperty("entitypersistenceprovidertype");
+        Collection<? extends EntityPersistenceProviderFactory> eppfactories = Lookup.getDefault().lookupResult(EntityPersistenceProviderFactory.class).allInstances();
+        for (EntityPersistenceProviderFactory eppfactory : eppfactories) {
+            if (eppfactory.getType().equals(puptype)) {
+                try {
+                    return eppfactory.createEntityPersistenceProvider(entityname, props, getPersistenceUnitProvider(dbkey));
+                } catch (IOException ex) {
+                    throw new LogicException("getEntityPersistenceProvide() failed: " + ex.getMessage());
+                }
+            }
+        }
+        throw new LogicException("Unknown EntityPersistenceProvider type used in Persistence Properties");
+    }
+    
+    /**
+     * Get an Entity Persistence Provider for an ordered entity.
+     *
+     * @param dbkey the EntityPersistenceUnitProvider key.
+     * @param entityname the entity name
+     * @param idx the index column name
+     * @return the EntityPersistenceProvider
+     * cannot be found.
+     */
+    public static EntityPersistenceProvider getEntityPersistenceProvider(String dbkey, String entityname, String idx) {
+        Properties props = dbproperties.get(dbkey);
+        if (props == null) {
+            throw new LogicException("Properties for " + dbkey + " are not available");
+        }
+        String puptype = props.getProperty("entitypersistenceprovidertype");
+        Collection<? extends EntityPersistenceProviderFactory> eppfactories = Lookup.getDefault().lookupResult(EntityPersistenceProviderFactory.class).allInstances();
+        for (EntityPersistenceProviderFactory eppfactory : eppfactories) {
+            if (eppfactory.getType().equals(puptype)) {
+                try {
+                    return eppfactory.createEntityPersistenceProvider(entityname, props, getPersistenceUnitProvider(dbkey), idx);
+                } catch (IOException ex) {
+                    throw new LogicException("getEntityPersistenceProvide() failed: " + ex.getMessage());
+                }
+            }
+        }
+        throw new LogicException("Unknown EntityPersistenceProvider type used in Persistence Properties");
     }
 
     /**

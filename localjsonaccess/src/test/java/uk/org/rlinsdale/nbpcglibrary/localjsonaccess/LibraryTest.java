@@ -103,15 +103,12 @@ public class LibraryTest {
     public void testLibrary() {
         System.out.println("Test Json Access Library");
         try {
-            String[] entitynames = new String[]{
-                "Data"
-            };
             Properties p = new Properties();
             p.setProperty("connection", dbdir.getAbsolutePath());
             p.setProperty("key", "jsondata");
             p.setProperty("entitypersistenceprovidertype", "local-json");
             p.setProperty("persistenceunitprovidertype", "local-json");
-            EntityPersistenceProviderManager.set(p, entitynames);
+            EntityPersistenceProviderManager.init(p);
             LocalJsonAutoIDEntityPersistenceProvider epp = (LocalJsonAutoIDEntityPersistenceProvider) EntityPersistenceProviderManager.getEntityPersistenceProvider("jsondata", "Data");
             //
             System.out.println("Instance Description: " + epp.instanceDescription());

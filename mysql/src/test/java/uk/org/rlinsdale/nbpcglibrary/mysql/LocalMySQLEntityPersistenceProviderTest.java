@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 
 /**
  * The test package for the LocalMySqlEntityPersistenceProvider
@@ -55,9 +55,6 @@ public class LocalMySQLEntityPersistenceProviderTest {
     @BeforeClass
     public static void setUpClass() throws IOException {
 
-        String[] entitynames = new String[]{
-            "Application", "Role", "Permission", "User", "UserRole", "Userpermission"
-        };
         Properties p = new Properties();
         p.setProperty("key", "authentication2");
         p.setProperty("connection", "jdbc:mysql://localhost:3306/authentication2");
@@ -65,7 +62,7 @@ public class LocalMySQLEntityPersistenceProviderTest {
         p.setProperty("persistenceunitprovidertype", "mysql");
         p.setProperty("user", "developer");
         p.setProperty("password", "dev");
-        EntityPersistenceProviderManager.set(p, entitynames);
+        EntityPersistenceProviderManager.init(p);
         instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("authentication2", "Application");
     }
 

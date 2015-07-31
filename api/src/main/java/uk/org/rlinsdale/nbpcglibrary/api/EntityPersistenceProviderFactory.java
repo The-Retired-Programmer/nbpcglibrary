@@ -40,14 +40,6 @@ public interface EntityPersistenceProviderFactory<K, D extends PersistenceUnitPr
     public String getType();
 
     /**
-     * Get the class of the PersistenceUnitProvider associated with this
-     * EntityPersistenceProvider.
-     *
-     * @return the PersistenceUnitProvider class
-     */
-    public Class<F> getPersistenceUnitProviderFactoryClass();
-
-    /**
      * Create an EntityPersistenceProvider.
      *
      * @param entityname the entity name to be managed
@@ -57,4 +49,16 @@ public interface EntityPersistenceProviderFactory<K, D extends PersistenceUnitPr
      * @throws IOException in cases of problems of creating the provider
      */
     public EntityPersistenceProvider<K> createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider) throws IOException;
+    
+    /**
+     * Create an EntityPersistenceProvider.
+     *
+     * @param entityname the entity name to be managed
+     * @param p the properties which define the provider configuration
+     * @param persistenceUnitProvider the PersistenceUnitProvider to be used
+     * @param idx the index column name (for ordered entities)
+     * @return the EntityPersistenceProvider
+     * @throws IOException in cases of problems of creating the provider
+     */
+    public EntityPersistenceProvider<K> createEntityPersistenceProvider(String entityname, Properties p, D persistenceUnitProvider, String idx) throws IOException;
 }

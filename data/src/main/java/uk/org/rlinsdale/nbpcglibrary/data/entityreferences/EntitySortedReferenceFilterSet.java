@@ -18,21 +18,22 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
+import java.util.Comparator;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 
 /**
- * Manages the list of Entities. The list of Entities is lazy loaded when
- * required.
+ * Manages the list of Entities - implements a sortable entity lists
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <K> the primary Key class
- * @param <E> the eEntity Class
- * @param <P> the parent Entity class
+ * @param <K> the primary key class for the entity
+ * @param <E> the Entity Class
+ * @param <P> the parent Entity Class
+ * @param <F> the fields enum type for the entity
  */
-public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends EntityReferenceSet<K,E,P> {
+public class EntitySortedReferenceFilterSet<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends EntitySortedReferenceSet<K, E, P, F> {
 
     private final String columnname;
     private final Object columnvalue;
@@ -41,14 +42,13 @@ public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param columnname the column name for use in selection equality filter
-     * @param columnvalue the column value for use in the selection equality
-     * filter
+     * @param comparator the comparator to be used to sort the list
+     * @param columnname the column name to be used in filter
+     * @param columnvalue the value to be used in the filter
      * @param emclass the associated entity manager class
      */
-    @SuppressWarnings("LeakingThisInConstructor")
-    public EntityReferenceFilterSet(String name, String columnname, Object columnvalue, Class<? extends EntityManager> emclass) {
-        super(name,emclass);
+    public EntitySortedReferenceFilterSet(String name, Comparator<E> comparator, String columnname, Object columnvalue, Class<? extends EntityManager> emclass) {
+        super(name, comparator, emclass);
         this.columnvalue = columnvalue;
         this.columnname = columnname;
     }
@@ -57,4 +57,6 @@ public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends
     protected List<K> getPrimaryKeySet() {
         return epp.find(columnname, columnvalue);
     }
+
+
 }

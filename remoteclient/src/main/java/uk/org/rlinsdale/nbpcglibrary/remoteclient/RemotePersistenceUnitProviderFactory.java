@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProviderFactory;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@ServiceProvider(service = RemotePersistenceUnitProviderFactory.class)
+@ServiceProvider(service = PersistenceUnitProviderFactory.class)
 public class RemotePersistenceUnitProviderFactory implements PersistenceUnitProviderFactory<RemotePersistenceUnitProvider> {
 
     @Override

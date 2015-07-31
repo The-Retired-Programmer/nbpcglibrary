@@ -40,14 +40,16 @@ public class LocalJsonEntityPersistenceProviderFactory implements EntityPersiste
     }
     
     @Override
-    public Class<LocalJsonPersistenceUnitProviderFactory> getPersistenceUnitProviderFactoryClass() {
-        return LocalJsonPersistenceUnitProviderFactory.class;
-    }
-
-    @Override
     public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalJsonPersistenceUnitProvider pup) throws IOException {
             LocalJsonAutoIDEntityPersistenceProvider epp = new LocalJsonAutoIDEntityPersistenceProvider();
             epp.init(entityname, p, pup);
+            return epp;
+    }
+    
+    @Override
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, LocalJsonPersistenceUnitProvider pup, String idx) throws IOException {
+            LocalJsonAutoIDEntityPersistenceProvider epp = new LocalJsonAutoIDEntityPersistenceProvider();
+            epp.init(entityname, idx, p, pup);
             return epp;
     }
 }

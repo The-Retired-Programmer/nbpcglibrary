@@ -39,14 +39,16 @@ public class RemoteEntityPersistenceProviderFactory implements EntityPersistence
     }
 
     @Override
-    public Class<RemotePersistenceUnitProviderFactory> getPersistenceUnitProviderFactoryClass() {
-        return RemotePersistenceUnitProviderFactory.class;
-    }
-
-    @Override
     public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, RemotePersistenceUnitProvider pup) {
           RemoteAutoIDEntityPersistenceProvider epp = new  RemoteAutoIDEntityPersistenceProvider();
             epp.init(entityname, p, pup);
+            return epp;
+    }
+    
+    @Override
+    public EntityPersistenceProvider createEntityPersistenceProvider(String entityname, Properties p, RemotePersistenceUnitProvider pup, String idx) {
+          RemoteAutoIDEntityPersistenceProvider epp = new  RemoteAutoIDEntityPersistenceProvider();
+            epp.init(entityname, idx, p, pup);
             return epp;
     }
 }

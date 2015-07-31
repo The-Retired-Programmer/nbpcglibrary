@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProviderManager;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 
 /**
  * Test for RemoteEntityPersistenceProvider
@@ -54,15 +54,12 @@ public class RemoteEntityPersistenceProviderTest {
      */
     @BeforeClass
     public static void setUpClass() throws IOException {
-        String[] entitynames = new String[]{
-            "Application", "Role", "Permission", "User", "UserRole", "Userpermission"
-        };
         Properties p = new Properties();
         p.setProperty("key", "authentication2");
         p.setProperty("connection", "http://localhost:8080/remoteauthentication2");
         p.setProperty("entitypersistenceprovidertype", "remote");
         p.setProperty("persistenceunitprovidertype", "remote");
-        EntityPersistenceProviderManager.set(p, entitynames);
+        EntityPersistenceProviderManager.init(p);
         instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("authentication2", "Application");
         assertNotNull(instance);
     }

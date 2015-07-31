@@ -19,20 +19,19 @@
 package uk.org.rlinsdale.nbpcglibrary.data.entityreferences;
 
 import java.util.List;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 
 /**
- * Manages the list of Entities. The list of Entities is lazy loaded when
- * required.
+ * Manages the list of Entities - implements a re-orderable entity lists
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <K> the primary Key class
- * @param <E> the eEntity Class
- * @param <P> the parent Entity class
+ * @param <K> the primary key class
+ * @param <E> the Entity Class
+ * @param <P> the parent entity
  */
-public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends EntityReferenceSet<K,E,P> {
+public class EntityIndexedReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends EntityIndexedReferenceSet<K, E, P> {
 
     private final String columnname;
     private final Object columnvalue;
@@ -41,18 +40,16 @@ public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends
      * Constructor.
      *
      * @param name the set name (for reporting)
-     * @param columnname the column name for use in selection equality filter
-     * @param columnvalue the column value for use in the selection equality
-     * filter
+     * @param columnname the column name to be used in filter
+     * @param columnvalue the value to be used in the filter
      * @param emclass the associated entity manager class
      */
-    @SuppressWarnings("LeakingThisInConstructor")
-    public EntityReferenceFilterSet(String name, String columnname, Object columnvalue, Class<? extends EntityManager> emclass) {
-        super(name,emclass);
+    public EntityIndexedReferenceFilterSet(String name, String columnname, Object columnvalue, Class<? extends EntityManager> emclass) {
+        super(name, emclass);
         this.columnvalue = columnvalue;
         this.columnname = columnname;
     }
-    
+
     @Override
     protected List<K> getPrimaryKeySet() {
         return epp.find(columnname, columnvalue);

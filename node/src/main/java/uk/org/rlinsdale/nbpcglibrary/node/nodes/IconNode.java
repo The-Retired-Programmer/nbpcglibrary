@@ -26,7 +26,7 @@ import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityManager;
 import uk.org.rlinsdale.nbpcglibrary.node.ImageFileFinder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import org.openide.cookies.InstanceCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;

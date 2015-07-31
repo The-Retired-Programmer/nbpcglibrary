@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProviderFactory;
  * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-@ServiceProvider(service = LocalMySQLPersistenceUnitProviderFactory.class)
+@ServiceProvider(service = PersistenceUnitProviderFactory.class)
 public class LocalMySQLPersistenceUnitProviderFactory implements PersistenceUnitProviderFactory<LocalMySQLPersistenceUnitProvider> {
 
     @Override

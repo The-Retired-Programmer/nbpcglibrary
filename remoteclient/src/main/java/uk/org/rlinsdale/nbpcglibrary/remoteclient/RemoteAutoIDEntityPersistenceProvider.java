@@ -21,7 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.remoteclient;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
 import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
 

@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 
 /**
  * Entity Manager for an Entity Class.

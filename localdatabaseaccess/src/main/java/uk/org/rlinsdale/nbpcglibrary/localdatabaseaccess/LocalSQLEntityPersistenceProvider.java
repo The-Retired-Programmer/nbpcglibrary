@@ -28,7 +28,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.PersistenceUnitProvider;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 
 /**
  * EntityPersistenceProvider Class for access localSQL databases
@@ -184,7 +184,7 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
                 throw new LogicException("Single row expected");
             }
             EntityFields idxrec = findidx.get(0);
-            return (Integer) idxrec.get("id");
+            return (Integer) idxrec.get("nextidx");
         } catch (SQLException ex) {
             LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "findNextIdx");
             throw new LogicException(ex.getMessage());

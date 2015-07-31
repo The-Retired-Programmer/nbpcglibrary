@@ -30,7 +30,7 @@ import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogicException;
+import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
@@ -67,7 +67,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     private Event<SimpleEventParams> nameChangeEvent;
     private EntityState state = INIT;
     private final String entityname;
-    private final EntityPersistenceProvider<K> epp;
+    protected final EntityPersistenceProvider<K> epp;
     private final Event<PrimaryKeyChangeEventParams<K>> primaryKeyChangeEvent;
     private final EntityManager<K, E, P> em;
     private final EntityStateChangeListener entitystatechangelistener;
@@ -127,12 +127,32 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @return the entity primary key
      */
     public abstract K getPK();
+    
+    /**
+     * Get the entity order index.
+     *
+     * @return the order index
+     */
+    public int getIdx() {
+        return 0;
+    }
+    
+    /**
+     * Set the entity order index.
+     * @param idx the order index
+     */
+    public void setIdx(int idx) {
+    }
 
     final void setState(EntityState state) {
         this.state = state;
     }
 
-    final EntityState getState() {
+    /**
+     * Get the current entity state
+     * @return  the entity state
+     */
+    protected final EntityState getState() {
         return state;
     }
 
@@ -416,7 +436,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 }
                 entityValues(ef);
                 em.removeFromCache((E) this);
-                loader(epp.insert(ef));
+                entityLoad(epp.insert(ef));
                 K newPK = getPK();
                 em.insertIntoCache(newPK, (E) this);
                 primaryKeyChangeEvent.fire(new PrimaryKeyChangeEventParams<>(newPK));
@@ -428,7 +448,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 }
                 entityDiffs(ef);
                 if (!ef.isEmpty()) {
-                    loader(epp.update(getPK(), ef));
+                    entityLoad(epp.update(getPK(), ef));
                 }
                 setState(DBENTITY);
                 break;
@@ -438,6 +458,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 }
         }
         fireStateChange(SAVE, oldState, DBENTITY);
+        fireFieldChangeAtLoad(ALL);
         return true;
     }
 
