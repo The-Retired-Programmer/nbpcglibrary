@@ -1,6 +1,6 @@
 This document refers to release v${project.version}
 
-To access the repository the following statement can be added to your POM:
+To access the repository the following statement can be added to your Settings:
 
     <repository>
         <id>rlinsdale</id>
@@ -13,27 +13,17 @@ To access the repository the following statement can be added to your POM:
 
 and then add any required dependencies into the POM.  An example statement is:
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>uk.org.rlinsdale</groupId>
-                <artifactId>nbpcglibrary</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     ...
     <dependency>
         <artifactId>xxxxx</artifactId>
         <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        <version>${project.version}</version>
     </dependency>
     ...
 
     where xxxxx is one of:
-    common, data, form, icons, mysql, node or topcomponent
+    api, annotations, common, data, form, icons, json, node, topcomponent
+    mysql, localjsonaccess, localdatabaseaccess, remoteclient or remotedb
 
 **Warning:** This repository is not currently indexed,
 so search capabilities from

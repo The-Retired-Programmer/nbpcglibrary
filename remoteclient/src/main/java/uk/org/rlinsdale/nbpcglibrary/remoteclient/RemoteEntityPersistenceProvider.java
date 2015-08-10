@@ -150,7 +150,7 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
     /**
      * Get the primary key - given a provided Json value
      *
-     * @param pkey
+     * @param pkey the primary key
      * @return the primary Key as a Java Object of correct class
      */
     protected abstract K getPK(JsonValue pkey);

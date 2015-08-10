@@ -1,0 +1,94 @@
+<!--
+Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+    Author     : Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8' />
+        <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+        <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+        <title>NBPCG Library  User Documentation</title>
+    </head>
+    <body>
+        <!-- HEADER -->
+        <div>
+            <header class="inverse_centred">
+                <h1 class="headertext">User Documentation        </h1>
+                <h2 class="taglinetext"></h2>
+            </header>
+        </div>
+        <!-- MENU OF LINKS -->
+        <div class="tab_content">
+            <section class="tab_section">
+                <span class="tabtext"><a href="index.html">NBPCG Library Home</a></span>
+            </section>
+        </div>
+        <!-- MAIN CONTENT -->
+        <div class="main_content">
+            <section class="main_section_left">
+                <p>This document refers to release v?.?.??</p>
+
+<p>To access the repository the following statement can be added to your Settings:</p>
+
+<pre><code>&lt;repository&gt;
+    &lt;id&gt;rlinsdale&lt;/id&gt;
+    &lt;name&gt;Richard-Linsdale&lt;/name&gt;
+    &lt;url&gt;http://repository.rlinsdale.org.uk&lt;/url&gt;
+    &lt;snapshots&gt;
+        &lt;enabled&gt;false&lt;/enabled&gt;
+    &lt;/snapshots&gt;
+&lt;/repository&gt;
+</code></pre>
+
+<p>and then add any required dependencies into the POM.  An example statement is:</p>
+
+<pre><code>...
+&lt;dependency&gt;
+    &lt;artifactId&gt;xxxxx&lt;/artifactId&gt;
+    &lt;groupId&gt;uk.org.rlinsdale.nbpcglibrary&lt;/groupId&gt;
+    &lt;version&gt;?.?.??&lt;/version&gt;
+&lt;/dependency&gt;
+...
+
+where xxxxx is one of:
+api, annotations, common, data, form, icons, json, node, topcomponent
+mysql, localjsonaccess, localdatabaseaccess, remoteclient or remotedb
+</code></pre>
+
+<p><strong>Warning:</strong> This repository is not currently indexed,
+so search capabilities from
+your IDE are extremely limited.  It is easier to manually add
+dependencies directly into your POM.</p>
+
+<p>Online Javadoc for this release can be found
+<a href="http://javadoc.rlinsdale.org.uk/nbpcglibrary/v?/index.html">here</a>,
+whilst a downloadable jar file containing the same Javadoc is available from
+<a href="http://repository.rlinsdale.org.uk/uk/org/rlinsdale/nbpcglibrary/?.?.??/nbpcglibrary-?.?.??-javadoc.jar">here</a></p>
+
+
+            </section>
+        </div>
+        <!-- FOOTER  -->
+        <div>
+            <footer class="inverse_centred">
+                <span class="footertext">NBPCG Library  created and maintained by <a href="http://www.rlinsdale.org.uk">Richard Linsdale</a> &COPY;</span>
+            </footer>
+        </div>
+    </body>
+</html>
