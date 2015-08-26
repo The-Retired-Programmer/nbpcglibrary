@@ -4,15 +4,26 @@
     
     <parent>
         <groupId>uk.org.rlinsdale.poms</groupId>
-        <artifactId>nb-library-parent</artifactId>
-        <version>1.0.5</version>
+        <artifactId>nb-library</artifactId>
+        <version>2.0.0</version>
     </parent>
     
     <groupId>uk.org.rlinsdale</groupId>
     <artifactId>nbpcglibrary</artifactId>
-    <version>3.1.7</version>
+    <version>3.1.8</version>
     <packaging>pom</packaging>
     <name>NBPCG Library</name>
+    
+    <properties>
+        <javaSource>1.8</javaSource>
+        <javaTarget>1.8</javaTarget>
+        <netbeans.version>RELEASE801</netbeans.version>
+        <release>3</release>
+        <brandingToken>nbpcglibrary</brandingToken>
+        <javadocname>nbpcglibrary</javadocname>
+        <javadoctitle>NBPCG Library</javadoctitle>
+        <ghpagesroot>nbpcglibrary</ghpagesroot>
+    </properties>
     
     <modules>
         <module>api</module>

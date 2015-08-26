@@ -3,14 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>uk.org.rlinsdale.poms</groupId>
-        <artifactId>nb-library-module</artifactId>
-        <version>1.0.5</version>
+        <groupId>uk.org.rlinsdale</groupId>
+        <artifactId>nbpcglibrary</artifactId>
+        <version>3.1.8</version>
     </parent>
 
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>api</artifactId>
-    <version>3.1.7</version>
     <packaging>nbm</packaging>
 
     <name>NBPCG API Library</name>
@@ -20,6 +19,7 @@
         <dependency>
             <artifactId>org-openide-util-lookup</artifactId>
             <groupId>org.netbeans.api</groupId>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <artifactId>json</artifactId>
