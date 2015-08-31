@@ -74,7 +74,6 @@ public class GridBagPanel extends JPanel {
         if (borderTitle != null) {
             setBorder(new TitledBorder(borderTitle));
         }
-        this.setBackground(Color.LIGHT_GRAY);
     }
 
     /**

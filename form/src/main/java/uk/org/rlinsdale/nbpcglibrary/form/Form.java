@@ -113,7 +113,6 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
         if (fieldsdef != null) {
             LogBuilder.writeLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
             fieldsdefs.add(fieldsdef);
-            addRow(fieldsdef.getErrorMarkerRow());
             fieldsdef.getFields().stream().forEach((field) -> {
                 addRow(field.getComponents());
             });
