@@ -29,7 +29,7 @@ import uk.org.rlinsdale.nbpcglibrary.json.JsonConversionException;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> the entity class
  */
-public interface BasicEntity<T extends BasicEntity> {
+public abstract class BasicEntity<T extends BasicEntity> {
 
     /**
      * set a field.
@@ -38,7 +38,7 @@ public interface BasicEntity<T extends BasicEntity> {
      * @param value the value to insert
      * @throws JsonConversionException if parsing problems
      */
-    public void setField(String key, JsonValue value) throws JsonConversionException;
+    public abstract void setField(String key, JsonValue value) throws JsonConversionException;
 
     /**
      * Write a field to the JsonObject
@@ -47,21 +47,21 @@ public interface BasicEntity<T extends BasicEntity> {
      * @param key the name of the field
      * @throws JsonConversionException if parsing problems
      */
-    public void writeField(JsonGenerator generator, String key) throws JsonConversionException;
+    public abstract void writeField(JsonGenerator generator, String key) throws JsonConversionException;
 
     /**
      * Write the primary Key value to the JsonArray
      *
      * @param generator the JsonGenerator being used to build the JsonArray
      */
-    public void writePK(JsonGenerator generator);
+    public abstract void writePK(JsonGenerator generator);
 
     /**
      * Write the primary Key name and value to the JsonObject
      *
      * @param generator the JsonGenerator being used to build the JsonObject
      */
-    public void writePKwithkey(JsonGenerator generator);
+    public abstract void writePKwithkey(JsonGenerator generator);
 
     /**
      * Write all fields as a jsonObject
@@ -69,5 +69,21 @@ public interface BasicEntity<T extends BasicEntity> {
      * @param generator the JsonGenerator being used to build the JsonObject
      * @param label the JsonObject's label
      */
-    public void writeAllFields(JsonGenerator generator, String label);
+    public abstract void writeAllFields(JsonGenerator generator, String label);
+    
+    /**
+     * Set the standard field prior to persisting a newly created entity.
+     * 
+     * @param user the usercode to be attached (as required)
+     */
+    public void setFieldsPreInsert(String user) {
+    }
+    
+    /**
+     * Set the standard field prior to persisting an updated entity.
+     * 
+     * @param user the usercode to be attached (as required)
+     */
+    public void setFieldsPreUpdate(String user) {
+    }
 }

@@ -19,6 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.remoteclient;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -79,12 +80,10 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         List<EntityFields> list = new ArrayList<>();
         try {
             JsonObjectBuilder job = Json.createObjectBuilder();
-            job.add("action", "getall")
-                    .add("entityname", entityname);
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "getall", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote get() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -101,11 +100,9 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
     public final synchronized EntityFields get(K pkey) {
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "get", pkey);
         try {
-            JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "get")
-                    .add("entityname", entityname);
+            JsonObjectBuilder job = Json.createObjectBuilder();
             addPK(job, pkey);
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "get", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote get(pkey) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -128,13 +125,11 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "find");
         try {
             List<K> list = new ArrayList<>();
-            JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "findall")
-                    .add("entityname", entityname);
+            JsonObjectBuilder job = Json.createObjectBuilder();
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "findall", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote find() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -161,14 +156,12 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         try {
             List<EntityFields> list = new ArrayList<>();
             JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "getbyfield")
-                    .add("entityname", entityname)
                     .add("field", parametername);
             JsonUtil.insertValue(job, "value", parametervalue);
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "getbyfield", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote get(field,value) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -187,14 +180,12 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         List<K> list = new ArrayList<>();
         try {
             JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "findbyfield")
-                    .add("entityname", entityname)
                     .add("field", parametername);
             JsonUtil.insertValue(job, "value", parametervalue);
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "findbyfield", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote find(field, value) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -212,14 +203,12 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "getOne", parametername, parametervalue.toString());
         try {
             JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "getbyfield")
-                    .add("entityname", entityname)
                     .add("field", parametername);
             JsonUtil.insertValue(job, "value", parametervalue);
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "getbyfield", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote getOne(field,value) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -239,14 +228,12 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         List<K> list = new ArrayList<>();
         try {
             JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "findbyfield")
-                    .add("entityname", entityname)
                     .add("field", parametername);
             JsonUtil.insertValue(job, "value", parametervalue);
             if (idx != null) {
                 job.add("orderby", idx);
             }
-            JsonArray pkeys = persistenceUnitProvider.executeSingleCommand(job.build()).getJsonArray("pkeys");
+            JsonArray pkeys = persistenceUnitProvider.executeSingleCommand(entityname, "findbyfield", job.build()).getJsonArray("pkeys");
             if (pkeys.size() != 1) {
                 throw new LogicException("Remote findOne(field,value) failed: Single row expected");
             }
@@ -263,10 +250,8 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
             throw new LogicException("findNextIdx() should not be called if the entity is not ordered");
         }
         try {
-            JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "findnextidx")
-                    .add("entityname", entityname);
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObjectBuilder job = Json.createObjectBuilder();
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "findnextidx", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote findNextIdx() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -281,11 +266,9 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "insert", values.toString());
         try {
             JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "create")
-                    .add("entityname", entityname)
                     .add("user", Settings.get("Usercode", "????"));
             addEntity(job, values);
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "create", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote insert(values) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -318,12 +301,10 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "update", pkey, diff.toString());
         try {
             JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "update")
-                    .add("entityname", entityname)
                     .add("user", Settings.get("Usercode", "????"));
             addPK(job, pkey);
             addEntity(job, diff);
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "update", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote update(pkey,values) failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }
@@ -339,11 +320,9 @@ public abstract class RemoteEntityPersistenceProvider<K> implements EntityPersis
     public final synchronized void delete(K pkey) {
         LogBuilder.writeLog("nbpcglib.RemoteEntityPersistenceProvider", this, "delete", pkey);
         try {
-            JsonObjectBuilder job = Json.createObjectBuilder()
-                    .add("action", "delete")
-                    .add("entityname", entityname);
+            JsonObjectBuilder job = Json.createObjectBuilder();
             addPK(job, pkey);
-            JsonObject reply = persistenceUnitProvider.executeSingleCommand(job.build());
+            JsonObject reply = persistenceUnitProvider.executeSingleCommand(entityname, "delete", job.build());
             if (!reply.getBoolean("success")) {
                 throw new LogicException("Remote delete() failed: " + reply.getString("message") + "; " + reply.getString("exceptionmessage", ""));
             }

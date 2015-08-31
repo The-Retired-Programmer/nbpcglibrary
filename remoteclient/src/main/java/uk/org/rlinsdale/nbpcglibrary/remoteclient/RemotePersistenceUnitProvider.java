@@ -66,14 +66,16 @@ public class RemotePersistenceUnitProvider implements PersistenceUnitProvider {
      * Execute Single Command - send a single command to executed by remote data
      * source.
      *
+     * @param tablename the name of the table to be accessed
+     * @param action the action request on that table
      * @param request the command object
      * @return the response object
      * @throws IOException if problems with parsing command data or problems
      * executing the command
      */
-    public synchronized JsonObject executeSingleCommand(JsonObject request) throws IOException {
+    public synchronized JsonObject executeSingleCommand(String tablename, String action, JsonObject request) throws IOException {
         JsonStructure res = null;
-        HttpPost httpPost = new HttpPost(url);
+        HttpPost httpPost = new HttpPost(url+tablename+"/"+action);
         httpPost.setEntity(new StringEntity(request.toString(), APPLICATION_JSON));
         try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
             if (response.getStatusLine().getStatusCode() == 200) {

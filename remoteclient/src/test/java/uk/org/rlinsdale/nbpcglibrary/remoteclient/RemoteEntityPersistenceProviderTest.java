@@ -56,7 +56,7 @@ public class RemoteEntityPersistenceProviderTest {
     public static void setUpClass() throws IOException {
         Properties p = new Properties();
         p.setProperty("key", "authentication2");
-        p.setProperty("connection", "http://localhost:8080/remoteauthentication2");
+        p.setProperty("connection", "http://localhost:8080/authentication/");
         p.setProperty("entitypersistenceprovidertype", "remote");
         p.setProperty("persistenceunitprovidertype", "remote");
         EntityPersistenceProviderManager.init(p);
@@ -116,6 +116,18 @@ public class RemoteEntityPersistenceProviderTest {
     }
 
     /**
+     * Test of get method, of class RemoteEntityPersistenceProvider.
+     *
+     * @throws Exception if problems
+     */
+    @Test
+    public void testGet() throws Exception {
+        System.out.println("get");
+        List<EntityFields> result = instance.get();
+        System.out.println(result.toString());
+        assertEquals(27, result.size());
+    }
+    /**
      * Test of find method, of class RemoteEntityPersistenceProvider.
      *
      * @throws Exception if problems
@@ -142,6 +154,21 @@ public class RemoteEntityPersistenceProviderTest {
         EntityFields ef = result.get(0);
         assertEquals(46, ef.get("id"));
     }
+    
+    /**
+     * Test of find method, of class RemoteEntityPersistenceProvider.
+     *
+     * @throws Exception if problems
+     */
+    @Test
+    public void testFind_String_JsonValue() throws Exception {
+        System.out.println("find");
+        List<Integer> result = instance.find("application", "JsonApp83");
+        System.out.println(result.toString());
+        assertEquals(1, result.size());
+        int id = result.get(0);
+        assertEquals(46, id);
+    }
 
     /**
      * Test of getOne method, of class RemoteEntityPersistenceProvider.
@@ -153,6 +180,18 @@ public class RemoteEntityPersistenceProviderTest {
         System.out.println("getOne");
         EntityFields result = instance.getOne("application", "JsonApp83");
         assertEquals(46, result.get("id"));
+    }
+    
+    /**
+     * Test of getOne method, of class RemoteEntityPersistenceProvider.
+     *
+     * @throws Exception if problems
+     */
+    @Test
+    public void testFindOne() throws Exception {
+        System.out.println("findOne");
+        int id = (int) instance.findOne("application", "JsonApp83");
+        assertEquals(46, id);
     }
     
     /**

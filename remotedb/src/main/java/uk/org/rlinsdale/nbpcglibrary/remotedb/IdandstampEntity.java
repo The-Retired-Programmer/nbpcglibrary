@@ -18,6 +18,11 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.remotedb;
 
+import javax.json.JsonObject;
+import javax.json.stream.JsonGenerator;
+import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
+import uk.org.rlinsdale.nbpcglibrary.json.JsonUtil;
+
 /**
  * The Additional interface needed for an entity which is implements a standard
  * Id and timeStamp fields.
@@ -25,47 +30,84 @@ package uk.org.rlinsdale.nbpcglibrary.remotedb;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> the entity class
  */
-public interface IdandstampEntity<T extends IdandstampEntity> extends BasicEntity<T> {
+public abstract class IdandstampEntity<T extends IdandstampEntity> extends BasicEntity<T> {
 
     /**
      * Get the entity Id (primary key value)
      *
      * @return the entity Id
      */
-    public Integer getId();
+    public abstract Integer getId();
     
     /**
      * Set the entity Id (primary key value)
      *
      * @param id the entity Id
      */
-    public void setId(Integer id);
+    public abstract void setId(Integer id);
 
     /**
      * Set the createdby field
      *
      * @param usercode the value
      */
-    public void setCreatedby(String usercode);
+    public abstract void setCreatedby(String usercode);
 
     /**
      * set the updatedby field
      *
      * @param usercode the value
      */
-    public void setUpdatedby(String usercode);
+    public abstract void setUpdatedby(String usercode);
 
     /**
      * set the createdon field
      *
      * @param timestamp the value
      */
-    public void setCreatedon(String timestamp);
+    public abstract void setCreatedon(String timestamp);
 
     /**
      * set the updatedon field
      *
      * @param timestamp the value
      */
-    public void setUpdatedon(String timestamp);
+    public abstract void setUpdatedon(String timestamp);
+    
+    
+    @Override
+    public void writePK(JsonGenerator generator) {
+        JsonUtil.writeIntegerValue(generator, getId());
+    }
+
+    @Override
+    public void writePKwithkey(JsonGenerator generator) {
+        JsonUtil.writeIntegerValue(generator, "pkey", getId());
+    }
+
+    @Override
+    public void setFieldsPreInsert(String user) {
+        setId(0);
+        setCreatedby(user);
+        setUpdatedby(user);
+        String when = (new Timestamp()).toSQLString();
+        setCreatedon(when);
+        setUpdatedon(when);
+    }
+    
+    @Override
+    public void setFieldsPreUpdate(String user) {
+        setUpdatedby(user);
+        String when = (new Timestamp()).toSQLString();
+        setUpdatedon(when);
+    }
+    
+    
+    public static Integer getPK(JsonObject command) {
+        return command.getInt("pkey");
+    }
+
+    public static void writePK(JsonGenerator generator, Integer pkey) {
+        generator.write("pkey", pkey);
+    }
 }
