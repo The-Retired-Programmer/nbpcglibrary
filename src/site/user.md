@@ -1,3 +1,8 @@
+{::comment define doc.title=NBPCG Library User Documentation /}
+{::comment define doc.header= User Documentation /}
+{::comment define doc.name = NBPCG Library /}
+{::comment define doc.menu.menu = [NBPCG Library Home](index.html) /}
+
 This document refers to release v${project.version}
 
 To access the repository the following statement can be added to your Settings:
