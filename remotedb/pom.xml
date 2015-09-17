@@ -3,12 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>uk.org.rlinsdale</groupId>
-        <artifactId>nbpcglibrary</artifactId>
+        <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        <artifactId>parent</artifactId>
         <version>3.1.8</version>
     </parent>
 
-    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>remotedb</artifactId>
     <packaging>jar</packaging>
 
@@ -39,19 +38,4 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-    
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>nbm-maven-plugin</artifactId>
-                <configuration>
-                    <publicPackages>
-                        <publicPackage>uk.org.rlinsdale.nbpcglibrary.remotedb</publicPackage>
-                    </publicPackages>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

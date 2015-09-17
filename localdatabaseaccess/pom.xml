@@ -3,12 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     
    <parent>
-        <groupId>uk.org.rlinsdale</groupId>
-        <artifactId>nbpcglibrary</artifactId>
+        <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        <artifactId>parent</artifactId>
         <version>3.1.8</version>
     </parent>
 
-    <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>localdatabaseaccess</artifactId>
     <packaging>nbm</packaging>
 
