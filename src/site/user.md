@@ -1,7 +1,7 @@
-{::comment define doc.title=NBPCG Library User Documentation /}
-{::comment define doc.header= User Documentation /}
-{::comment define doc.name = NBPCG Library /}
-{::comment define doc.menu.menu = [NBPCG Library Home](index.html) /}
+{::comment} define doc.title=NBPCG Library User Documentation {:/comment}
+{::comment} define doc.header= User Documentation {:/comment}
+{::comment} define doc.name = NBPCG Library {:/comment}
+{::comment} define doc.menu.menu = [NBPCG Library Home](index.html) {:/comment}
 
 This document refers to release v${project-version}
 
