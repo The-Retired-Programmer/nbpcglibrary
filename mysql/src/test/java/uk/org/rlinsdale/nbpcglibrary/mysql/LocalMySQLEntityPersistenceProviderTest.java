@@ -126,7 +126,7 @@ public class LocalMySQLEntityPersistenceProviderTest {
     public void testFind() throws Exception {
         System.out.println("find");
         List<Integer> result = instance.find();
-        assertEquals(27, result.size());
+        assertEquals(28, result.size());
     }
 
     /**

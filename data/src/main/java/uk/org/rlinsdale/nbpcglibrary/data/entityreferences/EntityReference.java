@@ -78,7 +78,6 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         titleListener = listener;
     }
 
-    
     /**
      * Constructor.
      *
@@ -107,7 +106,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         this(name, pk, em);
         titleListener = listener;
     }
-    
+
     /**
      * Constructor.
      *
@@ -176,7 +175,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         if (pk == null) {
             return set();
         }
-            boolean updated = (this.pk == null || !this.pk.equals(pk));
+        boolean updated = (this.pk == null || !this.pk.equals(pk));
         if (updated) {
             E old = get();
             if (old != null && titleListener != null) {

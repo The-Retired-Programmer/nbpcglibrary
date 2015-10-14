@@ -40,6 +40,15 @@ public class Timestamp {
     public Timestamp() {
         date = new Date();
     }
+    
+    /**
+     * Constructor
+     *
+     * @param date the initial value of the timestamp
+     */
+    public Timestamp(Date date) {
+        this.date = date;
+    }
 
     /**
      * Constructor

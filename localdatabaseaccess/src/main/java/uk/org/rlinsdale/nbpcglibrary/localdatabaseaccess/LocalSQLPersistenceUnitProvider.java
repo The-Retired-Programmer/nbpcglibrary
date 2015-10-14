@@ -242,8 +242,16 @@ public abstract class LocalSQLPersistenceUnitProvider implements PersistenceUnit
                 case BIT:
                     ef.put(meta.getColumnName(i), rs.getBoolean(i));
                     break;
+                case BIGINT:
+                    ef.put(meta.getColumnName(i), rs.getLong(i));
+                    break;
                 default:
-                    ef.put(meta.getColumnName(i), rs.getInt(i));
+                    int val = rs.getInt(i);
+                    if (rs.wasNull()) {
+                        ef.put(meta.getColumnName(i), null);
+                    } else {
+                        ef.put(meta.getColumnName(i), val);
+                    }
             }
         }
         return ef;
