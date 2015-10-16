@@ -36,7 +36,7 @@ import uk.org.rlinsdale.nbpcglibrary.icons.SpecialIcons;
  */
 public abstract class CoreEntity extends Rules implements HasInstanceDescription {
 
-    private final String iconname;
+    private String iconname;
     private final InstanceContent lookupcontent;
     private final Lookup lookup;
 
@@ -51,6 +51,10 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
         this.iconname = iconname;
         lookupcontent = new InstanceContent();
         lookup = new AbstractLookup(lookupcontent);
+    }
+    
+    public void setIcon(String iconname) {
+        this.iconname = iconname;
     }
     
     /**

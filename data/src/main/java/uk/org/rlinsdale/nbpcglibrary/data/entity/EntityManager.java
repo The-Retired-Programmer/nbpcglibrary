@@ -155,15 +155,15 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @return the created entity
      */
     abstract protected E createNewEntity();
-    
+
     /**
      * Test if given primary key is transient or persistent
-     * 
+     *
      * @param pkey the primary key value
      * @return true if persistent primary key
      */
     abstract protected boolean isPersistent(K pkey);
-    
+
     /**
      * Create an Entity. Does not load entity data into the entity. this will be
      * initialise with its primary key initially.
@@ -225,7 +225,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
         transientCache.put(pk, e);
         return e;
     }
-
+    
     /**
      * Create a new entity (initialised) and link it as child of a parent
      * entity.
@@ -238,7 +238,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
         link2parent(e, parent);
         return e;
     }
-
+    
     /**
      * Create a new entity, copy it's field from another entity and link it as
      * child of a parent entity.
@@ -252,7 +252,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
         e.copy(from);
         return e;
     }
-
+    
     /**
      * Get the EntityPersistenceProvider for this Entity Class.
      *
