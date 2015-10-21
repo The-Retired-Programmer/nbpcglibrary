@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,10 +18,14 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.node.nodes;
 
+import java.awt.EventQueue;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
-import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import org.openide.nodes.ChildFactory;
+import org.openide.util.Lookup;
+import org.openide.util.Lookup.Result;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
+import uk.org.rlinsdale.nbpcglibrary.api.ApplicationLookup;
+import uk.org.rlinsdale.nbpcglibrary.api.InhibitExplorerRefresh;
 
 /**
  * Root ChildFactory support
@@ -29,47 +33,32 @@ import org.openide.nodes.ChildFactory;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Parent CoreEntity Class
  */
-public abstract class RootChildFactory<E extends CoreEntity> extends ChildFactory<CoreEntity> {
+public abstract class RootChildFactory<E extends CoreEntity> extends CoreChildFactory<E> implements LookupListener, Runnable {
 
-    private final E parentEntity;
+    private final Result<InhibitExplorerRefresh> applkprefreshresult;
 
     /**
      * Constructor
      *
      * @param parentEntity the parent entity
      */
+    @SuppressWarnings("LeakingThisInConstructor")
     public RootChildFactory(E parentEntity) {
-        this.parentEntity = parentEntity;
+        super(parentEntity);
+        Lookup applkp = ApplicationLookup.getDefault();
+        applkprefreshresult = applkp.lookupResult(InhibitExplorerRefresh.class);
+        applkprefreshresult.addLookupListener(this);
     }
 
-    /**
-     * Get the parent entity.
-     *
-     * @return the parent entity
-     */
-    public E getParentEntity() {
-        return parentEntity;
-    }
-
-    /**
-     * get Change listener for the child entity set.
-     *
-     * @param name the name of the listener (for reporting/logging)
-     * @return  the required listener
-     */
-    public Listener<SetChangeEventParams> getSetChangeListener(String name) {
-        return new ChildSetChangeListener(name);
-    }
-
-    private class ChildSetChangeListener extends Listener<SetChangeEventParams> {
-
-        public ChildSetChangeListener(String name) {
-            super(name);
+    @Override
+    public void resultChanged(LookupEvent e) {
+        if (applkprefreshresult.allClasses().isEmpty()) {
+            EventQueue.invokeLater(this);
         }
+    }
 
-        @Override
-        public void action(SetChangeEventParams p) {
-            refresh(true);
-        }
+    @Override
+    public void run() {
+        refresh(true);
     }
 }

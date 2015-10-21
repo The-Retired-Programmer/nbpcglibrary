@@ -26,6 +26,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
+import static uk.org.rlinsdale.nbpcglibrary.common.Event.ListenerMode.IMMEDIATE;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 
@@ -120,7 +121,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         pkListener = new PrimaryKeyListener(name);
         this.pk = e.getPK();
         if (!e.isPersistent()) {
-            e.addPrimaryKeyListener(pkListener);
+            e.addPrimaryKeyListener(pkListener, IMMEDIATE);
         }
         saveState();
     }
@@ -153,11 +154,12 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
     public boolean set() {
         if (pk != null) {
             LogBuilder.writeLog("nbpcglibrary.data", this, "set");
-            E old = get();
+            E old = getNoLoad();
             if (old != null && titleListener != null) {
                 old.removeTitleListener(titleListener);
                 Event.fireSimpleEventParamsListener(titleListener);
             }
+            pk = null;
             return true;
         }
         return false;
@@ -253,11 +255,11 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * Test if this entity has been changed (ie Id is dirty). This could occur
      * when an entity has been inserted into an entity store and received a new
      * valid Id.
-     *
+     * 
      * @return true if changed
      */
     public boolean isDirty() {
-        return !pk.equals(savePK);
+        return pk != savePK;
     }
 
     /**

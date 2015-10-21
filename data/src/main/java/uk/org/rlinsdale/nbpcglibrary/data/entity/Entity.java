@@ -127,7 +127,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @return the entity primary key
      */
     public abstract K getPK();
-    
+
     /**
      * Get the entity order index.
      *
@@ -136,9 +136,10 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     public int getIdx() {
         return 0;
     }
-    
+
     /**
      * Set the entity order index.
+     *
      * @param idx the order index
      */
     public void setIdx(int idx) {
@@ -150,7 +151,8 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
 
     /**
      * Get the current entity state
-     * @return  the entity state
+     *
+     * @return the entity state
      */
     protected final EntityState getState() {
         return state;
@@ -426,7 +428,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         EntityState oldState = getState();
         switch (oldState) {
             case DBENTITY:
-                return true; //we don't need to do anything as this is a straight copy of a db entity
+                return true;
             case REMOVED:
                 return false;
             case NEW:
@@ -520,6 +522,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                     savable.remove();
                     break;
                 case SAVE:
+                    savable.remove();
                     break;
                 case REMOVE:
                     savable.remove();
@@ -560,9 +563,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         @Override
         protected void handleSave() throws IOException {
             LogBuilder.writeLog("nbpcglibrary.data", this, "handleSave");
-            if (Entity.this.save()) {
-                removeLookupContent(this);
-            } else {
+            if (!Entity.this.save()) {
                 EventQueue.invokeLater(new ReRegister());
                 LibraryOnStop.incRegisterOutstanding();
             }

@@ -32,7 +32,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
  * @param <E> the Parent Entity Class
  * @param <P> The Parent of Parent Entity Class
  */
-public abstract class BasicChildFactory<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends RootChildFactory<E> {
+public abstract class BasicChildFactory<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends CoreChildFactory<E> {
 
     private final EntityReference<K, E, P> parentref;
 

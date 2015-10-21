@@ -63,12 +63,12 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode imple
      * @param cf the childfactory
      * @param allowedDataFlavors allowed dataflavours that can be pasted
      */
-    protected BasicNode(RootChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
+    protected BasicNode(CoreChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
         this(new InstanceContent(), cf, allowedDataFlavors);
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private BasicNode(InstanceContent content, RootChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
+    private BasicNode(InstanceContent content, CoreChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
         super(Children.create(cf, true), new AbstractLookup(content));
         this.content = content;
         this.allowedDataFlavors = allowedDataFlavors;

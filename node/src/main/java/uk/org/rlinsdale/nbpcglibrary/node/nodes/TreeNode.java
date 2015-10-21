@@ -23,6 +23,7 @@ import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import org.openide.util.Lookup;
 import org.openide.util.datatransfer.ExTransferable;
+import static uk.org.rlinsdale.nbpcglibrary.common.Event.ListenerMode.IMMEDIATE;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
@@ -103,7 +104,7 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
         e.addFieldListener(fieldListener = new EntityFieldChangeListener(desc));
         e.addNameListener(nameListener = new EntityNameChangeListener(desc));
         if (!e.isPersistent()) {
-            e.addPrimaryKeyListener(new PrimaryKeyListener(desc));
+            e.addPrimaryKeyListener(new PrimaryKeyListener(desc), IMMEDIATE);
         }
     }
 
