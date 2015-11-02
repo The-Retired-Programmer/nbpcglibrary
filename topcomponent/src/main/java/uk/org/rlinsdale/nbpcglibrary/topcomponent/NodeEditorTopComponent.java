@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.logging.Level;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.form.Form;
 import org.openide.windows.TopComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
@@ -39,9 +40,8 @@ import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNode;
  * @param <P> the parent entity class
  * @param <F> the fields enum for this entity
  */
-public abstract class NodeEditorTopComponent<K, E extends Entity<K,E,P,F>, P extends CoreEntity, F> extends TopComponent {
+public abstract class NodeEditorTopComponent<K, E extends Entity<K,E,P,F>, P extends CoreEntity, F> extends DisplayTopComponent {
 
-    private final String name;
     private boolean abandon = false;
     private EntityStateChangeListener statechangelistener;
 
@@ -64,38 +64,9 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K,E,P,F>, P ext
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public NodeEditorTopComponent(TreeNode<K, E, P, F> node, String name, String hint) {
-        LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, node, name, hint);
-        setName(name);
-        setToolTipText(hint);
-        this.name = name;
+        super(name,hint);
         this.node = node;
     }
-
-    /**
-     * Open the Topcomponent and make it visible.
-     */
-    public void visible() {
-        open();
-        requestActive();
-    }
-
-    @Override
-    public void componentOpened() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentOpened")
-                .addMsg("TopComponent is {0})", this).write();
-        entity = node.getEntity();
-        entity.addStateListener(statechangelistener = new EntityStateChangeListener("TopComponent:" + entity.instanceDescription()));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(getForm());
-
-    }
-
-    /**
-     * Get the form being displayed on this editor.
-     *
-     * @return the form
-     */
-    protected abstract Form getForm();
 
     @Override
     public boolean canClose() {
@@ -110,25 +81,17 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K,E,P,F>, P ext
     protected abstract boolean canCloseForm();
 
     @Override
-    public void componentClosed() {
-        LogBuilder.create("nbpcglibrary.topcomponent", Level.FINE).addMethodName(this, "componentClosed")
-                .addMsg("TopComponent is {0})", this).write();
-        remove(dropForm());
-        entity = null;
+    protected void opened() {
+        entity = node.getEntity();
+        entity.addStateListener(statechangelistener = new EntityStateChangeListener("TopComponent:" + entity.instanceDescription()));
     }
-
+    
     @Override
-    public String toString() {
-        return name;
+    protected void closed() {
+        entity = null;
+        statechangelistener = null;
     }
-
-    /**
-     * Drop the form
-     *
-     * @return the form
-     */
-    protected abstract Form dropForm();
-
+    
     private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
 
         public EntityStateChangeListener(String name) {

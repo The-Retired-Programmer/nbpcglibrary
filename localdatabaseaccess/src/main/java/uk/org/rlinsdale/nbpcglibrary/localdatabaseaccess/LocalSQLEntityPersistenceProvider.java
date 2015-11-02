@@ -184,7 +184,7 @@ public abstract class LocalSQLEntityPersistenceProvider<K> implements EntityPers
                 throw new LogicException("Single row expected");
             }
             EntityFields idxrec = findidx.get(0);
-            return (Integer) idxrec.get("nextidx");
+            return ((Long) idxrec.get("nextidx")).intValue();
         } catch (SQLException ex) {
             LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "findNextIdx");
             throw new LogicException(ex.getMessage());

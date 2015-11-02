@@ -154,10 +154,12 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
     public boolean set() {
         if (pk != null) {
             LogBuilder.writeLog("nbpcglibrary.data", this, "set");
-            E old = getNoLoad();
-            if (old != null && titleListener != null) {
-                old.removeTitleListener(titleListener);
-                Event.fireSimpleEventParamsListener(titleListener);
+            if (titleListener != null) {
+                E old = getNoLoad();
+                if (old != null) {
+                    old.removeTitleListener(titleListener);
+                    Event.fireSimpleEventParamsListener(titleListener);
+                }
             }
             pk = null;
             return true;
@@ -179,18 +181,23 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         }
         boolean updated = (this.pk == null || !this.pk.equals(pk));
         if (updated) {
-            E old = get();
-            if (old != null && titleListener != null) {
-                old.removeTitleListener(titleListener);
-            }
-            this.pk = pk;
-            E e = em.get(pk);
-            this.entityreference = e == null ? null : new WeakReference<>(e);
             if (titleListener != null) {
-                if (e != null) {
-                    e.addTitleListener(titleListener);
+                E old = getNoLoad();
+                if (old != null) {
+                    old.removeTitleListener(titleListener);
                 }
-                Event.fireSimpleEventParamsListener(titleListener);
+                this.pk = pk;
+                E e = em.get(pk);
+                this.entityreference = e == null ? null : new WeakReference<>(e);
+                if (titleListener != null) {
+                    if (e != null) {
+                        e.addTitleListener(titleListener);
+                    }
+                    Event.fireSimpleEventParamsListener(titleListener);
+                }
+            } else {
+                this.pk = pk;
+                this.entityreference = null;
             }
         }
         return updated;
