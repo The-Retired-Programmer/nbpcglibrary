@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
+import java.awt.EventQueue;
 import javax.swing.ActionMap;
 import javax.swing.GroupLayout;
 import javax.swing.JScrollPane;
@@ -105,13 +106,40 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
     public String toString() {
         return topComponentName;
     }
+    
+    /**
+     * Reset the RootContext node (and refresh display)
+     * 
+     * @param rootcontext the new Root Context node
+     */
+    public void resetRootContextNode(AbstractNode rootcontext){
+         if (EventQueue.isDispatchThread()) {
+            em.setRootContext(rootcontext);
+        } else {
+            EventQueue.invokeLater(new SetRootContext(rootcontext));
+        }
+    }
+    
+    private class SetRootContext implements Runnable {
+
+        private final AbstractNode rootcontext;
+
+        public SetRootContext(AbstractNode rootcontext) {
+            this.rootcontext = rootcontext;
+        }
+
+        @Override
+        public void run() {
+             em.setRootContext(rootcontext);
+        }
+    }
 
     /**
      * Get the Root Node
      *
      * @return the root node
      */
-    public abstract AbstractNode getRootContextNode();
+    public abstract Node getRootContextNode();
 
     /**
      * Drop the Root Node
