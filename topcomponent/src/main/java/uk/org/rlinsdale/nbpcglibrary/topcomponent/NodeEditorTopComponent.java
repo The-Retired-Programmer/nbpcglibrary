@@ -66,6 +66,7 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K,E,P,F>, P ext
     public NodeEditorTopComponent(TreeNode<K, E, P, F> node, String name, String hint) {
         super(name,hint);
         this.node = node;
+        entity = node.getEntity();
     }
 
     @Override

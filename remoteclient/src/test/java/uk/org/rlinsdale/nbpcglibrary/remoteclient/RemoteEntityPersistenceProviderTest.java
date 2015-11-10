@@ -125,7 +125,7 @@ public class RemoteEntityPersistenceProviderTest {
         System.out.println("get");
         List<EntityFields> result = instance.get();
         System.out.println(result.toString());
-        assertEquals(28, result.size());
+        assertEquals(29, result.size());
     }
     /**
      * Test of find method, of class RemoteEntityPersistenceProvider.
@@ -137,7 +137,7 @@ public class RemoteEntityPersistenceProviderTest {
         System.out.println("find");
         List<Integer> result = instance.find();
         System.out.println(result.toString());
-        assertEquals(28, result.size());
+        assertEquals(29, result.size());
     }
 
     /**
