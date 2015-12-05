@@ -18,113 +18,85 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
 
 /**
- * A Field to select a string from a setField of values (implemented as a
- * ComboBox)
+ * A Field to select choice combobox
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <T> type of the data to be represented and selected in the combo box
  */
-public class ChoiceField extends EditableField<String> {
+public abstract class ChoiceField<T> extends EditableField<T> {
 
     /**
      * The undefined text as displayed in a choice field
      */
-    public final static String UNDEFINED = "...";
-    private List<String> choices;
-    private final JComboBox<String> combobox;
-    private final ChoiceFieldBackingObject backingObject;
+//    public final static String UNDEFINED = "...";
+    private List<T> choices = new ArrayList<>();
+    private final JComboBox<T> combobox;
     private final boolean nullSelectionAllowed;
 
     /**
      * Constructor
      *
-     * @param backingObject the backing Object
      * @param label the label text for the field
+     * @param nullSelectionAllowed true if a null selection item is to be added
+     * to the choice items
      */
-    public ChoiceField(ChoiceFieldBackingObject backingObject, String label) {
-        this(backingObject, label, new JComboBox<>(), false);
-    }
-    
-    /**
-     * Constructor
-     *
-     * @param backingObject the backing Object
-     * @param label the label text for the field
-     * @param nullSelectionAllowed true if a null selection item is to be added to the choice items
-     */
-    public ChoiceField(ChoiceFieldBackingObject backingObject, String label, boolean nullSelectionAllowed) {
-        this(backingObject, label, new JComboBox<>(), nullSelectionAllowed);
+    protected ChoiceField(String label, boolean nullSelectionAllowed) {
+        this(label, new JComboBox<>(), nullSelectionAllowed);
     }
 
-    private ChoiceField(ChoiceFieldBackingObject backingObject, String label, JComboBox<String> combobox, boolean nullSelectionAllowed) {
-        super(backingObject, label, combobox, null);
-        this.backingObject = backingObject;
+    private ChoiceField(String label, JComboBox<T> combobox, boolean nullSelectionAllowed) {
+        super(label, combobox, null);
         this.combobox = combobox;
         this.nullSelectionAllowed = nullSelectionAllowed;
         combobox.setEditable(false);
-        updateChoicesFromBackingObject(backingObject.get());
+        combobox.addActionListener(getActionListener());
     }
 
     /**
-     * Get the choices
-     * 
-     * @return list of choice texts
+     * Request that the values in the combo box are updated from the source.
      */
-    protected List<String> getChoicesText() {
-        return backingObject.getChoices();
-    }
-
-    @Override
-    final String get() {
-        return combobox.getItemAt(combobox.getSelectedIndex());
-    }
-
-    @Override
-    void updateIfChange(String value) {
-        if ((value != null) && (!value.equals(lastvaluesetinfield)) && (nullSelectionAllowed || !value.equals(UNDEFINED))) {
-            setField(value);
-            backingObject.set(value);
-        }
-    }
-
-    /**
-     * request that the choices for the field are updated from the values in the
-     * Backing Object
-     */
-    public final void updateChoicesFromBackingObject() {
-        updateChoicesFromBackingObject(lastvaluesetinfield);
-    }
-    
-    private void updateChoicesFromBackingObject(String value){
-        choices = getChoicesText();
+    protected void updateChoicesFromSource() {
+        choices = getSourceChoices();
         preFieldUpdateAction();
-        setField(value);
+        updateFieldFromSource(true);
         postFieldUpdateAction();
     }
 
     /**
      * hook to allow actions to take place before updating a combobox
      */
-    public void preFieldUpdateAction() {
+    protected void preFieldUpdateAction() {
     }
 
     /**
      * hook to allow actions to take place after updating a combobox
      */
-    public void postFieldUpdateAction() {
+    protected void postFieldUpdateAction() {
     }
-    
 
     @Override
-    void set(String value) {
+    protected final T getFieldValue() {
+        return combobox.getItemAt(combobox.getSelectedIndex());
+    }
+
+//    @Override
+//    protected final void updateIfChange(T value) {
+//        if ((value != null) && (!value.equals(lastvaluesetinfield)) && (nullSelectionAllowed || !value.equals(UNDEFINED))) {
+//            setSourceValue(value);
+//            backingObject.set(value);
+//        }
+//    }
+    @Override
+    protected final void setFieldValue(T value) {
         boolean selected = false;
         combobox.removeAllItems();
         if (choices != null) {
-            for (String item : choices) {
+            for (T item : choices) {
                 combobox.addItem(item);
                 if (item.equals(value)) {
                     combobox.setSelectedItem(item);
@@ -133,21 +105,31 @@ public class ChoiceField extends EditableField<String> {
             }
         }
         if (!selected || nullSelectionAllowed) {
-            combobox.insertItemAt(UNDEFINED, 0);
+            combobox.insertItemAt(null, 0);
+//            combobox.insertItemAt(UNDEFINED, 0);
         }
         if (!selected) {
-            combobox.setSelectedItem(UNDEFINED);
-            lastvaluesetinfield = UNDEFINED;
+//            combobox.setSelectedItem(UNDEFINED);
+//            lastvaluesetinfield = UNDEFINED;
+            combobox.setSelectedItem(null);
         }
     }
 
+    // no validation is normally required for a combobox
     @Override
-    final void addActionListener(ActionListener listener) {
-        combobox.addActionListener(listener);
+    protected boolean sourceCheckRules() {
+        return true;
     }
 
     @Override
-    final void removeActionListener(ActionListener listener) {
-        combobox.removeActionListener(listener);
+    protected String getSourceErrorMessages() {
+        return "";
     }
+
+    /**
+     * Request that the values in the combo box are updated from the source.
+     *
+     * @return the set of values to be inserted
+     */
+    protected abstract List<T> getSourceChoices();
 }

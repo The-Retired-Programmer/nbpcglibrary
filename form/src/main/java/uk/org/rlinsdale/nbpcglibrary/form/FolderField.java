@@ -30,33 +30,22 @@ import javax.swing.JFileChooser;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FolderField extends TextField {
+public abstract class FolderField extends TextField {
 
     private JButton folderButton;
 
     /**
      * Constructor
      *
-     * @param backingObject the backing Object
      * @param label field label
      * @param size size of the field
      */
-    public FolderField(FieldBackingObject<String> backingObject, String label, int size) {
-        this(backingObject, label, size, new JButton());
+    public FolderField(String label, int size) {
+        this(label, size, new JButton());
     }
 
-    /**
-     * Constructor
-     *
-     * @param backingObject the backing object
-     * @param label field label
-     */
-    public FolderField(FieldBackingObject<String> backingObject, String label) {
-        this(backingObject, label, 50);
-    }
-
-    private FolderField(FieldBackingObject<String> backingObject, String label, int size, JButton button) {
-        super(backingObject, label, size, button);
+    private FolderField(String label, int size, JButton button) {
+        super(label, size, button);
         folderButton = button;
         button.setIcon(new ImageIcon(getClass().getResource("folder_find.png")));
         button.setToolTipText("Select Folder");
@@ -69,11 +58,10 @@ public class FolderField extends TextField {
         public void actionPerformed(ActionEvent ae) {
             final JFileChooser fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            fc.setSelectedFile(new File(get()));
+            fc.setSelectedFile(new File(getFieldValue()));
             if (fc.showOpenDialog(folderButton) == JFileChooser.APPROVE_OPTION) {
                 String filepath = fc.getSelectedFile().getAbsolutePath();
-                set(filepath);
-                updateIfChange(filepath);
+                setFieldValue(filepath);
             }
         }
     }

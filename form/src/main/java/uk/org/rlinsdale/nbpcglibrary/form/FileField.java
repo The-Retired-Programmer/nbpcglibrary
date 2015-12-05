@@ -20,42 +20,33 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
  * A field class to get file path information.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FileField extends TextField {
+public abstract class FileField extends TextField {
 
     private JButton fileButton;
 
     /**
      * Constructor
      *
-     * @param backingObject the backing object
      * @param label field label
      * @param size size of the field display
      */
-    public FileField(FieldBackingObject<String> backingObject, String label, int size) {
-        this(backingObject, label, size, new JButton());
+    public FileField(String label, int size) {
+        this(label, size, new JButton());
     }
 
-    /**
-     * Constructor
-     *
-     * @param backingObject the backing object
-     * @param label field label
-     */
-    public FileField(FieldBackingObject<String> backingObject, String label) {
-        this(backingObject, label, 50);
-    }
-
-    private FileField(FieldBackingObject<String> backingObject, String label, int size, JButton button) {
-        super(backingObject, label, size, button);
+    private FileField(String label, int size, JButton button) {
+        super(label, size, button);
         fileButton = button;
         button.setIcon(new ImageIcon(getClass().getResource("page_find.png")));
         button.setToolTipText("Select File");
@@ -66,13 +57,25 @@ public class FileField extends TextField {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            final JFileChooser fc = new JFileChooser(get() + "/");
+            final JFileChooser fc = new JFileChooser(getFieldValue() + "/");
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             if (fc.showOpenDialog(fileButton) == JFileChooser.APPROVE_OPTION) {
                 String filepath = fc.getSelectedFile().getAbsolutePath();
-                set(filepath);
-                updateIfChange(filepath);
+                setFieldValue(filepath);
             }
+        }
+    }
+    
+    public class FileExistsRule extends Rule {
+
+        public FileExistsRule(String label) {
+            super(label + " - file does not exist or is a folder");
+        }
+
+        @Override
+        public boolean ruleCheck() {
+            File file = new File(getSourceValue());
+            return file.exists() && file.isFile();
         }
     }
 }

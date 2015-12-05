@@ -62,7 +62,7 @@ public class Timestamp {
         try {
             date = userformat.parse(datestring);
         } catch (ParseException ex) {
-            throw new BadFormatException("Timestamp:constructor - Illegal datestring format");
+            throw new BadFormatException("Bad entry format - expected a date and time (dd-MMM-yyyy-HH:mm:ss)");
         }
     }
 

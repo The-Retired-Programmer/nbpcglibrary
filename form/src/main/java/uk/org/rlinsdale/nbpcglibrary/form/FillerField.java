@@ -18,8 +18,11 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import javax.swing.JLabel;
+
 /**
- * A Field which creates a blank empty row in the form.
+ * A Field which creates a blank empty row in the form, which can be decorated
+ * with text labels, so could be used to create a column header row.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
@@ -27,16 +30,38 @@ public class FillerField extends Field<String> {
 
     /**
      * Constructor
+     *
+     * @param labeltext text to be placed in label column
+     * @param fieldtext text to be placed in the field column
+     * @param additionalfieldtext text to be placed in the additionalfield
+     * column
      */
-    public FillerField() {
-        super(null, "", null, null);
+    protected FillerField(String labeltext, String fieldtext, String additionalfieldtext) {
+        super("", fieldtext == null ? null : new JLabel(fieldtext),
+                additionalfieldtext == null ? null : new JLabel(additionalfieldtext), null);
     }
     
-    @Override
-    void setField(String value) {
+    /**
+     * Constructor
+     *
+     * @param labeltext text to be placed in label column
+     * @param fieldtext text to be placed in the field column
+     * @param additionalfieldtext text to be placed in the additionalfield
+     * column
+     * @param errormarker the error marker
+     */
+    protected FillerField(String labeltext, String fieldtext, String additionalfieldtext, ErrorMarker errormarker) {
+        super("", fieldtext == null ? null : new JLabel(fieldtext),
+                additionalfieldtext == null ? null : new JLabel(additionalfieldtext), errormarker);
     }
-    
+
     @Override
-    public void updateFieldFromBackingObject() {
+    protected void setFieldValue(String value) {
+        // null action as no field
+    }
+
+    @Override
+    protected String getSourceValue() {
+        return "";
     }
 }

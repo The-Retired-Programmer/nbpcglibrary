@@ -53,7 +53,7 @@ public class DateOnly {
         try {
             date = userformat.parse(datestring);
         } catch (ParseException ex) {
-            throw new BadFormatException("DateOnly:constructor - Illegal datestring format");
+            throw new BadFormatException("Bad entry format - expected a date (dd-MMM-yyyy)");
         }
     }
 

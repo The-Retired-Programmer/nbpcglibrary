@@ -16,12 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.form;
+package uk.org.rlinsdale.nbpcglibrary.common;
 
 import java.util.logging.Level;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * A basic Confirmation Dialog (YES / NO)

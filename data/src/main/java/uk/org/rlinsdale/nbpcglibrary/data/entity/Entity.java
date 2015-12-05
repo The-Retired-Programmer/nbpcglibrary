@@ -676,4 +676,9 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @param from the copy source entity
      */
     abstract protected void entityCopy(E from);
+    
+    @Override
+    public String toString() {
+        return getDisplayTitle();
+    }
 }

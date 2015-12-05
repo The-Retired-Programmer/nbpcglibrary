@@ -139,7 +139,7 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
             boolean ok = true;
             LogBuilder.writeLog("nbpcglibrary.form", this, "test");
             for (FieldsDef f : fieldsdefs) {
-                f.updateAllBackingObjectsFromFields();
+                f.updateAllSourcesFromFields();
                 if (!f.checkRules()) {
                     ok = false;
                 }
@@ -181,10 +181,10 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
     /**
      * Set the values of fields in the form.
      */
-    public void updateAllFieldsFromBackingObject() {
-        LogBuilder.writeLog("nbpcglibrary.form", this, "updateAllFieldsFromBackingObject");
+    public void updateAllFieldsFromSource() {
+        LogBuilder.writeLog("nbpcglibrary.form", this, "updateAllFieldsFromSource");
         fieldsdefs.stream().forEach((f) -> {
-            f.updateAllFieldsFromBackingObjects();
+            f.updateAllFieldsFromSource();
         });
     }
 

@@ -20,7 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.data;
 
 import java.util.concurrent.Callable;
 import org.netbeans.api.actions.Savable;
-import uk.org.rlinsdale.nbpcglibrary.form.ConfirmationDialog;
+import uk.org.rlinsdale.nbpcglibrary.common.ConfirmationDialog;
 import org.openide.modules.OnStop;
 
 /**

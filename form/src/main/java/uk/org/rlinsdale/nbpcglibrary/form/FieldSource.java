@@ -18,49 +18,47 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.io.IOException;
 import java.util.List;
+import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+import uk.org.rlinsdale.nbpcglibrary.common.Rules;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 
 /**
+ * The Field Source - Basic implementation
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <T> the type of the source value
  */
-public class SimpleChoiceBackingObject extends ChoiceFieldBackingObject {
+public class FieldSource<T> {
 
-    private List<String> choices;
-    private String backingString;
+    private T value; // data source
+    private final Rules rules = new Rules();
+    private List<T> choices;
 
-    /**
-     * Constructor
-     *
-     * @param choices list of possible selection texts to be displayed
-     */
-    public SimpleChoiceBackingObject(List<String> choices) {
-        this("", choices);
+    public void set(T value) {
+        this.value = value;
     }
 
-    /**
-     * Constructor
-     *
-     * @param initialvalue the initial value of the text variable
-     * @param choices list of possible selection texts to be displayed
-     */
-    public SimpleChoiceBackingObject(String initialvalue, List<String> choices) {
-        backingString = initialvalue;
-        this.choices = choices;
+    public Rules getRules() {
+        return rules;
     }
 
-    @Override
-    public List<String> getChoices() {
+    public T get() {
+        return value;
+    }
+
+    public List<T> getChoices() {
         return choices;
     }
 
-    @Override
-    public void set(String value) {
-        backingString = value;
+    public void setChoices(List<T> choices) {
+        this.choices = choices;
     }
 
-    @Override
-    public String get() {
-        return backingString;
+    public void addCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
+    }
+
+    public void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,15 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.Color;
 import javax.swing.JTextField;
+import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
 
 /**
- * A General purpose Field for displaying a value which is a simple textual
- * string.
+ * A Field for displaying and editing a value which is an Integer Value.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class TextReadonlyField extends Field<String> {
+public abstract class IntegerField extends EditableField<Integer> {
 
     private final JTextField field;
 
@@ -37,20 +36,28 @@ public abstract class TextReadonlyField extends Field<String> {
      * @param label field label
      * @param size size of the value display
      */
-    public TextReadonlyField(String label, int size) {
+    public IntegerField(String label, int size) {
         this(label, new JTextField(), size);
     }
 
-    private TextReadonlyField(String label, JTextField field, int size) {
-        super(label, field, null, null);
+    private IntegerField(String label, JTextField field, int size) {
+        super(label, field, null);
         this.field = field;
         field.setColumns(size);
-        field.setEditable(false);
-        field.setForeground(Color.GRAY);
+        field.addActionListener(getActionListener());
     }
 
     @Override
-    protected void setFieldValue(String value) {
-        field.setText(value);
+    protected final Integer getFieldValue() throws BadFormatException {
+        try {
+            return Integer.parseInt(field.getText().trim());
+        } catch (NumberFormatException ex) {
+            throw new BadFormatException("Bad entry format - expected a number");
+        }
+    }
+
+    @Override
+    protected final void setFieldValue(Integer value) {
+        field.setText(value.toString());
     }
 }

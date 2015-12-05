@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,32 +16,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.form;
-
-import java.util.List;
+package uk.org.rlinsdale.nbpcglibrary.common;
 
 /**
- * The backing Object interface for an editable field
+ * A simple callback interface
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class ChoiceFieldBackingObject implements FieldBackingObject<String> {
+public interface Callback {
 
     /**
-     * Get a set of Choice Strings
-     * @return the set of choice strings
+     * The call back method.
+     *
      */
-    public abstract List<String> getChoices();
-
-    // normally there is no need for validation on choices - provide default null implementations
-    
-    @Override
-    public boolean checkRules() {
-        return true;
-    }
-
-    @Override
-    public String getErrorMessages() {
-        return "";
-    }
+    public abstract void call();
 }

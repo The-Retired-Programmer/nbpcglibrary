@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,16 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.Color;
 import javax.swing.JTextField;
+import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
+import uk.org.rlinsdale.nbpcglibrary.api.Timestamp;
 
 /**
- * A General purpose Field for displaying a value which is a simple textual
- * string.
+ * A Field for displaying and editing a value which is a Timestamp Value.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class TextReadonlyField extends Field<String> {
+public abstract class DatetimeField extends EditableField<Timestamp> {
 
     private final JTextField field;
 
@@ -37,20 +37,24 @@ public abstract class TextReadonlyField extends Field<String> {
      * @param label field label
      * @param size size of the value display
      */
-    public TextReadonlyField(String label, int size) {
+    public DatetimeField(String label, int size) {
         this(label, new JTextField(), size);
     }
 
-    private TextReadonlyField(String label, JTextField field, int size) {
-        super(label, field, null, null);
+    private DatetimeField(String label, JTextField field, int size) {
+        super(label, field, null);
         this.field = field;
         field.setColumns(size);
-        field.setEditable(false);
-        field.setForeground(Color.GRAY);
+        field.addActionListener(getActionListener());
     }
 
     @Override
-    protected void setFieldValue(String value) {
-        field.setText(value);
+    protected final Timestamp getFieldValue() throws BadFormatException {
+            return new Timestamp(field.getText().trim());
+    }
+
+    @Override
+    protected final void setFieldValue(Timestamp value) {
+        field.setText(value.toString());
     }
 }

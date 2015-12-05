@@ -18,7 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.event.ActionListener;
+import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 
 /**
@@ -26,55 +26,45 @@ import javax.swing.JPasswordField;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class PasswordField extends EditableStringField {
+public abstract class PasswordField extends EditableField<String> {
 
-    private JPasswordField passwordfield;
-
-    /**
-     * Constructor
-     *
-     * @param backingObject the backing Object
-     * @param label field label
-     * @param size size of the value display
-     */
-    public PasswordField(FieldBackingObject<String> backingObject, String label, int size) {
-        this(backingObject, label, new JPasswordField(), size);
-    }
+    private JPasswordField field;
 
     /**
      * Constructor
      *
-     * @param backingObject the backing Object
      * @param label field label
+     * @param size the field size
      */
-    public PasswordField(FieldBackingObject<String> backingObject, String label) {
-        this(backingObject, label, 20);
+    public PasswordField(String label, int size) {
+        this(label, new JPasswordField(), size, null);
     }
     
-    private PasswordField(FieldBackingObject<String> backingObject, String label, JPasswordField passwordfield, int size) {
-        super(backingObject, label, passwordfield, null);
-        this.passwordfield = passwordfield;
-        this.passwordfield.setColumns(size);
-        updateFieldFromBackingObject();
+    /**
+     * Constructor
+     *
+     * @param label field label
+     * @param size the field size
+     * @param additionalfield the additional field to be display 
+     */
+    protected PasswordField(String label, int size, JComponent additionalfield) {
+        this(label, new JPasswordField(), size, additionalfield);
     }
-    
-    @Override
-    final String get() {
-        return new String(passwordfield.getPassword());
+
+    private PasswordField(String label, JPasswordField field, int size, JComponent additionalfield) {
+        super(label, field, additionalfield);
+        this.field = field;
+        this.field.setColumns(size);
+        field.addActionListener(getActionListener());
     }
 
     @Override
-    final void set(String value) {
-        passwordfield.setText(value);
+    protected final String getFieldValue() {
+        return new String(field.getPassword());
     }
 
     @Override
-    final void addActionListener(ActionListener listener) {
-        passwordfield.addActionListener(listener);
-    }
-
-    @Override
-    final void removeActionListener(ActionListener listener) {
-        passwordfield.removeActionListener(listener);
+    protected final void setFieldValue(String value) {
+        field.setText(value);
     }
 }

@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.event.ActionListener;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -28,78 +27,46 @@ import javax.swing.JTextField;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class TextField extends EditableStringField {
-    
-    private final JTextField textfield;
+public abstract class TextField extends EditableField<String> {
+
+    private final JTextField field;
 
     /**
      * Constructor
      *
-     * @param backingObject the backingObject
-     * @param label field label
-     * @param size size of the value display
+     * @param label label to be displayed with field
+     * @param size the size of the text field object
      */
-    public TextField(FieldBackingObject<String> backingObject, String label, int size) {
-        this(backingObject, label, new JTextField(), null, size);
+    public TextField(String label, int size) {
+        this(label, new JTextField(), size, null);
+    }
+    
+     /**
+     * Constructor
+     *
+     * @param label label to be displayed with field
+     * @param size the size of the text field object
+     * @param additionalfield the additional field obejct to be added after the
+     * main field object
+     */
+    protected TextField(String label, int size, JComponent additionalfield) {
+        this(label, new JTextField(), size, additionalfield);
     }
 
-    /**
-     * Constructor
-     *
-     * @param backingObject the backingObject
-     * @param label field label
-     */
-    public TextField(FieldBackingObject<String> backingObject, String label) {
-        this(backingObject, label, 20);
-    }
-    
-    /**
-     * Constructor
-     *
-     * @param backingObject the backingObject
-     * @param label field label
-     * @param size size of the value display
-     * @param additionalComponent additional component to additional to right of text field
-     */
-    public TextField(FieldBackingObject<String> backingObject, String label, int size, JComponent additionalComponent) {
-        this(backingObject, label, new JTextField(), additionalComponent, size);
+    private TextField(String label, JTextField field, int size, JComponent additionalfield) {
+        super(label, field, additionalfield);
+        this.field = field;
+        field.setColumns(size);
+        field.addActionListener(getActionListener());
     }
 
-    /**
-     * Constructor
-     *
-     * @param backingObject the backingObject
-     * @param label field label
-     * @param additionalComponent additional component to additional to right of text field
-     */
-    public TextField(FieldBackingObject<String> backingObject, String label, JComponent additionalComponent) {
-        this(backingObject, label, 20, additionalComponent);
-    }
-    
-    private TextField(FieldBackingObject<String> backingObject, String label, JTextField textfield, JComponent additionalfield, int size) {
-        super(backingObject, label, textfield, additionalfield);
-        this.textfield = textfield;
-        textfield.setColumns(size);
-        updateFieldFromBackingObject();
-    }
-    
     @Override
-    protected final String get() {
-        return textfield.getText().trim();
+    protected final String getFieldValue() {
+        return field.getText().trim();
     }
-    
+
     @Override
-    protected final void set(String value) {
-        textfield.setText(value);
-    }
-    
-    @Override
-    protected final void addActionListener(ActionListener listener) {
-        textfield.addActionListener(listener);
-    }
-    
-    @Override
-    protected final void removeActionListener(ActionListener listener) {
-        textfield.removeActionListener(listener);
+    protected final void setFieldValue(String value) {
+        field.setText(value);
     }
 }

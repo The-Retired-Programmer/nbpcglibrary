@@ -18,13 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
-import java.util.logging.Level;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import uk.org.rlinsdale.nbpcglibrary.form.Form;
-import org.openide.windows.TopComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;

@@ -23,7 +23,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface FieldsDefBackingObject {
+public interface FieldsDefRules {
 
     /**
      * Check if all rules associate with this fieldsdef are valid

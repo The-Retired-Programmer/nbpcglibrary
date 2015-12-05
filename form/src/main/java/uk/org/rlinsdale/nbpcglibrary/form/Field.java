@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.lang.ref.WeakReference;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -32,38 +31,32 @@ import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
  */
 public abstract class Field<T> implements HasInstanceDescription {
 
-    private final FieldBackingObject<T> backingObject;
     private final String label;
     private final JComponent labelfield;
     private final JComponent field;
     private final JComponent additionalfield;
-    private final ErrorMarker errorMarker = new ErrorMarker();
-    private WeakReference<FieldsDef> parent = new WeakReference<>(null);
+    private final JComponent errorMarker;
 
     /**
      * Constructor
      *
-     * @param backingObject the backingobject
      * @param label the label text for this field
      * @param field the actual field to be used
      * @param additionalfield optional additional field (set to null if not
      * required)
+     * @param errorMarker the field to be used to display the error marker
      */
-    public Field(FieldBackingObject<T> backingObject, String label, JComponent field, JComponent additionalfield) {
+    public Field(String label, JComponent field, JComponent additionalfield, JComponent errorMarker) {
         this.label = label;
         labelfield = new JLabel(label);
         this.field = field;
         this.additionalfield = additionalfield;
-        this.backingObject = backingObject;
+        this.errorMarker = errorMarker;
     }
 
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this, label);
-    }
-    
-    void setParent(FieldsDef parent){
-        this.parent = new WeakReference<>(parent);
     }
 
     /**
@@ -72,54 +65,30 @@ public abstract class Field<T> implements HasInstanceDescription {
      *
      * @return an array of components
      */
-    JComponent[] getComponents() {
+    protected JComponent[] getComponents() {
         return new JComponent[]{labelfield, field, additionalfield, errorMarker};
     }
 
     /**
-     * request that the value in the field is updated from the value in the
-     * Backing Object
+     * Request that the value in the field is updated from the value in the
+     * source.
      */
-    public void updateFieldFromBackingObject() {
-        setField(backingObject.get());
+    protected void updateFieldFromSource() {
+        setFieldValue(getSourceValue());
     }
 
     /**
-     * request that the backing bean has its value updated with the current
-     * value of the field
-     */
-    public void updateBackingObjectFromField() {
-        // a null action for a RO field - overwrite for a RW field
-    }
-
-    /**
-     * Set a value in the field
+     * Get the value from the source
      *
-     * @param value the value to setField into the field
+     * @return the value
      */
-    abstract void setField(T value);
+    abstract protected T getSourceValue();
 
     /**
-     * Check if all rules in the field's rule set are valid, and update error
-     * markers and error messages on the form.
+     * Set a value into the Field
      *
-     * @return true if all rules are valid
+     * @param value the value to be inserted into the Field
      */
-    public boolean checkRules() {
-        boolean res = true;
-        if (backingObject != null) {
-            res = backingObject.checkRules();
-            if (res) {
-                errorMarker.clearError();
-            } else {
-                errorMarker.setError(backingObject.getErrorMessages());
-            }
-        }
-        // now try and do the fieldsdef check as well
-        FieldsDef fdef = parent.get();
-        if (fdef != null) {
-            fdef.checkFieldsDefRules(); // do check - will update the field defs reporting
-        }
-        return res;
-    }
+    abstract protected void setFieldValue(T value);
+    
 }

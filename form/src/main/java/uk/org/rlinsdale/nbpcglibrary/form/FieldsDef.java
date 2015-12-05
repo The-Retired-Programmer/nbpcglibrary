@@ -21,7 +21,6 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
@@ -36,43 +35,28 @@ public abstract class FieldsDef implements HasInstanceDescription {
     private final List<Field> fields = new ArrayList<>();
     private String[] parameters;
     private final ErrorMarker errorMarker = new ErrorMarker();
-    private final FieldsDefBackingObject backingObject;
+    private final FieldsDefRules fieldsdefrules;
 
     /**
      * Constructor
-     *
      */
     public FieldsDef() {
-        this(null);
+        this.fieldsdefrules = null;
     }
 
     /**
      * Constructor
      *
-     * @param backingObject the backingObject for the fieldsDef - used to access
-     * fieldsdef level validation.
+     * @param fieldsdefrules the class level rules
      */
-    public FieldsDef(FieldsDefBackingObject backingObject) {
-        this.backingObject = backingObject;
+    public FieldsDef(FieldsDefRules fieldsdefrules) {
+        this.fieldsdefrules = fieldsdefrules;
+        add(new FillerField("", null, null, errorMarker));
     }
 
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
-    }
-
-    /**
-     * Get a row of components used to mark an error
-     *
-     * @return the set of components
-     */
-    public JComponent[] getErrorMarkerRow() {
-        return new JComponent[]{
-            null,
-            null,
-            null,
-            errorMarker
-        };
     }
 
     /**
@@ -82,7 +66,6 @@ public abstract class FieldsDef implements HasInstanceDescription {
      */
     public final void add(Field f) {
         fields.add(f);
-        f.setParent(this);
     }
 
     /**
@@ -97,27 +80,27 @@ public abstract class FieldsDef implements HasInstanceDescription {
     /**
      * Set the values of all fields.
      */
-    public final void updateAllFieldsFromBackingObjects() {
+    public final void updateAllFieldsFromSource() {
         fields.stream().forEach((f) -> {
-            f.updateFieldFromBackingObject();
+            f.updateFieldFromSource();
         });
     }
 
     /**
-     * Set the values of all fields into backingObjects.
+     * Set the values of all fields into sources.
      */
-    public final void updateAllBackingObjectsFromFields() {
-        fields.stream().forEach((f) -> {
-            f.updateBackingObjectFromField();
+    public final void updateAllSourcesFromFields() {
+        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
+            ((EditableField) f).updateSourceFromField();
         });
     }
 
     /**
-     * finalise the save action from backingObject to other storage (eg
-     * persistent storage)
+     * Finalise the save action from source to other storage (eg persistent
+     * storage)
      *
      * @return true if save was successful
-     * @throws IOException id problems occurred during save
+     * @throws IOException if problems occurred during save
      */
     public abstract boolean save() throws IOException;
 
@@ -143,9 +126,11 @@ public abstract class FieldsDef implements HasInstanceDescription {
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (Field field : fields) {
-            if (!field.checkRules()) {
-                valid = false;
+        for (Field f : fields) {
+            if (f instanceof EditableField) {
+                if (!((EditableField) f).checkRules()) {
+                    valid = false;
+                }
             }
         }
         if (!checkFieldsDefRules()) {
@@ -155,20 +140,21 @@ public abstract class FieldsDef implements HasInstanceDescription {
     }
 
     /**
-     * Check the rules defined for the field backingobject.
+     * Check the rules defined for the fieldDef.
      *
      * @return true if the rules are obeyed (ie OK)
      */
     public boolean checkFieldsDefRules() {
-        if (backingObject != null) {
-            boolean res = backingObject.checkRules();
+        if (fieldsdefrules != null) {
+            boolean res = fieldsdefrules.checkRules();
             if (res) {
                 errorMarker.clearError();
             } else {
-                errorMarker.setError(backingObject.getErrorMessages());
+                errorMarker.setError(fieldsdefrules.getErrorMessages());
             }
             return res;
+        } else {
+            return true;
         }
-        return true;
     }
 }

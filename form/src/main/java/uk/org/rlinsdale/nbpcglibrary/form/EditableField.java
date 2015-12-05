@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.JComponent;
+import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
 
 /**
  * Abstract Class representing an editable Field on a Form
@@ -32,90 +33,140 @@ import javax.swing.JComponent;
  */
 public abstract class EditableField<T> extends Field<T> {
 
-    private final FieldActionListener actionListener = new FieldActionListener();
-    private final FieldFocusListener focusListener = new FieldFocusListener();
-    private final JComponent field;
+    private FieldActionListener actionListener;
+    private final FieldFocusListener focusListener;
+    private final ErrorMarker errorMarker;
 
-    /**
-     *
-     */
-    protected T lastvaluesetinfield;
-    private final FieldBackingObject<T> backingObject;
+    private T lastvaluesetinfield;
+    private boolean inhibitListeneractions = false;
 
     /**
      * Constructor
      *
-     * @param backingObject the backing object
      * @param label the label text for this field
      * @param field the swing field component
-     * @param additionalfield optional additional field (set to null if not required)
+     * @param additionalfield optional additional field (set to null if not
+     * required)
      */
-    public EditableField(FieldBackingObject<T> backingObject, String label, JComponent field, JComponent additionalfield) {
-        super(backingObject, label, field, additionalfield);
-        this.backingObject = backingObject;
-        this.field = field;
-    }
-    
-    
-    /**
-     * setField an action listener for this field
-     *
-     * @param listener the listener
-     */
-    abstract void addActionListener(ActionListener listener);
-
-    /**
-     * remove an action listener for this field
-     *
-     * @param listener the listener
-     */
-    abstract void removeActionListener(ActionListener listener);
-
-    @Override
-    final void setField(T value) {
-        removeActionListener(actionListener);
-        field.removeFocusListener(focusListener);
-        this.lastvaluesetinfield = value;
-        set(value);
-        checkRules();
-        addActionListener(actionListener);
-        field.addFocusListener(focusListener);
+    protected EditableField(String label, JComponent field, JComponent additionalfield) {
+        this(label, field, additionalfield, new ErrorMarker());
     }
 
-    /**
-     * Set a value into the Field
-     *
-     * @param value the value to be inserted into the Field
-     */
-    abstract void set(T value);
+    private EditableField(String label, JComponent field, JComponent additionalfield, ErrorMarker errorMarker) {
+        super(label, field, additionalfield, errorMarker);
+        this.errorMarker = errorMarker;
+        field.addFocusListener(focusListener = new FieldFocusListener());
+    }
 
-    
+    protected final ActionListener getActionListener() {
+        return (actionListener = new FieldActionListener());
+    }
+
     @Override
-    public void updateFieldFromBackingObject() {
-        T value = backingObject.get();
+    protected final void updateFieldFromSource() {
+        T value = getSourceValue();
         if (!value.equals(lastvaluesetinfield)) {
             lastvaluesetinfield = value;
-            setField(value);
+            insertField(value);
         }
     }
-    
-    @Override
-    public void updateBackingObjectFromField() {
-        backingObject.set(get());
+
+    public final void updateFieldFromSource(boolean force) {
+        if (force) {
+            insertField(getSourceValue());
+        } else {
+            updateFieldFromSource();
+        }
     }
+
+    private void insertField(T value) {
+        inhibitListeneractions = true;
+        this.lastvaluesetinfield = value;
+        setFieldValue(value);
+        checkRules();
+        inhibitListeneractions = false;
+    }
+
+    protected final void updateSourceFromField() {
+        try {
+            setSourceValue(getFieldValue());
+        } catch (BadFormatException ex) {
+            errorMarker.setError("Badly Formated Number");
+        }
+    }
+
+    /**
+     * check that the value has changed and if so then update the lastvalue
+     * variable, and update the source
+     *
+     * @param value the new value to test
+     */
+    private void updateSourceFromFieldIfChange(T value) {
+        if (!value.equals(lastvaluesetinfield)) {
+            lastvaluesetinfield = value;
+            setSourceValue(value);
+            updateFieldFromSource(true); // and rewrite the field
+            checkRules();
+        }
+    }
+
+    /**
+     * Set the value in the source
+     *
+     * @param value the value
+     */
+    abstract protected void setSourceValue(T value);
 
     /**
      * Get a value from the field
      *
      * @return the value of the field
+     * @throws BadFormatException if field is not valid format for input type
+     * required.
      */
-    abstract T get();
+    protected abstract T getFieldValue() throws BadFormatException;
+
+    /**
+     * Check if all rules in the field's rule set are valid, and update error
+     * markers and error messages on the form.
+     *
+     * @return true if all rules are valid
+     */
+    protected boolean checkRules() {
+        boolean res = sourceCheckRules();
+        if (res) {
+            errorMarker.clearError();
+        } else {
+            errorMarker.setError(getSourceErrorMessages());
+        }
+        return res;
+    }
+
+    /**
+     * Check the rules for this field source.
+     *
+     * @return true if source is valid for all defined rules.
+     */
+    abstract protected boolean sourceCheckRules();
+
+    /**
+     * Get all error messages generated by rule failure of this field source.
+     *
+     * @return true if source is valid for all defined rules.
+     */
+    abstract protected String getSourceErrorMessages();
 
     private class FieldActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            updateIfChange(get());
+            if (!inhibitListeneractions) {
+                try {
+                    updateSourceFromFieldIfChange(getFieldValue());
+                } catch (BadFormatException ex) {
+                    errorMarker.setError("Badly Formated Number");
+                }
+            }
         }
     }
 
@@ -127,16 +178,32 @@ public abstract class EditableField<T> extends Field<T> {
 
         @Override
         public void focusLost(FocusEvent fe) {
-            updateIfChange(get());
+            if (!inhibitListeneractions) {
+                try {
+                    updateSourceFromFieldIfChange(getFieldValue());
+                } catch (BadFormatException ex) {
+                    errorMarker.setError("Badly Formated Number");
+                }
+            }
         }
     }
 
     /**
-     * check that the value has changed and if so then update the lastvalue
-     * variable, and update the backingobject if rule check is passed
-     *
-     * @param value the new value to test
+     * Get the value of the field object (not the actual JComponent).
+     * @return the value
      */
-    abstract void updateIfChange(T value);
+    abstract public T get();
 
+    /**
+     * Set the value of the field object (not the actual JComponent), will cause
+     * the actual field to be updated.
+     * @param value the value
+     */
+    abstract public void set(T value);
+
+    /**
+     * Reset the value of the field object (not the actual JComponent) to the
+     * initial field value, will cause the actual field to be updated.
+     */
+    abstract public void reset();
 }
