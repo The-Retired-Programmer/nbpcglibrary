@@ -38,8 +38,6 @@ import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.*;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField;
-import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams.CommonEntityField.ALL;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.CREATE;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.EDIT;
@@ -195,41 +193,19 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     }
 
     /**
-     * Fire actions on all field change listeners.
+     * Fire actions on all field change listeners relating to a specified field.
      *
      * @param field the field Id
      */
     protected final void fireFieldChange(F field) {
-        fireFieldChange(field, true);
+        fieldEvent.fire(new EntityFieldChangeEventParams<>(field));
     }
-
+    
     /**
-     * Fire actions on all field change listeners.
-     *
-     * @param field the field Id
+     * Fire actions on all field change listeners relating to all fields.
      */
-    protected final void fireFieldChange(CommonEntityField field) {
-        fireCommonFieldChange(field, true);
-    }
-
-    /**
-     * Fire actions on all field change listeners.
-     *
-     * @param field the field Id
-     * @param formatOK true if the field is formatted correctly
-     */
-    protected final void fireFieldChange(F field, boolean formatOK) {
-        fieldEvent.fire(new EntityFieldChangeEventParams<>(field, null, formatOK));
-    }
-
-    /**
-     * Fire actions on all field change listeners.
-     *
-     * @param field the field Id
-     * @param formatOK true if the field is formatted correctly
-     */
-    protected final void fireCommonFieldChange(CommonEntityField field, boolean formatOK) {
-        fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, formatOK));
+    protected final void fireFieldChange() {
+        fieldEvent.fire(new EntityFieldChangeEventParams<>(null));
     }
 
     /**
@@ -241,15 +217,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      */
     protected final void fireStateChange(EntityStateChange transition, EntityState oldState, EntityState newState) {
         stateEvent.fire(new EntityStateChangeEventParams(transition, oldState, newState));
-    }
-
-    /**
-     * Fire actions on Field Change listeners at load.
-     *
-     * @param field the field Id
-     */
-    protected final void fireFieldChangeAtLoad(CommonEntityField field) {
-        fieldEvent.fire(new EntityFieldChangeEventParams<>(null, field, true));
     }
 
     /**
@@ -361,7 +328,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         }
         if (wasEditing) {
             entityRestoreState();
-            fireFieldChange(ALL);
+            fireFieldChange();
             fireStateChange(RESET, oldState, state);
             nameListenerFire();
             titleListenerFire();
@@ -386,7 +353,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         entityLoad(data);
         setState(DBENTITY);
         fireStateChange(LOAD, oldState, DBENTITY);
-        fireFieldChangeAtLoad(ALL);
+        fireFieldChange();
     }
 
     /**
@@ -460,7 +427,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 }
         }
         fireStateChange(SAVE, oldState, DBENTITY);
-        fireFieldChangeAtLoad(ALL);
+        fireFieldChange();
         return true;
     }
 
@@ -500,7 +467,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         if (oldState == NEW || oldState == NEWEDITING) {
             entityCopy(e);
             ensureEditing();
-            fireFieldChange(ALL);
+            fireFieldChange();
             return;
         }
         throw new LogicException("Should not be trying to copy an entity in " + oldState + " state");

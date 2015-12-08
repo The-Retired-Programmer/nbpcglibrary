@@ -29,32 +29,15 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  */
 public class EntityFieldChangeEventParams<F> implements EventParams {
     
-    /**
-     * Entity field changes - common to all entities. 
-     */
-    public enum CommonEntityField {
-
-        /**
-         * All fields have/ may have been changed.
-         */
-        ALL
-    };
-
     private final F field;
-    private final CommonEntityField commonfield;
-    private final boolean formatOK;
 
     /**
      * Constructor.
      *
      * @param field the entity field identifier
-     * @param commonfield the common entity field identifier
-     * @param formatOK true if field is correctly formatted
      */
-    public EntityFieldChangeEventParams(F field, CommonEntityField commonfield, boolean formatOK) {
+    public EntityFieldChangeEventParams(F field) {
         this.field = field;
-        this.commonfield = commonfield;
-        this.formatOK = formatOK;
     }
 
     /**
@@ -65,26 +48,10 @@ public class EntityFieldChangeEventParams<F> implements EventParams {
     public F get() {
         return field;
     }
-    /**
-     * Get the common field Id
-     *
-     * @return the common field identifier
-     */
-    public CommonEntityField getCommon() {
-        return commonfield;
-    }
 
-    /**
-     * Test if the field was formatted correctly.
-     *
-     * @return true if field was formatted correctly
-     */
-    public boolean isFormatOK() {
-        return formatOK;
-    }
 
     @Override
     public String instanceDescription() {
-        return LogBuilder.instanceDescription(this, (field!=null?field.toString():"--")+"/"+(commonfield!=null?commonfield.toString():"--")+ " change (data was formatted " + (formatOK ? "OK" : "badly") + ")");
+        return LogBuilder.instanceDescription(this, (field!=null?field.toString():"ALL")+ " change" );
     }
 }

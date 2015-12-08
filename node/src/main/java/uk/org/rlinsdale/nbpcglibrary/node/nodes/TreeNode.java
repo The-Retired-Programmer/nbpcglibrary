@@ -172,14 +172,7 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
 
         @Override
         public void action(EntityFieldChangeEventParams<F> p) {
-            F f = p.get();
-            if (f != null) {
-                nodeProcessFieldChange(f);
-            }
-            EntityFieldChangeEventParams.CommonEntityField c = p.getCommon();
-            if (c != null) {
-                nodeProcessCommonFieldChange(c);
-            }
+            nodeProcessFieldChange(p.get());
             // TODO make decision about the Icon changes (based on changes to error state)
             iconChange(); // temporary - do always (just in case!)
         }
@@ -286,13 +279,6 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      * @param field the field Id
      */
     protected abstract void nodeProcessFieldChange(F field);
-
-    /**
-     * Process field changes.
-     *
-     * @param field the field Id
-     */
-    protected abstract void nodeProcessCommonFieldChange(EntityFieldChangeEventParams.CommonEntityField field);
 
     /**
      * Get the display title for this node.
