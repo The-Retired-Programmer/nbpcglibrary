@@ -19,52 +19,45 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import javax.swing.JCheckBox;
+import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
 /**
- * A General purpose Field for displaying and editing a value which is a simple
- * boolean using a checkbox.
+ * A Field for displaying and editing a value which is a simple boolean using a
+ * checkbox.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class CheckboxField extends EditableField<Boolean> {
-
-    private final JCheckBox checkbox;
+public class CheckboxField extends EditableFieldImpl<Boolean> {
+    
+    private final JCheckBox fieldcomponent;
 
     /**
      * Constructor
      *
-     * @param label field label
+     * @param source the data source for this field
+     * @param initialValue the initial value of the display (or null if source
+     * provides this
+     * @param callback the callback with is used to inform of source updates
+     * from field
      */
-    public CheckboxField(String label) {
-        this(label, new JCheckBox("", false));
+    public CheckboxField(FieldSource<Boolean> source, Boolean initialValue, Callback callback) {
+        this(new JCheckBox(), source, initialValue, callback);
     }
-
-    private CheckboxField(String label, JCheckBox checkbox) {
-        super(label, checkbox, null);
-        this.checkbox = checkbox;
-        checkbox.addActionListener(getActionListener());
-        updateFieldFromSource();
-    }
-
-    @Override
-    protected final Boolean getFieldValue() {
-        return checkbox.isSelected();
+    
+    private CheckboxField(JCheckBox fieldcomponent, FieldSource<Boolean> source, Boolean initialValue, Callback callback) {
+        super(fieldcomponent, source, initialValue, callback);
+        this.fieldcomponent = fieldcomponent;
+        fieldcomponent.addActionListener(getActionListener());
+        reset();
     }
 
     @Override
-    protected final void setFieldValue(Boolean value) {
-        checkbox.setSelected(value);
-    }
-
-    // no validation is normally required for a checkbox
-    @Override
-    protected boolean sourceCheckRules() {
-        return true;
+    public final Boolean getFieldValue() {
+        return fieldcomponent.isSelected();
     }
 
     @Override
-    protected String getSourceErrorMessages() {
-        return "";
+    public final void setFieldValue(Boolean value) {
+        fieldcomponent.setSelected(value);
     }
-
 }

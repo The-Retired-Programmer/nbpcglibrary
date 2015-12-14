@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,22 +18,35 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.util.List;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 /**
- * A General purpose Field for displaying a value which is a simple textual
- * string.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <T> type of data being handled by this field
  */
-public class FillerField extends FieldImpl {
+public class LabelDecorator<T> extends FieldDecorator<T> {
 
-    /**
-     * Constructor
-     *
-     * @param text the text to appear in the filler field
-     */
-    public FillerField(String text) {
-        super(new JLabel(text == null ? "" : text));
+    private final JLabel labelcomponent;
+    private final String labeltext;
+
+    public LabelDecorator(EditableField<T> field, String labeltext) {
+        super(field);
+        labelcomponent = new JLabel(labeltext);
+        this.labeltext = labeltext;
+    }
+
+    @Override
+    public String instanceDescription() {
+        return field.instanceDescription() + "/" + labeltext;
+    }
+
+    @Override
+    public List<JComponent> getComponents() {
+        List<JComponent> c = super.getComponents();
+        c.add(0, labelcomponent);
+        return c;
     }
 }

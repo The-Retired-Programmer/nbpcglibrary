@@ -18,22 +18,37 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import javax.swing.JLabel;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComponent;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
- * A General purpose Field for displaying a value which is a simple textual
- * string.
+ * Abstract Class representing a Basic Field on a Form
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FillerField extends FieldImpl {
+public abstract class FieldImpl implements Field {
+
+    private final JComponent fieldcomponent;
 
     /**
      * Constructor
      *
-     * @param text the text to appear in the filler field
+     * @param fieldcomponent the actual fieldcomponent to be used in this field
      */
-    public FillerField(String text) {
-        super(new JLabel(text == null ? "" : text));
+    protected FieldImpl(JComponent fieldcomponent) {
+        this.fieldcomponent = fieldcomponent;
+    }
+
+    public List<JComponent> getComponents() {
+        List<JComponent> c = new ArrayList<>();
+        c.add(fieldcomponent);
+        return c;
+    }
+
+    @Override
+    public String instanceDescription() {
+        return LogBuilder.instanceDescription(this);
     }
 }

@@ -18,77 +18,22 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.util.List;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
 /**
- * Abstract Class representing a Field on a Form
+ * Field (on a Form) Interface
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T> type of the data connecting to the backing Object
  */
-public abstract class Field<T> implements HasInstanceDescription {
-
-    private final String label;
-    private final JComponent labelfield;
-    private final JComponent field;
-    private final JComponent additionalfield;
-    private final JComponent errorMarker;
+public interface Field extends HasInstanceDescription {
 
     /**
-     * Constructor
-     *
-     * @param label the label text for this field
-     * @param field the actual field to be used
-     * @param additionalfield optional additional field (set to null if not
-     * required)
-     * @param errorMarker the field to be used to display the error marker
-     */
-    public Field(String label, JComponent field, JComponent additionalfield, JComponent errorMarker) {
-        this.label = label;
-        labelfield = new JLabel(label);
-        this.field = field;
-        this.additionalfield = additionalfield;
-        this.errorMarker = errorMarker;
-    }
-
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this, label);
-    }
-
-    /**
-     * Get an array of Components which make up the Field. The array will be in
+     * Get an list of Components which make up the Field. The list will be in
      * left to right display order.
      *
-     * @return an array of components
+     * @return an list of components
      */
-    protected JComponent[] getComponents() {
-        return new JComponent[]{labelfield, field, additionalfield, errorMarker};
-    }
-
-    /**
-     * Request that the value in the field is updated from the value in the
-     * source.
-     */
-    protected void updateFieldFromSource() {
-        setFieldValue(getSourceValue());
-    }
-
-    /**
-     * Get the value from the source
-     *
-     * @return the value
-     */
-    abstract protected T getSourceValue();
-
-    /**
-     * Set a value into the Field
-     *
-     * @param value the value to be inserted into the Field
-     */
-    abstract protected void setFieldValue(T value);
-    
+    public List<JComponent> getComponents();
 }

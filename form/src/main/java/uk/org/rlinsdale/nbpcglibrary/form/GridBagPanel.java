@@ -18,9 +18,9 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -32,7 +32,7 @@ import javax.swing.border.TitledBorder;
  */
 public class GridBagPanel extends JPanel {
 
-    private static final int DEFAULTCOLUMNS = 5;
+    private static final int DEFAULTCOLUMNS = 4;
     private int row = 0;
     private int columns;
 
@@ -91,6 +91,22 @@ public class GridBagPanel extends JPanel {
         }
         row++;
     }
+    
+     /**
+     * Add an list of components to a row, starting in column1
+     *
+     * @param components list of components
+     */
+    public void addRow(List<JComponent> components) {
+        int col = 0;
+        for (JComponent component : components) {
+            if (component != null) {
+                add(component, makeconstraints(row, col));
+            }
+            col++;
+        }
+        row++;
+    }
 
     /**
      * Add a JComponent to a row (spanning columns)
@@ -99,17 +115,7 @@ public class GridBagPanel extends JPanel {
      */
     public void addSpannedRow(JComponent component) {
         add(component, makeconstraints(row));
-    }
-
-    /**
-     * Add a JComponent to a row (spanning columns)
-     *
-     * @param component the component
-     * @param bg the background colour
-     */
-    public void addSpannedRow(JComponent component, Color bg) {
-        addSpannedRow(component);
-        component.setBackground(bg);
+        row++;
     }
 
     private GridBagConstraints makeconstraints(int row, int col) {
@@ -125,7 +131,7 @@ public class GridBagPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         c.gridy = row;
-        c.gridwidth = columns;
+        c.gridwidth = columns + 1;
         return c;
     }
 }

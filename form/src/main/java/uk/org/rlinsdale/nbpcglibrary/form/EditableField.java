@@ -18,104 +18,71 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
+import uk.org.rlinsdale.nbpcglibrary.common.CallbackReport;
+import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
- * Abstract Class representing an editable Field on a Form
+ * Interface for an editable Field on a Form
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T> type of the data connecting to the backing Object
+ * @param <T> type of the data contained in the field
  */
-public abstract class EditableField<T> extends Field<T> {
+public interface EditableField<T> extends Field {
 
-    private FieldActionListener actionListener;
-    private final FieldFocusListener focusListener;
-    private final ErrorMarker errorMarker;
-
-    private T lastvaluesetinfield;
-    private boolean inhibitListeneractions = false;
+//    /**
+//     * Define the callback for reporting errors and associated errormessages
+//     * 
+//     * @param errorReporter  the callback object
+//     */
+//    void setErrorReporter(CallbackReport errorReporter);
+    /**
+     * Get the value of the field object (not the actual JComponent).
+     *
+     * @return the value
+     */
+    public T get();
 
     /**
-     * Constructor
+     * Get the value from the source
      *
-     * @param label the label text for this field
-     * @param field the swing field component
-     * @param additionalfield optional additional field (set to null if not
-     * required)
+     * @return the value
      */
-    protected EditableField(String label, JComponent field, JComponent additionalfield) {
-        this(label, field, additionalfield, new ErrorMarker());
-    }
-
-    private EditableField(String label, JComponent field, JComponent additionalfield, ErrorMarker errorMarker) {
-        super(label, field, additionalfield, errorMarker);
-        this.errorMarker = errorMarker;
-        field.addFocusListener(focusListener = new FieldFocusListener());
-    }
-
-    protected final ActionListener getActionListener() {
-        return (actionListener = new FieldActionListener());
-    }
-
-    @Override
-    protected final void updateFieldFromSource() {
-        T value = getSourceValue();
-        if (!value.equals(lastvaluesetinfield)) {
-            lastvaluesetinfield = value;
-            insertField(value);
-        }
-    }
-
-    public final void updateFieldFromSource(boolean force) {
-        if (force) {
-            insertField(getSourceValue());
-        } else {
-            updateFieldFromSource();
-        }
-    }
-
-    private void insertField(T value) {
-        inhibitListeneractions = true;
-        this.lastvaluesetinfield = value;
-        setFieldValue(value);
-        checkRules();
-        inhibitListeneractions = false;
-    }
-
-    protected final void updateSourceFromField() {
-        try {
-            setSourceValue(getFieldValue());
-        } catch (BadFormatException ex) {
-            errorMarker.setError("Badly Formated Number");
-        }
-    }
+    public T getSourceValue();
 
     /**
-     * check that the value has changed and if so then update the lastvalue
-     * variable, and update the source
+     * Add a rule to this set of source rules
      *
-     * @param value the new value to test
+     * @param rule the rule to be added
      */
-    private void updateSourceFromFieldIfChange(T value) {
-        if (!value.equals(lastvaluesetinfield)) {
-            lastvaluesetinfield = value;
-            setSourceValue(value);
-            updateFieldFromSource(true); // and rewrite the field
-            checkRules();
-        }
-    }
+    public void addSourceRule(Rule rule);
 
     /**
-     * Set the value in the source
-     *
-     * @param value the value
+     * Update the field from the source. Only update field if source value
+     * appears to have changed since last setting this field.
      */
-    abstract protected void setSourceValue(T value);
+    public void updateFieldFromSource();
+
+    /**
+     * Update the field from the source
+     *
+     * @param force force the update even if the value does not appear to have
+     * changed
+     */
+    public void updateFieldFromSource(boolean force);
+
+    /**
+     * Update the source from the field. Will not do the update if the field
+     * value is not correctly formatted.
+     */
+    public void updateSourceFromField();
+
+    /**
+     * Set a value into the Field
+     *
+     * @param value the value to be inserted into the Field
+     */
+    public void setFieldValue(T value);
 
     /**
      * Get a value from the field
@@ -124,86 +91,39 @@ public abstract class EditableField<T> extends Field<T> {
      * @throws BadFormatException if field is not valid format for input type
      * required.
      */
-    protected abstract T getFieldValue() throws BadFormatException;
+    public T getFieldValue() throws BadFormatException;
 
     /**
+     * Define the callback for reporting errors and associated errormessages
+     *
+     * @param errorReporter the callback object
+     */
+    public void setErrorReporter(CallbackReport errorReporter);
+
+    /**
+     * finish managing the choices text
+     */
+    public void closeChoices();
+
+    /**
+     * Reset the value of the field object to the initial field value (will
+     * cause the actual field component to be updated).
+     */
+    public void reset();
+    
+    /**
+     * Set the value of the field object (will cause
+     * the actual field component to be updated).
+     *
+     * @param value the value
+     */
+    public void set(T value);
+    
+     /**
      * Check if all rules in the field's rule set are valid, and update error
      * markers and error messages on the form.
      *
      * @return true if all rules are valid
      */
-    protected boolean checkRules() {
-        boolean res = sourceCheckRules();
-        if (res) {
-            errorMarker.clearError();
-        } else {
-            errorMarker.setError(getSourceErrorMessages());
-        }
-        return res;
-    }
-
-    /**
-     * Check the rules for this field source.
-     *
-     * @return true if source is valid for all defined rules.
-     */
-    abstract protected boolean sourceCheckRules();
-
-    /**
-     * Get all error messages generated by rule failure of this field source.
-     *
-     * @return true if source is valid for all defined rules.
-     */
-    abstract protected String getSourceErrorMessages();
-
-    private class FieldActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            if (!inhibitListeneractions) {
-                try {
-                    updateSourceFromFieldIfChange(getFieldValue());
-                } catch (BadFormatException ex) {
-                    errorMarker.setError("Badly Formated Number");
-                }
-            }
-        }
-    }
-
-    private class FieldFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent fe) {
-        }
-
-        @Override
-        public void focusLost(FocusEvent fe) {
-            if (!inhibitListeneractions) {
-                try {
-                    updateSourceFromFieldIfChange(getFieldValue());
-                } catch (BadFormatException ex) {
-                    errorMarker.setError("Badly Formated Number");
-                }
-            }
-        }
-    }
-
-    /**
-     * Get the value of the field object (not the actual JComponent).
-     * @return the value
-     */
-    abstract public T get();
-
-    /**
-     * Set the value of the field object (not the actual JComponent), will cause
-     * the actual field to be updated.
-     * @param value the value
-     */
-    abstract public void set(T value);
-
-    /**
-     * Reset the value of the field object (not the actual JComponent) to the
-     * initial field value, will cause the actual field to be updated.
-     */
-    abstract public void reset();
+    public boolean checkRules();
 }

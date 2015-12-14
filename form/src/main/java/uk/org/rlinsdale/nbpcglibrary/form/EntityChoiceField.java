@@ -19,6 +19,8 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.io.IOException;
+import java.util.List;
+import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
@@ -31,29 +33,33 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the entity class
  */
-public abstract class EntityChoiceField<E extends Entity> extends ChoiceField<E> {
+public class EntityChoiceField<E extends Entity> extends ChoiceField<E> {
 
     private final ChoicesFieldListener choicesfieldListener;
     private final CollectionFieldListener collectionfieldListener;
 
-    /**
-     * Constructor.
+   /**
+     * Constructor
      *
-     * @param label the field label
-     * @param nullSelectionAllowed true if a null selection is allowed
+     * @param source the data source for this field
+     * @param nullSelectionAllowed true if a null selection item is to be added
+     * to the choice items
+     * @param initialValue the initial value of the display (or null if source
+     * provides this
+     * @param choices the choices to be displayed in the combobox
+     * @param callback the callback with is used to inform of source updates
+     * from field
      */
-    public EntityChoiceField(String label, boolean nullSelectionAllowed) {
-        super(label, nullSelectionAllowed);
-        choicesfieldListener = new ChoicesFieldListener(label + "/choices");
-        collectionfieldListener = new CollectionFieldListener(label + "/setchange");
+    public EntityChoiceField(FieldSource<E> source, boolean nullSelectionAllowed, E initialValue, List<E> choices, Callback callback) {
+        super( source, nullSelectionAllowed, initialValue, choices, callback);
+        choicesfieldListener = new ChoicesFieldListener("entity/choices");
+        collectionfieldListener = new CollectionFieldListener("entity/setchange");
     }
 
-    /**
-     * finish managing the choices text
-     */
+    @Override
     public void closeChoices() {
         try {
-            removeCollectionListeners(collectionfieldListener);
+            source.removeCollectionListeners(collectionfieldListener);
         } catch (IOException ex) {
             LogBuilder.writeExceptionLog("nbpcglibrary.form", ex, this, "closeChoices");
         }
@@ -72,40 +78,13 @@ public abstract class EntityChoiceField<E extends Entity> extends ChoiceField<E>
         });
     }
 
-//    /**
-//     * Get the set of entities.
-//     *
-//     * @return the set of entities
-//     * @throws IOException if problems
-//     */
-//    protected abstract List<E> getChoicesEntities() throws IOException;
-
-
-    /**
-     * add a given listener to all parent collections which could affect this
-     * reference choice.
-     *
-     * @param listener the set change listener
-     * @throws IOException if problems
-     */
-    protected abstract void addCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException;
-
-    /**
-     * remove a given listener from all parent collections which could affect
-     * this reference choice.
-     *
-     * @param listener the set change listener
-     * @throws IOException if problems
-     */
-    protected abstract void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException;
-
     /**
      * hook to allow actions to take place before updating a combobox
      */
     @Override
     protected final void preFieldUpdateAction() {
         try {
-            removeCollectionListeners(collectionfieldListener);
+            source.removeCollectionListeners(collectionfieldListener);
         } catch (IOException ex) {
             LogBuilder.writeExceptionLog("nbpcglibrary.form", ex, this, "preFieldUpdateAction");
         }
@@ -119,7 +98,7 @@ public abstract class EntityChoiceField<E extends Entity> extends ChoiceField<E>
     protected final void postFieldUpdateAction() {
         addChoicesListeners();
         try {
-            addCollectionListeners(collectionfieldListener);
+            source.removeCollectionListeners(collectionfieldListener);
         } catch (IOException ex) {
             LogBuilder.writeExceptionLog("nbpcglibrary.form", ex, this, "postFieldUpdateAction");
         }

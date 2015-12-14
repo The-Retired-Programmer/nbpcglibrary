@@ -19,37 +19,22 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.JButton;
 
 /**
- * A Class representing an error marker on a form
+ * A Class representing an toolbar type icon
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class ErrorMarker extends JLabel {
+public class IconButton extends JButton {
 
     /**
      * Constructor
+     * @param iconname the name of the icon to be displayed
+     * @param tooltip the tooltip to be displayed
      */
-    public ErrorMarker() {
-        clearError();
-    }
-
-    /**
-     * Switch on the error marker icon and associated tooltiptext
-     *
-     * @param errormessages error messages to be displayed
-     */
-    public final void setError(String errormessages) {
-        setIcon(new ImageIcon(getClass().getResource("error.png")));
-        setToolTipText(errormessages);
-    }
-
-    /**
-     * Switch off the error marker icon and associated tooltiptext
-     */
-    public final void clearError() {
-        setIcon(new ImageIcon(getClass().getResource("empty.png")));
-        setToolTipText(null);
+    public IconButton(String iconname, String tooltip) {
+        setIcon(new ImageIcon(getClass().getResource(iconname+".png")));
+        setToolTipText(tooltip);
     }
 }

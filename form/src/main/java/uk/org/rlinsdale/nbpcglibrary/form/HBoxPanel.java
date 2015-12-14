@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,22 +18,34 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import javax.swing.JLabel;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
 
 /**
- * A General purpose Field for displaying a value which is a simple textual
- * string.
+ * A basic Horizontally ordered Box panel for displaying stacked components.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FillerField extends FieldImpl {
+public class HBoxPanel extends JPanel {
 
     /**
      * Constructor
      *
-     * @param text the text to appear in the filler field
      */
-    public FillerField(String text) {
-        super(new JLabel(text == null ? "" : text));
+    public HBoxPanel() {
+        this(null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param borderTitle the panel title
+     */
+    public HBoxPanel(String borderTitle) {
+        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        if (borderTitle != null) {
+            setBorder(new TitledBorder(borderTitle));
+        }
     }
 }

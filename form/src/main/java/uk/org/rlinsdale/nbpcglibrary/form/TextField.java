@@ -18,8 +18,8 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import javax.swing.JComponent;
 import javax.swing.JTextField;
+import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
 /**
  * A General purpose Field for displaying and editing a value which is a simple
@@ -27,46 +27,47 @@ import javax.swing.JTextField;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class TextField extends EditableField<String> {
+public class TextField extends EditableFieldImpl<String> {
 
-    private final JTextField field;
-
+    private final JTextField fieldcomponent;
+    
     /**
      * Constructor
      *
-     * @param label label to be displayed with field
+     * @param source the data source for this field
      * @param size the size of the text field object
+     * @param min the minimum valid length of the text entry
+     * @param max the maximum valid length of the text entry
+     * @param initialValue the initial value of the display (or null if source
+     * provides this
+     * @param callback the callback with is used to inform of source updates
+     * from field
      */
-    public TextField(String label, int size) {
-        this(label, new JTextField(), size, null);
+    public TextField(FieldSource<String> source, int size, Integer min, Integer max, String initialValue, Callback callback) {
+         this(new JTextField(), source, size, min, max, initialValue, callback);
     }
     
-     /**
-     * Constructor
-     *
-     * @param label label to be displayed with field
-     * @param size the size of the text field object
-     * @param additionalfield the additional field obejct to be added after the
-     * main field object
-     */
-    protected TextField(String label, int size, JComponent additionalfield) {
-        this(label, new JTextField(), size, additionalfield);
-    }
-
-    private TextField(String label, JTextField field, int size, JComponent additionalfield) {
-        super(label, field, additionalfield);
-        this.field = field;
-        field.setColumns(size);
-        field.addActionListener(getActionListener());
+    private TextField(JTextField fieldcomponent, FieldSource<String> source, int size, Integer min, Integer max, String initialValue, Callback callback) {
+        super(fieldcomponent, source, initialValue, callback);
+        this.fieldcomponent = fieldcomponent;
+        fieldcomponent.setColumns(size);
+        fieldcomponent.addActionListener(getActionListener());
+        if (min != null) {
+            source.getRules().addRule(new MinLengthRule(min));
+        }
+        if (max != null) {
+            source.getRules().addRule(new MaxLengthRule(max));
+        }
+        reset();
     }
 
     @Override
-    protected final String getFieldValue() {
-        return field.getText().trim();
+    public final String getFieldValue() {
+        return fieldcomponent.getText().trim();
     }
 
     @Override
-    protected final void setFieldValue(String value) {
-        field.setText(value);
+    public final void setFieldValue(String value) {
+        fieldcomponent.setText(value);
     }
 }

@@ -21,6 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
+import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
 /**
  * A Field to select choice combobox
@@ -28,33 +29,43 @@ import javax.swing.JComboBox;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type of the data to be represented and selected in the combo box
  */
-public abstract class ChoiceField<T> extends EditableField<T> {
+public class ChoiceField<T> extends EditableFieldImpl<T> {
 
     /**
      * The undefined text as displayed in a choice field
      */
 //    public final static String UNDEFINED = "...";
     private List<T> choices = new ArrayList<>();
-    private final JComboBox<T> combobox;
     private final boolean nullSelectionAllowed;
+    private final JComboBox fieldcomponent;
 
     /**
      * Constructor
      *
-     * @param label the label text for the field
+     * @param source the data source for this field
      * @param nullSelectionAllowed true if a null selection item is to be added
      * to the choice items
+     * @param initialValue the initial value of the display (or null if source
+     * provides this
+     * @param choices the choices to be displayed in the combobox
+     * @param callback the callback with is used to inform of source updates
+     * from field
      */
-    protected ChoiceField(String label, boolean nullSelectionAllowed) {
-        this(label, new JComboBox<>(), nullSelectionAllowed);
+    public ChoiceField(FieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
+        this(new JComboBox(), source, nullSelectionAllowed, initialValue, choices, callback);
     }
 
-    private ChoiceField(String label, JComboBox<T> combobox, boolean nullSelectionAllowed) {
-        super(label, combobox, null);
-        this.combobox = combobox;
+    private ChoiceField (JComboBox fieldcomponent, FieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
+        super(fieldcomponent, source, initialValue, callback);
+        this.fieldcomponent = fieldcomponent;
         this.nullSelectionAllowed = nullSelectionAllowed;
-        combobox.setEditable(false);
-        combobox.addActionListener(getActionListener());
+        fieldcomponent.setEditable(false);
+        fieldcomponent.addActionListener(getActionListener());
+        source.setChoices(choices == null ? source.getChoices() : choices);
+        if (initialValue != null) {
+            source.set(initialValue);
+        }
+        updateChoicesFromSource();
     }
 
     /**
@@ -80,8 +91,8 @@ public abstract class ChoiceField<T> extends EditableField<T> {
     }
 
     @Override
-    protected final T getFieldValue() {
-        return combobox.getItemAt(combobox.getSelectedIndex());
+    public final T getFieldValue() {
+        return (T) fieldcomponent.getItemAt(fieldcomponent.getSelectedIndex());
     }
 
 //    @Override
@@ -92,38 +103,27 @@ public abstract class ChoiceField<T> extends EditableField<T> {
 //        }
 //    }
     @Override
-    protected final void setFieldValue(T value) {
+    public final void setFieldValue(T value) {
         boolean selected = false;
-        combobox.removeAllItems();
+        fieldcomponent.removeAllItems();
         if (choices != null) {
             for (T item : choices) {
-                combobox.addItem(item);
+                fieldcomponent.addItem(item);
                 if (item.equals(value)) {
-                    combobox.setSelectedItem(item);
+                    fieldcomponent.setSelectedItem(item);
                     selected = true;
                 }
             }
         }
         if (!selected || nullSelectionAllowed) {
-            combobox.insertItemAt(null, 0);
+            fieldcomponent.insertItemAt(null, 0);
 //            combobox.insertItemAt(UNDEFINED, 0);
         }
         if (!selected) {
 //            combobox.setSelectedItem(UNDEFINED);
 //            lastvaluesetinfield = UNDEFINED;
-            combobox.setSelectedItem(null);
+            fieldcomponent.setSelectedItem(null);
         }
-    }
-
-    // no validation is normally required for a combobox
-    @Override
-    protected boolean sourceCheckRules() {
-        return true;
-    }
-
-    @Override
-    protected String getSourceErrorMessages() {
-        return "";
     }
 
     /**
@@ -131,5 +131,7 @@ public abstract class ChoiceField<T> extends EditableField<T> {
      *
      * @return the set of values to be inserted
      */
-    protected abstract List<T> getSourceChoices();
+    protected List<T> getSourceChoices() {
+        return source.getChoices();
+    }
 }

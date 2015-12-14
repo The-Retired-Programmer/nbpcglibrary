@@ -34,14 +34,14 @@ public abstract class FieldsDef implements HasInstanceDescription {
 
     private final List<Field> fields = new ArrayList<>();
     private String[] parameters;
-    private final ErrorMarker errorMarker = new ErrorMarker();
     private final FieldsDefRules fieldsdefrules;
+    private final ErrorMarkerField errormarker;
 
     /**
      * Constructor
      */
     public FieldsDef() {
-        this.fieldsdefrules = null;
+        this(null);
     }
 
     /**
@@ -51,7 +51,8 @@ public abstract class FieldsDef implements HasInstanceDescription {
      */
     public FieldsDef(FieldsDefRules fieldsdefrules) {
         this.fieldsdefrules = fieldsdefrules;
-        add(new FillerField("", null, null, errorMarker));
+        errormarker = new ErrorMarkerField();
+        add(errormarker);
     }
 
     @Override
@@ -81,8 +82,8 @@ public abstract class FieldsDef implements HasInstanceDescription {
      * Set the values of all fields.
      */
     public final void updateAllFieldsFromSource() {
-        fields.stream().forEach((f) -> {
-            f.updateFieldFromSource();
+        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
+            ((EditableField) f).updateFieldFromSource();
         });
     }
 
@@ -148,9 +149,9 @@ public abstract class FieldsDef implements HasInstanceDescription {
         if (fieldsdefrules != null) {
             boolean res = fieldsdefrules.checkRules();
             if (res) {
-                errorMarker.clearError();
+                errormarker.clear();
             } else {
-                errorMarker.setError(fieldsdefrules.getErrorMessages());
+                errormarker.report(fieldsdefrules.getErrorMessages());
             }
             return res;
         } else {

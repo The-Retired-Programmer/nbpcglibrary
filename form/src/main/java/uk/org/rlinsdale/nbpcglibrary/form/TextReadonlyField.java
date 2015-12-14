@@ -19,6 +19,9 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.Color;
+import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 /**
@@ -27,30 +30,55 @@ import javax.swing.JTextField;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class TextReadonlyField extends Field<String> {
-
-    private final JTextField field;
+public class TextReadonlyField extends FieldImpl {
+    
+    private JLabel labelcomponent;
 
     /**
      * Constructor
      *
-     * @param label field label
      * @param size size of the value display
+     * @param initialValue the field initial value
      */
-    public TextReadonlyField(String label, int size) {
-        this(label, new JTextField(), size);
+    public TextReadonlyField(int size, String initialValue) {
+        this(new JTextField(), size, initialValue);
     }
-
-    private TextReadonlyField(String label, JTextField field, int size) {
-        super(label, field, null, null);
-        this.field = field;
-        field.setColumns(size);
-        field.setEditable(false);
-        field.setForeground(Color.GRAY);
+    
+    private TextReadonlyField(JTextField fieldcomponent, int size, String initialValue) {
+        super(fieldcomponent);
+        fieldcomponent.setColumns(size);
+        fieldcomponent.setEditable(false);
+        fieldcomponent.setForeground(Color.GRAY);
+        fieldcomponent.setText(initialValue);
     }
-
+    
+     /**
+     * Constructor
+     *
+     * @param label the label to be associated with this field
+     * @param size size of the value display
+     * @param initialValue the field initial value
+     */
+    public TextReadonlyField(String label, int size, String initialValue) {
+        this(new JLabel(), label, new JTextField(), size, initialValue);
+    }
+    
+    private TextReadonlyField(JLabel labelcomponent, String labeltext, JTextField fieldcomponent, int size, String initialValue) {
+        super(fieldcomponent);
+        fieldcomponent.setColumns(size);
+        fieldcomponent.setEditable(false);
+        fieldcomponent.setForeground(Color.GRAY);
+        fieldcomponent.setText(initialValue);
+        labelcomponent.setText(labeltext);
+        this.labelcomponent = labelcomponent;
+    }
+    
     @Override
-    protected void setFieldValue(String value) {
-        field.setText(value);
+    public List<JComponent> getComponents() {
+        List<JComponent> c = super.getComponents();
+        if (labelcomponent != null) {
+            c.add(0, labelcomponent);
+        }
+        return c;
     }
 }

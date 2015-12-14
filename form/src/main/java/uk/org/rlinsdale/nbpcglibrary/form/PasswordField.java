@@ -18,53 +18,55 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import javax.swing.JComponent;
 import javax.swing.JPasswordField;
+import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
 /**
  * A Field to handle password entry.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class PasswordField extends EditableField<String> {
+public class PasswordField extends EditableFieldImpl<String> {
 
-    private JPasswordField field;
+    private final JPasswordField fieldcomponent;
 
     /**
      * Constructor
      *
-     * @param label field label
-     * @param size the field size
+     * @param source the data source for this field
+     * @param size the size of the text field object
+     * @param min the minimum valid length of the text entry
+     * @param max the maximum valid length of the text entry
+     * @param initialValue the initial value of the display (or null if source
+     * provides this
+     * @param callback the callback with is used to inform of source updates
+     * from field
      */
-    public PasswordField(String label, int size) {
-        this(label, new JPasswordField(), size, null);
-    }
-    
-    /**
-     * Constructor
-     *
-     * @param label field label
-     * @param size the field size
-     * @param additionalfield the additional field to be display 
-     */
-    protected PasswordField(String label, int size, JComponent additionalfield) {
-        this(label, new JPasswordField(), size, additionalfield);
+    public PasswordField(FieldSource<String> source, int size, Integer min, Integer max, String initialValue, Callback callback) {
+        this(new JPasswordField(), source, size, min, max, initialValue, callback);
     }
 
-    private PasswordField(String label, JPasswordField field, int size, JComponent additionalfield) {
-        super(label, field, additionalfield);
-        this.field = field;
-        this.field.setColumns(size);
-        field.addActionListener(getActionListener());
+    private PasswordField(JPasswordField fieldcomponent, FieldSource<String> source, int size, Integer min, Integer max, String initialValue, Callback callback) {
+        super(fieldcomponent, source, initialValue, callback);
+        this.fieldcomponent = fieldcomponent;
+        fieldcomponent.setColumns(size);
+        fieldcomponent.addActionListener(getActionListener());
+        if (min != null) {
+            source.getRules().addRule(new MinLengthRule(min));
+        }
+        if (max != null) {
+            source.getRules().addRule(new MaxLengthRule(max));
+        }
+        reset();
     }
 
     @Override
-    protected final String getFieldValue() {
-        return new String(field.getPassword());
+    public final String getFieldValue() {
+        return new String(fieldcomponent.getPassword());
     }
 
     @Override
-    protected final void setFieldValue(String value) {
-        field.setText(value);
+    public final void setFieldValue(String value) {
+        fieldcomponent.setText(value);
     }
 }

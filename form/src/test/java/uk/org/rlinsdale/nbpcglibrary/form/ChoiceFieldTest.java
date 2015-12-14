@@ -197,8 +197,8 @@ public class ChoiceFieldTest {
 
     public class Fields extends FieldsDef {
 
-        private final ChoiceField<String> choiceField;
-        private final ChoiceField<Test> entityChoiceField;
+        private final EditableField<String> choiceField;
+        private final EditableField<TestEntity> entityChoiceField;
 
         public Fields() {
             super();
@@ -226,10 +226,10 @@ public class ChoiceFieldTest {
             e.setDescription("C");
             testentityroot.addTestEntity(e);
             List<Entity> choices = testentityroot.getTestEntities();
-            add(choiceField = FieldBuilder.stringType().label("CHOICE FIELD").choices(new String[]{"A", "B", "C"}).initialvalue(
+            add(choiceField = FieldBuilder.stringType().choices(new String[]{"A", "B", "C"}).initialvalue(
                     "A").choiceField());
             add(entityChoiceField
-                    = FieldBuilder.entityType().label("ENTITY CHOICE FIELD").
+                    =  FieldBuilder.entityType().label("ENTITY CHOICE FIELD").
                     choices(choices).initialvalue(choices.get(0)).fieldsource(new TestEntitySource(testentityroot)).entityChoiceField());
         }
 

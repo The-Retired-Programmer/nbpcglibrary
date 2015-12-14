@@ -20,44 +20,89 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import javax.swing.JTextField;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
+import uk.org.rlinsdale.nbpcglibrary.common.Callback;
+import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
  * A Field for displaying and editing a value which is a Long Value.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class LongField extends EditableField<Long> {
+public class LongField extends EditableFieldImpl<Long> {
 
-    private final JTextField field;
+    private final JTextField fieldcomponent;
 
     /**
      * Constructor
      *
-     * @param label field label
-     * @param size size of the value display
+     * @param source the data source for this field
+     * @param size the size of the text field object
+     * @param min the minimum size of the number entry
+     * @param max the maximum size of the number entry
+     * @param initialValue the initial value of the display (or null if source
+     * provides this
+     * @param callback the callback with is used to inform of source updates
+     * from field
      */
-    public LongField(String label, int size) {
-        this(label, new JTextField(), size);
+    public LongField(FieldSource<Long> source, int size, Long min, Long max, Long initialValue, Callback callback) {
+        this(new JTextField(), source, size, min, max, initialValue, callback);
     }
 
-    private LongField(String label, JTextField field, int size) {
-        super(label, field, null);
-        this.field = field;
-        field.setColumns(size);
-        field.addActionListener(getActionListener());
+    private LongField(JTextField fieldcomponent, FieldSource<Long> source, int size, Long min, Long max, Long initialValue, Callback callback) {
+        super(fieldcomponent, source, initialValue, callback);
+        this.fieldcomponent = fieldcomponent;
+        fieldcomponent.setColumns(size);
+        fieldcomponent.addActionListener(getActionListener());
+        if (min != null) {
+            source.getRules().addRule(new MinRule(min));
+        }
+        if (max != null) {
+            source.getRules().addRule(new MaxRule(max));
+        }
+        reset();
     }
 
     @Override
-    protected final Long getFieldValue() throws BadFormatException {
+    public final Long getFieldValue() throws BadFormatException {
         try {
-            return Long.parseLong(field.getText().trim());
+            return Long.parseLong(fieldcomponent.getText().trim());
         } catch (NumberFormatException ex) {
             throw new BadFormatException("Bad entry format - expected a number");
         }
     }
 
     @Override
-    protected final void setFieldValue(Long value) {
-        field.setText(value.toString());
+    public final void setFieldValue(Long value) {
+        fieldcomponent.setText(value.toString());
+    }
+
+    private class MinRule extends Rule {
+
+        private final long min;
+
+        protected MinRule(long min) {
+            super("Too small - minimum value is " + min);
+            this.min = min;
+        }
+
+        @Override
+        public boolean ruleCheck() {
+            return source.get() >= min;
+        }
+    }
+
+    private class MaxRule extends Rule {
+
+        private final long max;
+
+        protected MaxRule(long max) {
+            super("Too big - maximum value is " + max);
+            this.max = max;
+        }
+
+        @Override
+        public boolean ruleCheck() {
+            return source.get() <= max;
+        }
     }
 }

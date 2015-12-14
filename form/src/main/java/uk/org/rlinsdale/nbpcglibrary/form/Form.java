@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -38,7 +40,7 @@ import static uk.org.rlinsdale.nbpcglibrary.form.Form.FormSaveResult.SAVEVALIDAT
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("nbpcglibrary.form")
-public class Form extends GridBagPanel implements HasInstanceDescription {
+public class Form extends VBoxPanel implements HasInstanceDescription {
 
     /**
      * The Result code from a Form save action
@@ -73,6 +75,7 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
 
     private String formname;
     private final List<FieldsDef> fieldsdefs;
+    private final List<Table> tables;
     private final Event<SimpleEventParams> cancelEvent;
 
     /**
@@ -83,6 +86,7 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
     @SuppressWarnings("LeakingThisInConstructor")
     public Form(String formname) {
         fieldsdefs = new ArrayList<>();
+        tables = new ArrayList<>();
         this.formname = formname;
         cancelEvent = new Event<>(instanceDescription() + "-cancel");
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this, formname);
@@ -110,13 +114,51 @@ public class Form extends GridBagPanel implements HasInstanceDescription {
      * @param fieldsdef the collection of fields
      */
     public final void addFieldsdef(FieldsDef fieldsdef) {
+        GridBagPanel fdp = new GridBagPanel();
         if (fieldsdef != null) {
             LogBuilder.writeLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
             fieldsdefs.add(fieldsdef);
             fieldsdef.getFields().stream().forEach((field) -> {
-                addRow(field.getComponents());
+                fdp.addRow(field.getComponents());
             });
+            add(fdp);
+            //add(new Table(new TestTableDef()));
         }
+    }
+    
+    private class TestTableDef extends TableDef {
+
+        public TestTableDef() {
+            super(null, null, Arrays.asList(new String[] {"Description","Code","Type"}));
+        }
+
+        @Override
+        public List<JComponent> getRowComponents() {
+            List<JComponent> c = new ArrayList<>();
+            JTextField field = new JTextField();
+            field.setColumns(35);
+            field.setText("This is the description");
+            c.add(field);
+            field = new JTextField();
+            field.setColumns(10);
+            field.setText("code here");
+            c.add(field);
+            field = new JTextField();
+            field.setColumns(15);
+            field.setText("Type info here");
+            c.add(field);
+            return c;
+        }
+    }
+    
+    /**
+     * Add a table of fields for display on this form
+     *
+     * @param table the table field
+     */
+    public final void addTable(Table table) {
+        tables.add(table);
+        add(table);
     }
 
     /**
