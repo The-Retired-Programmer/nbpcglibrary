@@ -20,7 +20,6 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -77,13 +76,22 @@ public class GridBagPanel extends JPanel {
     }
 
     /**
-     * Add an array of components to a row, starting in column1
-     *
-     * @param components array of components
+     * Clear all components displayed on this panel
      */
-    public void addRow(JComponent[] components) {
+    public void clear() {
+        row = 0;
+        this.removeAll();
+        validate();
+    }
+
+    /**
+     * Add an list of fields to a row, starting in column1
+     *
+     * @param fieldlist a list of fields to insert into this row
+     */
+    public void addRow(FieldList fieldlist) {
         int col = 0;
-        for (JComponent component : components) {
+        for (JComponent component : fieldlist.getComponents()) {
             if (component != null) {
                 add(component, makeconstraints(row, col));
             }
@@ -91,15 +99,15 @@ public class GridBagPanel extends JPanel {
         }
         row++;
     }
-    
-     /**
-     * Add an list of components to a row, starting in column1
+
+    /**
+     * Add a fields to a row, starting in column1
      *
-     * @param components list of components
+     * @param field a field to insert into this row
      */
-    public void addRow(List<JComponent> components) {
+    public void addRow(Field field) {
         int col = 0;
-        for (JComponent component : components) {
+        for (JComponent component : field.getComponents()) {
             if (component != null) {
                 add(component, makeconstraints(row, col));
             }

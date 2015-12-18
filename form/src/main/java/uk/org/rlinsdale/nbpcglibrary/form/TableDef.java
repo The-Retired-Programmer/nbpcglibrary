@@ -19,7 +19,6 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
-import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
@@ -36,50 +35,71 @@ public abstract class TableDef implements HasInstanceDescription {
 //    private final ErrorMarker errorMarker = new ErrorMarker();
     private final String title;
     private final FieldsDefRules tabledefrules;
-    private final  List<String> headings;
 
     /**
      * Constructor
      *
      * @param title the table title (or null if no title to be displayed
      * @param tabledefrules the table level rules or null if notable level rules
-     * @param headings the list of column headings
      */
-    public TableDef(String title, FieldsDefRules tabledefrules, List<String> headings) {
+    public TableDef(String title, FieldsDefRules tabledefrules) {
         this.title = title;
         this.tabledefrules = tabledefrules;
-        this.headings = headings;
     }
 
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
     }
-    
+
     /**
      * Get the Title string for the table
-     * 
+     *
      * @return the table title or null if no title required
      */
     public String getTitle() {
         return title;
     }
-    
+
+    /**
+     * Get the number of components forming the table display
+     *
+     * @return number of components forming the table display
+     */
+    public abstract int getTableWidth();
+
     /**
      * Get the list of column headings for this table
-     * 
+     *
      * @return A list of column headings
      */
-    public List<String> getColumnHeadings() {
-        return headings;
-    }
+    public abstract FieldList getColumnHeadings();
+
+    /**
+     * Get the list of row fields for this table
+     *
+     * @return A list of rows contents (each is a fieldlist)
+     */
+    public abstract List<EditableFieldList> getRows();
+
+    /**
+     * Get the new row fields for this table
+     */
+    public abstract void createNewRow();
+
+    /**
+     * Copy a row to create new row fields for this table
+     *
+     * @param rowindices the list of rows to copy
+     */
+    public abstract void createCopyRows(List<Integer> rowindices);
     
     /**
-     * Get the list of row components for this table
-     * 
-     * @return A list of row components
+     * Delete row fields for this table
+     *
+     * @param rowindices the list of rows to delete
      */
-    public abstract List<JComponent> getRowComponents();
+    public abstract void deleteRows(List<Integer> rowindices);
 
 //    /**
 //     * add a field to this collection.

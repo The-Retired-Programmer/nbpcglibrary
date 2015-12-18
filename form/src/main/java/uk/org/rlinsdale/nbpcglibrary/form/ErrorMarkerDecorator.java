@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.Dimension;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -37,6 +38,7 @@ public class ErrorMarkerDecorator<T> extends FieldDecorator<T> implements Callba
     public ErrorMarkerDecorator(EditableField<T> field) {
         super(field);
         field.setErrorReporter(this);
+        errorMarker.setPreferredSize(new Dimension(16,16));
     }
     
     public ErrorMarkerDecorator() {

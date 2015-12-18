@@ -24,9 +24,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -42,6 +39,10 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
     private final IconButton deletebutton;
     private final IconButton copybutton;
     private int checkboxcount = 0;
+    private final JPanel buttons;
+    private final FieldList headerfields;
+    private final List<Integer> selectedrows = new ArrayList<>();
+    private final List<EditableField<Boolean>>checkboxes = new ArrayList<>();
 
     /**
      * Constructor
@@ -50,29 +51,17 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public Table(TableDef tabledef) {
-        super(tabledef.getTitle(), tabledef.getColumnHeadings().size()+2);
+        super(tabledef.getTitle(), tabledef.getTableWidth() + 2);
         this.tabledef = tabledef;
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this, tabledef.getTitle());
-        List<JComponent> colhdr = new ArrayList<>();
-        colhdr.add(null);
-        tabledef.getColumnHeadings().stream().forEach((columnheader) -> {
-            colhdr.add(new JLabel(columnheader));
-        });
+        // create the header fields
+        headerfields = tabledef.getColumnHeadings();
+        headerfields.add(0, FieldBuilder.stringType().label("").noerrormarker().columnlabelField());
         ErrorMarkerField errorMarker = new ErrorMarkerField();
         errorMarker.report("Dummy table error message");
-        colhdr.add((JComponent)errorMarker.getComponents().get(0));
-        addRow(colhdr);
-        for (int i = 0; i < 3; i++) {
-            ErrorMarkerDecorator rowerrorMarker = new ErrorMarkerDecorator();
-            rowerrorMarker.report("Dummy error message");
-            JCheckBox selector = new JCheckBox("", false);
-            selector.addItemListener(this);
-            List<JComponent> rowcomponents = tabledef.getRowComponents();
-            rowcomponents.add(0, selector);
-            rowcomponents.add((JComponent)rowerrorMarker.getComponents().get(0));
-            addRow(rowcomponents);
-        }
-        JPanel buttons = new HBoxPanel();
+        headerfields.add(errorMarker);
+        // create the buttons panel
+        buttons = new HBoxPanel();
         buttons.add(addbutton = new IconButton("add", "Add new line"));
         addbutton.setActionCommand("add");
         addbutton.addActionListener(this);
@@ -84,7 +73,33 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
         copybutton.setEnabled(false);
         copybutton.setActionCommand("copy");
         copybutton.addActionListener(this);
+        // and drw the table
+        drawTable();
+    }
+
+    private void drawTable() {
+        addRow(headerfields);
+        checkboxes.clear();
+        tabledef.getRows().stream().map((row) -> {
+            EditableFieldList displayrow = new EditableFieldList();
+            EditableField checkbox = FieldBuilder.booleanType().initialvalue(false).itemlistener(this).checkboxField();
+            checkboxes.add(checkbox);
+            displayrow.add(checkbox);
+            displayrow.addAll(row);
+            return displayrow;
+        }).forEach((displayrow) -> {
+            addRow(displayrow);
+        });
+        checkboxcount = 0;
+        deletebutton.setEnabled(false);
+        copybutton.setEnabled(false);
         addSpannedRow(buttons);
+        validate();
+    }
+
+    private void redrawTable() {
+        clear();
+        drawTable();
     }
 
     @Override
@@ -96,19 +111,35 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "add":
-                System.out.println("ADD");
+                tabledef.createNewRow();
+                redrawTable();
                 break;
             case "delete":
-                System.out.println("DELETE");
+                tabledef.deleteRows(getSelectedRows());
+                redrawTable();
                 break;
             case "copy":
-                System.out.println("COPY");
+                tabledef.createCopyRows(getSelectedRows());
+                redrawTable();
+                break;
         }
+    }
+    
+    private List<Integer> getSelectedRows(){
+        List<Integer> selected = new ArrayList<>();
+        int count = 0;
+        for (EditableField<Boolean> e : checkboxes) {
+            if (e.get()){
+                selected.add(count);
+            }
+            count++;
+        }
+        return selected;
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-
+        
         if (e.getStateChange() == ItemEvent.SELECTED) {
             checkboxcount++;
             if (checkboxcount == 1) {

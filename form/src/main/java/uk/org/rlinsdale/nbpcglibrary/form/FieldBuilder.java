@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.event.ItemListener;
 import java.util.Arrays;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.api.DateOnly;
@@ -43,6 +44,8 @@ public class FieldBuilder<T, M> {
     private List<T> fb_choices = null;
     private String fb_fieldtext = null;
     private Callback fb_callback = null;
+    private ItemListener fb_listener = null;
+    private boolean fb_noerrormarker = false;
 
     private FieldSource<T> fb_source = new FieldSource<>();
 
@@ -104,6 +107,16 @@ public class FieldBuilder<T, M> {
         return this;
     }
 
+    public FieldBuilder<T, M> itemlistener(ItemListener listener) {
+        fb_listener = listener;
+        return this;
+    }
+
+    public FieldBuilder<T, M> noerrormarker() {
+        fb_noerrormarker = true;
+        return this;
+    }
+
     public Field fillerField() {
         return new FillerField(fb_fieldtext);
     }
@@ -115,13 +128,19 @@ public class FieldBuilder<T, M> {
         return new TextReadonlyField(fb_label, fb_size, (String) fb_initialValue);
     }
 
+    public Field columnlabelField() {
+        return new ColumnLabelField(fb_label, !fb_noerrormarker);
+    }
+
     public EditableField textField() {
         if (fb_size == Integer.MIN_VALUE) {
             fb_size = 20;
         }
         EditableField tf = new TextField((FieldSource<String>) fb_source, fb_size, (Integer) fb_min, (Integer) fb_max, (String) fb_initialValue, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -132,8 +151,10 @@ public class FieldBuilder<T, M> {
             fb_size = 20;
         }
         EditableField tf = new PasswordField((FieldSource<String>) fb_source, fb_size, (Integer) fb_min, (Integer) fb_max, (String) fb_initialValue, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -144,8 +165,10 @@ public class FieldBuilder<T, M> {
             fb_size = 20;
         }
         EditableField tf = new IntegerField((FieldSource<Integer>) fb_source, fb_size, (Integer) fb_min, (Integer) fb_max, (Integer) fb_initialValue, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -156,8 +179,10 @@ public class FieldBuilder<T, M> {
             fb_size = 20;
         }
         EditableField tf = new LongField((FieldSource<Long>) fb_source, fb_size, (Long) fb_min, (Long) fb_max, (Long) fb_initialValue, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -168,8 +193,10 @@ public class FieldBuilder<T, M> {
             fb_size = 20;
         }
         EditableField tf = new DateField((FieldSource<DateOnly>) fb_source, fb_size, (DateOnly) fb_min, (DateOnly) fb_max, (DateOnly) fb_initialValue, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -180,17 +207,18 @@ public class FieldBuilder<T, M> {
             fb_size = 20;
         }
         EditableField tf = new DatetimeField((FieldSource<Timestamp>) fb_source, fb_size, (Timestamp) fb_min, (Timestamp) fb_max, (Timestamp) fb_initialValue, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
     }
 
     public EditableField checkboxField() {
-        EditableField tf = new CheckboxField((FieldSource<Boolean>) fb_source, (Boolean) fb_initialValue, fb_callback);
+        EditableField tf = new CheckboxField((FieldSource<Boolean>) fb_source, (Boolean) fb_initialValue, fb_listener, fb_callback);
         if (fb_label != null) {
-            tf = new ErrorMarkerDecorator(tf);
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -198,8 +226,10 @@ public class FieldBuilder<T, M> {
 
     public EditableField choiceField() {
         EditableField tf = new ChoiceField(fb_source, fb_nullselectionallowed, fb_initialValue, fb_choices, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -207,8 +237,10 @@ public class FieldBuilder<T, M> {
 
     public EditableField entityChoiceField() {
         EditableField tf = new EntityChoiceField(fb_source, fb_nullselectionallowed, (Entity) fb_initialValue, fb_choices, fb_callback);
-        if (fb_label != null) {
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -221,7 +253,11 @@ public class FieldBuilder<T, M> {
         EditableField tf = new TextField((FieldSource<String>) fb_source, fb_size, (Integer) fb_min, (Integer) fb_max, (String) fb_initialValue, fb_callback);
         if (fb_label != null) {
             tf = new FolderSelectionDecorator(tf);
+        }
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;
@@ -233,8 +269,12 @@ public class FieldBuilder<T, M> {
         }
         EditableField tf = new TextField((FieldSource<String>) fb_source, fb_size, (Integer) fb_min, (Integer) fb_max, (String) fb_initialValue, fb_callback);
         if (fb_label != null) {
-            tf = new FileSelectionDecorator(tf);
+            tf = new FolderSelectionDecorator(tf);
+        }
+        if (!fb_noerrormarker) {
             tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
             tf = new LabelDecorator(tf, fb_label);
         }
         return tf;

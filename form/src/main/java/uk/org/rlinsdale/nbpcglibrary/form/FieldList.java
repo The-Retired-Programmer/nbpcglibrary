@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,45 +18,33 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.Dimension;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import uk.org.rlinsdale.nbpcglibrary.common.CallbackReport;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
+ * A General purpose Field for displaying and editing a value which is a simple
+ * textual string.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class ErrorMarkerField extends FieldImpl implements CallbackReport {
+public class FieldList extends ArrayList<Field> implements Field {
 
-    private final JLabel errorMarker;
-
-    public ErrorMarkerField() {
-        this(new JLabel());
-    }
-
-    private ErrorMarkerField(JLabel errorMarker) {
-        super(errorMarker);
-        this.errorMarker = errorMarker;
-        errorMarker.setPreferredSize(new Dimension(16,16));
+    
+    public List<JComponent> getComponents() {
+        List<JComponent> c = new ArrayList<>();
+        this.stream().forEach((field) -> {
+            field.getComponents().stream().forEach((component) -> {
+                c.add(component);
+            });
+        });
+        return c;
     }
 
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
-    }
-
-    @Override
-    public void report(String errormessages) {
-        errorMarker.setIcon(new ImageIcon(getClass().getResource("error.png")));
-        errorMarker.setToolTipText(errormessages);
-    }
-
-    @Override
-    public void clear() {
-        errorMarker.setIcon(new ImageIcon(getClass().getResource("empty.png")));
-        errorMarker.setToolTipText(null);
     }
 
 }

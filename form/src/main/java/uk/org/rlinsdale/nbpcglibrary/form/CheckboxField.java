@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.event.ItemListener;
 import javax.swing.JCheckBox;
 import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
@@ -37,16 +38,20 @@ public class CheckboxField extends EditableFieldImpl<Boolean> {
      * @param source the data source for this field
      * @param initialValue the initial value of the display (or null if source
      * provides this
+     * @param listener the itemlistener to be associated with this field
      * @param callback the callback with is used to inform of source updates
      * from field
      */
-    public CheckboxField(FieldSource<Boolean> source, Boolean initialValue, Callback callback) {
-        this(new JCheckBox(), source, initialValue, callback);
+    public CheckboxField(FieldSource<Boolean> source, Boolean initialValue, ItemListener listener, Callback callback) {
+        this(new JCheckBox(), source, initialValue, listener, callback);
     }
     
-    private CheckboxField(JCheckBox fieldcomponent, FieldSource<Boolean> source, Boolean initialValue, Callback callback) {
+    private CheckboxField(JCheckBox fieldcomponent, FieldSource<Boolean> source, Boolean initialValue, ItemListener listener, Callback callback) {
         super(fieldcomponent, source, initialValue, callback);
         this.fieldcomponent = fieldcomponent;
+        if (listener != null ) {
+            fieldcomponent.addItemListener(listener);
+        }
         fieldcomponent.addActionListener(getActionListener());
         reset();
     }

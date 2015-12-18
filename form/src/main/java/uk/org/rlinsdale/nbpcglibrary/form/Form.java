@@ -21,9 +21,8 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
@@ -51,22 +50,18 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
          * Save was successful
          */
         SAVESUCCESS,
-
         /**
-         * Save failed due to validation 
+         * Save failed due to validation
          */
         SAVEVALIDATIONFAIL,
-
         /**
          * Save action failed
          */
         SAVEFAIL,
-
         /**
          * Save action was cancelled by user
          */
         CANCELLED,
-
         /**
          * Save action failed as user closed dialog
          */
@@ -102,7 +97,7 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
         this(formname);
         addFieldsdef(fieldsdef);
     }
-    
+
     @Override
     public final String instanceDescription() {
         return LogBuilder.instanceDescription(this, formname);
@@ -119,38 +114,82 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
             LogBuilder.writeLog("nbpcglibrary.form", this, "addFieldsdef", fieldsdef);
             fieldsdefs.add(fieldsdef);
             fieldsdef.getFields().stream().forEach((field) -> {
-                fdp.addRow(field.getComponents());
+                fdp.addRow(field);
             });
             add(fdp);
-            //add(new Table(new TestTableDef()));
+//            add(new Table(new TestTableDef()));
         }
     }
-    
-    private class TestTableDef extends TableDef {
+//
+//    private class TestTableDef extends TableDef {
+//
+//        private final List<EditableFieldList> rows;
+//
+//        public TestTableDef() {
+//            super("test table", null);
+//            rows = new ArrayList<>();
+//            // initialise the rows to be displayed
+//            rows.add(getRow(1));
+//            rows.add(getRow(2));
+//            rows.add(getRow(3));
+//            rows.add(getRow(4));
+//            rows.add(getRow(5));
+//        }
+//
+//        @Override
+//        public int getTableWidth() {
+//            return 3 * 2;
+//        }
+//
+//        @Override
+//        public FieldList getColumnHeadings() {
+//            FieldList c = new FieldList();
+//            c.add(FieldBuilder.stringType().label("Description").columnlabelField());
+//            c.add(FieldBuilder.stringType().label("Code").columnlabelField());
+//            c.add(FieldBuilder.stringType().label("Type").columnlabelField());
+//            return c;
+//        }
+//
+//        @Override
+//        public List<EditableFieldList> getRows() {
+//            return rows;
+//        }
+//
+//        private EditableFieldList getRow(int i) {
+//            EditableFieldList r = new EditableFieldList();
+//            r.add(FieldBuilder.stringType().fieldsize(35).min(1).max(100).initialvalue("This is the description").textField());
+//            r.add(FieldBuilder.integerType().fieldsize(10).min(1).max(1000).initialvalue(i).integerField());
+//            r.add(FieldBuilder.stringType().initialvalue("A").choices(Arrays.asList(new String[]{"A", "B", "C"})).choiceField());
+//            return r;
+//        }
+//
+//        @Override
+//        public void createNewRow() {
+//            EditableFieldList r = new EditableFieldList();
+//            r.add(FieldBuilder.stringType().fieldsize(35).min(1).max(100).initialvalue("").textField());
+//            r.add(FieldBuilder.integerType().fieldsize(10).min(1).max(1000).initialvalue(0).integerField());
+//            r.add(FieldBuilder.stringType().initialvalue("").choices(Arrays.asList(new String[]{"A", "B", "C"})).choiceField());
+//            rows.add(r);
+//        }
+//
+//        @Override
+//        public void createCopyRows(List<Integer> rowindices) {
+//            rowindices.stream().sorted().forEach((index) -> {
+//                EditableFieldList from = rows.get(index);
+//                EditableFieldList r = new EditableFieldList();
+//                r.add(FieldBuilder.stringType().fieldsize(35).min(1).max(100).initialvalue((String) from.get(0).get()).textField());
+//                r.add(FieldBuilder.integerType().fieldsize(10).min(1).max(1000).initialvalue((Integer) from.get(1).get()).integerField());
+//                r.add(FieldBuilder.stringType().initialvalue((String) from.get(2).get()).choices(Arrays.asList(new String[]{"A", "B", "C"})).choiceField());
+//                rows.add(r);
+//            });
+//        }
+//
+//        @Override
+//        public void deleteRows(List<Integer> rowindices) {
+//            rowindices.stream().sorted(Comparator.reverseOrder()).forEach((index) -> rows.remove((int)index));
+//        }
+//    }
 
-        public TestTableDef() {
-            super(null, null, Arrays.asList(new String[] {"Description","Code","Type"}));
-        }
-
-        @Override
-        public List<JComponent> getRowComponents() {
-            List<JComponent> c = new ArrayList<>();
-            JTextField field = new JTextField();
-            field.setColumns(35);
-            field.setText("This is the description");
-            c.add(field);
-            field = new JTextField();
-            field.setColumns(10);
-            field.setText("code here");
-            c.add(field);
-            field = new JTextField();
-            field.setColumns(15);
-            field.setText("Type info here");
-            c.add(field);
-            return c;
-        }
-    }
-    
     /**
      * Add a table of fields for display on this form
      *
@@ -171,8 +210,8 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
     }
 
     /**
-     * Do the form save actions: save the field values to backingObject; check the form rules are
-     * ok.  If ok do the save
+     * Do the form save actions: save the field values to backingObject; check
+     * the form rules are ok. If ok do the save
      *
      * @return save result code
      */
@@ -200,12 +239,12 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
             return SAVEFAIL;
         }
     }
-    
+
     List<String> getParameters() {
         List<String> parameters = new ArrayList<>();
         fieldsdefs.stream().forEach((f) -> {
             String[] params = f.getParameters();
-            if (params!= null) {
+            if (params != null) {
                 parameters.addAll(Arrays.asList(params));
             }
         });
@@ -231,8 +270,7 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
     }
 
     /**
-     * Check if all rules in the form (fieldsdef and field levels) are
-     * valid.
+     * Check if all rules in the form (fieldsdef and field levels) are valid.
      *
      * @return true if all rules are valid
      */

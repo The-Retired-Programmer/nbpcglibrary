@@ -59,7 +59,22 @@ public class FieldBuilderTest {
     @Test
     public void testTextFieldNoLabel() {
         System.out.println("textField - no label");
-        TextField username = (TextField)  FieldBuilder.stringType()/*.label("Username")*/.min(1).max(100).initialvalue("").textField();
+        EditableField<String> username = FieldBuilder.stringType()/*.label("Username")*/.min(1).max(100).initialvalue("").textField();
+        List<JComponent> lc = username.getComponents();
+        assertEquals(2, lc.size());
+        JComponent f = lc.get(0);
+        lc = username.getComponents();
+        assertEquals(2, lc.size());
+        assertTrue(f == lc.get(0));
+    }
+    
+    /**
+     * 
+     */
+    @Test
+    public void testTextFieldNoLabelNoErr() {
+        System.out.println("textField - no label - no errormarker");
+        EditableField<String> username = FieldBuilder.stringType().noerrormarker().min(1).max(100).initialvalue("").textField();
         List<JComponent> lc = username.getComponents();
         assertEquals(1, lc.size());
         JComponent f = lc.get(0);
@@ -87,14 +102,29 @@ public class FieldBuilderTest {
      * 
      */
     @Test
+    public void testTextFieldLabelNoErr() {
+        System.out.println("textField - label - no errormarker");
+        EditableField<String> username = FieldBuilder.stringType().label("Username").noerrormarker().min(1).max(100).initialvalue("").textField();
+        List<JComponent> lc = username.getComponents();
+        assertEquals(2, lc.size());
+        JComponent f = lc.get(1);
+        lc = username.getComponents();
+        assertEquals(2, lc.size());
+        assertEquals(f, lc.get(1));
+    }
+    
+    /**
+     * 
+     */
+    @Test
     public void testPasswordFieldNoLabel() {
         System.out.println("passwordField - no label");
-        EditableField<String> password =  FieldBuilder.stringType()/*.label("Username")*/.min(1).max(100).initialvalue("").passwordField();
+        EditableField<String> password =  FieldBuilder.stringType().min(1).max(100).initialvalue("").passwordField();
         List<JComponent> lc = password.getComponents();
-        assertEquals(1, lc.size());
+        assertEquals(2, lc.size());
         JComponent f = lc.get(0);
         lc = password.getComponents();
-        assertEquals(1, lc.size());
+        assertEquals(2, lc.size());
         assertTrue(f == lc.get(0));
     }
     
