@@ -46,5 +46,33 @@ public class EditableFieldList extends ArrayList<EditableField> implements Field
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
     }
+    
+    protected final void updateRowFieldsFromSource() {
+        this.stream().forEach((f) -> {
+            f.updateFieldFromSource();
+        });
+    
+    }
+    
+     protected final void updateRowSourcesFromFields() {
+         this.stream().forEach((f) -> {
+            f.updateSourceFromField();
+        });
+     }
 
+     /**
+     * Check if all rules in the collection's rule set and each individual field
+     * are valid.
+     *
+     * @return true if all rules are valid
+     */
+    public final boolean checkRules() {
+        boolean valid = true;
+        for (EditableField f : this) {
+            if (!f.checkRules()) {
+                valid = false;
+            }
+        }
+        return valid;
+    }
 }

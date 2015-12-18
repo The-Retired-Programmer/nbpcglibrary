@@ -40,6 +40,7 @@ public class ErrorMarkerField extends FieldImpl implements CallbackReport {
         super(errorMarker);
         this.errorMarker = errorMarker;
         errorMarker.setPreferredSize(new Dimension(16,16));
+        clear();
     }
 
     @Override

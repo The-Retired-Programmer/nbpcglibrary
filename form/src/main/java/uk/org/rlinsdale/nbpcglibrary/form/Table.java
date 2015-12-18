@@ -57,9 +57,7 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
         // create the header fields
         headerfields = tabledef.getColumnHeadings();
         headerfields.add(0, FieldBuilder.stringType().label("").noerrormarker().columnlabelField());
-        ErrorMarkerField errorMarker = new ErrorMarkerField();
-        errorMarker.report("Dummy table error message");
-        headerfields.add(errorMarker);
+        headerfields.add(tabledef.getTableErrorMarker());
         // create the buttons panel
         buttons = new HBoxPanel();
         buttons.add(addbutton = new IconButton("add", "Add new line"));

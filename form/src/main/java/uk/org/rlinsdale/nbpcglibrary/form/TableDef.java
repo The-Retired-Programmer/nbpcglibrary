@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.io.IOException;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
@@ -30,9 +31,8 @@ import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
  */
 public abstract class TableDef implements HasInstanceDescription {
 
-//    private final List<Field> fields = new ArrayList<>();
-//    private String[] parameters;
-//    private final ErrorMarker errorMarker = new ErrorMarker();
+    private String[] parameters;
+    private final ErrorMarkerField errorMarker = new ErrorMarkerField();
     private final String title;
     private final FieldsDefRules tabledefrules;
 
@@ -50,6 +50,15 @@ public abstract class TableDef implements HasInstanceDescription {
     @Override
     public String instanceDescription() {
         return LogBuilder.instanceDescription(this);
+    }
+    
+    /**
+     * Get the error marker field for displaying table level errors
+     * 
+     * @return the error marker field
+     */
+    public ErrorMarkerField getTableErrorMarker() {
+        return errorMarker;
     }
 
     /**
@@ -93,7 +102,7 @@ public abstract class TableDef implements HasInstanceDescription {
      * @param rowindices the list of rows to copy
      */
     public abstract void createCopyRows(List<Integer> rowindices);
-    
+
     /**
      * Delete row fields for this table
      *
@@ -101,102 +110,82 @@ public abstract class TableDef implements HasInstanceDescription {
      */
     public abstract void deleteRows(List<Integer> rowindices);
 
-//    /**
-//     * add a field to this collection.
-//     *
-//     * @param f the field to add
-//     */
-//    public final void add(Field f) {
-//        fields.add(f);
-//    }
-//
-//    /**
-//     * Get the collection of fields.
-//     *
-//     * @return the collection of fields
-//     */
-//    public final List<Field> getFields() {
-//        return fields;
-//    }
-//
-//    /**
-//     * Set the values of all fields.
-//     */
-//    public final void updateAllFieldsFromSource() {
-//        fields.stream().forEach((f) -> {
-//            f.updateFieldFromSource();
-//        });
-//    }
-//
-//    /**
-//     * Set the values of all fields into sources.
-//     */
-//    public final void updateAllSourcesFromFields() {
-//        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
-//            ((EditableField) f).updateSourceFromField();
-//        });
-//    }
-//
-//    /**
-//     * Finalise the save action from source to other storage (eg persistent
-//     * storage)
-//     *
-//     * @return true if save was successful
-//     * @throws IOException if problems occurred during save
-//     */
-//    public abstract boolean save() throws IOException;
-//
-//    String[] getParameters() {
-//        return parameters;
-//    }
-//
-//    /**
-//     * Set the parameters to be returned from the fielddef (consolidated at
-//     * dialog completion)
-//     *
-//     * @param parameters the set of parameters
-//     */
-//    protected void setParameters(String... parameters) {
-//        this.parameters = parameters;
-//    }
-//
-//    /**
-//     * Check if all rules in the collection's rule set and each individual field
-//     * are valid.
-//     *
-//     * @return true if all rules are valid
-//     */
-//    public final boolean checkRules() {
-//        boolean valid = true;
-//        for (Field f : fields) {
-//            if (f instanceof EditableField) {
-//                if (!((EditableField) f).checkRules()) {
-//                    valid = false;
-//                }
-//            }
-//        }
-//        if (!checkFieldsDefRules()) {
-//            valid = false;
-//        }
-//        return valid;
-//    }
-//
-//    /**
-//     * Check the rules defined for the fieldDef.
-//     *
-//     * @return true if the rules are obeyed (ie OK)
-//     */
-//    public boolean checkFieldsDefRules() {
-//        if (tabledefrules != null) {
-//            boolean res = tabledefrules.checkRules();
-//            if (res) {
-//                errorMarker.clearError();
-//            } else {
-//                errorMarker.setError(tabledefrules.getErrorMessages());
-//            }
-//            return res;
-//        } else {
-//            return true;
-//        }
-//    }
+    /**
+     * Set the values of all fields.
+     */
+    public final void updateAllFieldsFromSource() {
+        getRows().stream().forEach((r) -> {
+            r.updateRowFieldsFromSource();
+        });
+    }
+
+    /**
+     * Set the values of all fields into sources.
+     */
+    public final void updateAllSourcesFromFields() {
+        getRows().stream().forEach((r) -> {
+            r.updateRowSourcesFromFields();
+        });
+    }
+
+    /**
+     * Finalise the save action from source to other storage (eg persistent
+     * storage)
+     *
+     * @return true if save was successful
+     * @throws IOException if problems occurred during save
+     */
+    public abstract boolean save() throws IOException;
+
+    protected String[] getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Set the parameters to be returned from the fielddef (consolidated at
+     * dialog completion)
+     *
+     * @param parameters the set of parameters
+     */
+    protected void setParameters(String... parameters) {
+        this.parameters = parameters;
+    }
+
+    /**
+     * Check if all rules in the collection's rule set and each individual field
+     * are valid.
+     *
+     * @return true if all rules are valid
+     */
+    public final boolean checkRules() {
+        boolean valid = true;
+        for (EditableFieldList r : getRows()) {
+            if (!r.checkRules()) {
+                valid = false;
+            }
+        }
+        if (!checkTableDefRules()) {
+            valid = false;
+        }
+        return valid;
+    }
+
+    /**
+     * Check the rules defined for the Table.
+     *
+     * @return true if the rules are obeyed (ie OK)
+     */
+    public boolean checkTableDefRules() {
+        if (tabledefrules != null) {
+            boolean res = tabledefrules.checkRules();
+            if (res) {
+                errorMarker.clear();
+            } else {
+                errorMarker.report(tabledefrules.getErrorMessages());
+            }
+            return res;
+        } else {
+            return true;
+        }
+    }
 }

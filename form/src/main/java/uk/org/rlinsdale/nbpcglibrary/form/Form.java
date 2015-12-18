@@ -21,7 +21,6 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.Event;
@@ -70,7 +69,7 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
 
     private String formname;
     private final List<FieldsDef> fieldsdefs;
-    private final List<Table> tables;
+    private final List<TableDef> tabledefs;
     private final Event<SimpleEventParams> cancelEvent;
 
     /**
@@ -81,7 +80,7 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
     @SuppressWarnings("LeakingThisInConstructor")
     public Form(String formname) {
         fieldsdefs = new ArrayList<>();
-        tables = new ArrayList<>();
+        tabledefs = new ArrayList<>();
         this.formname = formname;
         cancelEvent = new Event<>(instanceDescription() + "-cancel");
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this, formname);
@@ -193,11 +192,11 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
     /**
      * Add a table of fields for display on this form
      *
-     * @param table the table field
+     * @param tabledef the table definition
      */
-    public final void addTable(Table table) {
-        tables.add(table);
-        add(table);
+    public final void addTableDef(TableDef tabledef) {
+        tabledefs.add(tabledef);
+        add(new Table(tabledef));
     }
 
     /**
@@ -228,9 +227,26 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
             if (!ok) {
                 return SAVEVALIDATIONFAIL;
             }
+            for (TableDef t : tabledefs) {
+                t.updateAllSourcesFromFields();
+                if (!t.checkRules()) {
+                    ok = false;
+                }
+            }
+            if (!ok) {
+                return SAVEVALIDATIONFAIL;
+            }
             LogBuilder.writeLog("nbpcglibrary.form", this, "save");
             for (FieldsDef f : fieldsdefs) {
                 if (!f.save()) {
+                    ok = false;
+                }
+            }
+            if (!ok) {
+                return SAVEFAIL;
+            }
+            for (TableDef t : tabledefs) {
+                if (!t.save()) {
                     ok = false;
                 }
             }
@@ -240,10 +256,16 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
         }
     }
 
-    List<String> getParameters() {
+    protected List<String> getParameters() {
         List<String> parameters = new ArrayList<>();
         fieldsdefs.stream().forEach((f) -> {
             String[] params = f.getParameters();
+            if (params != null) {
+                parameters.addAll(Arrays.asList(params));
+            }
+        });
+        tabledefs.stream().forEach((t) -> {
+            String[] params = t.getParameters();
             if (params != null) {
                 parameters.addAll(Arrays.asList(params));
             }
@@ -267,6 +289,9 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
         fieldsdefs.stream().forEach((f) -> {
             f.updateAllFieldsFromSource();
         });
+        tabledefs.stream().forEach((t) -> {
+            t.updateAllFieldsFromSource();
+        });
     }
 
     /**
@@ -278,6 +303,11 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
         boolean valid = true;
         for (FieldsDef f : fieldsdefs) {
             if (!f.checkRules()) {
+                valid = false;
+            }
+        }
+        for (TableDef t : tabledefs) {
+            if (!t.checkRules()) {
                 valid = false;
             }
         }
