@@ -50,7 +50,7 @@ public class EntityChoiceField<E extends Entity> extends ChoiceField<E> {
      * @param callback the callback with is used to inform of source updates
      * from field
      */
-    public EntityChoiceField(FieldSource<E> source, boolean nullSelectionAllowed, E initialValue, List<E> choices, Callback callback) {
+    public EntityChoiceField(ChoiceFieldSource<E> source, boolean nullSelectionAllowed, E initialValue, List<E> choices, Callback callback) {
         super( source, nullSelectionAllowed, initialValue, choices, callback);
         choicesfieldListener = new ChoicesFieldListener("entity/choices");
         collectionfieldListener = new CollectionFieldListener("entity/setchange");

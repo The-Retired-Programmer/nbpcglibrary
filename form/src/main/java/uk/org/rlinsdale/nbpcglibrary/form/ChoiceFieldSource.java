@@ -18,28 +18,33 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import uk.org.rlinsdale.nbpcglibrary.common.Rules;
+import java.io.IOException;
+import java.util.List;
+import uk.org.rlinsdale.nbpcglibrary.common.Listener;
+//import uk.org.rlinsdale.nbpcglibrary.common.Rules;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 
 /**
- * The Field Source - Basic implementation
+ * The Choice Field Source - basic implementation
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> the type of the source value
  */
-public class FieldSource<T> {
+public class ChoiceFieldSource<T> extends FieldSource<T> {
 
-    private T value; // data source
-    private final Rules rules = new Rules();
-
-    public void set(T value) {
-        this.value = value;
+    private List<T> choices;
+    
+    public List<T> getChoices() {
+        return choices;
     }
 
-    public Rules getRules() {
-        return rules;
+    public void setChoices(List<T> choices) {
+        this.choices = choices;
     }
 
-    public T get() {
-        return value;
+    public void addCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
+    }
+
+    public void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
     }
 }

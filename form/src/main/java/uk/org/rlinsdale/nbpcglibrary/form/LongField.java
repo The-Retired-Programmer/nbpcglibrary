@@ -28,7 +28,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class LongField extends EditableFieldImpl<Long> {
+public class LongField extends EditableFieldImpl<Long, FieldSource<Long>> {
 
     private final JTextField fieldcomponent;
 

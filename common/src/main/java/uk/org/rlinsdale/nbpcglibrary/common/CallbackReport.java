@@ -28,6 +28,7 @@ public interface CallbackReport {
     /**
      * The call back method.
      *
+     * @param parameter the error message(s) being reported 
      */
     public abstract void report(String parameter);
     

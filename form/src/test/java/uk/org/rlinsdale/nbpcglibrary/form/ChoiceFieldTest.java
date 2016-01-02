@@ -195,7 +195,7 @@ public class ChoiceFieldTest {
         }
     }
 
-    public class Fields extends FieldsDef {
+    public class Fields extends FormFields {
 
         private final EditableField<String> choiceField;
         private final EditableField<TestEntity> entityChoiceField;
@@ -243,13 +243,13 @@ public class ChoiceFieldTest {
 
     public class DForm extends Form {
 
-        public DForm(String formname, FieldsDef fieldsdef) {
+        public DForm(String formname, FormFields fieldsdef) {
             super(formname, fieldsdef);
         }
 
     }
 
-    public class TestEntitySource extends FieldSource<Entity> {
+    public class TestEntitySource extends ChoiceFieldSource<Entity> {
 
         private final TestEntityRoot root;
 

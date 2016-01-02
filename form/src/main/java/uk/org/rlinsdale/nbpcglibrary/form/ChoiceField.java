@@ -29,12 +29,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.Callback;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type of the data to be represented and selected in the combo box
  */
-public class ChoiceField<T> extends EditableFieldImpl<T> {
+public class ChoiceField<T> extends EditableFieldImpl<T, ChoiceFieldSource<T>> {
 
-    /**
-     * The undefined text as displayed in a choice field
-     */
-//    public final static String UNDEFINED = "...";
     private List<T> choices = new ArrayList<>();
     private final boolean nullSelectionAllowed;
     private final JComboBox fieldcomponent;
@@ -51,11 +47,11 @@ public class ChoiceField<T> extends EditableFieldImpl<T> {
      * @param callback the callback with is used to inform of source updates
      * from field
      */
-    public ChoiceField(FieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
+    public ChoiceField(ChoiceFieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
         this(new JComboBox(), source, nullSelectionAllowed, initialValue, choices, callback);
     }
 
-    private ChoiceField (JComboBox fieldcomponent, FieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
+    private ChoiceField (JComboBox fieldcomponent, ChoiceFieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
         super(fieldcomponent, source, initialValue, callback);
         this.fieldcomponent = fieldcomponent;
         this.nullSelectionAllowed = nullSelectionAllowed;
@@ -95,13 +91,6 @@ public class ChoiceField<T> extends EditableFieldImpl<T> {
         return (T) fieldcomponent.getItemAt(fieldcomponent.getSelectedIndex());
     }
 
-//    @Override
-//    protected final void updateIfChange(T value) {
-//        if ((value != null) && (!value.equals(lastvaluesetinfield)) && (nullSelectionAllowed || !value.equals(UNDEFINED))) {
-//            setSourceValue(value);
-//            backingObject.set(value);
-//        }
-//    }
     @Override
     public final void setFieldValue(T value) {
         boolean selected = false;
@@ -117,11 +106,8 @@ public class ChoiceField<T> extends EditableFieldImpl<T> {
         }
         if (!selected || nullSelectionAllowed) {
             fieldcomponent.insertItemAt(null, 0);
-//            combobox.insertItemAt(UNDEFINED, 0);
         }
         if (!selected) {
-//            combobox.setSelectedItem(UNDEFINED);
-//            lastvaluesetinfield = UNDEFINED;
             fieldcomponent.setSelectedItem(null);
         }
     }

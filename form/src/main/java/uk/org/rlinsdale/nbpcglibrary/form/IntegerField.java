@@ -28,7 +28,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class IntegerField extends EditableFieldImpl<Integer> {
+public class IntegerField extends EditableFieldImpl<Integer, FieldSource<Integer>> {
 
     private final JTextField fieldcomponent;
 

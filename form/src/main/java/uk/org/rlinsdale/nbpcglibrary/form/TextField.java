@@ -27,7 +27,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Callback;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class TextField extends EditableFieldImpl<String> {
+public class TextField extends EditableFieldImpl<String, FieldSource<String>> {
 
     private final JTextField fieldcomponent;
     

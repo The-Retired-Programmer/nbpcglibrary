@@ -19,24 +19,28 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 
 /**
- * A row of fields - for use in defining the fields content of a table segment.
+ * A collection of fields - for use in defining the fields content of a form
+ * segment.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class RowFieldsDef implements HasInstanceDescription {
+public abstract class FormFields implements HasInstanceDescription {
 
-    private final EditableFieldList row = new EditableFieldList();
+    private final List<Field> fields = new ArrayList<>();
+    private String[] parameters;
     private final FieldsDefRules fieldsdefrules;
     private final ErrorMarkerField errormarker;
 
     /**
      * Constructor
      */
-    public RowFieldsDef() {
+    public FormFields() {
         this(null);
     }
 
@@ -45,11 +49,10 @@ public abstract class RowFieldsDef implements HasInstanceDescription {
      *
      * @param fieldsdefrules the class level rules
      */
-    public RowFieldsDef(FieldsDefRules fieldsdefrules) {
+    public FormFields(FieldsDefRules fieldsdefrules) {
         this.fieldsdefrules = fieldsdefrules;
         errormarker = new ErrorMarkerField();
-        // TODO need to fix this ommission!
-//        add(errormarker);
+        add(errormarker);
     }
 
     @Override
@@ -58,29 +61,29 @@ public abstract class RowFieldsDef implements HasInstanceDescription {
     }
 
     /**
-     * add a field to this row.
+     * add a field to this collection.
      *
      * @param f the field to add
      */
-    public final void add(EditableField f) {
-        row.add(f);
+    public final void add(Field f) {
+        fields.add(f);
     }
 
     /**
-     * Get the row (collection of fields).
+     * Get the collection of fields.
      *
-     * @return the crow
+     * @return the collection of fields
      */
-    public final EditableFieldList getRow() {
-        return row;
+    public final List<Field> getFields() {
+        return fields;
     }
 
     /**
      * Set the values of all fields.
      */
     public final void updateAllFieldsFromSource() {
-        row.stream().forEach((f) -> {
-            f.updateFieldFromSource();
+        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
+            ((EditableField) f).updateFieldFromSource();
         });
     }
 
@@ -88,8 +91,8 @@ public abstract class RowFieldsDef implements HasInstanceDescription {
      * Set the values of all fields into sources.
      */
     public final void updateAllSourcesFromFields() {
-        row.stream().forEach((f) -> {
-            f.updateSourceFromField();
+        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
+            ((EditableField) f).updateSourceFromField();
         });
     }
 
@@ -102,17 +105,33 @@ public abstract class RowFieldsDef implements HasInstanceDescription {
      */
     public abstract boolean save() throws IOException;
 
+    String[] getParameters() {
+        return parameters;
+    }
+
     /**
-     * Check if all rules in the row's rule set and each individual field
+     * Set the parameters to be returned from the formfields (consolidated at
+     * dialog completion)
+     *
+     * @param parameters the set of parameters
+     */
+    protected void setParameters(String... parameters) {
+        this.parameters = parameters;
+    }
+
+    /**
+     * Check if all rules in the collection's rule set and each individual field
      * are valid.
      *
      * @return true if all rules are valid
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (EditableField f : row) {
-            if (!f.checkRules()) {
-                valid = false;
+        for (Field f : fields) {
+            if (f instanceof EditableField) {
+                if (!((EditableField) f).checkRules()) {
+                    valid = false;
+                }
             }
         }
         if (!checkFieldsDefRules()) {

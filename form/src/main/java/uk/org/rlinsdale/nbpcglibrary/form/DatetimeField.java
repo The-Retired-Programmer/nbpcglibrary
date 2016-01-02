@@ -29,7 +29,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class DatetimeField extends EditableFieldImpl<Timestamp> {
+public class DatetimeField extends EditableFieldImpl<Timestamp, FieldSource<Timestamp>> {
 
     private final JTextField fieldcomponent;
 

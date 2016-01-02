@@ -22,42 +22,59 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JPanel;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 
 /**
- *
+ *  Abstract Table class - subclass to create entity table classes
+ * 
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the Entity Class for row data access
+ * @param <S> the Source Class for row data access
  */
-public class Table extends GridBagPanel implements HasInstanceDescription, ActionListener, ItemListener {
+public abstract class Table<E extends Entity, S extends EntitySource<E>> extends GridBagPanel implements HasInstanceDescription, ActionListener, ItemListener {
 
-    private final TableDef tabledef;
+    private final String title;
+    private final FieldsDefRules tabledefrules;
     private final IconButton addbutton;
     private final IconButton deletebutton;
     private final IconButton copybutton;
     private int checkboxcount = 0;
     private final JPanel buttons;
     private final FieldList headerfields;
-    private final List<Integer> selectedrows = new ArrayList<>();
-    private final List<EditableField<Boolean>>checkboxes = new ArrayList<>();
+    private final List<EditableField<Boolean>> checkboxes = new ArrayList<>();
+    private String[] parameters;
+    private final ErrorMarkerField errorMarker = new ErrorMarkerField();
+    private final List<EditableFieldList> rows = new ArrayList<>();
+    private final List<S> sources = new ArrayList<>();
 
     /**
      * Constructor
      *
-     * @param tabledef the table definition
+     * @param title the table title (or null if no title to be displayed
+     * @param columnheadings the column headings to be displayed
+     * @param tabledefrules the table level rules or null if notable level rules
+     * @param tablewidth the field width of a table row
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public Table(TableDef tabledef) {
-        super(tabledef.getTitle(), tabledef.getTableWidth() + 2);
-        this.tabledef = tabledef;
-        LogBuilder.writeConstructorLog("nbpcglibrary.form", this, tabledef.getTitle());
+    public Table(String title, String[] columnheadings, FieldsDefRules tabledefrules, int tablewidth) {
+        super(title, columnheadings.length * 2 + 2);
+        LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title);
+        this.title = title;
+        this.tabledefrules = tabledefrules;
         // create the header fields
-        headerfields = tabledef.getColumnHeadings();
+        headerfields = new FieldList();
+        for (String label : columnheadings) {
+            headerfields.add(FieldBuilder.stringType().label(label).columnlabelField());
+        }
         headerfields.add(0, FieldBuilder.stringType().label("").noerrormarker().columnlabelField());
-        headerfields.add(tabledef.getTableErrorMarker());
+        headerfields.add(errorMarker);
         // create the buttons panel
         buttons = new HBoxPanel();
         buttons.add(addbutton = new IconButton("add", "Add new line"));
@@ -71,14 +88,74 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
         copybutton.setEnabled(false);
         copybutton.setActionCommand("copy");
         copybutton.addActionListener(this);
-        // and drw the table
+    }
+    
+    /**
+     * Initialise the table (pre display)
+     */
+    public void opened() {
+        setRows();
         drawTable();
     }
+    
+    /**
+     * terminate the table (post display)
+     */
+    public void closed(){
+        sources.stream().forEach((s) -> {
+            s.closed();
+        });
+    }
 
-    private void drawTable() {
+    /**
+     * Get the list of row fields for this table
+     *
+     * @return A list of rows contents (each is a fieldlist)
+     */
+    public final List<EditableFieldList> getRows() {
+        return rows;
+    }
+
+    private void setRows() {
+        sources.stream().forEach((s) -> {
+            s.closed();
+        });
+        sources.clear();
+        rows.clear();
+        getRowEntities().stream().map((p) -> createNewRowSource(p)).map((s) -> {
+            sources.add(s);
+            return s;
+        }).forEach((s) -> {
+            rows.add(s.getRowFields().getRow());
+        });
+        sources.stream().forEach((s) -> {
+            s.opened();
+        });
+    }
+
+    /**
+     * Get a list of all entities to be displayed in table
+     *
+     * @return the list of entities
+     */
+    protected abstract List<E> getRowEntities();
+
+    /**
+     * Get a new instance of a row Source
+     *
+     * @param e the entity
+     * @return a row source instance (binding the entity to the table row)
+     */
+    protected abstract S createNewRowSource(E e);
+
+    /**
+     * Draw the table into the table's gridbag for display
+     */
+    protected void drawTable() {
+        clear();
         addRow(headerfields);
         checkboxes.clear();
-        tabledef.getRows().stream().map((row) -> {
+        getRows().stream().map((row) -> {
             EditableFieldList displayrow = new EditableFieldList();
             EditableField checkbox = FieldBuilder.booleanType().initialvalue(false).itemlistener(this).checkboxField();
             checkboxes.add(checkbox);
@@ -95,39 +172,38 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
         validate();
     }
 
-    private void redrawTable() {
-        clear();
-        drawTable();
-    }
-
     @Override
     public final String instanceDescription() {
-        return LogBuilder.instanceDescription(this, tabledef.getTitle());
+        return LogBuilder.instanceDescription(this, title);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "add":
-                tabledef.createNewRow();
-                redrawTable();
+                createNewEntity();
                 break;
             case "delete":
-                tabledef.deleteRows(getSelectedRows());
-                redrawTable();
+                getSelectedRows().stream().sorted(Comparator.reverseOrder()).forEach((index) -> {
+                    sources.get(index).getEntity().remove();
+                });
                 break;
             case "copy":
-                tabledef.createCopyRows(getSelectedRows());
-                redrawTable();
+                getSelectedRows().stream().sorted().forEach((index) -> {
+                    S s = sources.get(index);
+                    copyEntity(s.getEntity());
+                });
                 break;
         }
+        setRows();
+        drawTable();
     }
-    
-    private List<Integer> getSelectedRows(){
+
+    private List<Integer> getSelectedRows() {
         List<Integer> selected = new ArrayList<>();
         int count = 0;
         for (EditableField<Boolean> e : checkboxes) {
-            if (e.get()){
+            if (e.get()) {
                 selected.add(count);
             }
             count++;
@@ -137,7 +213,7 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        
+
         if (e.getStateChange() == ItemEvent.SELECTED) {
             checkboxcount++;
             if (checkboxcount == 1) {
@@ -151,5 +227,104 @@ public class Table extends GridBagPanel implements HasInstanceDescription, Actio
                 copybutton.setEnabled(false);
             }
         }
+    }
+
+    /**
+     * Set the values of all fields.
+     */
+    public final void updateAllFieldsFromSource() {
+        getRows().stream().forEach((r) -> {
+            r.updateRowFieldsFromSource();
+        });
+    }
+
+    /**
+     * Set the values of all fields into sources.
+     */
+    public final void updateAllSourcesFromFields() {
+        getRows().stream().forEach((r) -> {
+            r.updateRowSourcesFromFields();
+        });
+    }
+
+    protected String[] getParameters() {
+        return parameters;
+    }
+
+    /**
+     * Set the parameters to be returned from the fielddef (consolidated at
+     * dialog completion)
+     *
+     * @param parameters the set of parameters
+     */
+    protected void setParameters(String... parameters) {
+        this.parameters = parameters;
+    }
+
+    /**
+     * Check if all rules in the collection's rule set and each individual field
+     * are valid.
+     *
+     * @return true if all rules are valid
+     */
+    public final boolean checkRules() {
+        boolean valid = true;
+        for (EditableFieldList r : getRows()) {
+            if (!r.checkRules()) {
+                valid = false;
+            }
+        }
+        if (!checkTableDefRules()) {
+            valid = false;
+        }
+        return valid;
+    }
+
+    /**
+     * Check the rules defined for the Table.
+     *
+     * @return true if the rules are obeyed (ie OK)
+     */
+    public boolean checkTableDefRules() {
+        if (tabledefrules != null) {
+            boolean res = tabledefrules.checkRules();
+            if (res) {
+                errorMarker.clear();
+            } else {
+                errorMarker.report(tabledefrules.getErrorMessages());
+            }
+            return res;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Create a new Entity
+     */
+    protected abstract void createNewEntity();
+
+    /**
+     * Copy an Entity, creating a new Entity
+     *
+     * @param e the Entity to copy from
+     */
+    protected abstract void copyEntity(E e);
+
+
+    /**
+     * Save all the rows in this table
+     * 
+     * @return true if all entities saved successfully
+     * @throws IOException if problems saving any row (ie entity)
+     */
+    public boolean save() throws IOException {
+        boolean ok = true;
+        for (S s : sources) {
+            if (!s.getEntity().save()) {
+                ok = false;
+            }
+        }
+        return ok;
     }
 }

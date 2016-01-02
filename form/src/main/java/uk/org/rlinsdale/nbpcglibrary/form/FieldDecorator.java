@@ -28,7 +28,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 /**
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T>
+ * @param <T> type class for data element (set or get)
  */
 public class FieldDecorator<T> implements EditableField<T> {
 

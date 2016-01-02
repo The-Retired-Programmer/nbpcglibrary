@@ -33,8 +33,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type of the data contained in the field
+ * @param <S> type of the source
  */
-public abstract class EditableFieldImpl<T> extends FieldImpl implements EditableField<T> {
+public abstract class EditableFieldImpl<T, S extends FieldSource<T>> extends FieldImpl implements EditableField<T> {
 
     private FieldActionListener actionListener;
     private final FieldFocusListener focusListener;
@@ -42,7 +43,7 @@ public abstract class EditableFieldImpl<T> extends FieldImpl implements Editable
     private boolean inhibitListeneractions = false;
     private final Callback callback;
     protected T initialValue;
-    protected FieldSource<T> source;
+    protected S source;
     protected CallbackReport errorReporter = null;
 
     /**
@@ -55,7 +56,7 @@ public abstract class EditableFieldImpl<T> extends FieldImpl implements Editable
      * @param callback the callback with is used to inform of source updates
      * from field
      */
-    protected EditableFieldImpl(JComponent fieldcomponent, FieldSource<T> source, T initialValue, Callback callback) {
+    protected EditableFieldImpl(JComponent fieldcomponent, S source, T initialValue, Callback callback) {
         super(fieldcomponent);
         fieldcomponent.addFocusListener(focusListener = new FieldFocusListener());
         this.source = source;
@@ -117,11 +118,20 @@ public abstract class EditableFieldImpl<T> extends FieldImpl implements Editable
     }
 
     private void updateSourceFromFieldIfChange(T value) {
-        if (!value.equals(lastvaluesetinfield)) {
-            lastvaluesetinfield = value;
-            setSourceValue(value);
-            updateFieldFromSource(true); // and rewrite the field
-            checkRules();
+        if (value == null) {
+            if (lastvaluesetinfield != null) {
+                lastvaluesetinfield = value;
+                setSourceValue(value);
+                updateFieldFromSource(true); // and rewrite the field
+                checkRules();
+            }
+        } else {
+            if (!value.equals(lastvaluesetinfield)) {
+                lastvaluesetinfield = value;
+                setSourceValue(value);
+                updateFieldFromSource(true); // and rewrite the field
+                checkRules();
+            }
         }
     }
 
@@ -144,16 +154,6 @@ public abstract class EditableFieldImpl<T> extends FieldImpl implements Editable
         }
         return res;
     }
-
-//    @Override
-//    public void setFieldValue(T value) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    @Override
-//    public T getFieldValue() throws BadFormatException {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
 
     private class FieldActionListener implements ActionListener {
 

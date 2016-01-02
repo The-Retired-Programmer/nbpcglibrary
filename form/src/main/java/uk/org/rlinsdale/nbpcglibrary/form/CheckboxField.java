@@ -28,7 +28,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Callback;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class CheckboxField extends EditableFieldImpl<Boolean> {
+public class CheckboxField extends EditableFieldImpl<Boolean, FieldSource<Boolean>> {
     
     private final JCheckBox fieldcomponent;
 
