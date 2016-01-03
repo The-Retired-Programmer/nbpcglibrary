@@ -32,8 +32,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 
 /**
- *  Abstract Table class - subclass to create entity table classes
- * 
+ * Abstract Table class - subclass to create entity table classes
+ *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <E> the Entity Class for row data access
  * @param <S> the Source Class for row data access
@@ -41,7 +41,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 public abstract class Table<E extends Entity, S extends EntitySource<E>> extends GridBagPanel implements HasInstanceDescription, ActionListener, ItemListener {
 
     private final String title;
-    private final FieldsDefRules tabledefrules;
+    private final FormRules tablerules;
     private final IconButton addbutton;
     private final IconButton deletebutton;
     private final IconButton copybutton;
@@ -59,15 +59,15 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      *
      * @param title the table title (or null if no title to be displayed
      * @param columnheadings the column headings to be displayed
-     * @param tabledefrules the table level rules or null if notable level rules
+     * @param tablerules the table level rules or null if notable level rules
      * @param tablewidth the field width of a table row
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public Table(String title, String[] columnheadings, FieldsDefRules tabledefrules, int tablewidth) {
+    public Table(String title, String[] columnheadings, FormRules tablerules, int tablewidth) {
         super(title, columnheadings.length * 2 + 2);
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title);
         this.title = title;
-        this.tabledefrules = tabledefrules;
+        this.tablerules = tablerules;
         // create the header fields
         headerfields = new FieldList();
         for (String label : columnheadings) {
@@ -89,7 +89,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
         copybutton.setActionCommand("copy");
         copybutton.addActionListener(this);
     }
-    
+
     /**
      * Initialise the table (pre display)
      */
@@ -97,11 +97,11 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
         setRows();
         drawTable();
     }
-    
+
     /**
      * terminate the table (post display)
      */
-    public void closed(){
+    public void closed() {
         sources.stream().forEach((s) -> {
             s.closed();
         });
@@ -262,8 +262,8 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
     }
 
     /**
-     * Check if all rules in the collection's rule set and each individual field
-     * are valid.
+     * Check if all rules in the table's rule set and each individual row rule
+     * set are valid.
      *
      * @return true if all rules are valid
      */
@@ -274,7 +274,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
                 valid = false;
             }
         }
-        if (!checkTableDefRules()) {
+        if (!checkTableRules()) {
             valid = false;
         }
         return valid;
@@ -285,13 +285,13 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      *
      * @return true if the rules are obeyed (ie OK)
      */
-    public boolean checkTableDefRules() {
-        if (tabledefrules != null) {
-            boolean res = tabledefrules.checkRules();
+    public boolean checkTableRules() {
+        if (tablerules != null) {
+            boolean res = tablerules.checkRules();
             if (res) {
                 errorMarker.clear();
             } else {
-                errorMarker.report(tabledefrules.getErrorMessages());
+                errorMarker.report(tablerules.getErrorMessages());
             }
             return res;
         } else {
@@ -311,10 +311,9 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      */
     protected abstract void copyEntity(E e);
 
-
     /**
      * Save all the rows in this table
-     * 
+     *
      * @return true if all entities saved successfully
      * @throws IOException if problems saving any row (ie entity)
      */

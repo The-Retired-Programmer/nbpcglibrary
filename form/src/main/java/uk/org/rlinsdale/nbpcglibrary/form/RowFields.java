@@ -30,7 +30,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 public abstract class RowFields implements HasInstanceDescription {
 
     private final EditableFieldList row = new EditableFieldList();
-    private final FieldsDefRules fieldsdefrules;
+    private final FormRules rowrules;
     private final ErrorMarkerField errormarker;
 
     /**
@@ -43,10 +43,10 @@ public abstract class RowFields implements HasInstanceDescription {
     /**
      * Constructor
      *
-     * @param fieldsdefrules the class level rules
+     * @param rowrules the class level rules
      */
-    public RowFields(FieldsDefRules fieldsdefrules) {
-        this.fieldsdefrules = fieldsdefrules;
+    public RowFields(FormRules rowrules) {
+        this.rowrules = rowrules;
         errormarker = new ErrorMarkerField();
         // TODO need to fix this ommission!
 //        add(errormarker);
@@ -115,24 +115,24 @@ public abstract class RowFields implements HasInstanceDescription {
                 valid = false;
             }
         }
-        if (!checkFieldsDefRules()) {
+        if (!checkRowRules()) {
             valid = false;
         }
         return valid;
     }
 
     /**
-     * Check the rules defined for the fieldDef.
+     * Check the rules defined for the Row.
      *
      * @return true if the rules are obeyed (ie OK)
      */
-    public boolean checkFieldsDefRules() {
-        if (fieldsdefrules != null) {
-            boolean res = fieldsdefrules.checkRules();
+    public boolean checkRowRules() {
+        if (rowrules != null) {
+            boolean res = rowrules.checkRules();
             if (res) {
                 errormarker.clear();
             } else {
-                errormarker.report(fieldsdefrules.getErrorMessages());
+                errormarker.report(rowrules.getErrorMessages());
             }
             return res;
         } else {

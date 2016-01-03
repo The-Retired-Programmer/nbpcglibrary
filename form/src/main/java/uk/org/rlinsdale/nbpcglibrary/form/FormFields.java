@@ -34,7 +34,7 @@ public abstract class FormFields implements HasInstanceDescription {
 
     private final List<Field> fields = new ArrayList<>();
     private String[] parameters;
-    private final FieldsDefRules fieldsdefrules;
+    private final FormRules formrules;
     private final ErrorMarkerField errormarker;
 
     /**
@@ -47,10 +47,10 @@ public abstract class FormFields implements HasInstanceDescription {
     /**
      * Constructor
      *
-     * @param fieldsdefrules the class level rules
+     * @param formrules the class level rules
      */
-    public FormFields(FieldsDefRules fieldsdefrules) {
-        this.fieldsdefrules = fieldsdefrules;
+    public FormFields(FormRules formrules) {
+        this.formrules = formrules;
         errormarker = new ErrorMarkerField();
         add(errormarker);
     }
@@ -120,7 +120,7 @@ public abstract class FormFields implements HasInstanceDescription {
     }
 
     /**
-     * Check if all rules in the collection's rule set and each individual field
+     * Check if all rules in the form's rule set and each individual field
      * are valid.
      *
      * @return true if all rules are valid
@@ -134,24 +134,19 @@ public abstract class FormFields implements HasInstanceDescription {
                 }
             }
         }
-        if (!checkFieldsDefRules()) {
+        if (!checkFormRules()) {
             valid = false;
         }
         return valid;
     }
 
-    /**
-     * Check the rules defined for the fieldDef.
-     *
-     * @return true if the rules are obeyed (ie OK)
-     */
-    public boolean checkFieldsDefRules() {
-        if (fieldsdefrules != null) {
-            boolean res = fieldsdefrules.checkRules();
+    private boolean checkFormRules() {
+        if (formrules != null) {
+            boolean res = formrules.checkRules();
             if (res) {
                 errormarker.clear();
             } else {
-                errormarker.report(fieldsdefrules.getErrorMessages());
+                errormarker.report(formrules.getErrorMessages());
             }
             return res;
         } else {
