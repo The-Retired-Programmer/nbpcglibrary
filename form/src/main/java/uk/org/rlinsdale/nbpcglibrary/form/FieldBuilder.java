@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.event.ItemListener;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.api.DateOnly;
@@ -218,6 +219,23 @@ public class FieldBuilder<T, S extends FieldSource, M> {
         return tf;
     }
 
+    public EditableField decimalField() {
+        if (fb_size == Integer.MIN_VALUE) {
+            fb_size = 20;
+        }
+        @SuppressWarnings("Convert2Diamond")
+        EditableField tf = new DecimalField(
+                fb_source == null ? new FieldSource<BigDecimal>(): fb_source,
+                fb_size, (BigDecimal) fb_min, (BigDecimal) fb_max, (BigDecimal) fb_initialValue, fb_callback);
+        if (!fb_noerrormarker) {
+            tf = new ErrorMarkerDecorator(tf);
+        }
+        if (fb_label != null) {
+            tf = new LabelDecorator(tf, fb_label);
+        }
+        return tf;
+    }
+    
     public EditableField datetimeField() {
         if (fb_size == Integer.MIN_VALUE) {
             fb_size = 20;
@@ -342,6 +360,11 @@ public class FieldBuilder<T, S extends FieldSource, M> {
     @SuppressWarnings("Convert2Diamond")
     public static FieldBuilder<Timestamp, FieldSource<Timestamp>, Timestamp> datetimeType() {
         return new FieldBuilder<Timestamp, FieldSource<Timestamp>, Timestamp>();
+    }
+    
+    @SuppressWarnings("Convert2Diamond")
+    public static FieldBuilder<BigDecimal, FieldSource<BigDecimal>, BigDecimal> decimalType() {
+        return new FieldBuilder<BigDecimal, FieldSource<BigDecimal>, BigDecimal>();
     }
 
     @SuppressWarnings("Convert2Diamond")

@@ -18,6 +18,7 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.mysql;
 
+import java.math.BigDecimal;
 import uk.org.rlinsdale.nbpcglibrary.api.LogicException;
 import uk.org.rlinsdale.nbpcglibrary.localdatabaseaccess.LocalSQLEntityPersistenceProvider;
 
@@ -44,6 +45,9 @@ public abstract class LocalMySQLEntityPersistenceProvider<K> extends LocalSQLEnt
         }
         if (value instanceof Long){
             return ((Long) value).toString();
+        }
+        if (value instanceof BigDecimal){
+            return ((BigDecimal) value).toPlainString();
         }
         throw new LogicException("Unknown Object type in LocalMySQLEntityPersistenceProvider:format()");
     }
