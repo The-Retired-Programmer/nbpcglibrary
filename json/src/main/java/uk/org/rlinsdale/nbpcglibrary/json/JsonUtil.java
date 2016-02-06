@@ -18,7 +18,6 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.json;
 
-import java.math.BigDecimal;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonNumber;

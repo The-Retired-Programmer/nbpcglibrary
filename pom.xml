@@ -10,7 +10,7 @@
     
     <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
     <artifactId>parent</artifactId>
-    <version>3.1.15</version>
+    <version>3.1.16</version>
     <packaging>pom</packaging>
     <name>NBPCG Library</name>
     
@@ -31,7 +31,6 @@
         <module>json</module>
         <module>topcomponent</module>
         <module>annotations</module>
-        <module>remotedb</module>
         <module>remoteclient</module>
     </modules>
     
