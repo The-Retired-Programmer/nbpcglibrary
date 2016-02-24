@@ -202,6 +202,40 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         }
         return updated;
     }
+    
+    /**
+     * Set the reference by entity.
+     *
+     * @param e the entity
+     * @return true if referenced entity is different (ie primary key has
+     * changed)
+     */
+    public boolean set(E e) {
+        LogBuilder.writeLog("nbpcglibrary.data", this, "set", e.instanceDescription());
+        K epk = e.getPK();
+        boolean updated = (this.pk == null || !this.pk.equals(epk));
+        if (updated) {
+            if (titleListener != null) {
+                E old = getNoLoad();
+                if (old != null) {
+                    old.removeTitleListener(titleListener);
+                }
+                this.pk = epk;
+                this.entityreference = new WeakReference<>(e);
+                if (titleListener != null) {
+                        e.addTitleListener(titleListener);
+                    Event.fireSimpleEventParamsListener(titleListener);
+                }
+            } else {
+                this.pk = epk;
+                this.entityreference = new WeakReference<>(e);
+            }
+            if (!e.isPersistent()){
+                 e.addPrimaryKeyListener(pkListener, IMMEDIATE);
+            }
+        }
+        return updated;
+    }
 
     private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams<K>> {
 

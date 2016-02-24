@@ -357,15 +357,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     }
 
     /**
-     * Add a Primary Key Listener to this entity.
-     *
-     * @param listener the listener
-     */
-    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<K>> listener) {
-        primaryKeyChangeEvent.addListener(listener);
-    }
-
-    /**
      * Remove a Primary Key listener from this entity.
      *
      * @param listener the listener

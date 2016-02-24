@@ -103,9 +103,6 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
         e.addStateListener(stateListener = new EntityStateChangeListener(desc));
         e.addFieldListener(fieldListener = new EntityFieldChangeListener(desc));
         e.addNameListener(nameListener = new EntityNameChangeListener(desc));
-        if (!e.isPersistent()) {
-            e.addPrimaryKeyListener(new PrimaryKeyListener(desc), IMMEDIATE);
-        }
     }
 
     @Override
@@ -118,18 +115,6 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      */
     public void setNoEntity() {
         eref.set();
-    }
-
-    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams<K>> {
-
-        public PrimaryKeyListener(String name) {
-            super(name);
-        }
-
-        @Override
-        public void action(PrimaryKeyChangeEventParams<K> p) {
-
-        }
     }
 
     private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {

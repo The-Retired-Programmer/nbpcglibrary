@@ -30,14 +30,14 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  */
 public class PrimaryKeyChangeEventParams<K> implements EventParams {
 
-    private K pkey;
+    private final K pkey;
     
     public PrimaryKeyChangeEventParams(K pkey){
         this.pkey = pkey;
     }
     @Override
     public String instanceDescription() {
-        return LogBuilder.instanceDescription(this);
+        return LogBuilder.instanceDescription(this,pkey.toString());
     }
     
     public K getNewPKey() {
