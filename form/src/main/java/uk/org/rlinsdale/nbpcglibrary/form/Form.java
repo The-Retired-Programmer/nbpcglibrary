@@ -186,6 +186,10 @@ public class Form extends VBoxPanel implements HasInstanceDescription {
         }
     }
 
+    /**
+     * Get the set of parameters returned by this form
+     * @return the list of parameters
+     */
     protected List<String> getParameters() {
         List<String> parameters = new ArrayList<>();
         allformfields.stream().forEach((f) -> {

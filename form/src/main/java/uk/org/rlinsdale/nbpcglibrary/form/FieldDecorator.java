@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,11 +30,18 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type class for data element (set or get)
  */
-public class FieldDecorator<T> implements EditableField<T> {
+public class FieldDecorator<T> implements Field<T> {
 
-    protected final EditableField<T> field;
+    /**
+     * The field which is being decorated
+     */
+    protected final Field<T> field;
 
-    public FieldDecorator(EditableField<T> field) {
+    /**
+     * the Constructor
+     * @param field The field which is being decorated
+     */
+    public FieldDecorator(Field<T> field) {
         this.field = field;
     }
 

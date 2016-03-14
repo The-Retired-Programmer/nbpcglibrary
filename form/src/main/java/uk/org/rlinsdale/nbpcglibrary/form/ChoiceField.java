@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Callback;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type of the data to be represented and selected in the combo box
  */
-public class ChoiceField<T> extends EditableFieldImpl<T, ChoiceFieldSource<T>> {
+public class ChoiceField<T> extends FieldImpl<T, ChoiceFieldSource<T>> {
 
     private List<T> choices = new ArrayList<>();
     private final boolean nullSelectionAllowed;

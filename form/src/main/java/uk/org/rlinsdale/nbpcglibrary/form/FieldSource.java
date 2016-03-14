@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,14 +31,26 @@ public class FieldSource<T> {
     private T value; // data source
     private final Rules rules = new Rules();
 
+    /**
+     * Set the value in this field source
+     * @param value the value
+     */
     public void set(T value) {
         this.value = value;
     }
 
+    /**
+     * Get the rules associated with this field source
+     * @return the set of rules
+     */
     public Rules getRules() {
         return rules;
     }
 
+    /**
+     * Get the value for this field source
+     * @return the value
+     */
     public T get() {
         return value;
     }

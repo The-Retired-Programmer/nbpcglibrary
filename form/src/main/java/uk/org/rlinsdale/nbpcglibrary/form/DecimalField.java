@@ -21,7 +21,6 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.math.BigDecimal;
 import javax.swing.JTextField;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
-import uk.org.rlinsdale.nbpcglibrary.api.DateOnly;
 import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
@@ -31,7 +30,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class DecimalField extends EditableFieldImpl<BigDecimal, FieldSource<BigDecimal>> {
+public class DecimalField extends FieldImpl<BigDecimal, FieldSource<BigDecimal>> {
 
     private final JTextField fieldcomponent;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import java.util.List;
 import javax.swing.JPanel;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
+import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 
 /**
@@ -41,17 +42,17 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 public abstract class Table<E extends Entity, S extends EntitySource<E>> extends GridBagPanel implements HasInstanceDescription, ActionListener, ItemListener {
 
     private final String title;
-    private final FormRules tablerules;
+    private final Rules tablerules;
     private final IconButton addbutton;
     private final IconButton deletebutton;
     private final IconButton copybutton;
     private int checkboxcount = 0;
     private final JPanel buttons;
     private final FieldList headerfields;
-    private final List<EditableField<Boolean>> checkboxes = new ArrayList<>();
+    private final List<Field<Boolean>> checkboxes = new ArrayList<>();
     private String[] parameters;
     private final ErrorMarkerField errorMarker = new ErrorMarkerField();
-    private final List<EditableFieldList> rows = new ArrayList<>();
+    private final List<FieldList> rows = new ArrayList<>();
     private final List<S> sources = new ArrayList<>();
 
     /**
@@ -60,11 +61,10 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      * @param title the table title (or null if no title to be displayed
      * @param columnheadings the column headings to be displayed
      * @param tablerules the table level rules or null if notable level rules
-     * @param tablewidth the field width of a table row
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public Table(String title, String[] columnheadings, FormRules tablerules, int tablewidth) {
-        super(title, columnheadings.length * 2 + 2);
+    public Table(String title, String[] columnheadings, Rules tablerules) {
+        super(title, columnheadings.length * 2 + 3);
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title);
         this.title = title;
         this.tablerules = tablerules;
@@ -73,6 +73,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
         for (String label : columnheadings) {
             headerfields.add(FieldBuilder.stringType().label(label).columnlabelField());
         }
+        headerfields.add(0, FieldBuilder.stringType().label("").noerrormarker().columnlabelField());
         headerfields.add(0, FieldBuilder.stringType().label("").noerrormarker().columnlabelField());
         headerfields.add(errorMarker);
         // create the buttons panel
@@ -112,7 +113,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      *
      * @return A list of rows contents (each is a fieldlist)
      */
-    public final List<EditableFieldList> getRows() {
+    public final List<FieldList> getRows() {
         return rows;
     }
 
@@ -156,8 +157,8 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
         addRow(headerfields);
         checkboxes.clear();
         getRows().stream().map((row) -> {
-            EditableFieldList displayrow = new EditableFieldList();
-            EditableField checkbox = FieldBuilder.booleanType().initialvalue(false).itemlistener(this).checkboxField();
+            FieldList displayrow = new FieldList();
+            Field checkbox = FieldBuilder.booleanType().initialvalue(false).itemlistener(this).checkboxField();
             checkboxes.add(checkbox);
             displayrow.add(checkbox);
             displayrow.addAll(row);
@@ -202,7 +203,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
     private List<Integer> getSelectedRows() {
         List<Integer> selected = new ArrayList<>();
         int count = 0;
-        for (EditableField<Boolean> e : checkboxes) {
+        for (Field<Boolean> e : checkboxes) {
             if (e.get()) {
                 selected.add(count);
             }
@@ -247,13 +248,16 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
         });
     }
 
+    /**
+     * Get the parameters to be returned from the table
+     * @return the parameters
+     */
     protected String[] getParameters() {
         return parameters;
     }
 
     /**
-     * Set the parameters to be returned from the fielddef (consolidated at
-     * dialog completion)
+     * Set the parameters to be returned from the table 
      *
      * @param parameters the set of parameters
      */
@@ -269,7 +273,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (EditableFieldList r : getRows()) {
+        for (FieldList r : getRows()) {
             if (!r.checkRules()) {
                 valid = false;
             }

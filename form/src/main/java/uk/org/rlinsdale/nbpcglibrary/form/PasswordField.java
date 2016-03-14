@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import uk.org.rlinsdale.nbpcglibrary.common.Callback;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class PasswordField extends EditableFieldImpl<String, FieldSource<String>> {
+public class PasswordField extends FieldImpl<String, FieldSource<String>> {
 
     private final JPasswordField fieldcomponent;
 

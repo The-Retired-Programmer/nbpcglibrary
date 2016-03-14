@@ -51,7 +51,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.PrimaryKeyChangeEvent
  * The Entity Abstract Class.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <K> th etype of the primary Key
+ * @param <K> the type of the primary Key
  * @param <E> the entity class
  * @param <P> the Parent Entity Class
  * @param <F> the entity field types
@@ -200,7 +200,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     protected final void fireFieldChange(F field) {
         fieldEvent.fire(new EntityFieldChangeEventParams<>(field));
     }
-    
+
     /**
      * Fire actions on all field change listeners relating to all fields.
      */
@@ -394,7 +394,9 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 if (!checkRules()) {
                     return false;
                 }
-                entityValues(ef);
+                if (!entityValues(ef)) {
+                    return false;
+                }
                 em.removeFromCache((E) this);
                 entityLoad(epp.insert(ef));
                 K newPK = getPK();
@@ -406,7 +408,9 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 if (!checkRules()) {
                     return false;
                 }
-                entityDiffs(ef);
+                if (!entityDiffs(ef)) {
+                    return false;
+                }
                 if (!ef.isEmpty()) {
                     entityLoad(epp.update(getPK(), ef));
                 }
@@ -612,15 +616,19 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * Add all field values to the given Entity Fields Object
      *
      * @param ef the entityfields object
+     * @return false if save processing is to terminate due to entity data not
+     * being correct
      */
-    abstract protected void entityValues(EntityFields ef);
+    abstract protected boolean entityValues(EntityFields ef);
 
     /**
      * Add any modified field values to the given Entity Fields Object
      *
      * @param ef the entityfields object
+     * @return false if save processing is to terminate due to entity data not
+     * being correct
      */
-    abstract protected void entityDiffs(EntityFields ef);
+    abstract protected boolean entityDiffs(EntityFields ef);
 
     /**
      * Complete any entity specific removal actions prior to entity deletion.
@@ -634,7 +642,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @param from the copy source entity
      */
     abstract protected void entityCopy(E from);
-    
+
     @Override
     public String toString() {
         return getDisplayTitle();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,11 @@ public class FileSelectionDecorator extends FieldDecorator<String> {
 
     private final JButton fileButton = new JButton();
 
-    public FileSelectionDecorator(EditableField<String> field) {
+    /**
+     * Create a File Selection Decorator wrapped around a field
+     * @param field the field which needs decorating
+     */
+    public FileSelectionDecorator(Field<String> field) {
         super(field);
         fileButton.setIcon(new ImageIcon(getClass().getResource("page_find.png")));
         fileButton.setToolTipText("Select File");

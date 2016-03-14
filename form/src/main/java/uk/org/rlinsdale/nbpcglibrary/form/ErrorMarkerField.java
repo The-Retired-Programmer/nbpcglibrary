@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,13 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class ErrorMarkerField extends FieldImpl implements CallbackReport {
+public class ErrorMarkerField extends FieldNonEditableImpl implements CallbackReport {
 
     private final JLabel errorMarker;
 
+    /**
+     * The Constructor
+     */
     public ErrorMarkerField() {
         this(new JLabel());
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -107,7 +108,8 @@ public class GridBagPanel extends JPanel {
      */
     public void addRow(Field field) {
         int col = 0;
-        for (JComponent component : field.getComponents()) {
+        List<JComponent> lc = field.getComponents();
+        for (JComponent component : lc) {
             if (component != null) {
                 add(component, makeconstraints(row, col));
             }

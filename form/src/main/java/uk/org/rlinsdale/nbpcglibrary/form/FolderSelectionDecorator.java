@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,11 @@ public class FolderSelectionDecorator extends FieldDecorator<String> {
 
     private final JButton folderButton = new JButton();
 
-    public FolderSelectionDecorator(EditableField<String> field) {
+    /**
+     * Create a Folder Selection Decorator wrapped around a field
+     * @param field the field which needs decorating
+     */
+    public FolderSelectionDecorator(Field<String> field) {
         super(field);
         folderButton.setIcon(new ImageIcon(getClass().getResource("folder_find.png")));
         folderButton.setToolTipText("Select Folder");

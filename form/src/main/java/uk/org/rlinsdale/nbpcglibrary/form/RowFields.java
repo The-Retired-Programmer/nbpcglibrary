@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.io.IOException;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
  * A row of fields - for use in defining the fields content of a table segment.
@@ -29,9 +30,9 @@ import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
  */
 public abstract class RowFields implements HasInstanceDescription {
 
-    private final EditableFieldList row = new EditableFieldList();
-    private final FormRules rowrules;
-    private final ErrorMarkerField errormarker;
+    private final FieldList row = new FieldList();
+    private final Rules rowrules;
+    private final ErrorMarkerField errormarker = new ErrorMarkerField();
 
     /**
      * Constructor
@@ -45,11 +46,9 @@ public abstract class RowFields implements HasInstanceDescription {
      *
      * @param rowrules the class level rules
      */
-    public RowFields(FormRules rowrules) {
+    public RowFields(Rules rowrules) {
         this.rowrules = rowrules;
-        errormarker = new ErrorMarkerField();
-        // TODO need to fix this ommission!
-//        add(errormarker);
+        row.add(errormarker);
     }
 
     @Override
@@ -62,7 +61,7 @@ public abstract class RowFields implements HasInstanceDescription {
      *
      * @param f the field to add
      */
-    public final void add(EditableField f) {
+    public final void add(Field f) {
         row.add(f);
     }
 
@@ -71,7 +70,7 @@ public abstract class RowFields implements HasInstanceDescription {
      *
      * @return the crow
      */
-    public final EditableFieldList getRow() {
+    public final FieldList getRow() {
         return row;
     }
 
@@ -89,7 +88,7 @@ public abstract class RowFields implements HasInstanceDescription {
      */
     public final void updateAllSourcesFromFields() {
         row.stream().forEach((f) -> {
-            f.updateSourceFromField();
+            ((Field) f).updateSourceFromField();
         });
     }
 
@@ -103,18 +102,18 @@ public abstract class RowFields implements HasInstanceDescription {
     public abstract boolean save() throws IOException;
 
     /**
-     * Check if all rules in the row's rule set and each individual field
-     * are valid.
+     * Check if all rules in the row's rule set and each individual field are
+     * valid.
      *
      * @return true if all rules are valid
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (EditableField f : row) {
-            if (!f.checkRules()) {
-                valid = false;
+        for (Field f : row) {
+                if (!f.checkRules()) {
+                    valid = false;
+                }
             }
-        }
         if (!checkRowRules()) {
             valid = false;
         }

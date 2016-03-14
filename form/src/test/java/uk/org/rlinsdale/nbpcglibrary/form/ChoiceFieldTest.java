@@ -197,8 +197,8 @@ public class ChoiceFieldTest {
 
     public class Fields extends FormFields {
 
-        private final EditableField<String> choiceField;
-        private final EditableField<TestEntity> entityChoiceField;
+        private final Field<String> choiceField;
+        private final Field<TestEntity> entityChoiceField;
 
         public Fields() {
             super();
@@ -359,11 +359,13 @@ public class ChoiceFieldTest {
         }
 
         @Override
-        protected void entityValues(EntityFields ef) {
+        protected boolean entityValues(EntityFields ef) {
+            return false;
         }
 
         @Override
-        protected void entityDiffs(EntityFields ef) {
+        protected boolean entityDiffs(EntityFields ef) {
+            return false;
         }
 
         @Override

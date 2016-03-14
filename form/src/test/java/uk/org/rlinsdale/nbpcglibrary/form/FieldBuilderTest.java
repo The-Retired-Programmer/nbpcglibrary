@@ -59,7 +59,7 @@ public class FieldBuilderTest {
     @Test
     public void testTextFieldNoLabel() {
         System.out.println("textField - no label");
-        EditableField<String> username = FieldBuilder.stringType()/*.label("Username")*/.min(1).max(100).initialvalue("").textField();
+        Field<String> username = FieldBuilder.stringType()/*.label("Username")*/.min(1).max(100).initialvalue("").textField();
         List<JComponent> lc = username.getComponents();
         assertEquals(2, lc.size());
         JComponent f = lc.get(0);
@@ -74,7 +74,7 @@ public class FieldBuilderTest {
     @Test
     public void testTextFieldNoLabelNoErr() {
         System.out.println("textField - no label - no errormarker");
-        EditableField<String> username = FieldBuilder.stringType().noerrormarker().min(1).max(100).initialvalue("").textField();
+        Field<String> username = FieldBuilder.stringType().noerrormarker().min(1).max(100).initialvalue("").textField();
         List<JComponent> lc = username.getComponents();
         assertEquals(1, lc.size());
         JComponent f = lc.get(0);
@@ -89,7 +89,7 @@ public class FieldBuilderTest {
     @Test
     public void testTextFieldLabel() {
         System.out.println("textField - label");
-        EditableField<String> username = FieldBuilder.stringType().label("Username").min(1).max(100).initialvalue("").textField();
+        Field<String> username = FieldBuilder.stringType().label("Username").min(1).max(100).initialvalue("").textField();
         List<JComponent> lc = username.getComponents();
         assertEquals(3, lc.size());
         JComponent f = lc.get(1);
@@ -104,7 +104,7 @@ public class FieldBuilderTest {
     @Test
     public void testTextFieldLabelNoErr() {
         System.out.println("textField - label - no errormarker");
-        EditableField<String> username = FieldBuilder.stringType().label("Username").noerrormarker().min(1).max(100).initialvalue("").textField();
+        Field<String> username = FieldBuilder.stringType().label("Username").noerrormarker().min(1).max(100).initialvalue("").textField();
         List<JComponent> lc = username.getComponents();
         assertEquals(2, lc.size());
         JComponent f = lc.get(1);
@@ -119,7 +119,7 @@ public class FieldBuilderTest {
     @Test
     public void testPasswordFieldNoLabel() {
         System.out.println("passwordField - no label");
-        EditableField<String> password =  FieldBuilder.stringType().min(1).max(100).initialvalue("").passwordField();
+        Field<String> password =  FieldBuilder.stringType().min(1).max(100).initialvalue("").passwordField();
         List<JComponent> lc = password.getComponents();
         assertEquals(2, lc.size());
         JComponent f = lc.get(0);
@@ -134,7 +134,7 @@ public class FieldBuilderTest {
     @Test
     public void testPasswordFieldLabel() {
         System.out.println("tpasswordField - label");
-        EditableField<String> password = FieldBuilder.stringType().label("Username").min(1).max(100).initialvalue("").passwordField();
+        Field<String> password = FieldBuilder.stringType().label("Username").min(1).max(100).initialvalue("").passwordField();
          List<JComponent> lc = password.getComponents();
         assertEquals(3, lc.size());
         JComponent f = lc.get(1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
  * A collection of fields - for use in defining the fields content of a form
@@ -34,7 +35,7 @@ public abstract class FormFields implements HasInstanceDescription {
 
     private final List<Field> fields = new ArrayList<>();
     private String[] parameters;
-    private final FormRules formrules;
+    private final Rules formrules;
     private final ErrorMarkerField errormarker;
 
     /**
@@ -49,10 +50,10 @@ public abstract class FormFields implements HasInstanceDescription {
      *
      * @param formrules the class level rules
      */
-    public FormFields(FormRules formrules) {
+    public FormFields(Rules formrules) {
         this.formrules = formrules;
         errormarker = new ErrorMarkerField();
-        add(errormarker);
+        fields.add(errormarker);
     }
 
     @Override
@@ -82,8 +83,8 @@ public abstract class FormFields implements HasInstanceDescription {
      * Set the values of all fields.
      */
     public final void updateAllFieldsFromSource() {
-        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
-            ((EditableField) f).updateFieldFromSource();
+        fields.stream().forEach((f) -> {
+            f.updateFieldFromSource();
         });
     }
 
@@ -91,8 +92,8 @@ public abstract class FormFields implements HasInstanceDescription {
      * Set the values of all fields into sources.
      */
     public final void updateAllSourcesFromFields() {
-        fields.stream().filter((f) -> (f instanceof EditableField)).forEach((f) -> {
-            ((EditableField) f).updateSourceFromField();
+        fields.stream().forEach((f) -> {
+            f.updateSourceFromField();
         });
     }
 
@@ -120,18 +121,16 @@ public abstract class FormFields implements HasInstanceDescription {
     }
 
     /**
-     * Check if all rules in the form's rule set and each individual field
-     * are valid.
+     * Check if all rules in the form's rule set and each individual field are
+     * valid.
      *
      * @return true if all rules are valid
      */
     public final boolean checkRules() {
         boolean valid = true;
         for (Field f : fields) {
-            if (f instanceof EditableField) {
-                if (!((EditableField) f).checkRules()) {
-                    valid = false;
-                }
+            if (!f.checkRules()) {
+                valid = false;
             }
         }
         if (!checkFormRules()) {

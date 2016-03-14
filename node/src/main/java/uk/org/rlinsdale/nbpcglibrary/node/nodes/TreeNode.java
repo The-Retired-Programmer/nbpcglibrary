@@ -23,7 +23,6 @@ import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import org.openide.util.Lookup;
 import org.openide.util.datatransfer.ExTransferable;
-import static uk.org.rlinsdale.nbpcglibrary.common.Event.ListenerMode.IMMEDIATE;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
@@ -33,7 +32,6 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.EntityReference;
-import uk.org.rlinsdale.nbpcglibrary.data.entityreferences.PrimaryKeyChangeEventParams;
 
 /**
  * Tree Node Abstract Class

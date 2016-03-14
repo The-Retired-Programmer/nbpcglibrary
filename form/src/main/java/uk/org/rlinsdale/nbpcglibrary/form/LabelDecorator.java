@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,12 @@ public class LabelDecorator<T> extends FieldDecorator<T> {
     private final JLabel labelcomponent;
     private final String labeltext;
 
-    public LabelDecorator(EditableField<T> field, String labeltext) {
+    /**
+     * Create a label Decorator wrapped around a field
+     * @param field the field which needs decorating 
+     * @param labeltext the label text
+     */
+    public LabelDecorator(Field<T> field, String labeltext) {
         super(field);
         labelcomponent = new JLabel(labeltext);
         this.labeltext = labeltext;

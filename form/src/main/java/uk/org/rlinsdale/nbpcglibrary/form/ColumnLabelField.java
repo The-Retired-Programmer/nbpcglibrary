@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-20156 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,23 +28,9 @@ import javax.swing.JLabel;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class ColumnLabelField extends FieldImpl {
+public class ColumnLabelField extends FieldNonEditableImpl {
     
     private final boolean errormarkerused;
-    
-    /**
-     * Constructor
-     *
-     * @param label the field initial value
-     */
-    public ColumnLabelField(String label) {
-        this(new JLabel(label));
-    }
-    
-    private ColumnLabelField(JLabel fieldcomponent) {
-        super(fieldcomponent);
-        errormarkerused = true;
-    }
     
     /**
      * Constructor

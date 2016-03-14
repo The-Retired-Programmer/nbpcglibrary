@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,13 +34,20 @@ public class ErrorMarkerDecorator<T> extends FieldDecorator<T> implements Callba
 
     private final JLabel errorMarker = new JLabel();
 
+    /**
+     * the Constructor
+     * @param field the field to associate with this error marker.
+     */
     @SuppressWarnings("LeakingThisInConstructor")
-    public ErrorMarkerDecorator(EditableField<T> field) {
+    public ErrorMarkerDecorator(Field<T> field) {
         super(field);
         field.setErrorReporter(this);
         errorMarker.setPreferredSize(new Dimension(16,16));
     }
     
+    /**
+     * the Constructor
+     */
     public ErrorMarkerDecorator() {
         super(null);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale.
+ * Copyright (C) 2015-2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,18 +33,41 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 public class ChoiceFieldSource<T> extends FieldSource<T> {
 
     private List<T> choices;
-    
+
+    /**
+     * Get the list of choices to be displayed in this field
+     *
+     * @return the list of choices
+     */
     public List<T> getChoices() {
         return choices;
     }
 
+    /**
+     * Set the list of choices which will be displayed in this field
+     *
+     * @param choices the list of choices
+     */
     public void setChoices(List<T> choices) {
         this.choices = choices;
     }
 
+    /**
+     * Add a listener to collection from which the choice list is derived.
+     *
+     * @param listener the listener
+     * @throws IOException if problems
+     */
     public void addCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
     }
 
+    /**
+     * Remove a listener from the collection from which the choice list is
+     * derived.
+     *
+     * @param listener the listener
+     * @throws IOException if problems
+     */
     public void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
     }
 }
