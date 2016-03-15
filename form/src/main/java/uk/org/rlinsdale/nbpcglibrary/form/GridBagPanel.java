@@ -88,11 +88,11 @@ public class GridBagPanel extends JPanel {
     /**
      * Add an list of fields to a row, starting in column1
      *
-     * @param fieldlist a list of fields to insert into this row
+     * @param fields a list of fields to insert into this row
      */
-    public void addRow(FieldList fieldlist) {
+    public void addRow(RowFields fields) {
         int col = 0;
-        for (JComponent component : fieldlist.getComponents()) {
+        for (JComponent component : fields.getComponents()) {
             if (component != null) {
                 add(component, makeconstraints(row, col));
             }
@@ -102,7 +102,7 @@ public class GridBagPanel extends JPanel {
     }
 
     /**
-     * Add a fields to a row, starting in column1
+     * Add a field to a row, starting in column1
      *
      * @param field a field to insert into this row
      */

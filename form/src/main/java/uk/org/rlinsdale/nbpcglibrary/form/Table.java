@@ -48,11 +48,11 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
     private final IconButton copybutton;
     private int checkboxcount = 0;
     private final JPanel buttons;
-    private final FieldList headerfields;
+    private final RowFields headerfields;
     private final List<Field<Boolean>> checkboxes = new ArrayList<>();
     private String[] parameters;
     private final ErrorMarkerField errorMarker = new ErrorMarkerField();
-    private final List<FieldList> rows = new ArrayList<>();
+    private final List<RowFields> rows = new ArrayList<>();
     private final List<S> sources = new ArrayList<>();
 
     /**
@@ -69,7 +69,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
         this.title = title;
         this.tablerules = tablerules;
         // create the header fields
-        headerfields = new FieldList();
+        headerfields = new RowFields();
         for (String label : columnheadings) {
             headerfields.add(FieldBuilder.stringType().label(label).columnlabelField());
         }
@@ -111,9 +111,9 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
     /**
      * Get the list of row fields for this table
      *
-     * @return A list of rows contents (each is a fieldlist)
+     * @return A list of rows contents
      */
-    public final List<FieldList> getRows() {
+    public final List<RowFields> getRows() {
         return rows;
     }
 
@@ -127,7 +127,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
             sources.add(s);
             return s;
         }).forEach((s) -> {
-            rows.add(s.getRowFields().getRow());
+            rows.add(s.getRowFields());
         });
         sources.stream().forEach((s) -> {
             s.opened();
@@ -152,14 +152,14 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
     /**
      * Draw the table into the table's gridbag for display
      */
-    protected void drawTable() {
+    private void drawTable() {
         clear();
         addRow(headerfields);
         checkboxes.clear();
-        getRows().stream().map((row) -> {
-            FieldList displayrow = new FieldList();
+        getRows().stream().map((RowFields row) -> {
             Field checkbox = FieldBuilder.booleanType().initialvalue(false).itemlistener(this).checkboxField();
             checkboxes.add(checkbox);
+            RowFields displayrow = new RowFields();
             displayrow.add(checkbox);
             displayrow.addAll(row);
             return displayrow;
@@ -234,8 +234,8 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      * Set the values of all fields.
      */
     public final void updateAllFieldsFromSource() {
-        getRows().stream().forEach((r) -> {
-            r.updateRowFieldsFromSource();
+        rows.stream().forEach((r) -> {
+            r.updateFieldsFromSources();
         });
     }
 
@@ -243,8 +243,8 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      * Set the values of all fields into sources.
      */
     public final void updateAllSourcesFromFields() {
-        getRows().stream().forEach((r) -> {
-            r.updateRowSourcesFromFields();
+        rows.stream().forEach((r) -> {
+            r.updateSourcesFromFields();
         });
     }
 
@@ -273,7 +273,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (FieldList r : getRows()) {
+        for (RowFields r : rows) {
             if (!r.checkRules()) {
                 valid = false;
             }
@@ -284,12 +284,7 @@ public abstract class Table<E extends Entity, S extends EntitySource<E>> extends
         return valid;
     }
 
-    /**
-     * Check the rules defined for the Table.
-     *
-     * @return true if the rules are obeyed (ie OK)
-     */
-    public boolean checkTableRules() {
+    private boolean checkTableRules() {
         if (tablerules != null) {
             boolean res = tablerules.checkRules();
             if (res) {

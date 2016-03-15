@@ -18,24 +18,26 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
 import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 
 /**
- * A row of fields - for use in defining the fields content of a table segment.
+ * A row of fields - for use in defining the fields content of a table row.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public abstract class RowFields implements HasInstanceDescription {
+public class RowFields extends ArrayList<Field> implements HasInstanceDescription {
 
-    private final FieldList row = new FieldList();
     private final Rules rowrules;
     private final ErrorMarkerField errormarker = new ErrorMarkerField();
 
     /**
      * Constructor
+     * 
      */
     public RowFields() {
         this(null);
@@ -48,7 +50,7 @@ public abstract class RowFields implements HasInstanceDescription {
      */
     public RowFields(Rules rowrules) {
         this.rowrules = rowrules;
-        row.add(errormarker);
+        add(errormarker);
     }
 
     @Override
@@ -57,49 +59,36 @@ public abstract class RowFields implements HasInstanceDescription {
     }
 
     /**
-     * add a field to this row.
-     *
-     * @param f the field to add
-     */
-    public final void add(Field f) {
-        row.add(f);
-    }
-
-    /**
-     * Get the row (collection of fields).
-     *
-     * @return the crow
-     */
-    public final FieldList getRow() {
-        return row;
-    }
-
-    /**
      * Set the values of all fields.
      */
-    public final void updateAllFieldsFromSource() {
-        row.stream().forEach((f) -> {
+    public final void updateFieldsFromSources() {
+        this.stream().forEach((f) -> {
             f.updateFieldFromSource();
         });
     }
 
+     /**
+     * Get the list of components which must be displayed.
+     * @return the list of components
+     */
+    public List<JComponent> getComponents() {
+        List<JComponent> c = new ArrayList<>();
+        this.stream().forEach((field) -> {
+            field.getComponents().stream().forEach(component -> {
+                c.add((JComponent) component);
+            });
+        });
+        return c;
+    }
+    
     /**
      * Set the values of all fields into sources.
      */
-    public final void updateAllSourcesFromFields() {
-        row.stream().forEach((f) -> {
-            ((Field) f).updateSourceFromField();
+    public final void updateSourcesFromFields() {
+        this.stream().forEach((f) -> {
+            f.updateSourceFromField();
         });
     }
-
-    /**
-     * Finalise the save action from source to other storage (eg persistent
-     * storage)
-     *
-     * @return true if save was successful
-     * @throws IOException if problems occurred during save
-     */
-    public abstract boolean save() throws IOException;
 
     /**
      * Check if all rules in the row's rule set and each individual field are
@@ -109,7 +98,7 @@ public abstract class RowFields implements HasInstanceDescription {
      */
     public final boolean checkRules() {
         boolean valid = true;
-        for (Field f : row) {
+        for (Field f : this) {
                 if (!f.checkRules()) {
                     valid = false;
                 }
@@ -120,12 +109,7 @@ public abstract class RowFields implements HasInstanceDescription {
         return valid;
     }
 
-    /**
-     * Check the rules defined for the Row.
-     *
-     * @return true if the rules are obeyed (ie OK)
-     */
-    public boolean checkRowRules() {
+    private boolean checkRowRules() {
         if (rowrules != null) {
             boolean res = rowrules.checkRules();
             if (res) {
