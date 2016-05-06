@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,18 +16,39 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.common;
+package uk.org.rlinsdale.nbpcglibrary.form;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * A simple callback interface
+ * The Null Field Model
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public interface Callback {
+public class NullFieldModel extends FieldModel<String> {
 
-    /**
-     * The call back method.
-     *
-     */
-    public abstract void call();
+    @Override
+    public String get() {
+        return "";
+    }
+
+    @Override
+    public void set(String value) {
+    }
+
+    @Override
+    public boolean test(StringBuilder sb) {
+        return true;
+    }
+
+    @Override
+    public boolean isNullSelectionAllowed() {
+        return false;
+    }
+
+    @Override
+    public List<String> getChoices() {
+        return new ArrayList<>();
+    }
 }

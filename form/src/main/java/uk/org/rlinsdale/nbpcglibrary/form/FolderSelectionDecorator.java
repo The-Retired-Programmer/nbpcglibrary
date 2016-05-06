@@ -21,13 +21,13 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
-import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
  *
@@ -41,22 +41,17 @@ public class FolderSelectionDecorator extends FieldDecorator<String> {
      * Create a Folder Selection Decorator wrapped around a field
      * @param field the field which needs decorating
      */
-    public FolderSelectionDecorator(Field<String> field) {
+    public FolderSelectionDecorator(FieldView<String> field) {
         super(field);
         folderButton.setIcon(new ImageIcon(getClass().getResource("folder_find.png")));
         folderButton.setToolTipText("Select Folder");
         folderButton.addActionListener(new FolderButtonListener());
-        field.addSourceRule(new FolderExistsRule());
     }
 
     @Override
-    public String instanceDescription() {
-        return super.instanceDescription() + "/FOLDERSELECTOR";
-    }
-
-    @Override
-    public List<JComponent> getComponents() {
-        List<JComponent> c = super.getComponents();
+    public List<JComponent> getViewComponents() {
+        List<JComponent> c = new ArrayList<>();
+        c.addAll(super.getViewComponents());
         c.add(folderButton);
         return c;
     }
@@ -67,7 +62,7 @@ public class FolderSelectionDecorator extends FieldDecorator<String> {
         public void actionPerformed(ActionEvent ae) {
             String initval;
             try {
-                initval = field.getFieldValue();
+                initval = field.get();
             } catch (BadFormatException ex) {
                 initval = "/";
             }
@@ -76,21 +71,8 @@ public class FolderSelectionDecorator extends FieldDecorator<String> {
             fc.setSelectedFile(new File(initval));
             if (fc.showOpenDialog(folderButton) == JFileChooser.APPROVE_OPTION) {
                 String filepath = fc.getSelectedFile().getAbsolutePath();
-                setFieldValue(filepath);
+                set(filepath);
             }
-        }
-    }
-
-    private class FolderExistsRule extends Rule {
-
-        protected FolderExistsRule() {
-            super("Folder does not exist or is a file");
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            File folder = new File(field.get());
-            return folder.exists() && folder.isDirectory();
         }
     }
 }

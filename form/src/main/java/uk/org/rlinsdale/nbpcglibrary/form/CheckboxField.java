@@ -18,9 +18,10 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.util.List;
 import javax.swing.JCheckBox;
-import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
 /**
  * A Field for displaying and editing a value which is a simple boolean using a
@@ -28,41 +29,46 @@ import uk.org.rlinsdale.nbpcglibrary.common.Callback;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class CheckboxField extends FieldImpl<Boolean, FieldSource<Boolean>> {
+public class CheckboxField extends FieldView<Boolean> {
     
     private final JCheckBox fieldcomponent;
 
     /**
      * Constructor
      *
-     * @param source the data source for this field
-     * @param initialValue the initial value of the display (or null if source
-     * provides this
      * @param listener the itemlistener to be associated with this field
-     * @param callback the callback with is used to inform of source updates
-     * from field
      */
-    public CheckboxField(FieldSource<Boolean> source, Boolean initialValue, ItemListener listener, Callback callback) {
-        this(new JCheckBox(), source, initialValue, listener, callback);
+    public CheckboxField(ItemListener listener) {
+        this(new JCheckBox(), listener);
     }
     
-    private CheckboxField(JCheckBox fieldcomponent, FieldSource<Boolean> source, Boolean initialValue, ItemListener listener, Callback callback) {
-        super(fieldcomponent, source, initialValue, callback);
+    /**
+     * Constructor
+     */
+    public CheckboxField() {
+        this(new JCheckBox(), null);
+    }
+    
+    private CheckboxField(JCheckBox fieldcomponent, ItemListener listener) {
+        super(fieldcomponent);
         this.fieldcomponent = fieldcomponent;
         if (listener != null ) {
             fieldcomponent.addItemListener(listener);
         }
-        fieldcomponent.addActionListener(getActionListener());
-        reset();
     }
 
     @Override
-    public final Boolean getFieldValue() {
+    public final Boolean get() {
         return fieldcomponent.isSelected();
     }
 
     @Override
-    public final void setFieldValue(Boolean value) {
+    public final void set(Boolean value) {
         fieldcomponent.setSelected(value);
+    }
+    
+    @Override
+    public void addActionListener(ActionListener listener) {
+        fieldcomponent.addActionListener(listener);
     }
 }

@@ -19,38 +19,16 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.io.IOException;
-import java.util.List;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-//import uk.org.rlinsdale.nbpcglibrary.common.Rules;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.SetChangeEventParams;
 
 /**
- * The Choice Field Source - basic implementation
+ * The Choice Field Model - basic implementation
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> the type of the source value
  */
-public class ChoiceFieldSource<T> extends FieldSource<T> {
-
-    private List<T> choices;
-
-    /**
-     * Get the list of choices to be displayed in this field
-     *
-     * @return the list of choices
-     */
-    public List<T> getChoices() {
-        return choices;
-    }
-
-    /**
-     * Set the list of choices which will be displayed in this field
-     *
-     * @param choices the list of choices
-     */
-    public void setChoices(List<T> choices) {
-        this.choices = choices;
-    }
+public abstract class EntityChoiceFieldModel<T> extends EntityFieldModel<T> {
 
     /**
      * Add a listener to collection from which the choice list is derived.
@@ -69,5 +47,10 @@ public class ChoiceFieldSource<T> extends FieldSource<T> {
      * @throws IOException if problems
      */
     public void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
+    }
+
+    @Override
+    public boolean test(StringBuilder sb) {
+        return true;
     }
 }

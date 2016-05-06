@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,6 +35,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
+import uk.org.rlinsdale.nbpcglibrary.common.Test;
+import uk.org.rlinsdale.nbpcglibrary.common.TestEvent;
 import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.*;
@@ -65,11 +67,15 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     private Event<SimpleEventParams> nameChangeEvent;
     private EntityState state = INIT;
     private final String entityname;
+    /**
+     * The Entity Persistence Provider for this entity
+     */
     protected final EntityPersistenceProvider<K> epp;
     private final Event<PrimaryKeyChangeEventParams<K>> primaryKeyChangeEvent;
     private final EntityManager<K, E, P> em;
     private final EntityStateChangeListener entitystatechangelistener;
     private final EntitySavable savable = new EntitySavable();
+    private final TestEvent presavetests = new TestEvent("presavetests");
 
     /**
      * Constructor.
@@ -379,9 +385,10 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     /**
      * Save this entity to entity storage.
      *
+     * @param sb Stringbuilder object used to collect any failure messages
      * @return true if save is successful
      */
-    public boolean save() {
+    public boolean save(StringBuilder sb) {
         EntityFields ef = new EntityFields();
         EntityState oldState = getState();
         switch (oldState) {
@@ -391,7 +398,10 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 return false;
             case NEW:
             case NEWEDITING:
-                if (!checkRules()) {
+                if (!presavetests.test(sb)) {
+                    return false;
+                }
+                if (!checkRules(sb)) {
                     return false;
                 }
                 if (!entityValues(ef)) {
@@ -405,7 +415,10 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 setState(DBENTITY);
                 break;
             case DBENTITYEDITING:
-                if (!checkRules()) {
+                if (!presavetests.test(sb)) {
+                    return false;
+                }
+                if (!checkRules(sb)) {
                     return false;
                 }
                 if (!entityDiffs(ef)) {
@@ -417,13 +430,34 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 setState(DBENTITY);
                 break;
             default:
-                if (!checkRules()) {
+                if (!presavetests.test(sb)) {
+                    return false;
+                }
+                if (!checkRules(sb)) {
                     return false;
                 }
         }
         fireStateChange(SAVE, oldState, DBENTITY);
         fireFieldChange();
         return true;
+    }
+
+    /**
+     * Register a pre-save test
+     *
+     * @param test the test to be added
+     */
+    public void registerPreSaveTest(Test test) {
+        presavetests.add(test);
+    }
+
+    /**
+     * Deregister a pre-save test
+     *
+     * @param test the test to be removed
+     */
+    public void deregisterPreSaveTest(Test test) {
+        presavetests.remove(test);
     }
 
     /**
@@ -497,7 +531,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
 
     @Override
     public Image getIcon() {
-        return checkRules() ? super.getIcon() : getIconWithError();
+        return checkRules(new StringBuilder()) ? super.getIcon() : getIconWithError();
     }
 
     private class EntitySavable<E, P, F> extends AbstractSavable implements Icon, HasInstanceDescription {
@@ -525,9 +559,12 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         @Override
         protected void handleSave() throws IOException {
             LogBuilder.writeLog("nbpcglibrary.data", this, "handleSave");
-            if (!Entity.this.save()) {
+            StringBuilder sb = new StringBuilder();
+            if (!Entity.this.save(sb)) {
                 EventQueue.invokeLater(new ReRegister());
                 LibraryOnStop.incRegisterOutstanding();
+                // TODO - should we place the error message in a visible place
+                LogBuilder.writeLog("nbpcglibrary.data", this, "handleSave-failure", sb.toString());
             }
         }
 

@@ -253,6 +253,11 @@ public class Event<P extends EventParams> implements HasInstanceDescription {
         }
     }
     
+    /**
+     * Fire the event listener on the EventQueue (rather than this thread)
+     * 
+     * @param listener the listener to be fired
+     */
     public static void fireSimpleEventParamsListener(Listener<SimpleEventParams> listener){
          EventQueue.invokeLater(new FireEventQueueListener<>(listener, new SimpleEventParams()));
     }

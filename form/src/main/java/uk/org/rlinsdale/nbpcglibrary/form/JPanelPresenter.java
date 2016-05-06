@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,34 +18,37 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
+import java.util.List;
 
 /**
- * A basic Horizontally ordered Box panel for displaying stacked components.
+ * JPanelPresenter - a presenter for a view which is a JPanel
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <C> the child presenter class
  */
-public class HBoxPanel extends JPanel {
+public interface JPanelPresenter<C> extends Presenter<JPanelView> {
 
     /**
-     * Constructor
-     *
+     * Set the  set of child presenters to be used with this panel
+     * 
+     * @param childpresenters a set of child presenters (as a set of parameters)
      */
-    public HBoxPanel() {
-        this(null);
-    }
+    public void setChildPresenters(C... childpresenters);
 
     /**
-     * Constructor
-     *
-     * @param borderTitle the panel title
+     * Set the  set of child presenters to be used with this panel
+     * 
+     * @param childpresenters a list of child presenters
      */
-    public HBoxPanel(String borderTitle) {
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-        if (borderTitle != null) {
-            setBorder(new TitledBorder(borderTitle));
-        }
-    }
+    public void setChildPresenters(List<C> childpresenters);
+    
+    /**
+     * Apply the save action for the MVP
+     *
+     * @param sb StringBuilder object to which error messages can be added if
+     * save fails
+     * @return true if save is ok
+     */
+    public boolean save(StringBuilder sb);
+
 }

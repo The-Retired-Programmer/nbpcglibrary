@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Richard Linsdale.
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,43 +18,49 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.awt.Dimension;
-import java.util.ArrayList;
+import java.awt.event.FocusListener;
+import java.util.Arrays;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 /**
+ * Abstract Class representing a Field View
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T> type of data being handled by this field
+ * @param <T> type of the data contained in the field
  */
-public class ErrorMarkerDecorator<T> extends FieldDecorator<T> {
+public abstract class FieldView<T> implements FieldViewAPI<T> {
 
-    private final JLabel errorMarker = new JLabel();
+    private final JComponent fieldcomponent;
 
     /**
-     * the Constructor
+     * Constructor
      *
-     * @param field the field to associate with this error marker.
+     * @param fieldcomponent the primary component to be used in field
      */
-    public ErrorMarkerDecorator(FieldViewAPI<T> field) {
-        super(field);
-        errorMarker.setPreferredSize(new Dimension(16, 16));
+    protected FieldView(JComponent fieldcomponent) {
+        this.fieldcomponent = fieldcomponent;
     }
 
     @Override
     public List<JComponent> getViewComponents() {
-        List<JComponent> c = new ArrayList<>();
-        c.addAll(super.getViewComponents());
-        c.add(errorMarker);
-        return c;
+        return Arrays.asList(new JComponent[]{fieldcomponent});
     }
 
     @Override
-    public void setErrorMarker(String errormessages) {
-        errorMarker.setIcon(new ImageIcon(getClass().getResource(errormessages == null ? "empty.png" : "error.png")));
-        errorMarker.setToolTipText(errormessages);
+    public void addFocusListener(FocusListener listener) {
+        fieldcomponent.addFocusListener(listener);
+    }
+
+    @Override
+    public void setErrorMarker(String message) {
+    }
+    
+    @Override
+    public void setChoices(List<T> choices) {
+    }
+
+    @Override
+    public void setNullSelectionAllowed(boolean isAllowed) {
     }
 }

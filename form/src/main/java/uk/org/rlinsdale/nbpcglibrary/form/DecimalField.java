@@ -18,11 +18,11 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.util.List;
 import javax.swing.JTextField;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
-import uk.org.rlinsdale.nbpcglibrary.common.Callback;
-import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
  * A Field for displaying and editing a value which is a Decimal (or Currency)
@@ -30,42 +30,34 @@ import uk.org.rlinsdale.nbpcglibrary.common.Rule;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class DecimalField extends FieldImpl<BigDecimal, FieldSource<BigDecimal>> {
+public class DecimalField extends FieldView<BigDecimal> {
 
     private final JTextField fieldcomponent;
 
     /**
      * Constructor
-     *
-     * @param source the data source for this field
-     * @param size the size of the text field object
-     * @param min the minimum valid length of the text entry
-     * @param max the maximum valid length of the text entry
-     * @param initialValue the initial value of the display (or null if source
-     * provides this
-     * @param callback the callback with is used to inform of source updates
-     * from field
      */
-    public DecimalField(FieldSource<BigDecimal> source, int size, BigDecimal min, BigDecimal max, BigDecimal initialValue, Callback callback) {
-        this(new JTextField(), source, size, min, max, initialValue, callback);
+    public DecimalField() {
+        this(new JTextField(), 20);
+    }
+    
+    /**
+     * Constructor
+     *
+     * @param size the size of the text field object
+     */
+    public DecimalField(int size) {
+        this(new JTextField(), size);
     }
 
-    private DecimalField(JTextField fieldcomponent, FieldSource<BigDecimal> source, int size, BigDecimal min, BigDecimal max, BigDecimal initialValue, Callback callback) {
-        super(fieldcomponent, source, initialValue, callback);
+    private DecimalField(JTextField fieldcomponent, int size) {
+        super(fieldcomponent);
         this.fieldcomponent = fieldcomponent;
         fieldcomponent.setColumns(size);
-        fieldcomponent.addActionListener(getActionListener());
-        if (min != null) {
-            source.getRules().addRule(new MinRule(min));
-        }
-        if (max != null) {
-            source.getRules().addRule(new MaxRule(max));
-        }
-        reset();
     }
 
     @Override
-    public final BigDecimal getFieldValue() throws BadFormatException {
+    public final BigDecimal get() throws BadFormatException {
         try {
             return new BigDecimal(fieldcomponent.getText().trim());
         } catch (NumberFormatException ex) {
@@ -74,37 +66,12 @@ public class DecimalField extends FieldImpl<BigDecimal, FieldSource<BigDecimal>>
     }
 
     @Override
-    public final void setFieldValue(BigDecimal value) {
+    public final void set(BigDecimal value) {
         fieldcomponent.setText(value.toString());
     }
 
-    private class MaxRule extends Rule {
-
-        private final BigDecimal max;
-
-        protected MaxRule(BigDecimal max) {
-            super("Too large - must be no greater than " + max);
-            this.max = max;
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            return source.get().compareTo(max) != 1;
-        }
-    }
-
-    private class MinRule extends Rule {
-
-        private final BigDecimal min;
-
-        protected MinRule(BigDecimal min) {
-            super("Too small - must be no smaller than " + min);
-            this.min = min;
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            return source.get().compareTo(min) != -1;
-        }
+    @Override
+    public void addActionListener(ActionListener listener) {
+        fieldcomponent.addActionListener(listener);
     }
 }

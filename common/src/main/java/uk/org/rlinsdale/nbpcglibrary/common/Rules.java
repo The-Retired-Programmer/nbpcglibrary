@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -54,37 +54,16 @@ public class Rules {
     }
 
     /**
-     * Add failure messages to the StringBuilder for each rule in this rule set
-     * which is failing.
-     *
-     * @param sb the StringBuilder collecting failure messages
-     */
-    public final void addFailureMessages(StringBuilder sb) {
-        rules.stream().forEach((rule) -> {
-            rule.addFailureMessage(sb);
-        });
-    }
-    
-    /**
-     * Get failure messages for each failing rule in this rule set.
-     *
-     * @return the combined failure message.
-     */
-    public final String getErrorMessages() {
-        StringBuilder sb = new StringBuilder();
-        addFailureMessages(sb);
-        return sb.toString();
-    }
-
-    /**
      * Check if all rules in the set are valid.
      *
+     * @param sb A string builder into which any error messages are placed if
+     * test fails
      * @return true if all rules are valid
      */
-    public final boolean checkRules() {
+    public final boolean checkRules(StringBuilder sb) {
         boolean valid = true;
         for (Rule rule : rules) {
-            if (!rule.check()) {
+            if (!rule.check(sb)) {
                 valid = false;
             }
         }
@@ -94,13 +73,15 @@ public class Rules {
     /**
      * Check if all rules (except those marked as unique) in the set are valid.
      *
+     * @param sb A string builder into which any error messages are placed if
+     * test fails
      * @return true if all rules (except unique) are valid
      */
-    public final boolean checkRulesAtLoad() {
+    public final boolean checkRulesAtLoad(StringBuilder sb) {
         boolean valid = true;
         for (Rule rule : rules) {
             if (!(rule instanceof UniqueRule)) {
-                if (!rule.check()) {
+                if (!rule.check(sb)) {
                     valid = false;
                 }
             }

@@ -53,6 +53,11 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
         lookup = new AbstractLookup(lookupcontent);
     }
     
+    /**
+     * Set the Icon for this entity
+     * 
+     * @param iconname the name of the icon (from icon library)
+     */
     public void setIcon(String iconname) {
         this.iconname = iconname;
     }

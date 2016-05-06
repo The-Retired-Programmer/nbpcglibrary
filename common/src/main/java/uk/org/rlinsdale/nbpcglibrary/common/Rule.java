@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -40,27 +40,17 @@ public abstract class Rule {
     }
 
     /**
-     * Add a failure message to the StringBuilder if the rule is currently
-     * failing.
-     *
-     * @param sb the StringBuilder collecting failure messages
-     */
-    public final void addFailureMessage(StringBuilder sb) {
-        if (!ruleCheck()) {
-            sb.append(failuremessage);
-            sb.append("; ");
-        }
-    }
-
-    /**
      * Test if the rule is passing.
      *
+     * @param sb the StringBuilder collecting failure messages
      * @return true if rule is passing
      */
-    public final boolean check() {
+    public final boolean check(StringBuilder sb) {
         if (ruleCheck()) {
             return true;
         }
+        sb.append(failuremessage);
+        sb.append("; ");
         LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName(this, "check")
                 .addMsg("Rule failure: {0}", failuremessage).write();
         return false;

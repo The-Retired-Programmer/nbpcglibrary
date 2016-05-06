@@ -32,6 +32,11 @@ public class PrimaryKeyChangeEventParams<K> implements EventParams {
 
     private final K pkey;
     
+    /**
+     * Constructor
+     * 
+     * @param pkey the primary key (new value)
+     */
     public PrimaryKeyChangeEventParams(K pkey){
         this.pkey = pkey;
     }
@@ -40,6 +45,11 @@ public class PrimaryKeyChangeEventParams<K> implements EventParams {
         return LogBuilder.instanceDescription(this,pkey.toString());
     }
     
+    /**
+     * Get the new primary key value for this change
+     * 
+     * @return the new primary key value
+     */
     public K getNewPKey() {
         return pkey;
     }

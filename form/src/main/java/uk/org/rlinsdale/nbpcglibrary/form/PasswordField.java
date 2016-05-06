@@ -18,55 +18,53 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.event.ActionListener;
+import java.util.List;
 import javax.swing.JPasswordField;
-import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
 /**
  * A Field to handle password entry.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class PasswordField extends FieldImpl<String, FieldSource<String>> {
+public class PasswordField extends FieldView<String> {
 
     private final JPasswordField fieldcomponent;
 
     /**
      * Constructor
-     *
-     * @param source the data source for this field
-     * @param size the size of the text field object
-     * @param min the minimum valid length of the text entry
-     * @param max the maximum valid length of the text entry
-     * @param initialValue the initial value of the display (or null if source
-     * provides this
-     * @param callback the callback with is used to inform of source updates
-     * from field
      */
-    public PasswordField(FieldSource<String> source, int size, Integer min, Integer max, String initialValue, Callback callback) {
-        this(new JPasswordField(), source, size, min, max, initialValue, callback);
+    public PasswordField() {
+        this(new JPasswordField(), 20);
+    }
+    
+    /**
+     * Constructor
+     *
+     * @param size the size of the text field object
+     */
+    public PasswordField(int size) {
+        this(new JPasswordField(), size);
     }
 
-    private PasswordField(JPasswordField fieldcomponent, FieldSource<String> source, int size, Integer min, Integer max, String initialValue, Callback callback) {
-        super(fieldcomponent, source, initialValue, callback);
+    private PasswordField(JPasswordField fieldcomponent, int size) {
+        super(fieldcomponent);
         this.fieldcomponent = fieldcomponent;
         fieldcomponent.setColumns(size);
-        fieldcomponent.addActionListener(getActionListener());
-        if (min != null) {
-            source.getRules().addRule(new MinLengthRule(min));
-        }
-        if (max != null) {
-            source.getRules().addRule(new MaxLengthRule(max));
-        }
-        reset();
     }
 
     @Override
-    public final String getFieldValue() {
+    public final String get() {
         return new String(fieldcomponent.getPassword());
     }
 
     @Override
-    public final void setFieldValue(String value) {
+    public final void set(String value) {
         fieldcomponent.setText(value);
+    }
+    
+    @Override
+    public void addActionListener(ActionListener listener) {
+        fieldcomponent.addActionListener(listener);
     }
 }

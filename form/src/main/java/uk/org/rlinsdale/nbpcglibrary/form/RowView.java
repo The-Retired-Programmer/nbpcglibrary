@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-20156 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,40 +19,27 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 /**
- * A General purpose Field for displaying a value which is a simple textual
- * string.
+ * Class representing a Row View
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class ColumnLabelField extends FieldNonEditableImpl {
-    
-    private final boolean errormarkerused;
-    
+public class RowView implements JPanelView<FieldViewAPI> {
+
+    private final TableView parentview;
+
     /**
      * Constructor
      *
-     * @param label the field initial value
-     * @param errormarkerused true if error marker used with fields in this column
+     * @param parentview the table view into which this row is to be inserted
      */
-    public ColumnLabelField(String label, boolean errormarkerused) {
-        this(new JLabel(label),errormarkerused );
+    public RowView(TableView parentview) {
+        this.parentview = parentview;
     }
-    
-    private ColumnLabelField(JLabel fieldcomponent, boolean errormarkerused) {
-        super(fieldcomponent);
-        this.errormarkerused = errormarkerused;
-    }
-    
+
     @Override
-    public List<JComponent> getComponents() {
-        List<JComponent> c = super.getComponents();
-        if (errormarkerused) {
-            c.add(null); 
-        }
-        return c;
+    public void insertChildViews(List<FieldViewAPI> childviews) {
+        parentview.insertChildViews(childviews);
     }
 }

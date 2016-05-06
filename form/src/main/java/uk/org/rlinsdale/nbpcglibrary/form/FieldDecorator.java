@@ -18,96 +18,41 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.util.ArrayList;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
 import java.util.List;
 import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
-import uk.org.rlinsdale.nbpcglibrary.common.CallbackReport;
-import uk.org.rlinsdale.nbpcglibrary.common.Rule;
 
 /**
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type class for data element (set or get)
  */
-public class FieldDecorator<T> implements Field<T> {
+public abstract class FieldDecorator<T> implements FieldViewAPI<T> {
 
     /**
      * The field which is being decorated
      */
-    protected final Field<T> field;
+    protected final FieldViewAPI<T> field;
 
     /**
      * the Constructor
+     *
      * @param field The field which is being decorated
      */
-    public FieldDecorator(Field<T> field) {
+    public FieldDecorator(FieldViewAPI<T> field) {
         this.field = field;
     }
 
     @Override
-    public T get() {
+    public T get() throws BadFormatException {
         return field.get();
     }
 
     @Override
-    public T getSourceValue() {
-        return field.getSourceValue();
-    }
-
-    @Override
-    public void setFieldValue(T value) {
-        field.setFieldValue(value);
-    }
-
-    @Override
-    public T getFieldValue() throws BadFormatException {
-        return field.getFieldValue();
-    }
-
-    @Override
-    public void addSourceRule(Rule rule) {
-        field.addSourceRule(rule);
-    }
-
-    @Override
-    public List<JComponent> getComponents() {
-        return field == null ? new ArrayList<>() : field.getComponents();
-    }
-
-    @Override
-    public String instanceDescription() {
-        return field.instanceDescription();
-    }
-
-    @Override
-    public void setErrorReporter(CallbackReport errorReporter) {
-        field.setErrorReporter(errorReporter);
-    }
-
-    @Override
-    public void updateFieldFromSource() {
-        field.updateFieldFromSource();
-    }
-
-    @Override
-    public void updateSourceFromField() {
-        field.updateSourceFromField();
-    }
-
-    @Override
-    public void updateFieldFromSource(boolean force) {
-        field.updateFieldFromSource(force);
-    }
-
-    @Override
-    public void closeChoices() {
-        field.closeChoices();
-    }
-
-    @Override
-    public void reset() {
-        field.reset();
+    public List<JComponent> getViewComponents() {
+        return field.getViewComponents();
     }
 
     @Override
@@ -116,7 +61,27 @@ public class FieldDecorator<T> implements Field<T> {
     }
 
     @Override
-    public boolean checkRules() {
-        return field.checkRules();
+    public void addFocusListener(FocusListener listener) {
+        field.addFocusListener(listener);
+    }
+
+    @Override
+    public void addActionListener(ActionListener listener) {
+        field.addActionListener(listener);
+    }
+
+    @Override
+    public void setErrorMarker(String message) {
+        field.setErrorMarker(message);
+    }
+
+    @Override
+    public void setChoices(List<T> choices) {
+        field.setChoices(choices);
+    }
+
+    @Override
+    public void setNullSelectionAllowed(boolean isAllowed) {
+        field.setNullSelectionAllowed(isAllowed);
     }
 }

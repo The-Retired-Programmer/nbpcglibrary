@@ -18,40 +18,27 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import uk.org.rlinsdale.nbpcglibrary.common.Rules;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The Field Source - Basic implementation
+ * The Field Model - Entity implementation
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> the type of the source value
  */
-public class FieldSource<T> {
+public abstract class EntityFieldModel<T> extends FieldModel<T> {
+    
 
-    private T value; // data source
-    private final Rules rules = new Rules();
-
-    /**
-     * Set the value in this field source
-     * @param value the value
-     */
-    public void set(T value) {
-        this.value = value;
+    @Override
+    public boolean isNullSelectionAllowed() {
+        // ignore - entityfield does not implement this feature
+        return false;
     }
 
-    /**
-     * Get the rules associated with this field source
-     * @return the set of rules
-     */
-    public Rules getRules() {
-        return rules;
-    }
-
-    /**
-     * Get the value for this field source
-     * @return the value
-     */
-    public T get() {
-        return value;
+    @Override
+    public List<T> getChoices() {
+        // ignore - entityfield does not implement this feature
+        return new ArrayList<>();
     }
 }

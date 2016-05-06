@@ -18,36 +18,50 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 /**
+ * The Field Model API
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <T> type of data being handled by this field
+ * @param <T> the type of the field value
  */
-public class LabelDecorator<T> extends FieldDecorator<T> {
-
-    private final JLabel labelcomponent;
+public abstract class FieldModel<T> {
 
     /**
-     * Create a label Decorator wrapped around a field
+     * Set the value in this field model
      *
-     * @param labeltext the label text
-     * @param field the field which needs decorating
+     * @param value the value
      */
-    public LabelDecorator(String labeltext, FieldViewAPI<T> field) {
-        super(field);
-        labelcomponent = new JLabel(labeltext);
-    }
+    public abstract void set(T value);
 
-    @Override
-    public List<JComponent> getViewComponents() {
-        List<JComponent> c = new ArrayList<>();
-        c.add(labelcomponent);
-        c.addAll(super.getViewComponents());
-        return c;
-    }
+    /**
+     * Get the value for this field model
+     *
+     * @return the value
+     */
+    public abstract T get();
+
+    /**
+     * Test if null selection is allowed in choice field
+     *
+     * @return true if a null selection is allowed
+     */
+    public abstract boolean isNullSelectionAllowed();
+
+    /**
+     * Get the list of possible selection values for a choice field
+     *
+     * @return the list of choices
+     */
+    public abstract List<T> getChoices();
+
+    /**
+     * Check that the model rules are ok.
+     *
+     * @param sb A string builder into which any error messages are placed if
+     * test fails
+     * @return true if all rules are ok.
+     */
+    public abstract boolean test(StringBuilder sb);
 }

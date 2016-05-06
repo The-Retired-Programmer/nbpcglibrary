@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,22 +18,24 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 /**
- * A basic Vertically ordered Box panel for displaying stacked components.
+ * A Composite view - consists of a set of views which are presented as
+ * vertically stacked objects
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class VBoxPanel extends JPanel {
+public class CompositeView extends JPanel implements JPanelView<JPanel> {
 
     /**
      * Constructor
      *
      */
-    public VBoxPanel() {
+    public CompositeView() {
         this(null);
     }
 
@@ -42,10 +44,15 @@ public class VBoxPanel extends JPanel {
      *
      * @param borderTitle the panel title
      */
-    public VBoxPanel(String borderTitle) {
+    public CompositeView(String borderTitle) {
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         if (borderTitle != null) {
             setBorder(new TitledBorder(borderTitle));
         }
+    }
+
+    @Override
+    public void insertChildViews(List<JPanel> childviews) {
+        childviews.stream().forEach(v -> add(v));
     }
 }

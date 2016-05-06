@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -126,7 +126,7 @@ public abstract class IconNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
             return entity.getIconWithError();
         }
         try {
-            return entity.checkRules() ? ImageIO.read(fi) : entity.addErrorToIcon(ImageIO.read(fi));
+            return entity.checkRules(new StringBuilder()) ? ImageIO.read(fi) : entity.addErrorToIcon(ImageIO.read(fi));
         } catch (IOException ex) {
             LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
                     .addMsg("Nodename is {0} - IOException when reading image", nodename).addExceptionMessage(ex).write();

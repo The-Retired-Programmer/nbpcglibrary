@@ -18,10 +18,10 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
-import uk.org.rlinsdale.nbpcglibrary.common.Callback;
 
 /**
  * A Field to select choice combobox
@@ -29,70 +29,42 @@ import uk.org.rlinsdale.nbpcglibrary.common.Callback;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <T> type of the data to be represented and selected in the combo box
  */
-public class ChoiceField<T> extends FieldImpl<T, ChoiceFieldSource<T>> {
+public class ChoiceField<T> extends FieldView<T> {
 
     private List<T> choices = new ArrayList<>();
-    private final boolean nullSelectionAllowed;
+    private boolean nullSelectionAllowed = false;
     private final JComboBox fieldcomponent;
 
     /**
      * Constructor
-     *
-     * @param source the data source for this field
-     * @param nullSelectionAllowed true if a null selection item is to be added
-     * to the choice items
-     * @param initialValue the initial value of the display (or null if source
-     * provides this
-     * @param choices the choices to be displayed in the combobox
-     * @param callback the callback with is used to inform of source updates
-     * from field
      */
-    public ChoiceField(ChoiceFieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
-        this(new JComboBox(), source, nullSelectionAllowed, initialValue, choices, callback);
+    public ChoiceField() {
+        this(new JComboBox());
     }
 
-    private ChoiceField (JComboBox fieldcomponent, ChoiceFieldSource<T> source, boolean nullSelectionAllowed, T initialValue, List<T> choices, Callback callback) {
-        super(fieldcomponent, source, initialValue, callback);
+    private ChoiceField(JComboBox fieldcomponent) {
+        super(fieldcomponent);
         this.fieldcomponent = fieldcomponent;
-        this.nullSelectionAllowed = nullSelectionAllowed;
         fieldcomponent.setEditable(false);
-        fieldcomponent.addActionListener(getActionListener());
-        source.setChoices(choices == null ? source.getChoices() : choices);
-        if (initialValue != null) {
-            source.set(initialValue);
-        }
-        updateChoicesFromSource();
-    }
-
-    /**
-     * Request that the values in the combo box are updated from the source.
-     */
-    protected void updateChoicesFromSource() {
-        choices = getSourceChoices();
-        preFieldUpdateAction();
-        updateFieldFromSource(true);
-        postFieldUpdateAction();
-    }
-
-    /**
-     * hook to allow actions to take place before updating a combobox
-     */
-    protected void preFieldUpdateAction() {
-    }
-
-    /**
-     * hook to allow actions to take place after updating a combobox
-     */
-    protected void postFieldUpdateAction() {
     }
 
     @Override
-    public final T getFieldValue() {
+    public final T get() {
         return (T) fieldcomponent.getItemAt(fieldcomponent.getSelectedIndex());
     }
 
     @Override
-    public final void setFieldValue(T value) {
+    public void setChoices(List<T> choices) {
+        this.choices = choices;
+    }
+
+    @Override
+    public void setNullSelectionAllowed(boolean isAllowed) {
+        this.nullSelectionAllowed = isAllowed;
+    }
+
+    @Override
+    public final void set(T value) {
         boolean selected = false;
         fieldcomponent.removeAllItems();
         if (choices != null) {
@@ -112,12 +84,8 @@ public class ChoiceField<T> extends FieldImpl<T, ChoiceFieldSource<T>> {
         }
     }
 
-    /**
-     * Request that the values in the combo box are updated from the source.
-     *
-     * @return the set of values to be inserted
-     */
-    protected List<T> getSourceChoices() {
-        return source.getChoices();
+    @Override
+    public void addActionListener(ActionListener listener) {
+        fieldcomponent.addActionListener(listener);
     }
 }

@@ -19,54 +19,76 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.awt.event.ActionListener;
+import java.awt.event.FocusListener;
+import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JTextField;
+import javax.swing.JComponent;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
-import uk.org.rlinsdale.nbpcglibrary.api.DateOnly;
 
 /**
- * A Field for displaying and editing a value which is a DateOnly Value.
+ * A null field view which generates a defined number of null field components
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class DateField extends FieldView<DateOnly> {
+public class NullField implements FieldViewAPI<String> {
 
-    private final JTextField fieldcomponent;
+    private final int componentcount;
 
     /**
      * Constructor
+     *
      */
-    public DateField() {
-        this(new JTextField(), 20);
+    public NullField() {
+        this(0);
     }
 
     /**
      * Constructor
      *
-     * @param size the size of the text field object
+     * @param componentcount the number of null components to generate for this
+     * field
      */
-    public DateField(int size) {
-        this(new JTextField(), size);
-    }
-
-    private DateField(JTextField fieldcomponent, int size) {
-        super(fieldcomponent);
-        this.fieldcomponent = fieldcomponent;
-        fieldcomponent.setColumns(size);
+    public NullField(int componentcount) {
+        this.componentcount = componentcount;
     }
 
     @Override
-    public final DateOnly get() throws BadFormatException {
-        return new DateOnly(fieldcomponent.getText().trim());
+    public List<JComponent> getViewComponents() {
+        List<JComponent> components = new ArrayList<>();
+        int count = componentcount;
+        while (count > 0) {
+            components.add(null);
+            count--;
+        }
+        return components;
     }
 
     @Override
-    public final void set(DateOnly value) {
-        fieldcomponent.setText(value.toString());
+    public void addFocusListener(FocusListener listener) {
+    }
+
+    @Override
+    public void setErrorMarker(String message) {
+    }
+
+    @Override
+    public void setChoices(List<String> choices) {
+    }
+
+    @Override
+    public void setNullSelectionAllowed(boolean isAllowed) {
     }
 
     @Override
     public void addActionListener(ActionListener listener) {
-        fieldcomponent.addActionListener(listener);
+    }
+
+    @Override
+    public void set(String value) {
+    }
+
+    @Override
+    public String get() throws BadFormatException {
+        return "";
     }
 }

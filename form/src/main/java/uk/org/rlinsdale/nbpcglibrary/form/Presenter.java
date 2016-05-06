@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2016 Richard Linsdale.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,22 +18,37 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import javax.swing.JLabel;
-
 /**
- * A General purpose Field for displaying a value which is a simple textual
- * string.
+ * Presenter
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <V> the view class
  */
-public class FillerField extends FieldNonEditableImpl {
+public interface Presenter<V> {
+    
+    /**
+     * Get the view associated with this presenter
+     *
+     * @return the view
+     */
+    public V getView();
+    
+    /**
+     * Check that the MVP rules are ok.
+     *
+     * @param sb StringBuilder object to which error messages can be added if
+     * test fails
+     * @return true if all rules are ok.
+     */
+    public boolean test(StringBuilder sb);
 
     /**
-     * Constructor
-     *
-     * @param text the text to appear in the filler field
+     * Enable the View
      */
-    public FillerField(String text) {
-        super(new JLabel(text == null ? "" : text));
-    }
+    public void enableView();
+    
+    /**
+     * Refresh the View (using data from model)
+     */
+    public void refreshView();
 }
