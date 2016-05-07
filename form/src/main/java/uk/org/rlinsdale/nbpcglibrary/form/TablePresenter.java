@@ -72,12 +72,8 @@ public class TablePresenter implements JPanelPresenter<RowPresenter>, ActionList
         createTableHeader(colheadings);
     }
 
-    /**
-     * Define the function to be used to get the set of ChildPresenters (in this case Row Presenters).
-     * 
-     * @param getRowPresentersFunction the function to get a set of child presenters
-     */
-    public void setGetRowPresenterFunction(Supplier<List<RowPresenter>> getRowPresentersFunction) {
+    @Override
+    public void setGetChildPresentersFunction(Supplier<List<RowPresenter>> getRowPresentersFunction) {
         this.getRowPresentersFunction = getRowPresentersFunction;
     }
 
@@ -168,15 +164,5 @@ public class TablePresenter implements JPanelPresenter<RowPresenter>, ActionList
     @Override
     public void refreshView() {
         rowpresenters.stream().forEach(rp -> rp.refreshView());
-    }
-
-    @Override
-    public void setChildPresenters(RowPresenter... childpresenters) {
-        throw new UnsupportedOperationException("Use setGetRowPresenterFunction to define child presenters for table rows.");
-    }
-
-    @Override
-    public void setChildPresenters(List<RowPresenter> childpresenters) {
-        throw new UnsupportedOperationException("Use setGetRowPresenterFunction to define child presenters for table rows.");
     }
 }

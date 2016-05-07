@@ -19,6 +19,8 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * JPanelPresenter - a presenter for a view which is a JPanel
@@ -29,18 +31,10 @@ import java.util.List;
 public interface JPanelPresenter<C> extends Presenter<JPanelView> {
 
     /**
-     * Set the  set of child presenters to be used with this panel
-     * 
-     * @param childpresenters a set of child presenters (as a set of parameters)
+     * Define a function to be used to get the set of child presenters
+     * @param getchildpresentersfunction the function
      */
-    public void setChildPresenters(C... childpresenters);
-
-    /**
-     * Set the  set of child presenters to be used with this panel
-     * 
-     * @param childpresenters a list of child presenters
-     */
-    public void setChildPresenters(List<C> childpresenters);
+    public void setGetChildPresentersFunction(Supplier<List<C>> getchildpresentersfunction);
     
     /**
      * Apply the save action for the MVP

@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.swing.JPanel;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
@@ -54,15 +55,10 @@ public class CompositePresenter implements JPanelPresenter<JPanelPresenter> {
         this.view = new CompositeView(borderTitle);
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this);
     }
-
+    
     @Override
-    public void setChildPresenters(JPanelPresenter... childpresenters) {
-        this.childpresenters = Arrays.asList(childpresenters);
-    }
-
-    @Override
-    public void setChildPresenters(List<JPanelPresenter> childpresenters) {
-        this.childpresenters = childpresenters;
+    public void setGetChildPresentersFunction(Supplier<List<JPanelPresenter>> getchildpresentersfunction) {
+        childpresenters = getchildpresentersfunction.get();
     }
 
     @Override

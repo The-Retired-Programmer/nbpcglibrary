@@ -19,9 +19,9 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
 
@@ -33,7 +33,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
  */
 public class RowPresenter implements JPanelPresenter<FieldPresenter> {
 
-    private final List<FieldPresenter> fields = new ArrayList<>();
+    private final List<FieldPresenter> fieldpresenters = new ArrayList<>();
     private final FieldView<Boolean> checkbox;
     private final Runnable copyaction;
     private final Runnable deleteaction;
@@ -62,16 +62,11 @@ public class RowPresenter implements JPanelPresenter<FieldPresenter> {
     public void setSaveFunction(Function<StringBuilder, Boolean> savefunction) {
         this.savefunction = savefunction;
     }
-
+    
     @Override
-    public void setChildPresenters(FieldPresenter... fieldpresenters) {
-        setChildPresenters(Arrays.asList(fieldpresenters));
-    }
-
-    @Override
-    public void setChildPresenters(List<FieldPresenter> fieldpresenters) {
-        fields.add(new FieldPresenter<>("Row Checkbox",checkbox,new BasicFieldModel<>(false)));
-        fields.addAll(fieldpresenters);
+    public void setGetChildPresentersFunction(Supplier<List<FieldPresenter>> getchildpresentersfunction) {
+        fieldpresenters.add(new FieldPresenter<>("Row Checkbox",checkbox,new BasicFieldModel<>(false)));
+        fieldpresenters.addAll(getchildpresentersfunction.get());
     }
 
     /**
@@ -103,7 +98,7 @@ public class RowPresenter implements JPanelPresenter<FieldPresenter> {
 
     @Override
     public boolean test(StringBuilder sb) {
-        return fields.stream().filter(presenter -> !presenter.test(sb)).count() == 0;
+        return fieldpresenters.stream().filter(presenter -> !presenter.test(sb)).count() == 0;
     }
 
 
@@ -115,14 +110,14 @@ public class RowPresenter implements JPanelPresenter<FieldPresenter> {
     @Override
     public void enableView() {
         getView().insertChildViews(
-                fields.stream().map(fp -> fp.getView()).collect(Collectors.toList())
+                fieldpresenters.stream().map(fp -> fp.getView()).collect(Collectors.toList())
         );
-        fields.stream().forEach(presenter -> presenter.enableView());
+        fieldpresenters.stream().forEach(presenter -> presenter.enableView());
     }
     
     @Override
     public void refreshView() {
-        fields.stream().forEach(presenter -> presenter.refreshView());
+        fieldpresenters.stream().forEach(presenter -> presenter.refreshView());
     }
 
     @Override

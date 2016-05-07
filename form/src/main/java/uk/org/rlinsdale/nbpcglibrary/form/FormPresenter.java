@@ -18,9 +18,9 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -58,17 +58,12 @@ public class FormPresenter implements JPanelPresenter<FieldPresenter> {
     public void setSaveFunction(Function<StringBuilder, Boolean> savefunction) {
         this.savefunction = savefunction; 
     }
-
+    
     @Override
-    public void setChildPresenters(FieldPresenter... fieldpresenters) {
-        setChildPresenters(Arrays.asList(fieldpresenters));
+    public void setGetChildPresentersFunction(Supplier<List<FieldPresenter>> getchildpresentersfunction) {
+        fieldpresenters = getchildpresentersfunction.get();
     }
-
-    @Override
-    public void setChildPresenters(List<FieldPresenter> fieldpresenters) {
-        this.fieldpresenters = fieldpresenters;
-    }
-
+    
     @Override
     public FormView getView() {
         return view;
