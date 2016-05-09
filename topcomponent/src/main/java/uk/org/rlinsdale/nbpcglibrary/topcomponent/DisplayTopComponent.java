@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
+ * Copyright (C) 2015-2016 Richard Linsdale (richard.linsdale at blueyonder.co.uk).
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,8 +18,10 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
-import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
+import java.util.List;
 import javax.swing.JComponent;
+import javax.swing.JToolBar;
 import org.openide.windows.TopComponent;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
@@ -32,6 +34,7 @@ public abstract class DisplayTopComponent extends TopComponent {
 
     private final String name;
     private JComponent displaycomponent;
+    private JToolBar toolbar;
 
     /**
      * Constructor
@@ -40,7 +43,7 @@ public abstract class DisplayTopComponent extends TopComponent {
      * @param hint the topcomponent hint
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public DisplayTopComponent( String name, String hint) {
+    public DisplayTopComponent(String name, String hint) {
         LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, name, hint);
         setName(name);
         setToolTipText(hint);
@@ -58,9 +61,15 @@ public abstract class DisplayTopComponent extends TopComponent {
     @Override
     public void componentOpened() {
         LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentOpened", name);
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
+        toolbar = new JToolBar("editor toolbar");
+        List<ToolbarElement> ltbe = getToolbarElements();
+        if (!ltbe.isEmpty()) {
+            ltbe.stream().forEach(tbe -> toolbar.add(tbe.getToolbarButton()));
+            add(toolbar, BorderLayout.PAGE_START);
+        }
         displaycomponent = getDisplayComponent();
-        add(displaycomponent);
+        add(displaycomponent, BorderLayout.CENTER);
         opened();
     }
 
@@ -71,7 +80,14 @@ public abstract class DisplayTopComponent extends TopComponent {
      */
     protected abstract JComponent getDisplayComponent();
 
-   /**
+    /**
+     * Get the toolbar elements to be displayed on this top component.
+     *
+     * @return the component to be displayed
+     */
+    protected abstract List<ToolbarElement> getToolbarElements();
+
+    /**
      * do any opening activities.
      *
      */
@@ -79,12 +95,13 @@ public abstract class DisplayTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        LogBuilder.writeLog("nbpcglibrary.topcomponent",this, "componentClosed", name);
-        remove(displaycomponent);
-        displaycomponent = null;
+        LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentClosed", name);
         closed();
+        remove(displaycomponent);
+        remove(toolbar);
+        displaycomponent = null;
     }
-    
+
     /**
      * Do any closing activities.
      *
