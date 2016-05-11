@@ -19,16 +19,15 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * JPanelPresenter - a presenter for a view which is a JPanel
+ * PanePresenter - a presenter for a view which is a JPanel
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <C> the child presenter class
  */
-public interface JPanelPresenter<C> extends Presenter<JPanelView> {
+public interface PanePresenter<C> extends Presenter<PaneView> {
 
     /**
      * Define a function to be used to get the set of child presenters

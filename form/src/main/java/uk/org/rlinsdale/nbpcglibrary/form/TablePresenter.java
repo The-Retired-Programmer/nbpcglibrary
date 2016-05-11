@@ -34,7 +34,7 @@ import javax.swing.JPanel;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class TablePresenter implements JPanelPresenter<RowPresenter>, ActionListener, ItemListener {
+public class TablePresenter implements PanePresenter<RowPresenter>, ActionListener, ItemListener {
 
     private List<RowPresenter> rowpresenters = new ArrayList<>();
     private final Runnable newaction;

@@ -23,19 +23,20 @@ import java.awt.GridBagLayout;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
-import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * View for a table object
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class TableView extends JPanel implements JPanelView<FieldViewAPI> {
+public class TableView extends JScrollPane implements PaneView<FieldViewAPI> {
 
     private final int columns;
     private int row = 0;
     private int col = 0;
+    private final JPanel panel;
 
     /**
      * Constructor
@@ -44,14 +45,23 @@ public class TableView extends JPanel implements JPanelView<FieldViewAPI> {
      * @param columns the table column width (as measured in components)
      *
      */
-    @SuppressWarnings("LeakingThisInConstructor")
     public TableView(String title, int columns) {
+        this(title, columns, new JPanel());
+    }
+
+    private TableView(String title, int columns, JPanel panel) {
+        super(panel);
+        this.panel = panel;
         this.columns = columns;
-        setLayout(new GridBagLayout());
+        panel.setLayout(new GridBagLayout());
         if (title != null) {
-            setBorder(new TitledBorder(title));
+            panel.setBorder(new TitledBorder(title));
         }
-        LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title);
+    }
+
+    @Override
+    public JComponent getViewComponent() {
+        return this;
     }
 
     @Override
@@ -60,7 +70,7 @@ public class TableView extends JPanel implements JPanelView<FieldViewAPI> {
         fvl.stream().forEach(fv
                 -> fv.getViewComponents().stream().forEach(component -> {
                     if (component != null) {
-                        add((JComponent) component, makeconstraints(row, col));
+                        panel.add((JComponent) component, makeconstraints(row, col));
                     }
                     col++;
                 }));
@@ -81,7 +91,7 @@ public class TableView extends JPanel implements JPanelView<FieldViewAPI> {
      * @param component the component
      */
     public void insertSpannedRow(JComponent component) {
-        add(component, makeconstraints(row));
+        panel.add(component, makeconstraints(row));
         row++;
     }
 
@@ -99,7 +109,7 @@ public class TableView extends JPanel implements JPanelView<FieldViewAPI> {
      */
     public void clear() {
         row = 0;
-        this.removeAll();
+        panel.removeAll();
         validate();
     }
 }

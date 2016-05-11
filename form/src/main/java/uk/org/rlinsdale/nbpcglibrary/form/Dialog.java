@@ -40,7 +40,7 @@ public class Dialog implements HasInstanceDescription {
 
     private static Dialog instance;
     private final DialogDescriptor dd;
-    private final JPanelPresenter presenter;
+    private final PanePresenter presenter;
     private final String title;
     private final Event<SimpleEventParams> cancellationEvent;
 
@@ -50,7 +50,7 @@ public class Dialog implements HasInstanceDescription {
      * @param title the dialog title
      * @param presenter the controller used to create the body of the dialog
      */
-    public static void show(String title, JPanelPresenter presenter) {
+    public static void show(String title, PanePresenter presenter) {
         instance = new Dialog(title, presenter, false, null);
     }
 
@@ -61,15 +61,15 @@ public class Dialog implements HasInstanceDescription {
      * @param presenter the presenter used to create the body of the dialog
      * @param onCancellation listener for dialog completion
      */
-    public static void showModal(String title, JPanelPresenter presenter, Listener<SimpleEventParams> onCancellation) {
+    public static void showModal(String title, PanePresenter presenter, Listener<SimpleEventParams> onCancellation) {
         instance = new Dialog(title, presenter, true, onCancellation);
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private Dialog(String title, JPanelPresenter presenter, boolean isModal, Listener<SimpleEventParams> onCancellation) {
+    private Dialog(String title, PanePresenter presenter, boolean isModal, Listener<SimpleEventParams> onCancellation) {
         this.presenter = presenter;
         presenter.enableView();
-        JPanelView view = (JPanelView) this.presenter.getView();
+        PaneView view = (PaneView) this.presenter.getView();
         this.title = title;
         cancellationEvent = new Event<>("DialogueCancellation");
         cancellationEvent.addListener(onCancellation);

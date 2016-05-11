@@ -17,6 +17,7 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
+import javax.swing.JComponent;
 
 /**
  * A View which implements a JPanel as its core component
@@ -24,7 +25,7 @@ import java.util.List;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  * @param <V> the class of the inserted views
  */
-public interface JPanelView<V> {
+public interface PaneView<V> {
 
     /**
      * Insert a set of child views into this view.
@@ -32,4 +33,11 @@ public interface JPanelView<V> {
      * @param childviews the list of child views
      */
     public void insertChildViews(List<V> childviews);
+    
+    /**
+     * Get the Component which is this View.
+     *
+     * @return the components
+     */
+    public JComponent getViewComponent();
 }

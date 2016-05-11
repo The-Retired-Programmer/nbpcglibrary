@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FormPresenter implements JPanelPresenter<FieldPresenter> {
+public class FormPresenter implements PanePresenter<FieldPresenter> {
 
     private List<FieldPresenter> fieldpresenters;
     private final FormView view;

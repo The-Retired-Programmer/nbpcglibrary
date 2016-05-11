@@ -31,7 +31,7 @@ import uk.org.rlinsdale.nbpcglibrary.api.BadFormatException;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)/** Called
  * whenever a row checkbox is checked or unchecked.
  */
-public class RowPresenter implements JPanelPresenter<FieldPresenter> {
+public class RowPresenter implements PanePresenter<FieldPresenter> {
 
     private final List<FieldPresenter> fieldpresenters = new ArrayList<>();
     private final FieldView<Boolean> checkbox;

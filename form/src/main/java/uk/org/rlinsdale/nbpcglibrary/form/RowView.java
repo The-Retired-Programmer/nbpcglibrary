@@ -19,13 +19,14 @@
 package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
+import javax.swing.JComponent;
 
 /**
  * Class representing a Row View
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class RowView implements JPanelView<FieldViewAPI> {
+public class RowView implements PaneView<FieldViewAPI> {
 
     private final TableView parentview;
 
@@ -41,5 +42,10 @@ public class RowView implements JPanelView<FieldViewAPI> {
     @Override
     public void insertChildViews(List<FieldViewAPI> childviews) {
         parentview.insertChildViews(childviews);
+    }
+
+    @Override
+    public JComponent getViewComponent() {
+        return parentview.getViewComponent(); // not sure if this is correct as I dont think it will ever be called!!
     }
 }

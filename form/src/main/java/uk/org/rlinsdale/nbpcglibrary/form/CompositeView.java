@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.form;
 
 import java.util.List;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
@@ -29,7 +30,7 @@ import javax.swing.border.TitledBorder;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class CompositeView extends JPanel implements JPanelView<JPanel> {
+public class CompositeView extends JPanel implements PaneView<PaneView> {
 
     /**
      * Constructor
@@ -52,7 +53,12 @@ public class CompositeView extends JPanel implements JPanelView<JPanel> {
     }
 
     @Override
-    public void insertChildViews(List<JPanel> childviews) {
-        childviews.stream().forEach(v -> add(v));
+    public void insertChildViews(List<PaneView> childviews) {
+        childviews.stream().forEach(v -> add(v.getViewComponent()));
+    }
+
+    @Override
+    public JComponent getViewComponent() {
+        return this;
     }
 }

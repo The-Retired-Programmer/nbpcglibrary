@@ -23,6 +23,7 @@ import java.awt.GridBagLayout;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
 /**
@@ -30,10 +31,11 @@ import javax.swing.border.TitledBorder;
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
-public class FormView extends JPanel implements JPanelView<FieldViewAPI> {
+public class FormView extends JScrollPane implements PaneView<FieldViewAPI> {
 
     private int row = 0;
     private int col = 0;
+    private final JPanel panel;
 
     /**
      * Constructor
@@ -48,10 +50,21 @@ public class FormView extends JPanel implements JPanelView<FieldViewAPI> {
      * @param title the view's title
      */
     public FormView(String title) {
-        setLayout(new GridBagLayout());
+        this(null, new JPanel());
+    }
+    
+    private FormView(String title, JPanel panel) {
+        super(panel);
+        this.panel = panel;
+        panel.setLayout(new GridBagLayout());
         if (title != null) {
-            setBorder(new TitledBorder(title));
+            panel.setBorder(new TitledBorder(title));
         }
+    }
+    
+    @Override
+    public JComponent getViewComponent() {
+        return this;
     }
 
     @Override
@@ -61,7 +74,7 @@ public class FormView extends JPanel implements JPanelView<FieldViewAPI> {
                 fv.getViewComponents().stream().forEach(component
                     -> {
                         if (component != null) {
-                            add((JComponent) component, makeconstraints(row, col));
+                            panel.add((JComponent) component, makeconstraints(row, col));
                         }
                         col++;
                     });

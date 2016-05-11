@@ -25,7 +25,7 @@ import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
-import uk.org.rlinsdale.nbpcglibrary.form.JPanelPresenter;
+import uk.org.rlinsdale.nbpcglibrary.form.PanePresenter;
 import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNode;
 
 /**
@@ -87,7 +87,7 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K, E, P, F>, P 
      * 
      * @return the top level presenter
      */
-    protected abstract JPanelPresenter getPresenter();
+    protected abstract PanePresenter getPresenter();
 
     @Override
     public boolean canClose() {

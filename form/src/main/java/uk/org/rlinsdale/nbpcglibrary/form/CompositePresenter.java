@@ -18,11 +18,9 @@
  */
 package uk.org.rlinsdale.nbpcglibrary.form;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.swing.JPanel;
 import uk.org.rlinsdale.nbpcglibrary.annotations.RegisterLog;
 import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
@@ -33,9 +31,9 @@ import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
  */
 @RegisterLog("nbpcglibrary.form")
-public class CompositePresenter implements JPanelPresenter<JPanelPresenter> {
+public class CompositePresenter implements PanePresenter<PanePresenter> {
 
-    private List<JPanelPresenter> childpresenters;
+    private List<PanePresenter> childpresenters;
     private final CompositeView view;
 
     /**
@@ -55,9 +53,9 @@ public class CompositePresenter implements JPanelPresenter<JPanelPresenter> {
         this.view = new CompositeView(borderTitle);
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this);
     }
-    
+
     @Override
-    public void setGetChildPresentersFunction(Supplier<List<JPanelPresenter>> getchildpresentersfunction) {
+    public void setGetChildPresentersFunction(Supplier<List<PanePresenter>> getchildpresentersfunction) {
         childpresenters = getchildpresentersfunction.get();
     }
 
@@ -74,7 +72,7 @@ public class CompositePresenter implements JPanelPresenter<JPanelPresenter> {
     @Override
     public void enableView() {
         getView().insertChildViews(childpresenters.stream()
-                .map(p -> (JPanel) p.getView()).collect(Collectors.toList()));
+                .map(p -> (PaneView) p.getView()).collect(Collectors.toList()));
         childpresenters.stream().forEach(presenter -> presenter.enableView());
     }
 
