@@ -20,6 +20,7 @@ package uk.org.rlinsdale.nbpcglibrary.topcomponent;
 
 import java.util.Arrays;
 import java.util.List;
+import org.openide.awt.StatusDisplayer;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
@@ -75,11 +76,25 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K, E, P, F>, P 
     }
     
     private boolean testaction() {
-        return getPresenter().test(new StringBuilder());
+        StringBuilder messages = new StringBuilder();
+        boolean res = getPresenter().test(messages);
+        if (!res) {
+            StatusDisplayer.getDefault().setStatusText(messages.toString());
+        }
+        return res;
     }
     
     private boolean saveaction() {
-        return testaction() && getPresenter().save(new StringBuilder());
+        return testaction() && saveonlyaction() ;
+    }
+    
+    private boolean saveonlyaction() {
+        StringBuilder messages = new StringBuilder();
+        boolean res = getPresenter().save(messages);
+        if (!res) {
+            StatusDisplayer.getDefault().setStatusText(messages.toString());
+        }
+        return res;
     }
     
     /**
@@ -91,15 +106,8 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K, E, P, F>, P 
 
     @Override
     public boolean canClose() {
-        return abandon ? true : canCloseForm();
+        return abandon ? true : saveaction();
     }
-
-    /**
-     * Can Close the form
-     *
-     * @return true if form can be closed
-     */
-    protected abstract boolean canCloseForm();
 
     @Override
     protected void opened() {

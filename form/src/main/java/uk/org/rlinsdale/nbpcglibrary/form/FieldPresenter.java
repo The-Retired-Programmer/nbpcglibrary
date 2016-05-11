@@ -110,12 +110,12 @@ public class FieldPresenter<T> implements Presenter<FieldViewAPI<T>>, ActionList
      * @param value the new value to insert
      */
     public void set(T value) {
-        StringBuilder sb = new StringBuilder();
         model.set(value);
-        updateViewFromModel(sb);
+        updateViewFromModel();
     }
 
-    private void updateViewFromModel(StringBuilder sb) {
+    private void updateViewFromModel() {
+        StringBuilder sb = new StringBuilder();
         view.setErrorMarker(model.test(sb) ? null : sb.toString());
         inhibitListeneractions = true;
         view.setNullSelectionAllowed(model.isNullSelectionAllowed());
@@ -134,8 +134,10 @@ public class FieldPresenter<T> implements Presenter<FieldViewAPI<T>>, ActionList
         }
         String lsbs = lsb.toString();
         view.setErrorMarker(lsbs);
-        sb.append(id);
-        sb.append(": ");
+        if (!id.equals("")) {
+            sb.append(id);
+            sb.append(": ");
+        }
         sb.append(lsbs);
         sb.append("; ");
         return false;
@@ -143,13 +145,11 @@ public class FieldPresenter<T> implements Presenter<FieldViewAPI<T>>, ActionList
 
     @Override
     public void enableView() {
-        StringBuilder sb = new StringBuilder();
-        updateViewFromModel(sb);
+        updateViewFromModel();
     }
 
     @Override
     public void refreshView() {
-        StringBuilder sb = new StringBuilder();
-        updateViewFromModel(sb);
+        updateViewFromModel();
     }
 }

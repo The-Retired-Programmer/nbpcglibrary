@@ -50,7 +50,6 @@ public abstract class Rule {
             return true;
         }
         sb.append(failuremessage);
-        sb.append("; ");
         LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName(this, "check")
                 .addMsg("Rule failure: {0}", failuremessage).write();
         return false;
