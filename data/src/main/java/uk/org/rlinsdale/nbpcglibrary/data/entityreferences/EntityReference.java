@@ -337,7 +337,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
     private class DefinedRule extends Rule {
 
         public DefinedRule() {
-            super("No " + name + " defined");
+            super("Not defined");
         }
 
         @Override

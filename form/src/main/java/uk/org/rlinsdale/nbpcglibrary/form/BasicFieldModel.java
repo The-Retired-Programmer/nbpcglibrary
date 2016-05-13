@@ -135,7 +135,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
         private final int min;
 
         public MinLengthRule(int min) {
-            super("Field Length is too short");
+            super("Too short");
             this.min = min;
         }
 
@@ -161,7 +161,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
         private final int max;
 
         public MaxLengthRule(int max) {
-            super("Field Length is too long");
+            super("Too long");
             this.max = max;
         }
 
@@ -187,7 +187,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
         private final long min;
 
         public MinRule(long min) {
-            super("Field value is too small");
+            super("Too small");
             this.min = min;
         }
 
@@ -213,7 +213,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
         private final long max;
 
         public MaxRule(long max) {
-            super("Field value is too large");
+            super("Too large");
             this.max = max;
         }
 
@@ -236,7 +236,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
     private class FilenameRule extends Rule {
 
         public FilenameRule() {
-            super("Field value is not a filename");
+            super("Not a filename");
         }
 
         @Override
@@ -258,7 +258,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
     private class FoldernameRule extends Rule {
 
         public FoldernameRule() {
-            super("Field value is not a folder");
+            super("Not a folder");
         }
 
         @Override

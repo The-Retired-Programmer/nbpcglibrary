@@ -228,7 +228,7 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
         private final int max;
 
         public MaxRule(int max) {
-            super("Too many " + name + "s defined");
+            super("Too many defined");
             this.max = max;
         }
 
@@ -243,7 +243,7 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
         private final int min;
 
         public MinRule(int min) {
-            super("Too few " + name + "s defined");
+            super("Too few defined");
             this.min = min;
         }
 
