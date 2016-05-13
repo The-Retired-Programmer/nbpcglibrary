@@ -22,49 +22,36 @@ import java.util.Arrays;
 import java.util.List;
 import org.openide.awt.StatusDisplayer;
 import uk.org.rlinsdale.nbpcglibrary.common.Listener;
-import uk.org.rlinsdale.nbpcglibrary.data.entity.CoreEntity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.Entity;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import uk.org.rlinsdale.nbpcglibrary.form.PanePresenter;
-import uk.org.rlinsdale.nbpcglibrary.node.nodes.TreeNode;
 
 /**
- * Editor Topcomponent which displays/edits a node.
+ * Editor -  Topcomponent which displays/edits an entity.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
- * @param <K> the primary Key class for this entity
- * @param <E> the entity class
- * @param <P> the parent entity class
- * @param <F> the fields enum for this entity
  */
-public abstract class NodeEditorTopComponent<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends DisplayTopComponent {
-
+public abstract class EditorTopComponent<E extends Entity> extends DisplayTopComponent {
     private boolean abandon = false;
     private EntityStateChangeListener statechangelistener;
 
     /**
-     * the node being edited
-     */
-    protected final TreeNode<K, E, P, F> node;
-
-    /**
      * the entity being edited
      */
-    protected E entity;
+    protected final E entity;
 
     /**
      * Constructor
      *
-     * @param node the node
+     * @param entity the entity being edited
      * @param name the topcomponent name
      * @param hint the topcomponent hint
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public NodeEditorTopComponent(TreeNode<K, E, P, F> node, String name, String hint) {
+    public EditorTopComponent(E entity, String name, String hint) {
         super(name, hint);
-        this.node = node;
-        entity = node.getEntity();
+        this.entity = entity;
     }
 
     @Override
@@ -111,13 +98,11 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K, E, P, F>, P 
 
     @Override
     protected void opened() {
-        entity = node.getEntity();
         entity.addStateListener(statechangelistener = new EntityStateChangeListener("TopComponent:" + entity.instanceDescription()));
     }
 
     @Override
     protected void closed() {
-        entity = null;
         statechangelistener = null;
     }
 
@@ -131,7 +116,7 @@ public abstract class NodeEditorTopComponent<K, E extends Entity<K, E, P, F>, P 
         public void action(EntityStateChangeEventParams p) {
             if (p.getTransition() == REMOVE) {
                 abandon = true;
-                NodeEditorTopComponent.this.close();
+                EditorTopComponent.this.close();
             }
         }
     }
