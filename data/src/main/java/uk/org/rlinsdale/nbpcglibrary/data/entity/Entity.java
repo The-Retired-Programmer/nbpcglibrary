@@ -35,8 +35,6 @@ import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
-import uk.org.rlinsdale.nbpcglibrary.common.Test;
-import uk.org.rlinsdale.nbpcglibrary.common.TestEvent;
 import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.*;
@@ -75,7 +73,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     private final EntityManager<K, E, P> em;
     private final EntityStateChangeListener entitystatechangelistener;
     private final EntitySavable savable = new EntitySavable();
-    private final TestEvent presavetests = new TestEvent("presavetests");
 
     /**
      * Constructor.
@@ -398,9 +395,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 return false;
             case NEW:
             case NEWEDITING:
-                if (!presavetests.test(sb)) {
-                    return false;
-                }
                 if (!checkRules(sb)) {
                     return false;
                 }
@@ -415,9 +409,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 setState(DBENTITY);
                 break;
             case DBENTITYEDITING:
-                if (!presavetests.test(sb)) {
-                    return false;
-                }
                 if (!checkRules(sb)) {
                     return false;
                 }
@@ -430,9 +421,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 setState(DBENTITY);
                 break;
             default:
-                if (!presavetests.test(sb)) {
-                    return false;
-                }
                 if (!checkRules(sb)) {
                     return false;
                 }
@@ -440,24 +428,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         fireStateChange(SAVE, oldState, DBENTITY);
         fireFieldChange();
         return true;
-    }
-
-    /**
-     * Register a pre-save test
-     *
-     * @param test the test to be added
-     */
-    public void registerPreSaveTest(Test test) {
-        presavetests.add(test);
-    }
-
-    /**
-     * Deregister a pre-save test
-     *
-     * @param test the test to be removed
-     */
-    public void deregisterPreSaveTest(Test test) {
-        presavetests.remove(test);
     }
 
     /**
