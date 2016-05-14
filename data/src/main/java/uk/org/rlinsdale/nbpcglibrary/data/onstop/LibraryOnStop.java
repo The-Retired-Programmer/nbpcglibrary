@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301  USA
  */
-package uk.org.rlinsdale.nbpcglibrary.data;
+package uk.org.rlinsdale.nbpcglibrary.data.onstop;
 
 import java.util.concurrent.Callable;
 import org.netbeans.api.actions.Savable;
@@ -31,6 +31,8 @@ import org.openide.modules.OnStop;
  */
 @OnStop
 public class LibraryOnStop implements Callable<Boolean> {
+    
+    private static boolean enableSavable = false;
 
     @Override
     public Boolean call() {
@@ -58,5 +60,28 @@ public class LibraryOnStop implements Callable<Boolean> {
      */
     public static void decRegisterOutstanding() {
         outstandingSavableRegistrations--;
+    }
+    
+    /**
+     * Test if Savable to be implemented for entities in this application
+     * 
+     * @return true if Savable to be enabled
+     */
+    public static boolean isSavableEnabled() {
+        return enableSavable;
+    }
+    
+    /**
+     * Set the state of Savable Enabled to true
+     */
+    public static void setSavableEnabled() {
+        enableSavable = true;
+    }
+    
+    /**
+     * Set the state of Savable Enabled to false
+     */
+    public static void setSavableDisabled() {
+        enableSavable = false;
     }
 }

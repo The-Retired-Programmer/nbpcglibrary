@@ -35,7 +35,8 @@ import uk.org.rlinsdale.nbpcglibrary.common.SimpleEventParams;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.org.rlinsdale.nbpcglibrary.api.EntityFields;
 import uk.org.rlinsdale.nbpcglibrary.api.HasInstanceDescription;
-import uk.org.rlinsdale.nbpcglibrary.data.LibraryOnStop;
+import uk.org.rlinsdale.nbpcglibrary.data.onstop.LibraryOnStop;
+import static uk.org.rlinsdale.nbpcglibrary.data.onstop.LibraryOnStop.isSavableEnabled;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
 import static uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState.*;
 import uk.org.rlinsdale.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange;
@@ -509,16 +510,24 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         private Icon icon;
 
         public void add() {
+            if (isSavableEnabled()) {
             if (getLookup().lookup(EntitySavable.class) == null) {
                 register();
                 addLookupContent(this);
             }
             icon = null;
+            } else {
+                LibraryOnStop.incRegisterOutstanding(); 
+            }
         }
 
         public void remove() {
-            removeLookupContent(this);
-            unregister();
+            if (isSavableEnabled()) {
+                removeLookupContent(this);
+                unregister();
+            } else {
+                LibraryOnStop.decRegisterOutstanding();
+            }
         }
 
         @Override
