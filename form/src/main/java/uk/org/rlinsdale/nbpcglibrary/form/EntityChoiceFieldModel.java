@@ -48,9 +48,4 @@ public abstract class EntityChoiceFieldModel<T> extends EntityFieldModel<T> {
      */
     public void removeCollectionListeners(Listener<SetChangeEventParams> listener) throws IOException {
     }
-
-    @Override
-    public boolean test(StringBuilder sb) {
-        return true;
-    }
 }
