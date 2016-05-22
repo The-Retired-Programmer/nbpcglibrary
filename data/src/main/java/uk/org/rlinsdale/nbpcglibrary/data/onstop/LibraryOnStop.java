@@ -19,9 +19,11 @@
 package uk.org.rlinsdale.nbpcglibrary.data.onstop;
 
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import org.netbeans.api.actions.Savable;
 import uk.org.rlinsdale.nbpcglibrary.common.ConfirmationDialog;
 import org.openide.modules.OnStop;
+import uk.org.rlinsdale.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Standard On Stop action - tests if forms have error, and dialogs with
@@ -53,6 +55,7 @@ public class LibraryOnStop implements Callable<Boolean> {
      */
     public static void incRegisterOutstanding() {
         outstandingSavableRegistrations++;
+        LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMsg("LibraryOnStop.incRegisterOutstanding() - count is now {0}", outstandingSavableRegistrations).write();
     }
 
     /**
@@ -60,6 +63,7 @@ public class LibraryOnStop implements Callable<Boolean> {
      */
     public static void decRegisterOutstanding() {
         outstandingSavableRegistrations--;
+        LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMsg("LibraryOnStop.decRegisterOutstanding() - count is now {0}", outstandingSavableRegistrations).write();
     }
     
     /**

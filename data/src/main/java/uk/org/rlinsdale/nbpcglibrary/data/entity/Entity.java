@@ -508,16 +508,20 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     private class EntitySavable<E, P, F> extends AbstractSavable implements Icon, HasInstanceDescription {
 
         private Icon icon;
+        private boolean isRegisteredAsOutstanding = false;
 
         public void add() {
             if (isSavableEnabled()) {
-            if (getLookup().lookup(EntitySavable.class) == null) {
-                register();
-                addLookupContent(this);
-            }
-            icon = null;
+                if (getLookup().lookup(EntitySavable.class) == null) {
+                    register();
+                    addLookupContent(this);
+                }
+                icon = null;
             } else {
-                LibraryOnStop.incRegisterOutstanding(); 
+                if (!isRegisteredAsOutstanding) {
+                    LibraryOnStop.incRegisterOutstanding();
+                    isRegisteredAsOutstanding = true;
+                }
             }
         }
 
@@ -526,7 +530,10 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                 removeLookupContent(this);
                 unregister();
             } else {
-                LibraryOnStop.decRegisterOutstanding();
+                if (isRegisteredAsOutstanding) {
+                    LibraryOnStop.decRegisterOutstanding();
+                    isRegisteredAsOutstanding = false;
+                }
             }
         }
 
