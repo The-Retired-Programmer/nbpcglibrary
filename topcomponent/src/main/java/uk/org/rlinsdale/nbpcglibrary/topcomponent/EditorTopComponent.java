@@ -31,6 +31,7 @@ import uk.org.rlinsdale.nbpcglibrary.form.PanePresenter;
  * Editor -  Topcomponent which displays/edits an entity.
  *
  * @author Richard Linsdale (richard.linsdale at blueyonder.co.uk)
+ * @param <E> the class of the entity being edited
  */
 public abstract class EditorTopComponent<E extends Entity> extends DisplayTopComponent {
     private boolean abandon = false;
