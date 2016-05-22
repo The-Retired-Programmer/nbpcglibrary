@@ -40,17 +40,17 @@ public class FieldPresenter<T> implements Presenter<FieldViewAPI<T>>, ActionList
 
     /**
      * Constructor
-     * 
+     *
      * @param view the view to be used with this presenter
      * @param model the model to be used with this presenter
      */
     public FieldPresenter(FieldViewAPI<T> view, FieldModel<T> model) {
-        this("",view, model);
+        this("", view, model);
     }
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param id the field ID (for use in error messages.
      * @param view view the view to be used with this presenter
      * @param model the model to be used with this presenter
@@ -85,38 +85,46 @@ public class FieldPresenter<T> implements Presenter<FieldViewAPI<T>>, ActionList
 
     private void fieldActionHandler() {
         if (!inhibitListeneractions) {
-            T value;
-            try {
-                value = view.get();
-            } catch (BadFormatException ex) {
-                view.setErrorMarker("Badly Formatted Field");
-                return;
+            StringBuilder sb = new StringBuilder();
+            view.setErrorMarker(updateModelFromView(sb) ? null : sb.toString());
+        }
+    }
+
+    private boolean updateModelFromView(StringBuilder sb) {
+        T value;
+        try {
+            value = view.get();
+        } catch (BadFormatException ex) {
+            sb.append("Badly Formatted");
+            return false;
+        }
+        if (value == null) {
+            if (lastvaluesetinfield != null) {
+                model.set(value);
+                updateViewFromModel();
             }
-            if (value == null) {
-                if (lastvaluesetinfield != null) {
-                    set(value);
-                }
-            } else {
-                if (!value.equals(lastvaluesetinfield)) {
-                    set(value);
-                }
+        } else {
+            if (!value.equals(lastvaluesetinfield)) {
+                model.set(value);
+                updateViewFromModel();
             }
         }
+        return model.test(sb);
     }
 
     /**
      * Set an updated value in the model and present it in the view
-     * 
+     *
      * @param value the new value to insert
      */
     public void set(T value) {
         model.set(value);
         updateViewFromModel();
+        StringBuilder sb = new StringBuilder();
+        view.setErrorMarker(model.test(sb) ? null : sb.toString());
     }
 
     private void updateViewFromModel() {
-        StringBuilder sb = new StringBuilder();
-        view.setErrorMarker(model.test(sb) ? null : sb.toString());
         inhibitListeneractions = true;
         view.setNullSelectionAllowed(model.isNullSelectionAllowed());
         view.setChoices(model.getChoices());
@@ -128,7 +136,7 @@ public class FieldPresenter<T> implements Presenter<FieldViewAPI<T>>, ActionList
     @Override
     public boolean test(StringBuilder sb) {
         StringBuilder lsb = new StringBuilder();
-        if (model.test(lsb)) {
+        if (updateModelFromView(lsb)) {
             view.setErrorMarker(null);
             return true;
         }
@@ -146,10 +154,13 @@ public class FieldPresenter<T> implements Presenter<FieldViewAPI<T>>, ActionList
     @Override
     public void enableView() {
         updateViewFromModel();
+        view.setErrorMarker(null);
     }
 
     @Override
     public void refreshView() {
+        StringBuilder sb = new StringBuilder();
         updateViewFromModel();
+        view.setErrorMarker(model.test(sb) ? null : sb.toString());
     }
 }
