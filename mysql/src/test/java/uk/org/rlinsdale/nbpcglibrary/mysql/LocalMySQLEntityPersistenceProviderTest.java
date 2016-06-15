@@ -56,14 +56,12 @@ public class LocalMySQLEntityPersistenceProviderTest {
     public static void setUpClass() throws IOException {
 
         Properties p = new Properties();
-        p.setProperty("key", "authentication2");
-        p.setProperty("connection", "jdbc:mysql://localhost:3306/authentication2");
+        p.setProperty("key", "testingmysqllibrary");
+        p.setProperty("connection", "jdbc:mysql://localhost:3306/testingmysqllibrary");
         p.setProperty("entitypersistenceprovidertype", "local-mysql");
         p.setProperty("persistenceunitprovidertype", "mysql");
-        p.setProperty("user", "developer");
-        p.setProperty("password", "dev");
         EntityPersistenceProviderManager.init(p);
-        instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("authentication2", "Application");
+        instance = EntityPersistenceProviderManager.getEntityPersistenceProvider("testingmysqllibrary", "TestTable");
     }
 
     /**
@@ -94,7 +92,7 @@ public class LocalMySQLEntityPersistenceProviderTest {
     @Test
     public void testInstanceDescription() {
         System.out.println("instanceDescription");
-        String expResult = "LocalMySQLAutoIDEntityPersistenceProvider[LocalMySQLPersistenceUnitProvider-Application]";
+        String expResult = "LocalMySQLAutoIDEntityPersistenceProvider[LocalMySQLPersistenceUnitProvider-TestTable]";
         String result = instance.instanceDescription();
         assertEquals(expResult, result);
     }
@@ -107,14 +105,14 @@ public class LocalMySQLEntityPersistenceProviderTest {
     @Test
     public void testGet_int() throws Exception {
         System.out.println("get");
-        int id = 48;
+        int id = 2;
         EntityFields result = instance.get(id);
-        assertEquals("RL12", result.get("updatedby"));
-        assertEquals("RL12", result.get("createdby"));
-        assertEquals("20150422213408", result.get("updatedon"));
-        assertEquals("20150422213408", result.get("createdon"));
+        assertEquals("test", result.get("updatedby"));
+        assertEquals("test", result.get("createdby"));
+        assertEquals("20000101000000", result.get("updatedon"));
+        assertEquals("20000101000000", result.get("createdon"));
         assertEquals(id, result.get("id"));
-        assertEquals("JsonApp60", result.get("application"));
+        assertEquals("app2", result.get("application"));
     }
 
     /**
@@ -126,7 +124,7 @@ public class LocalMySQLEntityPersistenceProviderTest {
     public void testFind() throws Exception {
         System.out.println("find");
         List<Integer> result = instance.find();
-        assertEquals(29, result.size());
+        assertEquals(3, result.size());
     }
 
     /**
@@ -137,9 +135,9 @@ public class LocalMySQLEntityPersistenceProviderTest {
     @Test
     public void testGet_String_JsonValue() throws Exception {
         System.out.println("get");
-        List<EntityFields> result = instance.get("application", "JsonApp83");
+        List<EntityFields> result = instance.get("application", "app1");
         assertEquals(1, result.size());
-        assertEquals(46, result.get(0).get("id"));
+        assertEquals(1, result.get(0).get("id"));
     }
 
     /**
@@ -150,8 +148,8 @@ public class LocalMySQLEntityPersistenceProviderTest {
     @Test
     public void testGetOne() throws Exception {
         System.out.println("getOne");
-        EntityFields result = instance.getOne("application", "JsonApp83");
-        assertEquals(46, result.get("id"));
+        EntityFields result = instance.getOne("application", "app3");
+        assertEquals(3, result.get("id"));
     }
 
     /**

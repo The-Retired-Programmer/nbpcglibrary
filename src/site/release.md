@@ -3,6 +3,12 @@
 {::comment} define doc.name = NBPCG Library {:/comment}
 {::comment} define doc.menu.menu = [NBPCG Library Home](index.html) {:/comment}
 
+##Release 3.1.18
+
+Update of library to use NetBeans Platform version 8.1.
+New Forms API and implementation using MVP pattern.
+
+
 ##Release 3.1.7
 
 Update of library to support major update/refactoring of NBPCG (version 4.0.14).

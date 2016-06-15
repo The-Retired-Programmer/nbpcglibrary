@@ -8,8 +8,8 @@ This document refers to release v${project-version}
 To access the repository the following statement can be added to your Settings:
 
     <repository>
-        <id>rlinsdale-repository</id>
-        <name>Richard-Linsdale Repository</name>
+        <id>rlinsdale</id>
+        <name>Richard-Linsdale</name>
         <url>http://www.rlinsdale.org.uk/repository</url>
         <snapshots>
             <enabled>false</enabled>
@@ -27,8 +27,8 @@ and then add any required dependencies into the POM.  An example statement is:
     ...
 
     where xxxxx is one of:
-    api, annotations, common, data, form, icons, json, node, topcomponent
-    mysql, localjsonaccess, localdatabaseaccess, remoteclient or remotedb
+    api, annotations, common, data, form, icons, json, node, topcomponent,
+    mysql, localjsonaccess, localdatabaseaccess or remoteclient
 
 **Warning:** This repository is not currently indexed,
 so search capabilities from
