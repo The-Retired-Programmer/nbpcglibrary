@@ -1,12 +1,6 @@
-{::comment} define doc.title=NBPCG Library User Documentation {:/comment}
-{::comment} define doc.header= User Documentation {:/comment}
-{::comment} define doc.name = NBPCG Library {:/comment}
-{::comment} define doc.menu.menu = [NBPCG Library Home](index.html) {:/comment}
-
-This document refers to release v${project-version}
-
 To access the repository the following statement can be added to your Settings:
 
+~~~ xml
     <repository>
         <id>rlinsdale</id>
         <name>Richard-Linsdale</name>
@@ -15,9 +9,11 @@ To access the repository the following statement can be added to your Settings:
             <enabled>false</enabled>
         </snapshots>
     </repository>
+~~~
 
 and then add any required dependencies into the POM.  An example statement is:
 
+~~~ xml
     ...
     <dependency>
         <artifactId>xxxxx</artifactId>
@@ -25,10 +21,23 @@ and then add any required dependencies into the POM.  An example statement is:
         <version>${project-version}</version>
     </dependency>
     ...
+~~~
 
-    where xxxxx is one of:
-    api, annotations, common, data, form, icons, json, node, topcomponent,
-    mysql, localjsonaccess, localdatabaseaccess or remoteclient
+where xxxxx is one of:
+
+  * api
+  * annotations
+  * common
+  * data
+  * form
+  * icons
+  * json
+  * node
+  * topcomponent
+  * mysql
+  * localjsonaccess
+  * localdatabaseaccess
+  * remoteclient
 
 **Warning:** This repository is not currently indexed,
 so search capabilities from

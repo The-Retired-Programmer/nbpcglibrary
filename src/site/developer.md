@@ -1,20 +1,15 @@
-{::comment} define doc.title=NBPCG Library Developer Documentation {:/comment}
-{::comment} define doc.header= Developer Documentation {:/comment}
-{::comment} define doc.name = NBPCG Library {:/comment}
-{::comment} define doc.menu.menu = [NBPCG Library Home](index.html) {:/comment}
+The source code is available on GitHub.
 
-This document refers to release v${project-version}
+The build/dependency manangement system is Maven.
 
-As an open source solution, the source code
-is available on GitHub. The project is a Maven project written in Java, and
-is available from a Maven repository.  The Netbeans IDE was used as
-the development platform, but is not mandatory as this is a Maven project.
+The development environment uses the Netbeans IDE, but this is not mandatory,
+any development environment which can work with a Maven project can be used.
 
-Sources for this release can be found
-[here](https://github.com/Richard-Linsdale/nbpcglibrary/releases/tag/v${project-version}).
+**Source Code**
 
-Alternatively the project can be forked from
-[here](https://github.com/Richard-Linsdale/nbpcglibrary)
+Sources for this release can be found [here](https://github.com/Richard-Linsdale/nbpcglibrary/releases/tag/v${project-version}).
+
+Alternatively the project can be forked from [here](https://github.com/Richard-Linsdale/nbpcglibrary)
 to obtain the whole source tree.  Tag v${project-version} refers to the sources
 relevant to this release.
 
@@ -26,4 +21,3 @@ whilst a downloadable jar file containing the same Javadoc is available from
 Developers modifying the source code are encouraged to submit their changes
 back to the project using a Pull-Request (for consideration for
 inclusion in a future release).
-
