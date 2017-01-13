@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module-Localizing-Bundle: uk/org/rlinsdale/nbpcglibrary/topcomponent/Bundle.properties
+OpenIDE-Module-Localizing-Bundle: uk/theretiredprogrammer/nbpcglibrary/topcomponent/Bundle.properties
 OpenIDE-Module-Display-Category: NBPCG Library
 AutoUpdate-Essential-Module: true
 AutoUpdate-Show-In-Client: false

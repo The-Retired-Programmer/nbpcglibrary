@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
         <artifactId>parent</artifactId>
-        <version>3.1.18</version>
+        <version>4.0.0</version>
     </parent>
 
     <artifactId>remoteclient</artifactId>
@@ -17,23 +17,23 @@
     <dependencies>
         <dependency>
             <artifactId>common</artifactId>
-            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <artifactId>api</artifactId>
-            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
         </dependency>
          <dependency>
             <artifactId>data</artifactId>
-            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <artifactId>json</artifactId>
-            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -56,7 +56,7 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>uk.org.rlinsdale.nbpcglibrary.remoteclient</publicPackage>
+                        <publicPackage>uk.theretiredprogrammer.nbpcglibrary.remoteclient</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

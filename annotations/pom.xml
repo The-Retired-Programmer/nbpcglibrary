@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
         <artifactId>parent</artifactId>
-        <version>3.1.18</version>
+        <version>4.0.0</version>
     </parent>
     
     <artifactId>annotations</artifactId>
@@ -21,7 +21,7 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>uk.org.rlinsdale.nbpcglibrary.annotations</publicPackage>
+                        <publicPackage>uk.theretiredprogrammer.nbpcglibrary.annotations</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
@@ -29,7 +29,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <excludePackageNames>uk.org.rlinsdale.nbpcglibrary.annotations.impl</excludePackageNames>
+                    <excludePackageNames>uk.theretiredprogrammer.nbpcglibrary.annotations.impl</excludePackageNames>
                 </configuration>
             </plugin>
         </plugins>

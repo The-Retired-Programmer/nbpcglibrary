@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+        <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
         <artifactId>parent</artifactId>
-        <version>3.1.18</version>
+        <version>4.0.0</version>
     </parent>
 
     <artifactId>api</artifactId>
@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <artifactId>json</artifactId>
-            <groupId>uk.org.rlinsdale.nbpcglibrary</groupId>
+            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -34,7 +34,7 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>uk.org.rlinsdale.nbpcglibrary.api</publicPackage>
+                        <publicPackage>uk.theretiredprogrammer.nbpcglibrary.api</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
