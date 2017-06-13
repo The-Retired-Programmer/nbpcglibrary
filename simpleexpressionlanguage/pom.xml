@@ -4,7 +4,7 @@
     <parent>
         <groupId>uk.theretiredprogrammer</groupId>
         <artifactId>nbpcglibrary</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
 
     <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
