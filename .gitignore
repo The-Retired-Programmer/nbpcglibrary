@@ -31,3 +31,7 @@
 /remotedbclient/target/
 /remoteclient/target/
 /localjsonaccess/target/
+/email/target/
+/expressionparserandevaluate/target/
+/lifecycle/target/
+/simpleexpressionlanguage/target/

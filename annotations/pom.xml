@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-        <artifactId>parent</artifactId>
+        <groupId>uk.theretiredprogrammer</groupId>
+        <artifactId>nbpcglibrary</artifactId>
         <version>4.0.0</version>
     </parent>
-    
+
+    <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
     <artifactId>annotations</artifactId>
     <packaging>nbm</packaging>
     
@@ -19,7 +19,14 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
+                <version>3.14.1</version>
+                <extensions>true</extensions>
                 <configuration>
+                    <cluster>nbpcglibrary</cluster>
+                    <homePageUrl>${project.url}</homePageUrl>
+                    <licenseFile>../LICENSE</licenseFile>
+                    <licenseName>The Apache License, Version 2.0</licenseName>
+                    <brandingToken>nbpcglibrary</brandingToken>
                     <publicPackages>
                         <publicPackage>uk.theretiredprogrammer.nbpcglibrary.annotations</publicPackage>
                     </publicPackages>
@@ -31,9 +38,10 @@
                 <configuration>
                     <excludePackageNames>uk.theretiredprogrammer.nbpcglibrary.annotations.impl</excludePackageNames>
                 </configuration>
-            </plugin>
+            <version>2.10.4</version></plugin>
         </plugins>
     </build>
+    
     <dependencies>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -41,4 +49,37 @@
             <version>${netbeans.version}</version>
         </dependency>
     </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>aggregate-javadocs</id>
+                                <phase/>
+                                <goals>
+                                    <goal>aggregate-jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

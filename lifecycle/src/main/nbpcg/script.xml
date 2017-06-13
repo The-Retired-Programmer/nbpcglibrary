@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nbpcg PUBLIC "-//uk/theretiredprogrammer/nbpcg/DTD NBPCG SCHEMA 1.0//EN"
+    "nbres:/uk/theretiredprogrammer/nbpcg/nbpcg.dtd" >
+
+<nbpcg name="Authentication">
+    <build viewerroles="Manager" copyright="2014-2016 Richard Linsdale (richard at theretiredprogrammer.uk)" >
+        <project name="NBPCG LifeCycle" log="nbpcglibrary.lifecycle" license="apache20">
+            <generate type="mysqldatabase" package="uk.theretiredprogrammer.nbpcglibrary.lifecycle.mysql"/>
+            <generate type="jsondatabase" package="uk.theretiredprogrammer.nbpcglibrary.lifecycle.json" />
+            <generate type="data" package="uk.theretiredprogrammer.nbpcglibrary.authentication.dataobjects" />
+        </project>
+        <project name="Access Control Manager - generated" log="accesscontrolmanager">
+            <generate type="node" package="uk.theretiredprogrammer.accesscontrolmanager.nodes" />
+            <generate type="nodeviewer" package="uk.theretiredprogrammer.accesscontrolmanager.topcomponents" />
+            <generate type="editor" package="uk.theretiredprogrammer.accesscontrolmanager.topcomponents" />
+        </project>
+        <project name="Authentication" log="authentication">
+             <generate type="remotedb" package="uk.theretiredprogrammer.authentication" />
+             <generate type="mysqldatabase" package="uk.theretiredprogrammer.authentication.mysql"/>
+        </project>
+    </build>
+    <node name="User" rooticon="folder_user" icon="user">
+        <entryfield name="password" type="password"
+            mapsto="encodedpassword" 
+            mapping="uk.theretiredprogrammer.nbpcglibrary.authentication.Authentication.encodePassword"
+            rule="uk.theretiredprogrammer.nbpcglibrary.authentication.Authentication.strongPasswordCheck"
+            errormessage="Strong Password required" />
+        <node name="Userpermission" icon="thumb_up" />
+        <node name="Userrole" icon="key" />
+    </node>
+    <node name="Application" rooticon="folder_table" icon="application"  >
+        <node name="Role" icon="key" displaytitleformat="{role} for {application}" />
+        <node name="Permission" icon="thumb_up" displaytitleformat="{permission} for {application}" />
+    </node>
+    <databases>
+        <database name="authentication" dbname="authentication2" pkey="idauto" extrafields="usertimestamp" >
+            <table name="User">
+                <field name="username" max="100" unique="yes"/>
+                <field name="encodedpassword" min="40" max="40" />
+                <field name="usercode" max="4" min = "4" unique="yes" />
+                <field name="enabled" type="boolean" />
+                <insertentity>
+                    <insertfield name="username" value="richard"/>
+                    <insertfield name="encodedpassword" value="ea27671eaac43ca1ecb782b7c9e9344a82b0702d"/>
+                    <insertfield name="usercode" value="rl12"/>
+                    <insertfield name="enabled" value="true"/>
+                </insertentity>
+            </table>
+            <table name="Application">
+                <field name="application" max="100" unique="yes" />
+                <insertentity>
+                    <insertfield name="application" value="accesscontrolmanager"/>
+                </insertentity>
+                <insertentity>
+                    <insertfield name="application" value="photogallery"/>
+                </insertentity>
+                <insertentity>
+                    <insertfield name="application" value="marktimingsrecorder"/>
+                </insertentity>
+            </table>
+            <table name="Role" >
+                <field name="role" max="100"/>
+                <insertentity>
+                    <insertfield name="role" value="Manager"/>
+                    <insertfield name="application" value="1"/>
+                </insertentity>
+                <insertentity>
+                    <insertfield name="role" value="Manager"/>
+                    <insertfield name="application" value="2"/>
+                </insertentity>
+                <insertentity>
+                    <insertfield name="role" value="Coach"/>
+                    <insertfield name="application" value="3"/>
+                </insertentity>
+            </table>
+            <table name="Permission">
+                <field name="permission" max="100"/>
+            </table>
+            <table name="Userrole" >
+                <field type="reference" name="role" references="Role" />
+                <insertentity>
+                    <insertfield name="role" value="1"/>
+                    <insertfield name="user" value="1"/>
+                </insertentity>
+                <insertentity>
+                    <insertfield name="role" value="2"/>
+                    <insertfield name="user" value="1"/>
+                </insertentity>
+                <insertentity>
+                    <insertfield name="role" value="3"/>
+                    <insertfield name="user" value="1"/>
+                </insertentity>
+            </table>
+            <table name="Userpermission">
+                <field type="reference" name="permission" references="Permission" />
+            </table>
+        </database>
+    </databases>
+</nbpcg>
