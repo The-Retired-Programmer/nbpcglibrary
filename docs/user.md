@@ -11,7 +11,7 @@ in user's POM. Add any required dependencies into the POM.  An example statement
     <dependency>
         <artifactId>xxxxx</artifactId>
         <groupId>uk.the retiredprogrammer.nbpcglibrary</groupId>
-        <version>${project-version}</version>
+        <version>4.0.0</version>
     </dependency>
     ...
 ~~~
@@ -38,5 +38,5 @@ where xxxxx is one of:
 
 Online Javadoc for this release can be found [here](http://www.javadoc.io/doc/uk.theretiredprogrammer/nbpcglibrary),
 whilst a downloadable jar file containing the same Javadoc is available
-[from Maven Central](http://central.maven.org/maven2/uk/theretiredprogrammer/nbpcglibrary/${project-version}/nbpcglibrary-${project-version}-javadoc.jar).
+[from Maven Central](http://central.maven.org/maven2/uk/theretiredprogrammer/nbpcglibrary/4.0.0/nbpcglibrary-4.0.0-javadoc.jar).
 
