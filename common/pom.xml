@@ -53,14 +53,9 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.14.1</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <cluster>nbpcglibrary</cluster>
-                    <homePageUrl>${project.url}</homePageUrl>
                     <licenseFile>../LICENSE</licenseFile>
-                    <licenseName>The Apache License, Version 2.0</licenseName>
-                    <brandingToken>nbpcglibrary</brandingToken>
                     <publicPackages>
                         <publicPackage>uk.theretiredprogrammer.nbpcglibrary.common</publicPackage>
                     </publicPackages>
@@ -75,9 +70,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.4</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
