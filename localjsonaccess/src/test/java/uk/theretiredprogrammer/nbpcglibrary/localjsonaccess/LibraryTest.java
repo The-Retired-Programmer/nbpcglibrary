@@ -15,7 +15,6 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.localjsonaccess;
 
-import uk.theretiredprogrammer.nbpcglibrary.localjsonaccess.LocalJsonAutoIDEntityPersistenceProvider;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

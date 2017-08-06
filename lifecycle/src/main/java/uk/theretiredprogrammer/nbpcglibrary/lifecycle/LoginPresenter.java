@@ -17,11 +17,8 @@ package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import org.openide.windows.WindowManager;
-import uk.theretiredprogrammer.nbpcglibrary.authentication.Authentication;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
-import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
+import java.util.function.Consumer;
+import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.AuthData;
 import uk.theretiredprogrammer.nbpcglibrary.form.BasicFieldModel;
 import uk.theretiredprogrammer.nbpcglibrary.form.FieldPresenter;
 import uk.theretiredprogrammer.nbpcglibrary.form.FormPresenter;
@@ -35,17 +32,22 @@ import uk.theretiredprogrammer.nbpcglibrary.form.TextField;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public class UserRegistrationPresenter extends FormPresenter {
+class LoginPresenter extends FormPresenter {
 
     private BasicFieldModel<String> usernamemodel;
     private BasicFieldModel<String> passwordmodel;
+    private final Consumer<AuthData> responsehandler;
 
     /**
      * Constructor
+     *
+     * @param responsehandler
      */
-    public UserRegistrationPresenter() {
-        setSaveFunction(sb -> userRegistrationSave(sb));
+    @SuppressWarnings("OverridableMethodCallInConstructor")
+    LoginPresenter(Consumer<AuthData> responsehandler) {
+        setSaveFunction(sb -> loginSave(sb));
         setGetChildPresentersFunction(() -> getFieldPresenters());
+        this.responsehandler = responsehandler;
     }
 
     private List<FieldPresenter> getFieldPresenters() {
@@ -60,20 +62,11 @@ public class UserRegistrationPresenter extends FormPresenter {
         );
     }
 
-    private Boolean userRegistrationSave(StringBuilder sb) {
-        if (Authentication.authenticate(ApplicationProperties.get().get("application.key"), usernamemodel.get(), passwordmodel.get())) {
-            Settings.set("Username", usernamemodel.get());
-            Settings.set("Usercode", Authentication.getUser().getUsercode());
-            String role = Authentication.getRole();
-            Settings.set("NeedsRegistration", "no");
-            LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "userRegistrationSave")
-                    .addMsg("Full Authentication: User Role is {0}", role).write();
-            WindowManager.getDefault().setRole(role);
-            return true;
+    private Boolean loginSave(StringBuilder sb) {
+        boolean res;
+        if (res = test(sb)) {
+            responsehandler.accept(new AuthData(usernamemodel.get(), passwordmodel.get()));
         }
-        LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "userRegistrationSave")
-                .addMsg("Application Registration Failure - authentication failure").write();
-        sb.append("Authentication Failure");
-        return false;
+        return res;
     }
 }

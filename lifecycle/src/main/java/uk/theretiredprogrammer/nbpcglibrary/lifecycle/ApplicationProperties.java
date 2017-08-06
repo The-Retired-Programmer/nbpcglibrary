@@ -26,7 +26,7 @@ import java.util.Properties;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public class ApplicationProperties {
+class ApplicationProperties {
 
     private static ApplicationProperties instance;
     private Properties properties = new Properties();
@@ -39,7 +39,7 @@ public class ApplicationProperties {
      * @return the application properties instance
      * @throws ApplicationPropertiesException if problems reading/parse properties
      */
-    public static ApplicationProperties set(InputStream in) throws ApplicationPropertiesException {
+    static ApplicationProperties set(InputStream in) throws ApplicationPropertiesException {
         return instance = new ApplicationProperties(in);
     }
 
@@ -48,7 +48,7 @@ public class ApplicationProperties {
      *
      * @return the application properties instance
      */
-    public static ApplicationProperties get() {
+    static ApplicationProperties getDefault() {
         return instance;
     }
 
@@ -67,7 +67,7 @@ public class ApplicationProperties {
      * @return the property value (or and empty string if the property name has
      * not been defined)
      */
-    public String get(String name) {
+    String get(String name) {
         return get(name, "");
     }
 
@@ -79,7 +79,7 @@ public class ApplicationProperties {
      * defined
      * @return the property value
      */
-    public String get(String name, String missing) {
+    String get(String name, String missing) {
         return properties.getProperty(name, missing);
     }
 }

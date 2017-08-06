@@ -97,7 +97,7 @@
                     <configuration>
                         <cluster>nbpcglibrary</cluster>
                         <homePageUrl>${project.url}</homePageUrl>
-                        <licenseFile>LICENSE</licenseFile>
+                        <licenseFile>../LICENSE</licenseFile>
                         <licenseName>The Apache License, Version 2.0</licenseName>
                         <brandingToken>nbpcglibrary</brandingToken>
                     </configuration>
@@ -141,9 +141,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.19.1</version>
-                    <configuration>
-                        <skipTests>${skipTests}</skipTests>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -167,12 +164,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>nbm-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
     </build>
     
     <profiles>
@@ -204,12 +195,19 @@
                         <executions>
                             <execution>
                                 <id>aggregate-javadocs</id>
+                                <inherited>false</inherited>
                                 <goals>
                                     <goal>aggregate-jar</goal>
                                 </goals>
                                 <configuration>
                                     <attach>true</attach>
                                 </configuration>
+                            </execution>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

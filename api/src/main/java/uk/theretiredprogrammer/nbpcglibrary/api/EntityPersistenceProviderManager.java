@@ -33,8 +33,8 @@ import org.openide.util.Lookup;
  */
 public class EntityPersistenceProviderManager {
 
-    private final static Map<String, PersistenceUnitProvider> persistenceUnitProviders = new HashMap<>();
-    private final static Map<String, Properties> dbproperties = new HashMap<>();
+    private final static Map<String, PersistenceUnitProvider> PERSISTENCEUNITPROVIDERS = new HashMap<>();
+    private final static Map<String, Properties> DBPROPERTIES = new HashMap<>();
 
     private static final String DEFAULTUSER = "nbplatform";
     private static final String DEFAULTPASSWORD = "netbeans";
@@ -68,13 +68,13 @@ public class EntityPersistenceProviderManager {
         if (!props.containsKey("password")) {
             props.setProperty("password", DEFAULTPASSWORD);
         }
-        dbproperties.put(dbkey, props);
+        DBPROPERTIES.put(dbkey, props);
         String puptype = props.getProperty("persistenceunitprovidertype");
         Collection<? extends PersistenceUnitProviderFactory> pupfactories = Lookup.getDefault().lookupResult(PersistenceUnitProviderFactory.class).allInstances();
         for (PersistenceUnitProviderFactory pupfactory : pupfactories) {
             if (pupfactory.getType().equals(puptype)) {
                 PersistenceUnitProvider pup = pupfactory.createPersistenceUnitProvider(props);
-                persistenceUnitProviders.put(dbkey, pup);
+                PERSISTENCEUNITPROVIDERS.put(dbkey, pup);
                 return;
             }
         }
@@ -90,7 +90,7 @@ public class EntityPersistenceProviderManager {
      * cannot be found.
      */
     private static PersistenceUnitProvider getPersistenceUnitProvider(String dbkey) {
-        PersistenceUnitProvider pup = persistenceUnitProviders.get(dbkey);
+        PersistenceUnitProvider pup = PERSISTENCEUNITPROVIDERS.get(dbkey);
         if (pup != null) {
             return pup;
         }
@@ -106,7 +106,7 @@ public class EntityPersistenceProviderManager {
      * cannot be found.
      */
     public static EntityPersistenceProvider getEntityPersistenceProvider(String dbkey, String entityname) {
-        Properties props = dbproperties.get(dbkey);
+        Properties props = DBPROPERTIES.get(dbkey);
         if (props == null) {
             throw new LogicException("Properties for " + dbkey + " are not available");
         }
@@ -134,7 +134,7 @@ public class EntityPersistenceProviderManager {
      * cannot be found.
      */
     public static EntityPersistenceProvider getEntityPersistenceProvider(String dbkey, String entityname, String idx) {
-        Properties props = dbproperties.get(dbkey);
+        Properties props = DBPROPERTIES.get(dbkey);
         if (props == null) {
             throw new LogicException("Properties for " + dbkey + " are not available");
         }
@@ -158,6 +158,6 @@ public class EntityPersistenceProviderManager {
      * @return the set of all PersistenceUnitProviders
      */
     public static Collection<? extends PersistenceUnitProvider> getAllPersistenceUnitProviders() {
-        return persistenceUnitProviders.values();
+        return PERSISTENCEUNITPROVIDERS.values();
     }
 }

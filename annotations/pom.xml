@@ -19,9 +19,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <extensions>true</extensions>
                 <configuration>
-                    <licenseFile>../LICENSE</licenseFile>
                     <publicPackages>
                         <publicPackage>uk.theretiredprogrammer.nbpcglibrary.annotations</publicPackage>
                     </publicPackages>
@@ -57,15 +55,8 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
-                            </execution>
-                            <execution>
-                                <id>aggregate-javadocs</id>
-                                <phase/>
-                                <goals>
-                                    <goal>aggregate-jar</goal>
-                                </goals>
                                 <configuration>
-                                    <attach>true</attach>
+                                    <excludePackageNames>uk.theretiredprogrammer.nbpcglibrary.annotations.impl</excludePackageNames>
                                 </configuration>
                             </execution>
                         </executions>

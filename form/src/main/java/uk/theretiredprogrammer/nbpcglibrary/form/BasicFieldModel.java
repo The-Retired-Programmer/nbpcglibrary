@@ -181,16 +181,16 @@ public class BasicFieldModel<T> extends FieldModel<T> {
 
     private class MinRule extends Rule {
 
-        private final long min;
+        private final int min;
 
-        public MinRule(long min) {
+        public MinRule(int min) {
             super("Too small");
             this.min = min;
         }
 
         @Override
         protected boolean ruleCheck() {
-            return ((Long) value) >= min;
+            return (Integer) value >= min;
         }
     }
 
@@ -200,23 +200,23 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @param max the minimum value
      * @return itself (to enable fluent construction)
      */
-    public BasicFieldModel<T> addMaxRule(long max) {
+    public BasicFieldModel<T> addMaxRule(int max) {
         rules.addRule(new MaxRule(max));
         return this;
     }
 
     private class MaxRule extends Rule {
 
-        private final long max;
+        private final int max;
 
-        public MaxRule(long max) {
+        public MaxRule(int max) {
             super("Too large");
             this.max = max;
         }
 
         @Override
         protected boolean ruleCheck() {
-            return ((Long) value) <= max;
+            return (Integer)value <= max;
         }
     }
 

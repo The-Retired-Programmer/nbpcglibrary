@@ -28,7 +28,7 @@ public class ApplicationOnShowing implements Runnable {
 
     @Override
     public void run() {
-        ApplicationProperties props = ApplicationProperties.get();
+        ApplicationProperties props = ApplicationProperties.getDefault();
         WindowManager.getDefault().getMainWindow().
                 setTitle(props.get("application.title") + " " +
                 props.get("application.version") );

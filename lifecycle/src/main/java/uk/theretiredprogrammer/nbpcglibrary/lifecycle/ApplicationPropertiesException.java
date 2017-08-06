@@ -22,12 +22,13 @@ import java.io.IOException;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public class ApplicationPropertiesException extends IOException {
+class ApplicationPropertiesException extends IOException {
 
     /**
      * Constructor.
      */
-    public ApplicationPropertiesException() {
+    
+   ApplicationPropertiesException() {
         super();
     }
 
@@ -36,7 +37,7 @@ public class ApplicationPropertiesException extends IOException {
      *
      * @param message the exception message text
      */
-    public ApplicationPropertiesException(String message) {
+    ApplicationPropertiesException(String message) {
         super(message);
     }
 
@@ -45,7 +46,7 @@ public class ApplicationPropertiesException extends IOException {
      *
      * @param ex the causal exception
      */
-    public ApplicationPropertiesException(Exception ex) {
+    ApplicationPropertiesException(Exception ex) {
         super(ex);
     }
 
@@ -55,7 +56,7 @@ public class ApplicationPropertiesException extends IOException {
      * @param message the exception message text
      * @param ex the causal exception
      */
-    public ApplicationPropertiesException(String message, Exception ex) {
+    ApplicationPropertiesException(String message, Exception ex) {
         super(message, ex);
     }
 }

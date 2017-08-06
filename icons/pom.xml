@@ -39,53 +39,14 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <extensions>true</extensions>
                 <configuration>
-                    <licenseFile>../LICENSE</licenseFile>
                     <publicPackages>
                         <publicPackage>com.famfamfam.www.silkicons</publicPackage>
                         <publicPackage>uk.theretiredprogrammer.nbpcglibrary.icons</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>com.famfamfam.www.silkicons</excludePackageNames>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>aggregate-javadocs</id>
-                                <phase/>
-                                <goals>
-                                    <goal>aggregate-jar</goal>
-                                </goals>
-                                <configuration>
-                                    <attach>true</attach>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>

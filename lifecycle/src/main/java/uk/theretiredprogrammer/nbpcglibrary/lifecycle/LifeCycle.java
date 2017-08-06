@@ -17,22 +17,20 @@ package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 import org.openide.LifecycleManager;
 import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
-import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
 import uk.theretiredprogrammer.nbpcglibrary.form.ErrorInformationDialog;
 import org.openide.windows.WindowManager;
-import uk.theretiredprogrammer.nbpcglibrary.api.PersistenceUnitProvider;
 import uk.theretiredprogrammer.nbpcglibrary.api.EntityPersistenceProviderManager;
+import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA;
+import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.AUTHENTICATION_RESULT;
+import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.AuthData;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
+import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
 import uk.theretiredprogrammer.nbpcglibrary.common.SimpleEventParams;
-import uk.theretiredprogrammer.nbpcglibrary.form.CompositePresenter;
-import uk.theretiredprogrammer.nbpcglibrary.form.PanePresenter;
+import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
 
 /**
  * Abstract Class to handle Application Initialisation
@@ -40,74 +38,136 @@ import uk.theretiredprogrammer.nbpcglibrary.form.PanePresenter;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
 @RegisterLog("nbpcglibrary.lifecycle")
-public abstract class LifeCycle {
+public abstract class LifeCycle implements Runnable {
+    
+    private final InputStream ppconfig;
+    private static long persistenceUnitProviderFailures = 0;
+    private static AUTHENTICATION_RESULT authresult;
 
     private static final ExitApplication EXITAPPLICATION = new ExitApplication();
-    private final OnCancellation onCancellation = new OnCancellation();
+    private static boolean authorisationRequired;
 
     /**
      * Constructor.
      *
      * @param in the Application Properties File inputstream
-     * @throws ApplicationPropertiesException if problems
+     * @param ppconfig in persistence provider configuration inputstream
+     * @param authorisationRequired true if authorisation is required when opening this application
      */
-    protected LifeCycle(InputStream in) throws ApplicationPropertiesException {
-        ApplicationProperties.set(in);
-    }
-
-    /**
-     * core initialisation
-     *
-     * @throws IOException if problems
-     */
-    protected void init() throws IOException {
-        WindowManager.getDefault().setRole("NONE");
-    }
-
-    /**
-     * Test if all required DataAccessManagers are Operational - ie available
-     * and able to access data.
-     *
-     * @return true if all required DataAccessManager are operational
-     */
-    public boolean areAllDataAccessManagersOperational() {
-        boolean allOperational = true;
-        for (PersistenceUnitProvider ds : EntityPersistenceProviderManager.getAllPersistenceUnitProviders()) {
-            if (ds.isOperational()) {
-                LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "areAllDataAccessManagersOperational")
-                        .addMsg("Data Service {0} is operational", ds.getName()).write();
-            } else {
-                allOperational = false;
-                LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "areAllDataAccessManagersOperational")
-                        .addMsg("Data Service {0} is not operational", ds.getName()).write();
-            }
+    protected LifeCycle(InputStream in, InputStream ppconfig, boolean authorisationRequired) {
+        LifeCycle.authorisationRequired = authorisationRequired;
+        this.ppconfig = ppconfig;
+        try {
+            ApplicationProperties.set(in);
+            
+        } catch (ApplicationPropertiesException ex) {
+            stop(ex);
         }
-        return allOperational;
     }
-
-    /**
-     * Display the registration form (if any models are defined).
-     *
-     * @param presenters a set of presenters for the registration form
-     */
-    protected final void displayRegistrationForm(PanePresenter... presenters) {
-        List<PanePresenter> p = Arrays.asList(presenters).stream().filter(presenter -> presenter != null).collect(Collectors.toList());
-        if (!p.isEmpty()) {
-            CompositePresenter presenter = new CompositePresenter("Registration");
-            presenter.setGetChildPresentersFunction(() -> p);
+    
+    @Override
+    public void run() {
+        if (authorisationRequired) {
             Dialog.showModal(
-                    ApplicationProperties.get().get("application.title"),
-                    presenter, onCancellation);
+                    ApplicationProperties.getDefault().get("application.title"),
+                    new LoginPresenter((authdata)-> processAuthData(authdata)));
         }
+        if (!isAuthorisationProblem()) {
+            if (ppconfig != null ) {
+                try {
+                    EntityPersistenceProviderManager.init(ppconfig);
+                } catch (IOException ex) {
+                    stop(ex);
+                }
+            }
+            persistenceUnitProviderFailures = persistenceUnitProvidersOperationalCheck();
+        }
+        WindowManager.getDefault().setRole(isProblem() ? "PROBLEMS" : isWarning() ? "WARNINGS" : "OPERATIONAL");
+    }
+    
+    private void processAuthData(AuthData authdata){
+        authresult = AandA.authenticate(
+                ApplicationProperties.getDefault().get("jwt.claims.prefix"),
+                Settings.get("auth.server"),
+                authdata);
+    } 
+
+    /**
+     * Test if PersistenceUnitProviders are available.
+     * 
+     * @return true if all PersistenceUnitProviders appear to be available
+     */
+    static long getPersistenceUnitProviderFailures() {
+        return persistenceUnitProviderFailures;
+    }
+    
+     /**
+     * Test if Settings have been saved by the user - ie some
+     * settings initialisation has occurred.
+     * 
+     * @return true if the Setting appear to be initialised 
+     */
+    static boolean areSettingsSaved() {
+        return Settings.get(ApplicationProperties.getDefault().get("jwt.claims.prefix")+"settings.saved") != null;
+    }
+    
+    /**
+     * Get the result of the  User authentication.
+     * 
+     * @return authentication result or null if no authentication resquired
+     */
+    static AUTHENTICATION_RESULT authenticationResult() {
+        return authorisationRequired ? authresult : null;
+    }
+    
+    /**
+     * Test if an authorisation problem has occurred.
+     * 
+     * @return true if an authorisation problem observed
+     */
+    static boolean isAuthorisationProblem() {
+        return authorisationRequired ? authresult != AUTHENTICATION_RESULT.OK : false;
+    }
+    
+    /**
+     * Test if a startup problem has occurred.
+     * 
+     * @return true if startup problem observed
+     */
+    static boolean isProblem() {
+        return  isAuthorisationProblem() || (persistenceUnitProviderFailures > 0);
+    }
+    
+    /**
+     * Test if a startup warning has occurred.
+     * 
+     * @return true if startup warning observed
+     */
+    static boolean isWarning() {
+        return (!areSettingsSaved());
     }
 
+    private long persistenceUnitProvidersOperationalCheck() {
+        return EntityPersistenceProviderManager.getAllPersistenceUnitProviders().stream().filter( (psp) -> {
+            if (psp.isOperational()) {
+                LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "PersistenceUnitProvidersOperationalCheck")
+                        .addMsg("PersistenceUnitProvider {0} is operational", psp.getName()).write();
+                return false;
+            } else {
+                LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "PersistenceUnitProvidersOperationalCheck")
+                        .addMsg("PersistenceUnitProvider {0} is not operational", psp.getName()).write();
+                return true;
+            }
+        }).count();
+    }
+    
     /**
      * Handler to exit application following a terminal exception catch. Close
      * down the application with a simple dialog and then stop
      *
      * @param ex the terminal exception
      */
-    public static void stop(Exception ex) {
+    static void stop(Exception ex) {
         ErrorInformationDialog.show("Fatal Program Failure", ex.toString(), EXITAPPLICATION);
     }
 
@@ -118,7 +178,7 @@ public abstract class LifeCycle {
      * @param title the error dialog title
      * @param message the error dialog message
      */
-    public static void stop(String title, String message) {
+    static void stop(String title, String message) {
         ErrorInformationDialog.show(title, message, EXITAPPLICATION);
     }
 
@@ -137,25 +197,6 @@ public abstract class LifeCycle {
         @Override
         public void action(SimpleEventParams lp) {
             LifecycleManager.getDefault().exit();
-        }
-    }
-
-    /**
-     * On Cancellation Class - listener class which is called on dialogue
-     * cancellation
-     */
-    public final class OnCancellation extends Listener<SimpleEventParams> {
-
-        /**
-         * Constructor
-         */
-        public OnCancellation() {
-            super("LifeCycle-OnCancellation");
-        }
-
-        @Override
-        public void action(SimpleEventParams p) {
-            ErrorInformationDialog.show("Terminating Application", "Initialisation cancelled/closed by User", EXITAPPLICATION);
         }
     }
 }

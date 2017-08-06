@@ -50,6 +50,16 @@ public class Dialog implements HasInstanceDescription {
     public static void show(String title, PanePresenter presenter) {
         instance = new Dialog(title, presenter, false, null);
     }
+    
+    /**
+     * Display the modal dialog.
+     *
+     * @param title the dialog title
+     * @param presenter the presenter used to create the body of the dialog
+     */
+    public static void showModal(String title, PanePresenter presenter) {
+        instance = new Dialog(title, presenter, true, null);
+    }
 
     /**
      * Display the modal dialog.
