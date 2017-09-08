@@ -20,7 +20,7 @@ import org.openide.util.lookup.ServiceProvider;
 import uk.theretiredprogrammer.nbpcglibrary.api.PersistenceUnitProviderFactory;
 
 /**
- * A Factory to create PersistenceUnitProvider for local MySQL databases.
+ * A Factory to create PersistenceUnitProvider for remote MySQL databases.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */

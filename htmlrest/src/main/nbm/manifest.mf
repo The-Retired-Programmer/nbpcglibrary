@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Localizing-Bundle: uk/theretiredprogrammer/nbpcglibrary/htmlrest/Bundle.properties
+

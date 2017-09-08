@@ -23,9 +23,6 @@ import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
 import uk.theretiredprogrammer.nbpcglibrary.form.ErrorInformationDialog;
 import org.openide.windows.WindowManager;
 import uk.theretiredprogrammer.nbpcglibrary.api.EntityPersistenceProviderManager;
-import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA;
-import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.AUTHENTICATION_RESULT;
-import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.AuthData;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
@@ -42,7 +39,6 @@ public abstract class LifeCycle implements Runnable {
     
     private final InputStream ppconfig;
     private static long persistenceUnitProviderFailures = 0;
-    private static AUTHENTICATION_RESULT authresult;
 
     private static final ExitApplication EXITAPPLICATION = new ExitApplication();
     private static boolean authorisationRequired;
@@ -70,7 +66,7 @@ public abstract class LifeCycle implements Runnable {
         if (authorisationRequired) {
             Dialog.showModal(
                     ApplicationProperties.getDefault().get("application.title"),
-                    new LoginPresenter((authdata)-> processAuthData(authdata)));
+                    new LoginPresenter((user,pwd)-> processAuthData(user,pwd)));
         }
         if (!isAuthorisationProblem()) {
             if (ppconfig != null ) {
@@ -85,11 +81,11 @@ public abstract class LifeCycle implements Runnable {
         WindowManager.getDefault().setRole(isProblem() ? "PROBLEMS" : isWarning() ? "WARNINGS" : "OPERATIONAL");
     }
     
-    private void processAuthData(AuthData authdata){
-        authresult = AandA.authenticate(
+    private void processAuthData(String user, String pwd){
+        AandA.authenticate(
                 ApplicationProperties.getDefault().get("jwt.claims.prefix"),
                 Settings.get("auth.server"),
-                authdata);
+                user,pwd);
     } 
 
     /**
@@ -116,8 +112,8 @@ public abstract class LifeCycle implements Runnable {
      * 
      * @return authentication result or null if no authentication resquired
      */
-    static AUTHENTICATION_RESULT authenticationResult() {
-        return authorisationRequired ? authresult : null;
+    static int authenticationResult() {
+        return authorisationRequired ? AandA.getLastAuthStatus() : 0;
     }
     
     /**
@@ -126,7 +122,7 @@ public abstract class LifeCycle implements Runnable {
      * @return true if an authorisation problem observed
      */
     static boolean isAuthorisationProblem() {
-        return authorisationRequired ? authresult != AUTHENTICATION_RESULT.OK : false;
+        return authorisationRequired ? authenticationResult() != 200 : false;
     }
     
     /**

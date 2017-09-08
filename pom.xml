@@ -27,6 +27,7 @@
         <module>expressionparserandevaluate</module>
         <module>lifecycle</module>
         <module>simpleexpressionlanguage</module>
+        <module>htmlrest</module>
     </modules>
     
     <url>http://www.theretiredprogrammer.uk/nbpcglibrary</url>

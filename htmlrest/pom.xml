@@ -8,51 +8,16 @@
     </parent>
     
     <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-    <artifactId>lifecycle</artifactId>
+    <artifactId>htmlrest</artifactId>
     <packaging>nbm</packaging>
 
-    <name>NBPCG LifeCycle</name>
-    <description>NBPCG Lifecycle Management</description>
+    <name>NBPCG HTML Rest library</name>
+    <description>NBPCG HTML Rest library</description>
     
     <dependencies>
         <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-windows</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <artifactId>org-openide-util-lookup</artifactId>
-            <groupId>org.netbeans.api</groupId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <artifactId>data</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <artifactId>common</artifactId>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <artifactId>json</artifactId>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <artifactId>annotations</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <artifactId>form</artifactId>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -60,22 +25,13 @@
             <artifactId>api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <artifactId>htmlrest</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util-ui</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
             <version>1.0.4</version>
             <type>jar</type>
         </dependency>
+-->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
@@ -98,17 +54,14 @@
             <version>1.3</version>
             <scope>test</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>7.0</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.7.0</version>
-        </dependency>
+        -->
     </dependencies>
 
     <build>
@@ -118,9 +71,7 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <configuration>
                     <publicPackages>
-                        <publicPackage>uk.theretiredprogrammer.nbpcglibrary.authentication</publicPackage>
-                        <publicPackage>uk.theretiredprogrammer.nbpcglibrary.authentication.dataobjects</publicPackage>
-                        <publicPackage>uk.theretiredprogrammer.nbpcglibrary.lifecycle</publicPackage>
+                        <publicPackage>uk.theretiredprogrammer.nbpcglibrary.htmlrest</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>

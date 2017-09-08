@@ -17,8 +17,7 @@ package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.AuthData;
+import java.util.function.BiConsumer;
 import uk.theretiredprogrammer.nbpcglibrary.form.BasicFieldModel;
 import uk.theretiredprogrammer.nbpcglibrary.form.FieldPresenter;
 import uk.theretiredprogrammer.nbpcglibrary.form.FormPresenter;
@@ -36,7 +35,7 @@ class LoginPresenter extends FormPresenter {
 
     private BasicFieldModel<String> usernamemodel;
     private BasicFieldModel<String> passwordmodel;
-    private final Consumer<AuthData> responsehandler;
+    private final BiConsumer<String,String> responsehandler;
 
     /**
      * Constructor
@@ -44,7 +43,7 @@ class LoginPresenter extends FormPresenter {
      * @param responsehandler
      */
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    LoginPresenter(Consumer<AuthData> responsehandler) {
+    LoginPresenter(BiConsumer<String, String> responsehandler) {
         setSaveFunction(sb -> loginSave(sb));
         setGetChildPresentersFunction(() -> getFieldPresenters());
         this.responsehandler = responsehandler;
@@ -65,7 +64,7 @@ class LoginPresenter extends FormPresenter {
     private Boolean loginSave(StringBuilder sb) {
         boolean res;
         if (res = test(sb)) {
-            responsehandler.accept(new AuthData(usernamemodel.get(), passwordmodel.get()));
+            responsehandler.accept(usernamemodel.get(), passwordmodel.get());
         }
         return res;
     }

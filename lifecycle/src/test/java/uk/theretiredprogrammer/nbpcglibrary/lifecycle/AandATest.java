@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth;
+package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.AUTHENTICATION_RESULT;
-import static uk.theretiredprogrammer.nbpcglibrary.lifecycle.auth.AandA.getAuthority;
 
 /**
  *
@@ -39,9 +37,7 @@ public class AandATest {
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        AUTHENTICATION_RESULT expResult = AUTHENTICATION_RESULT.OK;
-        AUTHENTICATION_RESULT result = AandA.authenticate(appkey, url, u, p);
-        assertEquals(expResult, result);
+        assert(AandA.authenticate(appkey, url, u, p));
     }
     
     /**
@@ -54,9 +50,7 @@ public class AandATest {
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "wordpass";
-        AUTHENTICATION_RESULT expResult = AUTHENTICATION_RESULT.NOT_AUTHENTICATED;
-        AUTHENTICATION_RESULT result = AandA.authenticate(appkey, url, u, p);
-        assertEquals(expResult, result);
+        assert(!AandA.authenticate(appkey, url, u, p));
     }
     
      /**
@@ -69,9 +63,7 @@ public class AandATest {
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        AUTHENTICATION_RESULT expResult = AUTHENTICATION_RESULT.NOT_AUTHORISED;
-        AUTHENTICATION_RESULT result = AandA.authenticate(appkey, url, u, p);
-        assertEquals(expResult, result);
+        assert(!AandA.authenticate(appkey, url, u, p));
     }
     
      /**
@@ -84,9 +76,7 @@ public class AandATest {
         String url = "http://localhost:9090";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        AUTHENTICATION_RESULT expResult = AUTHENTICATION_RESULT.CONNECTION_FAILURE;
-        AUTHENTICATION_RESULT result = AandA.authenticate(appkey, url, u, p);
-        assertEquals(expResult, result);
+        assert(!AandA.authenticate(appkey, url, u, p));
     }
     
      /**
@@ -99,9 +89,7 @@ public class AandATest {
         String url = null;
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        AUTHENTICATION_RESULT expResult = AUTHENTICATION_RESULT.URL_UNDEFINED;
-        AUTHENTICATION_RESULT result = AandA.authenticate(appkey, url, u, p);
-        assertEquals(expResult, result);
+        assert(!AandA.authenticate(appkey, url, u, p));
     }
 
     /**
@@ -114,12 +102,8 @@ public class AandATest {
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        AUTHENTICATION_RESULT expResult = AUTHENTICATION_RESULT.OK;
-        AUTHENTICATION_RESULT result = AandA.authenticate(appkey, url, u, p);
-        assertEquals(expResult, result);
-        appkey = "undefinedkey";
-        String r =  (String) getAuthority(appkey);
-        assertNull(r);
+        assert(AandA.authenticate(appkey, url, u, p));
+        assertNull(AandA.getAuthority("undefinedkey"));
     }
     
     /**
@@ -132,12 +116,7 @@ public class AandATest {
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        AUTHENTICATION_RESULT expResult = AUTHENTICATION_RESULT.OK;
-        AUTHENTICATION_RESULT result = AandA.authenticate(appkey, url, u, p);
-        assertEquals(expResult, result);
-        appkey = "client";
-        String expResult2 = "admin";
-        String r =  (String) getAuthority(appkey);
-        assertEquals(expResult2, r);
+        assert(AandA.authenticate(appkey, url, u, p));
+        assertEquals("admin", AandA.getAuthority("client"));
     }
 }

@@ -73,20 +73,18 @@ public final class ProblemWarningTC extends TopComponent {
             if (LifeCycle.isAuthorisationProblem()) {
                 sb.append("<br/><hr>");
                 switch (LifeCycle.authenticationResult()) {
-                    case NOT_AUTHENTICATED:
-                    case TOKEN_VALIDATION_FAILURE:
+                    case 401:
+                    case 601:
                         sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authen"));
                         break;
-                    case NOT_AUTHORISED:
+                    case 602:
                         sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_auth"));
                         break;
-                    case CONNECTION_FAILURE:
-                        sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authconnect"));
-
-                        break;
-                    case URL_UNDEFINED:
+                    case 600:
                         sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authurl"));
-
+                        break;
+                    default:
+                        sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authconnect"));
                 }
             } else {
                 if (LifeCycle.getPersistenceUnitProviderFailures() > 0) {
