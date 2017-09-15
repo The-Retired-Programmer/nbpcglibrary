@@ -36,23 +36,26 @@ public abstract class HTMLRest<E> implements Rest<E> {
     private final Client client = ClientBuilder.newClient();
     private final Class<E> responseEntityClass;
     private final String jwtoken;
+    private final String locationroot;
 
     /**
      * Constructor
      * 
+     * @param locationroot the root section of the location uri
      * @param responseEntityClass the class of the entity being transferred (same as generic E)
      * @param jwtoken the authorisation token for the authenticated user
      */
-    public HTMLRest(Class<E> responseEntityClass, String jwtoken) {
+    public HTMLRest(String locationroot, Class<E> responseEntityClass, String jwtoken) {
+        this.locationroot = locationroot;
         this.responseEntityClass = responseEntityClass;
         this.jwtoken = jwtoken;
     }
 
     @Override
-    public E get(String location) {
+    public E get(int id) {
         try {
             Response response = client
-                    .target(location)
+                    .target(locationroot + "/" + Integer.toString(id))
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .header("authorization", "bearer " + jwtoken)
                     .get();
@@ -69,13 +72,12 @@ public abstract class HTMLRest<E> implements Rest<E> {
      * 
      * Allows the caller to subsequently extract the enitity list from response.
      * 
-     * @param location the url for the GETting the list of entities
      * @return the response object returned from this function if successful, else null
      */
-    public Response getAllResponse(String location) {
+    public Response getAllResponse() {
         try {
             Response response = client
-                    .target(location)
+                    .target(locationroot)
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .header("authorization", "bearer " + jwtoken)
                     .get();
@@ -90,10 +92,10 @@ public abstract class HTMLRest<E> implements Rest<E> {
     }
 
     @Override
-    public E create(String location, E entity) {
+    public E create(E entity) {
         try {
             Response response = client
-                    .target(location)
+                    .target(locationroot)
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .header("Content-Type", "application/json")
                     .header("authorization", "bearer " + jwtoken)
@@ -107,10 +109,10 @@ public abstract class HTMLRest<E> implements Rest<E> {
     }
 
     @Override
-    public E update(String location, E entity) {
+    public E update(int id, E entity) {
         try {
             Response response = client
-                    .target(location)
+                    .target(locationroot + "/" + Integer.toString(id))
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .header("Content-Type", "application/json")
                     .header("authorization", "bearer " + jwtoken)
@@ -124,17 +126,17 @@ public abstract class HTMLRest<E> implements Rest<E> {
     }
     
     @Override
-    public E patch(String location, Map<String, Object> updates) {
+    public E patch(int id, Map<String, Object> updates) {
         // temporary until javaee8
         throw new RuntimeException("Patch not implemented over HTML Rest");
     }
     
 
     @Override
-    public boolean delete(String location) {
+    public boolean delete(int id) {
         try {
             Response response = client
-                    .target(location)
+                    .target(locationroot + "/" + Integer.toString(id))
                     .request(MediaType.TEXT_PLAIN_TYPE)
                     .header("authorization", "bearer " + jwtoken)
                     .delete();

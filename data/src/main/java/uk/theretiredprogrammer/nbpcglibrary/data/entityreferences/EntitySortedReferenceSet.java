@@ -27,12 +27,11 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * Manages the list of Entities - implements a sortable entity lists
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the primary key class for the entity
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
  * @param <F> the fields enum type for the entity
  */
-public class EntitySortedReferenceSet<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends EntityReferenceSet<K, E, P> {
+public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F> extends EntityReferenceSet<E, P> {
 
     private final Comparator<E> comparator;
     private boolean unsorted = true;

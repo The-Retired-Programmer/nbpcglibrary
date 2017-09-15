@@ -26,11 +26,10 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
  * Manages the list of Entities - implements a re-orderable entity lists
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the primary key class
  * @param <E> the Entity Class
  * @param <P> the parent entity
  */
-public class EntityIndexedReferenceSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends EntityReferenceSet<K, E, P> {
+public class EntityIndexedReferenceSet<E extends Entity, P extends CoreEntity> extends EntityReferenceSet<E, P> {
 
     /**
      * Constructor.
@@ -63,7 +62,7 @@ public class EntityIndexedReferenceSet<K, E extends Entity<K, E, P, ?>, P extend
                 permin++;
             }
         }
-        List<EntityReference<K, E, P>> reordered = new ArrayList<>(clsize);
+        List<EntityReference<E, P>> reordered = new ArrayList<>(clsize);
         for (int i = 0; i < clsize; i++) {
             reordered.add(null);
         }

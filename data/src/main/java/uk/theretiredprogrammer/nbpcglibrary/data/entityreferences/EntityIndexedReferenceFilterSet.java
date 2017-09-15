@@ -24,11 +24,10 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
  * Manages the list of Entities - implements a re-orderable entity lists
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the primary key class
  * @param <E> the Entity Class
  * @param <P> the parent entity
  */
-public class EntityIndexedReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends EntityIndexedReferenceSet<K, E, P> {
+public class EntityIndexedReferenceFilterSet<E extends Entity, P extends CoreEntity> extends EntityIndexedReferenceSet<E, P> {
 
     private final String columnname;
     private final Object columnvalue;
@@ -48,7 +47,7 @@ public class EntityIndexedReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P 
     }
 
     @Override
-    protected List<K> getPrimaryKeySet() {
+    protected List<Integer> getPrimaryKeySet() {
         return epp.find(columnname, columnvalue);
     }
 }

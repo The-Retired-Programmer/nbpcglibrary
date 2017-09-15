@@ -40,11 +40,10 @@ import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
  * reads by holding references to those recently touched objects.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the type of the Primary Key
  * @param <E> The Entity Class being managed
  * @param <P> The Parent Entity Class
  */
-abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> implements HasInstanceDescription {
+abstract public class EntityManager<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
 
     private static final int MAXLRUCACHE = 10;
 
@@ -56,15 +55,15 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
     /**
      * The entity cache.
      */
-    protected final Map<K, SoftReference<E>> cache;
+    protected final Map<Integer, SoftReference<E>> cache;
     private final ReferenceQueue<E> refqueue;
 
     /**
      * The LRU cache.
      */
-    protected final LRUCache<K, E> lrucache;
-    private EntityPersistenceProvider<K> entityPersistenceProvider;
-    private final Map<K, E> transientCache;
+    protected final LRUCache<Integer, E> lrucache;
+    private EntityPersistenceProvider<Integer> entityPersistenceProvider;
+    private final Map<Integer, E> transientCache;
 
     /**
      * Constructor.
@@ -102,7 +101,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @param pk the primary key value
      * @return the entity
      */
-    public final synchronized E get(K pk) {
+    public final synchronized E get(int pk) {
         if (isPersistent(pk)) {
             freeReleasedEntries();
             E e = lrucache.get(pk);
@@ -159,7 +158,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @param pkey the primary key value
      * @return true if persistent primary key
      */
-    abstract protected boolean isPersistent(K pkey);
+    abstract protected boolean isPersistent(int pkey);
 
     /**
      * Create an Entity. Does not load entity data into the entity. this will be
@@ -168,12 +167,12 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @param pk the primary key for this entity
      * @return the created entity
      */
-    abstract protected E createNewEntity(K pk);
+    abstract protected E createNewEntity(int pk);
 
     private void freeReleasedEntries() {
         Reference<? extends E> r;
         while ((r = (Reference<? extends E>) refqueue.poll()) != null) {
-            K pk = r.get().getPK();
+            int pk = r.get().getPK();
             cache.remove(pk);
             LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "freeReleasedEntries")
                     .addMsg("Cache Free ({0}) (SoftReference cache)", pk).write();
@@ -186,7 +185,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @param pk the primary key
      * @param e the entity
      */
-    protected void insertIntoCache(K pk, E e) {
+    protected void insertIntoCache(int pk, E e) {
         lrucache.put(pk, e);
         cache.put(pk, new SoftReference<>(e));
     }
@@ -197,7 +196,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      * @param e the entity
      */
     protected synchronized void removeFromCache(E e) {
-        K pk = e.getPK();
+        int pk = e.getPK();
         if (e.isPersistent()) {
             lrucache.remove(pk);
             cache.remove(pk);
@@ -217,7 +216,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      */
     public final synchronized E getNew() {
         E e = createNewEntity();
-        K pk = e.getPK();
+        int pk = e.getPK();
         LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", pk);
         transientCache.put(pk, e);
         return e;
@@ -255,7 +254,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      *
      * @return the EntityPersistenceProvider
      */
-    public EntityPersistenceProvider<K> getEntityPersistenceProvider() {
+    public EntityPersistenceProvider<Integer> getEntityPersistenceProvider() {
         if (entityPersistenceProvider == null) {
             entityPersistenceProvider = createEntityPersistenceProvider();
         }
@@ -267,7 +266,7 @@ abstract public class EntityManager<K, E extends Entity<K, E, P, ?>, P extends C
      *
      * @return the EntityPersistenceProvider
      */
-    abstract protected EntityPersistenceProvider<K> createEntityPersistenceProvider();
+    abstract protected EntityPersistenceProvider<Integer> createEntityPersistenceProvider();
 
     /**
      * Link a child entity to its parent.

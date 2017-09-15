@@ -30,57 +30,55 @@ public interface Rest<E> {
     /**
      * Get an entity
      *
-     * @param location the uri for the entity
+     * @param id the id for the entity
      * @return the entity or null if a problem
      */
-    public E get(String location);
+    public E get(int id);
 
     /**
      * Get a list of Entities
      *
-     * @param location the uri for the entitylist
      * @return the entity list or null if a problem
      */
-    public List<E> getAll(String location);
+    public List<E> getAll();
 
     /**
      * Create a new entity
      *
-     * @param location the uri for creating new entities
      * @param entity the entity being saved
      * @return the created entity as now stored in the permanent store or null
      * if a problem
      */
-    public E create(String location, E entity);
+    public E create(E entity);
 
     /**
      * Update an entity, replacing it entirely with the provided entity. Will do
      * a create if the request URI does not exist.
      *
-     * @param location the uri for the entity to be replaced
+     * @param id the id of the entity to be updated
      * @param entity the entity to be used for the update
      * @return the updated/created entity as now stored in the permanent store
      * or null if a problem
      */
-    public E update(String location, E entity);
+    public E update(int id, E entity);
 
     /**
      * Patch an existing entity.
      *
-     * @param location the URi of the entity to be patched
+     * @param id the id of the entity to be patched
      * @param patches a map, containing field names and values which are to be
      * updated
      * @return the updated entity as now stored in the permanent store or null
      * if a problem
      */
-    public E patch(String location, Map<String, Object> patches);
+    public E patch(int id, Map<String, Object> patches);
 
     /**
      * Delete an existing entity
      *
-     * @param location the uri of the entity to be deleted
+     * @param id the id of the entity to be deleted
      * @return true if deleted, false if a problem
      */
-    public boolean delete(String location);
+    public boolean delete(int id);
 
 }

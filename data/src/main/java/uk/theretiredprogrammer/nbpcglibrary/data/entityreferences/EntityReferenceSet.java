@@ -33,24 +33,23 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * required.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the primary Key class
  * @param <E> the eEntity Class
  * @param <P> the parent Entity class
  */
-public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEntity> {
+public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
 
     /**
      * The Entity Manager associated with the entities
      */
-    protected final EntityManager<K, E, P> em;
+    protected final EntityManager<E, P> em;
     /**
      * The Entity Persistence Provider for this entity set
      */
-    protected final EntityPersistenceProvider<K> epp;
+    protected final EntityPersistenceProvider<Integer> epp;
     /**
      * The list of Entity References
      */
-    protected final List<EntityReference<K, E, P>> childList;
+    protected final List<EntityReference<E, P>> childList;
 
     /**
      * The name of the Set (for reporting purposes)
@@ -85,7 +84,7 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      * Get the set of primary keys for this entity set.
      * @return  the set of primary keys
      */
-    protected List<K> getPrimaryKeySet() {
+    protected List<Integer> getPrimaryKeySet() {
         return epp.find();
     }
 
@@ -188,9 +187,9 @@ public class EntityReferenceSet<K, E extends Entity<K,E,P,?>, P extends CoreEnti
      * @return true if entity removed
      */
     public boolean remove(E e) {
-        K pk = e.getPK();
-        for (EntityReference<K,E, P> ref : childList) {
-            if (ref.getPK().equals(pk)) {
+        int pk = e.getPK();
+        for (EntityReference<E, P> ref : childList) {
+            if (ref.getPK() == pk) {
                 if (childList.remove(ref)) {
                     fireSetChange();
                     return true;

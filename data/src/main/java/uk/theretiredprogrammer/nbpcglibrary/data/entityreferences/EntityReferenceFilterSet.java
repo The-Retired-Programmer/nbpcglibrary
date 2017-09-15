@@ -25,11 +25,10 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * required.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the primary Key class
  * @param <E> the eEntity Class
  * @param <P> the parent Entity class
  */
-public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends EntityReferenceSet<K,E,P> {
+public class EntityReferenceFilterSet<E extends Entity, P extends CoreEntity> extends EntityReferenceSet<E,P> {
 
     private final String columnname;
     private final Object columnvalue;
@@ -51,7 +50,7 @@ public class EntityReferenceFilterSet<K, E extends Entity<K, E, P, ?>, P extends
     }
     
     @Override
-    protected List<K> getPrimaryKeySet() {
+    protected List<Integer> getPrimaryKeySet() {
         return epp.find(columnname, columnvalue);
     }
 }

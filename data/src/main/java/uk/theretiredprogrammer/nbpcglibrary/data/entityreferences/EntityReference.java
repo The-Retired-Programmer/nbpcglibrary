@@ -39,13 +39,13 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * @param <E> The Entity Class
  * @param <P> The Parent Entity Class
  */
-public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> implements HasInstanceDescription {
+public class EntityReference<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
 
     private final String name;
-    private K pk;
-    private K savePK;
+    private int pk;
+    private int savePK;
     private WeakReference<E> entityreference = null;
-    private final EntityManager<K, E, P> em;
+    private final EntityManager<E, P> em;
     private final PrimaryKeyListener pkListener;
     private Listener<SimpleEventParams> titleListener = null;
 
@@ -55,10 +55,10 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * @param name the name of the entity (for reporting)
      * @param em the associated Entity Manager
      */
-    public EntityReference(String name, EntityManager<K, E, P> em) {
+    public EntityReference(String name, EntityManager<E, P> em) {
         this.name = name;
         this.em = em;
-        this.pk = null;
+        this.pk = 0;
         this.entityreference = null;
         pkListener = null;
         saveState();
@@ -71,7 +71,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * @param em the associated Entity Manager
      * @param listener a listener to receive title change actions
      */
-    public EntityReference(String name, EntityManager<K, E, P> em, Listener<SimpleEventParams> listener) {
+    public EntityReference(String name, EntityManager<E, P> em, Listener<SimpleEventParams> listener) {
         this(name, em);
         titleListener = listener;
     }
@@ -83,7 +83,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * @param pk the primary key
      * @param em the associated Entity Manager
      */
-    public EntityReference(String name, K pk, EntityManager<K, E, P> em) {
+    public EntityReference(String name, int pk, EntityManager<E, P> em) {
         this.name = name;
         this.em = em;
         this.pk = pk;
@@ -100,7 +100,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * @param em the associated Entity Manager
      * @param listener a listener to receive title change actions
      */
-    public EntityReference(String name, K pk, EntityManager<K, E, P> em, Listener<SimpleEventParams> listener) {
+    public EntityReference(String name, int pk, EntityManager<E, P> em, Listener<SimpleEventParams> listener) {
         this(name, pk, em);
         titleListener = listener;
     }
@@ -112,7 +112,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * @param e the entity
      * @param em the associated Entity Manager
      */
-    public EntityReference(String name, E e, EntityManager<K, E, P> em) {
+    public EntityReference(String name, E e, EntityManager<E, P> em) {
         this.name = name;
         this.em = em;
         pkListener = new PrimaryKeyListener(name);
@@ -131,7 +131,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * @param em the associated Entity Manager
      * @param listener a listener to receive title change actions
      */
-    public EntityReference(String name, E e, EntityManager<K, E, P> em, Listener<SimpleEventParams> listener) {
+    public EntityReference(String name, E e, EntityManager<E, P> em, Listener<SimpleEventParams> listener) {
         this(name, e, em);
         titleListener = listener;
         e.addTitleListener(listener);
@@ -143,13 +143,13 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
     }
 
     /**
-     * Set the reference to "Null".
+     * Set the reference to "Null" (ie value 0).
      *
      * @return true if referenced entity is different (ie primary key has
      * changed)
      */
     public boolean set() {
-        if (pk != null) {
+        if (pk != 0) {
             LogBuilder.writeLog("nbpcglibrary.data", this, "set");
             if (titleListener != null) {
                 E old = getNoLoad();
@@ -158,7 +158,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
                     Event.fireSimpleEventParamsListener(titleListener);
                 }
             }
-            pk = null;
+            pk = 0;
             return true;
         }
         return false;
@@ -171,12 +171,12 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      * @return true if referenced entity is different (ie primary key has
      * changed)
      */
-    public boolean set(K pk) {
+    public boolean set(int pk) {
         LogBuilder.writeLog("nbpcglibrary.data", this, "set", pk);
-        if (pk == null) {
+        if (pk == 0) {
             return set();
         }
-        boolean updated = (this.pk == null || !this.pk.equals(pk));
+        boolean updated = (this.pk == 0 || this.pk != pk);
         if (updated) {
             if (titleListener != null) {
                 E old = getNoLoad();
@@ -209,8 +209,8 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      */
     public boolean set(E e) {
         LogBuilder.writeLog("nbpcglibrary.data", this, "set", e.instanceDescription());
-        K epk = e.getPK();
-        boolean updated = (this.pk == null || !this.pk.equals(epk));
+        int epk = e.getPK();
+        boolean updated = (this.pk == 0 || this.pk != epk);
         if (updated) {
             if (titleListener != null) {
                 E old = getNoLoad();
@@ -234,14 +234,14 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
         return updated;
     }
 
-    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams<K>> {
+    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams<Integer>> {
 
         public PrimaryKeyListener(String name) {
             super(name);
         }
 
         @Override
-        public void action(PrimaryKeyChangeEventParams<K> p) {
+        public void action(PrimaryKeyChangeEventParams<Integer> p) {
             pk = p.getNewPKey();
             saveState();
         }
@@ -259,7 +259,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
                 return e;
             }
         }
-        if (pk == null) {
+        if (pk == 0) {
             return null;
         }
         E e = em.get(pk);
@@ -285,7 +285,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
      *
      * @return the entity primary key
      */
-    public final K getPK() {
+    public final int getPK() {
         return pk;
     }
 
@@ -339,7 +339,7 @@ public class EntityReference<K, E extends Entity<K, E, P, ?>, P extends CoreEnti
 
         @Override
         public boolean ruleCheck() {
-            return pk != null;
+            return pk != 0;
         }
     }
 }

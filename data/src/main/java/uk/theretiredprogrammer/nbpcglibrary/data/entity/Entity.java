@@ -29,9 +29,9 @@ import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 import uk.theretiredprogrammer.nbpcglibrary.common.SimpleEventParams;
-import uk.theretiredprogrammer.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.theretiredprogrammer.nbpcglibrary.api.EntityFields;
 import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.onstop.LibraryOnStop;
 import static uk.theretiredprogrammer.nbpcglibrary.data.onstop.LibraryOnStop.isSavableEnabled;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityState;
@@ -49,26 +49,29 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.PrimaryKeyChan
  * The Entity Abstract Class.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the type of the primary Key
+ * @param <R> the base entity class used in the rest transfer
  * @param <E> the entity class
  * @param <P> the Parent Entity Class
  * @param <F> the entity field types
  */
 @RegisterLog("nbpcglibrary.data")
-public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends CoreEntity {
+public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> extends CoreEntity {
 
     private final Event<EntityStateChangeEventParams> stateEvent;
     private final Event<EntityFieldChangeEventParams<F>> fieldEvent;
+    @SuppressWarnings("FieldMayBeFinal") 
     private Event<SimpleEventParams> titleChangeEvent;
+    @SuppressWarnings("FieldMayBeFinal")
     private Event<SimpleEventParams> nameChangeEvent;
     private EntityState state = INIT;
     private final String entityname;
     /**
      * The Entity Persistence Provider for this entity
      */
-    protected final EntityPersistenceProvider<K> epp;
-    private final Event<PrimaryKeyChangeEventParams<K>> primaryKeyChangeEvent;
-    private final EntityManager<K, E, P> em;
+//    protected final EntityPersistenceProvider<K> epp;
+    private final Rest<R> rest;
+    private final Event<PrimaryKeyChangeEventParams<Integer>> primaryKeyChangeEvent;
+    private final EntityManager<E, P> em;
     private final EntityStateChangeListener entitystatechangelistener;
     private final EntitySavable savable = new EntitySavable();
 
@@ -78,25 +81,15 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @param entityname the entity name
      * @param icon name of the icon graphic
      * @param em the entity manager for this entity class
+     * @param rest the Data Access object for this entity class
      */
-    public Entity(String entityname, String icon, EntityManager<K, E, P> em) {
-        this(entityname, icon, em, em.getEntityPersistenceProvider());
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param entityname the entity name
-     * @param icon name of the icon graphic
-     * @param em the entity manager for this entity class
-     * @param epp the Data Access object for this entity class
-     */
-    protected Entity(String entityname, String icon, EntityManager<K, E, P> em, EntityPersistenceProvider<K> epp) {
+    public Entity(String entityname, String icon, EntityManager<E, P> em, Rest<R> rest) {
         super(entityname, icon);
-        this.epp = epp;
+//        this.epp = epp;
+        this.rest = rest;
         this.entityname = entityname;
         @SuppressWarnings({"OverridableMethodCallInConstructor", "LeakingThisInConstructor"})
-        String name = LogBuilder.instanceDescription(this, getPK().toString());
+        String name = LogBuilder.instanceDescription(this, Integer.toString(getPK()));
         stateEvent = new Event<>("statechange:" + name);
         fieldEvent = new Event<>("fieldchange:" + name);
         nameChangeEvent = new Event<>("namechange:" + name);
@@ -125,7 +118,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      *
      * @return the entity primary key
      */
-    public abstract K getPK();
+    public abstract int getPK();
 
     /**
      * Get the entity order index.
@@ -342,19 +335,16 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      *
      * @param pk the entity primary key
      */
-    protected void load(K pk) {
+    protected void load(int pk) {
         if (isPersistent()) {
-            loader(epp.get(pk));
+            R baseentity = rest.get(pk);
+            LogBuilder.writeLog("nbpcglibrary.data", this, "loader", baseentity.toString());
+            EntityState oldState = getState();
+            setBaseEntity(baseentity);
+            setState(DBENTITY);
+            fireStateChange(LOAD, oldState, DBENTITY);
+            fireFieldChange();
         }
-    }
-
-    private void loader(EntityFields data) {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "loader", data.toString());
-        EntityState oldState = getState();
-        entityLoad(data);
-        setState(DBENTITY);
-        fireStateChange(LOAD, oldState, DBENTITY);
-        fireFieldChange();
     }
 
     /**
@@ -362,7 +352,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      *
      * @param listener the listener
      */
-    public final void removePrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<K>> listener) {
+    public final void removePrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<Integer>> listener) {
         primaryKeyChangeEvent.removeListener(listener);
     }
 
@@ -373,7 +363,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @param mode the indicators of listener action (on current thread or on
      * event queue; priority/normal)
      */
-    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<K>> listener, Event.ListenerMode mode) {
+    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<Integer>> listener, Event.ListenerMode mode) {
         primaryKeyChangeEvent.addListener(listener, mode);
     }
 
@@ -400,8 +390,8 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                     return false;
                 }
                 em.removeFromCache((E) this);
-                entityLoad(epp.insert(ef));
-                K newPK = getPK();
+                setBaseEntity(rest.create(getBaseEntity()));
+                int newPK = getPK();
                 em.insertIntoCache(newPK, (E) this);
                 primaryKeyChangeEvent.fire(new PrimaryKeyChangeEventParams<>(newPK));
                 setState(DBENTITY);
@@ -414,7 +404,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
                     return false;
                 }
                 if (!ef.isEmpty()) {
-                    entityLoad(epp.update(getPK(), ef));
+                    setBaseEntity(rest.update(getPK(), getBaseEntity()));
                 }
                 setState(DBENTITY);
                 break;
@@ -444,7 +434,7 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
             case DBENTITY:
             case DBENTITYEDITING:
                 entityRemove();
-                epp.delete(getPK());
+                rest.delete(getPK());
                 em.removeFromCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
@@ -502,7 +492,8 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
         return checkRules(new StringBuilder()) ? super.getIcon() : getIconWithError();
     }
 
-    private class EntitySavable<E, P, F> extends AbstractSavable implements Icon, HasInstanceDescription {
+//    private class EntitySavable<E, P, F> extends AbstractSavable implements Icon, HasInstanceDescription {
+    private class EntitySavable<E> extends AbstractSavable implements Icon, HasInstanceDescription {
 
         private Icon icon;
         private boolean isRegisteredAsOutstanding = false;
@@ -611,13 +602,6 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
     abstract protected void entitySaveState();
 
     /**
-     * Load the entity field data into the entity fields.
-     *
-     * @param data the data to be inserted
-     */
-    abstract protected void entityLoad(EntityFields data);
-
-    /**
      * Get the key string which will be used in when sorting this entity
      *
      * @return the sort key
@@ -662,6 +646,10 @@ public abstract class Entity<K, E extends Entity<K, E, P, F>, P extends CoreEnti
      * @param from the copy source entity
      */
     abstract protected void entityCopy(E from);
+
+    abstract protected R getBaseEntity();
+
+    abstract protected void setBaseEntity(R claimentity);
 
     @Override
     public String toString() {

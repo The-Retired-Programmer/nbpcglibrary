@@ -17,6 +17,8 @@ package uk.theretiredprogrammer.nbpcglibrary.data.entity;
 
 import com.famfamfam.www.silkicons.Icons;
 import java.awt.Image;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
@@ -38,6 +40,22 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
     private final Lookup lookup;
 
     /**
+     * The date format for translating database timestamp fields to/from Date
+     * objects
+     */
+    protected final DateFormat DATETIME_ISO8601;
+    /**
+     * The date format for translating datetime strings in readable format
+     * to/from Date objects
+     */
+    protected final DateFormat DATETIME_READABLE;
+    /**
+     * The date format for translating dateonly string in readable format
+     * to/from Date objects
+     */
+    protected final DateFormat DATEONLY_READABLE;
+
+    /**
      * Constructor.
      *
      * @param entityname the name of the entity class (for reporting purposes)
@@ -48,17 +66,23 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
         this.iconname = iconname;
         lookupcontent = new InstanceContent();
         lookup = new AbstractLookup(lookupcontent);
+        DATETIME_ISO8601 = new SimpleDateFormat("yyyyMMddHHmmss");
+        DATETIME_ISO8601.setLenient(false);
+        DATETIME_READABLE = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+        DATETIME_READABLE.setLenient(true);
+        DATEONLY_READABLE = new SimpleDateFormat("dd-MMM-yyyy");
+        DATEONLY_READABLE.setLenient(true);
     }
-    
+
     /**
      * Set the Icon for this entity
-     * 
+     *
      * @param iconname the name of the icon (from icon library)
      */
     public void setIcon(String iconname) {
         this.iconname = iconname;
     }
-    
+
     /**
      * Get the entity lookup
      *
@@ -92,7 +116,7 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
      * @param rules the field ruleset
      * @param rule the rule to add
      */
-    protected void addRule(Rules rules, Rule rule) {
+    protected final void addRule(Rules rules, Rule rule) {
         addRule(rule);
         rules.addRule(rule);
     }
@@ -131,7 +155,7 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
     public Image addErrorToIcon(Image icon) {
         return ImageUtilities.mergeImages(icon, SpecialIcons.get("errormarker"), 0, 6);
     }
-    
+
     /**
      * Restore entity state.
      */

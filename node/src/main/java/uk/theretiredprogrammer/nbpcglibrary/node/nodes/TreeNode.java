@@ -34,12 +34,11 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.EntityReferenc
  * Tree Node Abstract Class
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the Primary Key class for entity
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
  * @param <F> the Entity Field enum class
  */
-public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends BasicNode<E> {
+public abstract class TreeNode<E extends Entity, P extends CoreEntity, F> extends BasicNode<E> {
 
     /**
      * Copy Allowed - for OperationsEnabled
@@ -54,7 +53,7 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      */
     public static final int CAN_DELETE = 4;
     ;
-    private EntityReference<K, E, P> eref;
+    private EntityReference<E, P> eref;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
     private EntityNameChangeListener nameListener;
@@ -71,7 +70,7 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      * @param operationsEnabled set for copy , cut and delete enabled
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    protected TreeNode(String nodename, E e, BasicChildFactory<K, E, P> cf, Class<? extends EntityManager> emclass, DataFlavor[] allowedDataFlavors, int operationsEnabled) {
+    protected TreeNode(String nodename, E e, BasicChildFactory<E, P> cf, Class<? extends EntityManager> emclass, DataFlavor[] allowedDataFlavors, int operationsEnabled) {
         super(cf, allowedDataFlavors);
         commonConstructor(nodename, e, emclass, operationsEnabled);
     }
@@ -91,7 +90,7 @@ public abstract class TreeNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
     }
 
     private void commonConstructor(String nodename, E e, Class<? extends EntityManager> emclass, int operationsEnabled) {
-        EntityManager<K, E, P> em = Lookup.getDefault().lookup(emclass);
+        EntityManager<E, P> em = Lookup.getDefault().lookup(emclass);
         eref = new EntityReference<>(nodename, e, em);
         this.operationsEnabled = operationsEnabled;
         String desc = e.instanceDescription();

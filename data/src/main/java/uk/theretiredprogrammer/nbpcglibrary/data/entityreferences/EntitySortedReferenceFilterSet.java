@@ -25,12 +25,11 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * Manages the list of Entities - implements a sortable entity lists
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the primary key class for the entity
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
  * @param <F> the fields enum type for the entity
  */
-public class EntitySortedReferenceFilterSet<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends EntitySortedReferenceSet<K, E, P, F> {
+public class EntitySortedReferenceFilterSet<E extends Entity, P extends CoreEntity, F> extends EntitySortedReferenceSet<E, P, F> {
 
     private final String columnname;
     private final Object columnvalue;
@@ -51,7 +50,7 @@ public class EntitySortedReferenceFilterSet<K, E extends Entity<K, E, P, F>, P e
     }
     
     @Override
-    protected List<K> getPrimaryKeySet() {
+    protected List<Integer> getPrimaryKeySet() {
         return epp.find(columnname, columnvalue);
     }
 

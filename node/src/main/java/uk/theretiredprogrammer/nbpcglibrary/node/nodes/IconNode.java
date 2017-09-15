@@ -37,12 +37,11 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
  * Read-Write Icon Node Abstract Class
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the Entity primary Key class
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
  * @param <F> the Entity Field enum class
  */
-public abstract class IconNode<K, E extends Entity<K, E, P, F>, P extends CoreEntity, F> extends TreeNode<K, E, P, F> {
+public abstract class IconNode<E extends Entity, P extends CoreEntity, F> extends TreeNode<E, P, F> {
 
     private final ImageFileFinder<E> imagefilefinder;
     private final String nodename;
@@ -57,7 +56,7 @@ public abstract class IconNode<K, E extends Entity<K, E, P, F>, P extends CoreEn
      * @param allowedDataFlavors allowed paste actions
      * @param operationsEnabled set for copy , cut and delete enabled
      */
-    public IconNode(String nodename, E e, BasicChildFactory<K, E, P> cf, Class<? extends EntityManager> emclass, DataFlavor[] allowedDataFlavors, int operationsEnabled) {
+    public IconNode(String nodename, E e, BasicChildFactory<E, P> cf, Class<? extends EntityManager> emclass, DataFlavor[] allowedDataFlavors, int operationsEnabled) {
         super(nodename, e, cf, emclass, allowedDataFlavors, operationsEnabled);
         this.nodename = nodename;
         imagefilefinder = getImageFileFinder(nodename);

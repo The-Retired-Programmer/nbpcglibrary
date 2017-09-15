@@ -25,13 +25,12 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.EntityReferenc
  * Extended ChildFactory support
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the Parent Primary Key Class
  * @param <E> the Parent Entity Class
  * @param <P> The Parent of Parent Entity Class
  */
-public abstract class BasicChildFactory<K, E extends Entity<K, E, P, ?>, P extends CoreEntity> extends CoreChildFactory<E> {
+public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> extends CoreChildFactory<E> {
 
-    private final EntityReference<K, E, P> parentref;
+    private final EntityReference<E, P> parentref;
 
     /**
      * Constructor.
@@ -43,7 +42,7 @@ public abstract class BasicChildFactory<K, E extends Entity<K, E, P, ?>, P exten
     @SuppressWarnings("LeakingThisInConstructor")
     public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManager> emclass) {
         super(null);
-        EntityManager<K, E, P> em = Lookup.getDefault().lookup(emclass);
+        EntityManager<E, P> em = Lookup.getDefault().lookup(emclass);
         parentref = new EntityReference<>(factoryname + ">" + parentEntity.instanceDescription(), parentEntity, em);
     }
 
