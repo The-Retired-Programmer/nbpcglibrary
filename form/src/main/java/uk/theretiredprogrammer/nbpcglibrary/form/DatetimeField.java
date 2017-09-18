@@ -16,16 +16,18 @@
 package uk.theretiredprogrammer.nbpcglibrary.form;
 
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JTextField;
 import uk.theretiredprogrammer.nbpcglibrary.api.BadFormatException;
-import uk.theretiredprogrammer.nbpcglibrary.api.Timestamp;
 
 /**
  * A Field for displaying and editing a value which is a Timestamp Value.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public class DatetimeField extends FieldView<Timestamp> {
+public class DatetimeField extends FieldView<Date> {
 
     private final JTextField fieldcomponent;
 
@@ -52,13 +54,21 @@ public class DatetimeField extends FieldView<Timestamp> {
     }
 
     @Override
-    public final Timestamp get() throws BadFormatException {
-        return new Timestamp(fieldcomponent.getText().trim());
+    public final Date get() throws BadFormatException {
+        SimpleDateFormat datetime_readable = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+        datetime_readable.setLenient(true);
+        try {
+            return datetime_readable.parse(fieldcomponent.getText().trim());
+        } catch (ParseException ex) {
+            throw new BadFormatException("Bad input for Date Only");
+        }
     }
 
     @Override
-    public final void set(Timestamp value) {
-        fieldcomponent.setText(value.toString());
+    public final void set(Date value) {
+        SimpleDateFormat datetime_readable = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+        datetime_readable.setLenient(true);
+        fieldcomponent.setText(datetime_readable.format(value));
     }
     
     @Override

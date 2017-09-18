@@ -17,7 +17,9 @@ package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import org.openide.awt.ActionID;
@@ -26,7 +28,6 @@ import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
 import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
-import uk.theretiredprogrammer.nbpcglibrary.api.Timestamp;
 import uk.theretiredprogrammer.nbpcglibrary.form.BasicFieldModel;
 import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
 import uk.theretiredprogrammer.nbpcglibrary.form.FieldPresenter;
@@ -68,9 +69,12 @@ public final class MarkLog implements ActionListener {
     }
 
     private boolean save(StringBuilder sb) {
+        SimpleDateFormat datetime_readable = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+        datetime_readable.setLenient(true);
+        String when = datetime_readable.format(new Date());
         LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO)
                 .addMsg("******** USER MARK @ {0} - {1}",
-                        (new Timestamp()).toString(), commentModel.get()).write();
+                        when, commentModel.get()).write();
         return true;
     }
 }

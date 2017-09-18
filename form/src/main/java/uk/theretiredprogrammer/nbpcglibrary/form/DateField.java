@@ -16,16 +16,18 @@
 package uk.theretiredprogrammer.nbpcglibrary.form;
 
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JTextField;
 import uk.theretiredprogrammer.nbpcglibrary.api.BadFormatException;
-import uk.theretiredprogrammer.nbpcglibrary.api.DateOnly;
 
 /**
  * A Field for displaying and editing a value which is a DateOnly Value.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public class DateField extends FieldView<DateOnly> {
+public class DateField extends FieldView<Date> {
 
     private final JTextField fieldcomponent;
 
@@ -52,13 +54,21 @@ public class DateField extends FieldView<DateOnly> {
     }
 
     @Override
-    public final DateOnly get() throws BadFormatException {
-        return new DateOnly(fieldcomponent.getText().trim());
+    public final Date get() throws BadFormatException {
+        SimpleDateFormat dateonly_readable = new SimpleDateFormat("dd-MMM-yyyy");
+        dateonly_readable.setLenient(true);
+        try {
+            return dateonly_readable.parse(fieldcomponent.getText().trim());
+        } catch (ParseException ex) {
+            throw new BadFormatException("Bad input for Date Only");
+        }
     }
 
     @Override
-    public final void set(DateOnly value) {
-        fieldcomponent.setText(value.toString());
+    public final void set(Date value) {
+        SimpleDateFormat dateonly_readable = new SimpleDateFormat("dd-MMM-yyyy");
+        dateonly_readable.setLenient(true);
+        fieldcomponent.setText(dateonly_readable.format(value));
     }
 
     @Override

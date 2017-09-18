@@ -86,11 +86,6 @@ public final class ProblemWarningTC extends TopComponent {
                     default:
                         sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authconnect"));
                 }
-            } else {
-                if (LifeCycle.getPersistenceUnitProviderFailures() > 0) {
-                    sb.append("<br/><hr>");
-                    sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_datasource"));
-                }
             }
             if (!LifeCycle.areSettingsSaved()) {
                 sb.append("<br/><hr>");

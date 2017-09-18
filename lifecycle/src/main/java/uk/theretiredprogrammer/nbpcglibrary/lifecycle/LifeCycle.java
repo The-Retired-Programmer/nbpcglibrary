@@ -15,16 +15,12 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 import org.openide.LifecycleManager;
 import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
 import uk.theretiredprogrammer.nbpcglibrary.form.ErrorInformationDialog;
 import org.openide.windows.WindowManager;
-import uk.theretiredprogrammer.nbpcglibrary.api.EntityPersistenceProviderManager;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
 import uk.theretiredprogrammer.nbpcglibrary.common.SimpleEventParams;
 import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
@@ -37,9 +33,6 @@ import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
 @RegisterLog("nbpcglibrary.lifecycle")
 public abstract class LifeCycle implements Runnable {
     
-    private final InputStream ppconfig;
-    private static long persistenceUnitProviderFailures = 0;
-
     private static final ExitApplication EXITAPPLICATION = new ExitApplication();
     private static boolean authorisationRequired;
 
@@ -47,15 +40,12 @@ public abstract class LifeCycle implements Runnable {
      * Constructor.
      *
      * @param in the Application Properties File inputstream
-     * @param ppconfig in persistence provider configuration inputstream
      * @param authorisationRequired true if authorisation is required when opening this application
      */
-    protected LifeCycle(InputStream in, InputStream ppconfig, boolean authorisationRequired) {
+    protected LifeCycle(InputStream in, boolean authorisationRequired) {
         LifeCycle.authorisationRequired = authorisationRequired;
-        this.ppconfig = ppconfig;
         try {
             ApplicationProperties.set(in);
-            
         } catch (ApplicationPropertiesException ex) {
             stop(ex);
         }
@@ -68,16 +58,6 @@ public abstract class LifeCycle implements Runnable {
                     ApplicationProperties.getDefault().get("application.title"),
                     new LoginPresenter((user,pwd)-> processAuthData(user,pwd)));
         }
-        if (!isAuthorisationProblem()) {
-            if (ppconfig != null ) {
-                try {
-                    EntityPersistenceProviderManager.init(ppconfig);
-                } catch (IOException ex) {
-                    stop(ex);
-                }
-            }
-            persistenceUnitProviderFailures = persistenceUnitProvidersOperationalCheck();
-        }
         WindowManager.getDefault().setRole(isProblem() ? "PROBLEMS" : isWarning() ? "WARNINGS" : "OPERATIONAL");
     }
     
@@ -88,15 +68,6 @@ public abstract class LifeCycle implements Runnable {
                 user,pwd);
     } 
 
-    /**
-     * Test if PersistenceUnitProviders are available.
-     * 
-     * @return true if all PersistenceUnitProviders appear to be available
-     */
-    static long getPersistenceUnitProviderFailures() {
-        return persistenceUnitProviderFailures;
-    }
-    
      /**
      * Test if Settings have been saved by the user - ie some
      * settings initialisation has occurred.
@@ -110,7 +81,7 @@ public abstract class LifeCycle implements Runnable {
     /**
      * Get the result of the  User authentication.
      * 
-     * @return authentication result or null if no authentication resquired
+     * @return authentication result or 0 if no authentication required
      */
     static int authenticationResult() {
         return authorisationRequired ? AandA.getLastAuthStatus() : 0;
@@ -122,7 +93,7 @@ public abstract class LifeCycle implements Runnable {
      * @return true if an authorisation problem observed
      */
     static boolean isAuthorisationProblem() {
-        return authorisationRequired ? authenticationResult() != 200 : false;
+        return authenticationResult() != 200;
     }
     
     /**
@@ -131,7 +102,7 @@ public abstract class LifeCycle implements Runnable {
      * @return true if startup problem observed
      */
     static boolean isProblem() {
-        return  isAuthorisationProblem() || (persistenceUnitProviderFailures > 0);
+        return  isAuthorisationProblem() ;
     }
     
     /**
@@ -141,20 +112,6 @@ public abstract class LifeCycle implements Runnable {
      */
     static boolean isWarning() {
         return (!areSettingsSaved());
-    }
-
-    private long persistenceUnitProvidersOperationalCheck() {
-        return EntityPersistenceProviderManager.getAllPersistenceUnitProviders().stream().filter( (psp) -> {
-            if (psp.isOperational()) {
-                LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "PersistenceUnitProvidersOperationalCheck")
-                        .addMsg("PersistenceUnitProvider {0} is operational", psp.getName()).write();
-                return false;
-            } else {
-                LogBuilder.create("nbpcglibrary.lifecycle", Level.INFO).addMethodName(this, "PersistenceUnitProvidersOperationalCheck")
-                        .addMsg("PersistenceUnitProvider {0} is not operational", psp.getName()).write();
-                return true;
-            }
-        }).count();
     }
     
     /**

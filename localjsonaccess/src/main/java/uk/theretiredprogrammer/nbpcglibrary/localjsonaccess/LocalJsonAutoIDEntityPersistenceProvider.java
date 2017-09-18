@@ -15,8 +15,9 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.localjsonaccess;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import uk.theretiredprogrammer.nbpcglibrary.api.EntityFields;
-import uk.theretiredprogrammer.nbpcglibrary.api.Timestamp;
 import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
 
 /**
@@ -38,7 +39,9 @@ public class LocalJsonAutoIDEntityPersistenceProvider extends LocalJsonEntityPer
     @Override
     public void addTimestampInfo(EntityFields ef) {
         String user = Settings.get("Usercode", "????");
-        String when = (new Timestamp()).toSQLString();
+        SimpleDateFormat datetime_ISO8601 = new SimpleDateFormat("yyyyMMddHHmmss");
+        datetime_ISO8601.setLenient(false);
+        String when = datetime_ISO8601.format(new Date());
         ef.put("createdby", user);
         ef.put("createdon", when);
         ef.put("updatedby", user);
@@ -48,7 +51,9 @@ public class LocalJsonAutoIDEntityPersistenceProvider extends LocalJsonEntityPer
     @Override
     public void updateTimestampInfo(EntityFields ef) {
         String user = Settings.get("Usercode", "????");
-        String when = (new Timestamp()).toSQLString();
+        SimpleDateFormat datetime_ISO8601 = new SimpleDateFormat("yyyyMMddHHmmss");
+        datetime_ISO8601.setLenient(false);
+        String when = datetime_ISO8601.format(new Date());
         ef.put("updatedby", user);
         ef.put("updatedon", when);
     }

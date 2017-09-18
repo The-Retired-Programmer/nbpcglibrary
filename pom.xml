@@ -12,11 +12,9 @@
     <modules>
         <module>api</module>
         <module>data</module>
-        <module>localdatabaseaccess</module>
         <module>localjsonaccess</module>
         <module>form</module>
         <module>icons</module>
-        <module>mysql</module>
         <module>node</module>
         <module>common</module>
         <module>json</module>
@@ -28,6 +26,7 @@
         <module>lifecycle</module>
         <module>simpleexpressionlanguage</module>
         <module>htmlrest</module>
+        <module>dbrest</module>
     </modules>
     
     <url>http://www.theretiredprogrammer.uk/nbpcglibrary</url>

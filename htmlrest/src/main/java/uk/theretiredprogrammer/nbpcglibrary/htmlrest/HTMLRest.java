@@ -50,6 +50,17 @@ public abstract class HTMLRest<E> implements Rest<E> {
         this.responseEntityClass = responseEntityClass;
         this.jwtoken = jwtoken;
     }
+    
+    @Override
+    public boolean open() {
+        return true;
+    }
+    
+    @Override
+    public boolean close() {
+        return true;
+    }
+    
 
     @Override
     public E get(int id) {

@@ -28,6 +28,26 @@ import java.util.Map;
 public interface Rest<E> {
 
     /**
+     * Open the Rest Stream.
+     *
+     * used to create any pooled resourses etc which may be needed to support
+     * the Rest calls.
+     *
+     * @return true if stream is opened without problems
+     */
+    public boolean open();
+
+    /**
+     * Close the Rest Stream.
+     *
+     * used to close any pooled resources, save any cached information etc which
+     * may be needed to support the Rest calls.
+     *
+     * @return true if stream is closed without problems.
+     */
+    public boolean close();
+
+    /**
      * Get an entity
      *
      * @param id the id for the entity
