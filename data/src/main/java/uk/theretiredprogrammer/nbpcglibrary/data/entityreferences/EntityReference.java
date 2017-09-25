@@ -35,7 +35,6 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * entity can be reloaded if required.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <K> the primary Key class for the entity
  * @param <E> The Entity Class
  * @param <P> The Parent Entity Class
  */

@@ -61,6 +61,15 @@ public interface Rest<E> {
      * @return the entity list or null if a problem
      */
     public List<E> getAll();
+    
+    /**
+     * Get a list of Entities
+     *
+     * @param filtername the name of the filter item to be applied
+     * @param filtervalue the filter value - if matched then include in list
+     * @return the entity list or null if a problem
+     */
+    public List<E> getMany(String filtername, int filtervalue);
 
     /**
      * Create a new entity

@@ -59,7 +59,7 @@ public class AandA {
             jwtoken = response.readEntity(String.class);
             // now check the Token
             response = client
-                    .target(url + "/auth/check")
+                    .target(url + "/auth/auth")
                     .request(MediaType.TEXT_PLAIN_TYPE)
                     .header("authorization", "bearer " + jwtoken)
                     .get();

@@ -15,6 +15,7 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.data.entity;
 
+import uk.theretiredprogrammer.nbpcglibrary.api.LRUCache;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -23,7 +24,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
-import uk.theretiredprogrammer.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 
 /**
@@ -61,8 +61,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
     /**
      * The LRU cache.
      */
-    protected final LRUCache<Integer, E> lrucache;
-    private EntityPersistenceProvider<Integer> entityPersistenceProvider;
+    protected final LRUCache<E> lrucache;
     private final Map<Integer, E> transientCache;
 
     /**
@@ -83,7 +82,7 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
     public EntityManager(String name, int maxLRUcache) {
         super();
         this.name = name;
-        lrucache = new LRUCache<>(name, maxLRUcache);
+        lrucache = new LRUCache<>(maxLRUcache);
         cache = new HashMap<>();
         refqueue = new ReferenceQueue<>();
         transientCache = new HashMap<>();
@@ -249,25 +248,6 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
         return e;
     }
     
-    /**
-     * Get the EntityPersistenceProvider for this Entity Class.
-     *
-     * @return the EntityPersistenceProvider
-     */
-    public EntityPersistenceProvider<Integer> getEntityPersistenceProvider() {
-        if (entityPersistenceProvider == null) {
-            entityPersistenceProvider = createEntityPersistenceProvider();
-        }
-        return entityPersistenceProvider;
-    }
-
-    /**
-     * Create the EntityPersistenceProvider for this Entity Class.
-     *
-     * @return the EntityPersistenceProvider
-     */
-    abstract protected EntityPersistenceProvider<Integer> createEntityPersistenceProvider();
-
     /**
      * Link a child entity to its parent.
      *

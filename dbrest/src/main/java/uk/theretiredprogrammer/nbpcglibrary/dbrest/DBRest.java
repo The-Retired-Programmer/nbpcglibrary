@@ -51,7 +51,7 @@ import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 
 /**
  * EntityPersistenceProvider Class for access localSQL databases
@@ -60,7 +60,7 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.IdTimestampBaseEntity;
  * @param <E> the Entity class being processed
  */
 @RegisterLog("nbpcglib.localdatabaseaccess")
-public abstract class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
+public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
 
     private String tablename;
     private String ordercolumn;
@@ -126,6 +126,19 @@ public abstract class DBRest<E extends IdTimestampBaseEntity> implements Rest<E>
         String sql = ordercolumn == null
                 ? "SELECT * from " + tablename
                 : "SELECT * from " + tablename + " ORDER BY " + ordercolumn;
+        try {
+            return query(sql);
+        } catch (SQLException ex) {
+            return new ArrayList<>();
+        }
+    }
+    
+    @Override
+    public List<E> getMany(String filtername, int filtervalue) {
+      LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "get");
+        String sql = ordercolumn == null
+                ? buildsql("SELECT * from " + tablename + " where " + filtername + "={P}", filtervalue)
+                : buildsql("SELECT * from " + tablename + " where " + filtername + "={P} ORDER BY " + ordercolumn, filtervalue);
         try {
             return query(sql);
         } catch (SQLException ex) {
@@ -343,7 +356,11 @@ public abstract class DBRest<E extends IdTimestampBaseEntity> implements Rest<E>
 
     private String buildsql(String sql, Object parameter) {
         sql = sql.replace("{P}", format(parameter));
-        LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "buildsql", sql);
+        return sql;
+    }
+    
+    private String buildsql(String sql, int parameter) {
+        sql = sql.replace("{P}", Integer.toString(parameter));
         return sql;
     }
 

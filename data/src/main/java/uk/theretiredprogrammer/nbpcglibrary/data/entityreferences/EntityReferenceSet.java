@@ -17,7 +17,6 @@ package uk.theretiredprogrammer.nbpcglibrary.data.entityreferences;
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.theretiredprogrammer.nbpcglibrary.api.EntityPersistenceProvider;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.SetChangeEventParams;
@@ -43,10 +42,6 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      */
     protected final EntityManager<E, P> em;
     /**
-     * The Entity Persistence Provider for this entity set
-     */
-    protected final EntityPersistenceProvider<Integer> epp;
-    /**
      * The list of Entity References
      */
     protected final List<EntityReference<E, P>> childList;
@@ -67,7 +62,6 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
         this.name = name;
         setChangeEvent = new Event<>(name);
         em = Lookup.getDefault().lookup(emclass);
-        this.epp = em.getEntityPersistenceProvider();
         childList = new ArrayList<>();
     }
     
@@ -85,7 +79,8 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      * @return  the set of primary keys
      */
     protected List<Integer> getPrimaryKeySet() {
-        return epp.find();
+//        return epp.find();
+        return null;
     }
 
     /**

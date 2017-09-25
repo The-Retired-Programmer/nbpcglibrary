@@ -51,7 +51,8 @@ public class EntitySortedReferenceFilterSet<E extends Entity, P extends CoreEnti
     
     @Override
     protected List<Integer> getPrimaryKeySet() {
-        return epp.find(columnname, columnvalue);
+//        return epp.find(columnname, columnvalue);
+        return null;
     }
 
 

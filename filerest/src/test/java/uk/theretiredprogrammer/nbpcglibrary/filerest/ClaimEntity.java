@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.dbrest;
+package uk.theretiredprogrammer.nbpcglibrary.filerest;
 
 import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 
@@ -101,5 +101,10 @@ public class ClaimEntity extends IdTimestampBaseEntity {
      */
     public void setUser(Integer user) {
         this.user = user;
+    }
+
+    @Override
+    public boolean isMatch(String fieldname, int fieldvalue) {
+        return (fieldname.equals("user")) && (fieldvalue == user);
     }
 }
