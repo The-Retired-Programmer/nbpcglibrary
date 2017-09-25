@@ -20,11 +20,6 @@
             <groupId>org.netbeans.api</groupId>
             <version>${netbeans.version}</version>
         </dependency>
-        <dependency>
-            <artifactId>json</artifactId>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
     
     <build>

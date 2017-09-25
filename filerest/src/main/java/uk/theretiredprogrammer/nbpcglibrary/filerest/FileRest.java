@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +38,9 @@ import javax.json.JsonReader;
 import javax.json.JsonValue;
 import javax.json.JsonWriter;
 import javax.json.stream.JsonParsingException;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
 import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
-import uk.theretiredprogrammer.nbpcglibrary.json.JsonUtil;
 
 /**
  * EntityPersistenceProvider Class for access local Json File based persistent
@@ -97,14 +94,14 @@ public class FileRest<E extends IdTimestampBaseEntity> implements Rest<E> {
             try (JsonReader jsonReader = Json.createReader(new FileReader(dbfile))) {
                 tableJson = jsonReader.readObject();
             }
-            nextid = JsonUtil.getObjectKeyIntegerValue(tableJson, "nextid");
-            nextidx = JsonUtil.getObjectKeyIntegerValue(tableJson, "nextidx");
-            name = JsonUtil.getObjectKeyStringValue(tableJson, "name");
+            nextid = tableJson.getInt("nextid");
+            nextidx = tableJson.getInt("nextidx");
+            name = tableJson.getString("name");
             if (!name.equals(tablename)) {
                 return false;
             }
             //
-            JsonArray records = JsonUtil.getObjectKeyArrayValue(tableJson, "entities");
+            JsonArray records = tableJson.getJsonArray("entities");
             for (JsonValue record : records) {
                 JsonObject rec = (JsonObject) record;
                 E e = createEntity(rec);
@@ -177,7 +174,6 @@ public class FileRest<E extends IdTimestampBaseEntity> implements Rest<E> {
 
     @Override
     public E get(int id) {
-        LogBuilder.writeLog("nbpcglib.localJsonPersistenceUnitProvider", this, "get", id);
         return copyfunction.apply(tablerecords.get(id));
     }
 

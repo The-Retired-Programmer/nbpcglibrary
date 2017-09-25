@@ -31,11 +31,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <artifactId>json</artifactId>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <artifactId>data</artifactId>
             <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
