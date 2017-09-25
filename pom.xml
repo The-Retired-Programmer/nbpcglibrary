@@ -16,7 +16,6 @@
         <module>icons</module>
         <module>node</module>
         <module>common</module>
-        <module>json</module>
         <module>topcomponent</module>
         <module>annotations</module>
         <module>email</module>
