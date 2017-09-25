@@ -90,16 +90,16 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
         this.entityname = entityname;
         @SuppressWarnings({"OverridableMethodCallInConstructor", "LeakingThisInConstructor"})
         String name = LogBuilder.instanceDescription(this, Integer.toString(getPK()));
-        stateEvent = new Event<>("statechange:" + name);
-        fieldEvent = new Event<>("fieldchange:" + name);
-        nameChangeEvent = new Event<>("namechange:" + name);
-        titleChangeEvent = new Event<>("titlechange:" + name);
+        stateEvent = new Event<>();
+        fieldEvent = new Event<>();
+        nameChangeEvent = new Event<>();
+        titleChangeEvent = new Event<>();
         EntityState oldState = state;
         state = NEW;
         fireStateChange(CREATE, oldState, state);
         //
         this.em = em;
-        primaryKeyChangeEvent = new Event<>(entityname);
+        primaryKeyChangeEvent = new Event<>();
         entitystatechangelistener = new EntityStateChangeListener("entity:" + instanceDescription());
         addStateListener(entitystatechangelistener);
         // and as this is new it is saveable (too early to rely on listener)

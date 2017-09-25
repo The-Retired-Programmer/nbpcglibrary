@@ -36,7 +36,7 @@ import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 public class ErrorInformationDialog {
 
     private final DialogDescriptor dd;
-    private final Event<SimpleEventParams> dialogDone = new Event<>("ErrorInformationDialogDone");
+    private final Event<SimpleEventParams> dialogDone = new Event<>();
     private static ErrorInformationDialog instance;
 
     /**

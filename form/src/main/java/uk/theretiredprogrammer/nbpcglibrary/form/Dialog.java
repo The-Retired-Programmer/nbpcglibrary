@@ -78,7 +78,7 @@ public class Dialog implements HasInstanceDescription {
         presenter.enableView();
         PaneView view = (PaneView) this.presenter.getView();
         this.title = title;
-        cancellationEvent = new Event<>("DialogueCancellation");
+        cancellationEvent = new Event<>();
         cancellationEvent.addListener(onCancellation);
         LogBuilder.writeConstructorLog("nbpcglibrary.form", this, title, this.presenter, isModal, onCancellation);
         dd = new DialogDescriptor(

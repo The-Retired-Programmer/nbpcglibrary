@@ -60,7 +60,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      */
     public EntityReferenceSet(String name,  Class<? extends EntityManager> emclass) {
         this.name = name;
-        setChangeEvent = new Event<>(name);
+        setChangeEvent = new Event<>();
         em = Lookup.getDefault().lookup(emclass);
         childList = new ArrayList<>();
     }
