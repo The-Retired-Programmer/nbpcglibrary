@@ -649,7 +649,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
 
     abstract protected R getBaseEntity();
 
-    abstract protected void setBaseEntity(R claimentity);
+    abstract protected void setBaseEntity(R entity);
 
     @Override
     public String toString() {

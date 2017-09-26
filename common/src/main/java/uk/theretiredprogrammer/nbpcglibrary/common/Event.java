@@ -113,6 +113,15 @@ public class Event<P extends EventParams> {
     public boolean hasListener() {
         return listenersImmediate.hasListener() || listenersEventQueue.hasListener();
     }
+    
+    /**
+     * Test if there are listeners registered with this listening.
+     *
+     * @return count of the registered listeners
+     */
+    public int listenerCount() {
+        return listenersImmediate.size() + listenersEventQueue.size();
+    }
 
     /**
      * Fire all listeners registered - event will fire immediately on the
