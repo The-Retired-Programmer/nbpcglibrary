@@ -16,7 +16,6 @@
 
 package uk.theretiredprogrammer.nbpcglibrary.common;
 
-import uk.theretiredprogrammer.nbpcglibrary.api.EventParams;
 import java.awt.EventQueue;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -28,9 +27,8 @@ import java.util.stream.Collectors;
  * fire
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <P> the listener parameter class
  */
-public class Event<P extends EventParams> {
+public class Event {
 
     /**
      * the Modes that a listener can request it is added
@@ -57,15 +55,15 @@ public class Event<P extends EventParams> {
          */
         EVENTQUEUE };
     
-    private final ListenerStore<P> listenersImmediate = new ListenerStore<>();
-    private final ListenerStore<P> listenersEventQueue = new ListenerStore<>();
+    private final ListenerStore listenersImmediate = new ListenerStore();
+    private final ListenerStore listenersEventQueue = new ListenerStore();
 
     /**
      * Add a listener - will fire action on EventQueue
      *
      * @param listener the listener
      */
-    public void addListener(Listener<P> listener) {
+    public void addListener(Listener listener) {
         listenersEventQueue.add(listener);
     }
 
@@ -77,7 +75,7 @@ public class Event<P extends EventParams> {
      * @param mode mode indicating priority v. normal and immediate v event
      * queue
      */
-    public void addListener(Listener<P> listener, ListenerMode mode) {
+    public void addListener(Listener listener, ListenerMode mode) {
         if (listener != null) {
             switch (mode) {
                 case PRIORITY_IMMEDIATE:
@@ -100,7 +98,7 @@ public class Event<P extends EventParams> {
      *
      * @param listener the listener
      */
-    public void removeListener(Listener<P> listener) {
+    public void removeListener(Listener listener) {
         listenersImmediate.remove(listener);
         listenersEventQueue.remove(listener); // remove a listener from either queue
     }
@@ -129,7 +127,7 @@ public class Event<P extends EventParams> {
      *
      * @param p the listener parameters object
      */
-    public void fire(P p) {
+    public void fire(Object p) {
         listenersImmediate.fire(p);
         if (EventQueue.isDispatchThread()) {
             listenersEventQueue.fire(p);
@@ -138,39 +136,39 @@ public class Event<P extends EventParams> {
         }
     }
 
-    private class ListenerStore<P extends EventParams> {
+    private class ListenerStore {
 
-        private List<WeakReference<Listener<P>>> listeners = new ArrayList<>();
+        private List<WeakReference<Listener>> listeners = new ArrayList<>();
         
-        public final synchronized void add(Listener<P> listener) {
+        public final synchronized void add(Listener listener) {
             if (listeners.stream().noneMatch(wref -> wref.get() != null && wref.get() == listener)) {
                     listeners.add(new WeakReference<>(listener));
             }
         }
         
-        public final synchronized void addPriority(Listener<P> listener) {
+        public final synchronized void addPriority(Listener listener) {
             if (listeners.stream().noneMatch(wref -> wref.get() != null && wref.get() == listener)) {
                     listeners.add(0, new WeakReference<>(listener));
             }
         }
         
-        public final synchronized void remove(Listener<P> listener) {
+        public final synchronized void remove(Listener listener) {
             listeners = listeners.stream()
                     .filter(wref -> wref.get() != null && wref.get() != listener)
                     .collect(Collectors.toList());
         }
 
-        public final synchronized void fire(P p) {
+        public final synchronized void fire(Object p) {
             listeners.stream()
                     .filter(wref -> wref.get()!= null)
                     .forEach( wref -> wref.get().actionPerformed(p));
         }
 
-        public final synchronized void fireLaterOnEventQueue(P p) {
+        public final synchronized void fireLaterOnEventQueue(Object p) {
             listeners.stream()
                     .filter(wref -> wref.get()!= null)
                     .forEach( wref -> 
-                        EventQueue.invokeLater(new FireEventQueueListener<>(wref.get(), p))
+                        EventQueue.invokeLater(new FireEventQueueListener(wref.get(), p))
                     );
         }
 
@@ -185,12 +183,12 @@ public class Event<P extends EventParams> {
         }
     }
 
-    private static class FireEventQueueListener<P extends EventParams> implements Runnable {
+    private static class FireEventQueueListener implements Runnable {
 
-        private final P p;
-        private final Listener<P> al;
+        private final Object p;
+        private final Listener al;
 
-        public FireEventQueueListener(Listener<P> al, P p) {
+        public FireEventQueueListener(Listener al, Object p) {
             this.al = al;
             this.p = p;
         }
@@ -206,7 +204,7 @@ public class Event<P extends EventParams> {
      * 
      * @param listener the listener to be fired
      */
-    public static void fireSimpleEventParamsListener(Listener<SimpleEventParams> listener){
-         EventQueue.invokeLater(new FireEventQueueListener<>(listener, new SimpleEventParams()));
+    public static void fireSimpleEventParamsListener(Listener listener){
+         EventQueue.invokeLater(new FireEventQueueListener(listener, null));
     }
 }

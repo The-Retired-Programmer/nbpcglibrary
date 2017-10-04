@@ -16,56 +16,28 @@
 
 package uk.theretiredprogrammer.nbpcglibrary.common;
 
-import uk.theretiredprogrammer.nbpcglibrary.api.EventParams;
-import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
 
 /**
  * A Standard Listener - defined with a generic class for use as parameters
  * passed on action.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <P> the Class of the listener parameter
  */
-public abstract class Listener<P extends EventParams> implements HasInstanceDescription {
-
-    private final String description;
-
-    /**
-     * Constructor
-     *
-     * @param description the listener's descriptive name - for use in error
-     * /log reporting
-     */
-    @SuppressWarnings("LeakingThisInConstructor")
-    public Listener(String description) {
-        this.description = description;
-        LogBuilder.writeConstructorLog("nbpcglibrary.common", this, description);
-    }
-    
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this, description);
-    }
+public abstract class Listener {
 
     /**
      * Fired on Action.
      *
      * @param p the listener parameters
      */
-    public void actionPerformed(P p) {
-        LogBuilder.writeLog("nbpcglibrary.common",this, "actionPerformed", p);
+    public void actionPerformed(Object p) {
         action(p);
     }
-
-    @Override
-    public String toString() {
-        return description;
-    }
-
+    
     /**
      * The action processing method.
      *
      * @param p the listener parameters
      */
-    public abstract void action(P p);
+    public abstract void action(Object p);
 }

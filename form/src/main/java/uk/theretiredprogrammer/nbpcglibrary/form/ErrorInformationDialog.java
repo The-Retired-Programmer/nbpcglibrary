@@ -22,11 +22,9 @@ import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.common.Event;
-import uk.theretiredprogrammer.nbpcglibrary.common.SimpleEventParams;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * A Standard Error Information Dialog Display
@@ -36,7 +34,7 @@ import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 public class ErrorInformationDialog {
 
     private final DialogDescriptor dd;
-    private final Event<SimpleEventParams> dialogDone = new Event<>();
+    private final Event dialogDone = new Event();
     private static ErrorInformationDialog instance;
 
     /**
@@ -46,11 +44,11 @@ public class ErrorInformationDialog {
      * @param message the dialog message
      * @param l a listener which will be fired when the dialog is closed
      */
-    public static void show(String title, String message, Listener<SimpleEventParams> l) {
+    public static void show(String title, String message, Listener l) {
         instance = new ErrorInformationDialog(title, message, l);
     }
 
-    private ErrorInformationDialog(String title, String message, Listener<SimpleEventParams> l) {
+    private ErrorInformationDialog(String title, String message, Listener l) {
         dialogDone.addListener(l);
         dd = new DialogDescriptor(
                 message,
@@ -71,9 +69,8 @@ public class ErrorInformationDialog {
 
         @Override
         public void actionPerformed(ActionEvent ae) {
-            LogBuilder.writeLog("nbpcglibrary.form", this, "actionPerformed");
             dd.setClosingOptions(null); // and allow closing
-            dialogDone.fire(new SimpleEventParams());
+            dialogDone.fire(null);
             instance = null;
         }
     }
@@ -84,10 +81,8 @@ public class ErrorInformationDialog {
         public void propertyChange(PropertyChangeEvent pce) {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
-                 LogBuilder.create("nbpcglibrary.form", Level.FINEST).addMethodName(this, "propertyChange")
-                                .addMsg("Window closed").write();
                 dd.setClosingOptions(null); // and allow closing
-                dialogDone.fire(new SimpleEventParams());
+                dialogDone.fire(null);
                 instance = null;
             }
         }

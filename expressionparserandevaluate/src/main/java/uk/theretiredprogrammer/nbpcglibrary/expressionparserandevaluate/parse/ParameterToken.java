@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parse;
 
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parsetree.ParseTree;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * A Parameter Name Token.
@@ -34,11 +33,6 @@ public class ParameterToken implements TerminalToken {
      */
     public ParameterToken(String name) {
         this.name = name;
-    }
-    
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this,name);
     }
 
     /**

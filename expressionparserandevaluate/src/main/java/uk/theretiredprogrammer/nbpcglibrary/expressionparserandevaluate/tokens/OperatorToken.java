@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.tokens;
 
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parsetree.ParseTree;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Operator Token.
@@ -34,11 +33,6 @@ public abstract class OperatorToken implements Token {
      */
     public OperatorToken(int index) {
         this.index = index;
-    }
-    
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this);
     }
 
     /**

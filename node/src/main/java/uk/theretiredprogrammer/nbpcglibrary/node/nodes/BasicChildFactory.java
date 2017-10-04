@@ -15,9 +15,10 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.node.nodes;
 
-import org.openide.util.Lookup;
+import java.util.function.Function;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
 import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.EntityReference;
 
@@ -25,25 +26,24 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.EntityReferenc
  * Extended ChildFactory support
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <R> the base entity class used in the rest transfer
  * @param <E> the Parent Entity Class
  * @param <P> The Parent of Parent Entity Class
  */
-public abstract class BasicChildFactory<E extends Entity, P extends CoreEntity> extends CoreChildFactory<E> {
+public abstract class BasicChildFactory<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> extends CoreChildFactory<E> {
 
-    private final EntityReference<E, P> parentref;
+    private final EntityReference<R, E, P> parentref;
 
     /**
      * Constructor.
      *
-     * @param factoryname the factory name
      * @param parentEntity the parent entity
-     * @param emclass the parent entity manager class
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      */
-    @SuppressWarnings("LeakingThisInConstructor")
-    public BasicChildFactory(String factoryname, E parentEntity, Class<? extends EntityManager> emclass) {
+    public BasicChildFactory(E parentEntity, Function<R,E> entitycreator, Class<? extends Rest<R>> restclass) {
         super(null);
-        EntityManager<E, P> em = Lookup.getDefault().lookup(emclass);
-        parentref = new EntityReference<>(factoryname + ">" + parentEntity.instanceDescription(), parentEntity, em);
+        parentref = new EntityReference<>(entitycreator, restclass, parentEntity);
     }
 
     @Override

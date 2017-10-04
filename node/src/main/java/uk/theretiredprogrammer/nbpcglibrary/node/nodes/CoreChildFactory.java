@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.node.nodes;
 
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import org.openide.nodes.ChildFactory;
 import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationLookup;
@@ -37,7 +36,6 @@ public abstract class CoreChildFactory<E extends CoreEntity> extends ChildFactor
      *
      * @param parentEntity the parent entity
      */
-    @SuppressWarnings("LeakingThisInConstructor")
     public CoreChildFactory(E parentEntity) {
         this.parentEntity = parentEntity;
     }
@@ -54,21 +52,16 @@ public abstract class CoreChildFactory<E extends CoreEntity> extends ChildFactor
     /**
      * get Change listener for the child entity set.
      *
-     * @param name the name of the listener (for reporting/logging)
      * @return the required listener
      */
-    public Listener<SetChangeEventParams> getSetChangeListener(String name) {
-        return new ChildSetChangeListener(name);
+    public Listener getSetChangeListener() {
+        return new ChildSetChangeListener();
     }
 
-    private class ChildSetChangeListener extends Listener<SetChangeEventParams> {
-
-        public ChildSetChangeListener(String name) {
-            super(name);
-        }
+    private class ChildSetChangeListener extends Listener {
 
         @Override
-        public void action(SetChangeEventParams p) {
+        public void action(Object p) {
             if (ApplicationLookup.getDefault().lookup(InhibitExplorerRefresh.class) == null) {
                 refresh(true);
             }

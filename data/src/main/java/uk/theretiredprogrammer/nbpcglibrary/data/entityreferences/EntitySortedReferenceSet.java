@@ -17,9 +17,10 @@ package uk.theretiredprogrammer.nbpcglibrary.data.entityreferences;
 
 import java.util.Comparator;
 import java.util.List;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
+import java.util.function.Function;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityFieldChangeEventParams;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 
@@ -27,11 +28,12 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * Manages the list of Entities - implements a sortable entity lists
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <R> the BasicEntity (data transfer) Class
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
  * @param <F> the fields enum type for the entity
  */
-public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F> extends EntityReferenceSet<E, P> {
+public class EntitySortedReferenceSet<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity, F> extends EntityReferenceSet<R, E, P> {
 
     private final Comparator<E> comparator;
     private boolean unsorted = true;
@@ -40,13 +42,13 @@ public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F>
     /**
      * Constructor.
      *
-     * @param name the set name (for reporting)
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      * @param comparator the comparator to be used to sort the list
-     * @param emclass the associated entity manager class
      */
-    public EntitySortedReferenceSet(String name, Comparator<E> comparator, Class<? extends EntityManager> emclass) {
-        super(name, emclass);
-        childListener = new ChildListener(name);
+    public EntitySortedReferenceSet(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, Comparator<E> comparator) {
+        super(entitycreator, restclass);
+        childListener = new ChildListener();
         this.comparator = comparator;
     }
 
@@ -58,7 +60,7 @@ public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F>
         java.util.Collections.sort(el, comparator);
         childList.clear();
         el.stream().forEach((e) -> {
-            childList.add(new EntityReference<>(name, e, em));
+            childList.add(new EntityReference<>(entitycreator, restclass, e));
         });
         unsorted = false;
         fireSetChange();
@@ -109,14 +111,10 @@ public class EntitySortedReferenceSet<E extends Entity, P extends CoreEntity, F>
         unsorted = true;
     }
 
-    private class ChildListener extends Listener<EntityFieldChangeEventParams<F>> {
-
-        public ChildListener(String name) {
-            super(name);
-        }
+    private class ChildListener extends Listener {
 
         @Override
-        public void action(EntityFieldChangeEventParams<F> p) {
+        public void action(Object p) {
             sort();
         }
     }

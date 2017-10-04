@@ -24,13 +24,12 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.netbeans.spi.actions.AbstractSavable;
 import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
+import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationLookup;
 import uk.theretiredprogrammer.nbpcglibrary.common.Event;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
-import uk.theretiredprogrammer.nbpcglibrary.common.SimpleEventParams;
 import uk.theretiredprogrammer.nbpcglibrary.api.EntityFields;
-import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.onstop.LibraryOnStop;
 import static uk.theretiredprogrammer.nbpcglibrary.data.onstop.LibraryOnStop.isSavableEnabled;
@@ -43,7 +42,6 @@ import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChange
 import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.RESET;
 import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.SAVE;
-import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.PrimaryKeyChangeEventParams;
 
 /**
  * The Entity Abstract Class.
@@ -55,52 +53,37 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.PrimaryKeyChan
  * @param <F> the entity field types
  */
 @RegisterLog("nbpcglibrary.data")
-public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> extends CoreEntity {
+public abstract class Entity<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity, F> extends CoreEntity {
 
-    private final Event<EntityStateChangeEventParams> stateEvent;
-    private final Event<EntityFieldChangeEventParams<F>> fieldEvent;
+    private final Event stateEvent;
+    private final Event fieldEvent;
     @SuppressWarnings("FieldMayBeFinal") 
-    private Event<SimpleEventParams> titleChangeEvent;
+    private Event titleChangeEvent;
     @SuppressWarnings("FieldMayBeFinal")
-    private Event<SimpleEventParams> nameChangeEvent;
+    private Event nameChangeEvent;
     private EntityState state = INIT;
-    private final String entityname;
-    /**
-     * The Entity Persistence Provider for this entity
-     */
-//    protected final EntityPersistenceProvider<K> epp;
-    private final Rest<R> rest;
-    private final Event<PrimaryKeyChangeEventParams<Integer>> primaryKeyChangeEvent;
-    private final EntityManager<E, P> em;
+    private final Event primaryKeyChangeEvent;
     private final EntityStateChangeListener entitystatechangelistener;
     private final EntitySavable savable = new EntitySavable();
+    private final Class<? extends Rest<R>> restclass;
 
     /**
      * Constructor.
      *
-     * @param entityname the entity name
-     * @param icon name of the icon graphic
-     * @param em the entity manager for this entity class
-     * @param rest the Data Access object for this entity class
+     * @param restclass class of the rest client for this entity
      */
-    public Entity(String entityname, String icon, EntityManager<E, P> em, Rest<R> rest) {
-        super(entityname, icon);
-//        this.epp = epp;
-        this.rest = rest;
-        this.entityname = entityname;
-        @SuppressWarnings({"OverridableMethodCallInConstructor", "LeakingThisInConstructor"})
-        String name = LogBuilder.instanceDescription(this, Integer.toString(getPK()));
-        stateEvent = new Event<>();
-        fieldEvent = new Event<>();
-        nameChangeEvent = new Event<>();
-        titleChangeEvent = new Event<>();
+    public Entity(Class<? extends Rest<R>> restclass) {
+        this.restclass = restclass;
+        stateEvent = new Event();
+        fieldEvent = new Event();
+        nameChangeEvent = new Event();
+        titleChangeEvent = new Event();
         EntityState oldState = state;
         state = NEW;
         fireStateChange(CREATE, oldState, state);
         //
-        this.em = em;
-        primaryKeyChangeEvent = new Event<>();
-        entitystatechangelistener = new EntityStateChangeListener("entity:" + instanceDescription());
+        primaryKeyChangeEvent = new Event();
+        entitystatechangelistener = new EntityStateChangeListener();
         addStateListener(entitystatechangelistener);
         // and as this is new it is saveable (too early to rely on listener)
         savable.add();
@@ -155,7 +138,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void addStateListener(Listener<EntityStateChangeEventParams> listener) {
+    public final void addStateListener(Listener listener) {
         stateEvent.addListener(listener);
     }
 
@@ -164,7 +147,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void removeStateListener(Listener<EntityStateChangeEventParams> listener) {
+    public final void removeStateListener(Listener listener) {
         stateEvent.removeListener(listener);
     }
 
@@ -173,7 +156,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void addFieldListener(Listener<EntityFieldChangeEventParams<F>> listener) {
+    public final void addFieldListener(Listener listener) {
         fieldEvent.addListener(listener);
     }
 
@@ -182,7 +165,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void removeFieldListener(Listener<EntityFieldChangeEventParams<F>> listener) {
+    public final void removeFieldListener(Listener listener) {
         fieldEvent.removeListener(listener);
     }
 
@@ -192,14 +175,14 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      * @param field the field Id
      */
     protected final void fireFieldChange(F field) {
-        fieldEvent.fire(new EntityFieldChangeEventParams<>(field));
+        fieldEvent.fire(field);
     }
 
     /**
      * Fire actions on all field change listeners relating to all fields.
      */
     protected final void fireFieldChange() {
-        fieldEvent.fire(new EntityFieldChangeEventParams<>(null));
+        fieldEvent.fire(null);
     }
 
     /**
@@ -218,7 +201,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void addNameListener(Listener<SimpleEventParams> listener) {
+    public final void addNameListener(Listener listener) {
         nameChangeEvent.addListener(listener);
     }
 
@@ -227,7 +210,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void removeNameListener(Listener<SimpleEventParams> listener) {
+    public final void removeNameListener(Listener listener) {
         nameChangeEvent.removeListener(listener);
     }
 
@@ -235,7 +218,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      * Fire Listeners if name changes.
      */
     protected void nameListenerFire() {
-        nameChangeEvent.fire(new SimpleEventParams());
+        nameChangeEvent.fire(null);
     }
 
     /**
@@ -243,7 +226,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void addTitleListener(Listener<SimpleEventParams> listener) {
+    public final void addTitleListener(Listener listener) {
         titleChangeEvent.addListener(listener);
     }
 
@@ -252,7 +235,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void removeTitleListener(Listener<SimpleEventParams> listener) {
+    public final void removeTitleListener(Listener listener) {
         titleChangeEvent.removeListener(listener);
     }
 
@@ -260,7 +243,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      * Fire Listeners if title changes.
      */
     protected void titleListenerFire() {
-        titleChangeEvent.fire(new SimpleEventParams());
+        titleChangeEvent.fire(null);
     }
 
     /**
@@ -333,12 +316,12 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      * Load Data from entity storage into this entity and fire the field change
      * at load listeners.
      *
-     * @param pk the entity primary key
+     * @param id the entity primary key
      */
-    protected void load(int pk) {
+    protected void load(int id) {
         if (isPersistent()) {
-            R baseentity = rest.get(pk);
-            LogBuilder.writeLog("nbpcglibrary.data", this, "loader", baseentity.toString());
+            Rest<R> rest = ApplicationLookup.getDefault().lookup(restclass);
+            R baseentity = rest.get(id);
             EntityState oldState = getState();
             setBaseEntity(baseentity);
             setState(DBENTITY);
@@ -352,7 +335,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      *
      * @param listener the listener
      */
-    public final void removePrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<Integer>> listener) {
+    public final void removePrimaryKeyListener(Listener listener) {
         primaryKeyChangeEvent.removeListener(listener);
     }
 
@@ -363,7 +346,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      * @param mode the indicators of listener action (on current thread or on
      * event queue; priority/normal)
      */
-    public final void addPrimaryKeyListener(Listener<PrimaryKeyChangeEventParams<Integer>> listener, Event.ListenerMode mode) {
+    public final void addPrimaryKeyListener(Listener listener, Event.ListenerMode mode) {
         primaryKeyChangeEvent.addListener(listener, mode);
     }
 
@@ -374,6 +357,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
      * @return true if save is successful
      */
     public boolean save(StringBuilder sb) {
+        Rest<R> rest;
         EntityFields ef = new EntityFields();
         EntityState oldState = getState();
         switch (oldState) {
@@ -389,11 +373,10 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
                 if (!entityValues(ef)) {
                     return false;
                 }
-                em.removeFromCache((E) this);
+                rest = ApplicationLookup.getDefault().lookup(restclass);
                 setBaseEntity(rest.create(getBaseEntity()));
                 int newPK = getPK();
-                em.insertIntoCache(newPK, (E) this);
-                primaryKeyChangeEvent.fire(new PrimaryKeyChangeEventParams<>(newPK));
+                primaryKeyChangeEvent.fire(newPK);
                 setState(DBENTITY);
                 break;
             case DBENTITYEDITING:
@@ -404,6 +387,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
                     return false;
                 }
                 if (!ef.isEmpty()) {
+                    rest = ApplicationLookup.getDefault().lookup(restclass);
                     setBaseEntity(rest.update(getPK(), getBaseEntity()));
                 }
                 setState(DBENTITY);
@@ -427,15 +411,16 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
             case NEW:
             case NEWEDITING:
                 entityRemove();
-                em.removeFromCache((E) this);
+                //em.removeFromCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
                 return;
             case DBENTITY:
             case DBENTITYEDITING:
                 entityRemove();
+                Rest<R> rest = ApplicationLookup.getDefault().lookup(restclass);
                 rest.delete(getPK());
-                em.removeFromCache((E) this);
+                //em.removeFromCache((E) this);
                 setState(REMOVED);
                 fireStateChange(REMOVE, oldState, REMOVED);
                 return;
@@ -460,15 +445,11 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
         throw new LogicException("Should not be trying to copy an entity in " + oldState + " state");
     }
 
-    private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
-
-        public EntityStateChangeListener(String name) {
-            super(name);
-        }
+    private class EntityStateChangeListener extends Listener {
 
         @Override
-        public void action(EntityStateChangeEventParams p) {
-            switch (p.getTransition()) {
+        public void action(Object p) {
+            switch ( ((EntityStateChangeEventParams) p).getTransition()) {
                 case EDIT:
                     savable.add();
                     break;
@@ -493,7 +474,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
     }
 
 //    private class EntitySavable<E, P, F> extends AbstractSavable implements Icon, HasInstanceDescription {
-    private class EntitySavable<E> extends AbstractSavable implements Icon, HasInstanceDescription {
+    private class EntitySavable<E> extends AbstractSavable implements Icon {
 
         private Icon icon;
         private boolean isRegisteredAsOutstanding = false;
@@ -526,19 +507,12 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
         }
 
         @Override
-        public String instanceDescription() {
-            return LogBuilder.instanceDescription(this, entityname);
-        }
-
-        @Override
         protected void handleSave() throws IOException {
-            LogBuilder.writeLog("nbpcglibrary.data", this, "handleSave");
             StringBuilder sb = new StringBuilder();
             if (!Entity.this.save(sb)) {
                 EventQueue.invokeLater(new ReRegister());
                 LibraryOnStop.incRegisterOutstanding();
                 // TODO - should we place the error message in a visible place
-                LogBuilder.writeLog("nbpcglibrary.data", this, "handleSave-failure", sb.toString());
             }
         }
 
@@ -553,7 +527,7 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
 
         @Override
         protected String findDisplayName() {
-            return getDisplayTitle();
+            return "was getDisplayname()";
         }
 
         @Override
@@ -602,21 +576,6 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
     abstract protected void entitySaveState();
 
     /**
-     * Get the key string which will be used in when sorting this entity
-     *
-     * @return the sort key
-     */
-    public abstract String getSortKey();
-
-    /**
-     * get the title string which will be used to display the fully in context
-     * name for the entity
-     *
-     * @return the title string
-     */
-    public abstract String getDisplayTitle();
-
-    /**
      * Add all field values to the given Entity Fields Object
      *
      * @param ef the entityfields object
@@ -650,9 +609,4 @@ public abstract class Entity<R, E extends Entity, P extends CoreEntity, F> exten
     abstract protected R getBaseEntity();
 
     abstract protected void setBaseEntity(R entity);
-
-    @Override
-    public String toString() {
-        return getDisplayTitle();
-    }
 }

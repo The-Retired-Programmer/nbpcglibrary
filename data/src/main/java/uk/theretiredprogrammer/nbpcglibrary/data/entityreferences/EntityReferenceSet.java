@@ -17,13 +17,14 @@ package uk.theretiredprogrammer.nbpcglibrary.data.entityreferences;
 
 import java.util.ArrayList;
 import java.util.List;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
+import java.util.function.Function;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.SetChangeEventParams;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.common.Event;
 import uk.theretiredprogrammer.nbpcglibrary.common.Rule;
-import org.openide.util.Lookup;
+import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationLookup;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.common.Event.ListenerMode;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 
@@ -32,36 +33,34 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * required.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <E> the eEntity Class
+ * @param <R> the BasicEntity (data transfer) Class
+ * @param <E> the Entity Class
  * @param <P> the parent Entity class
  */
-public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
+public class EntityReferenceSet<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> {
 
-    /**
-     * The Entity Manager associated with the entities
-     */
-    protected final EntityManager<E, P> em;
     /**
      * The list of Entity References
      */
-    protected final List<EntityReference<E, P>> childList;
+    protected final List<EntityReference<R, E, P>> childList;
 
     /**
      * The name of the Set (for reporting purposes)
      */
-    protected final String name;
-    private final Event<SetChangeEventParams> setChangeEvent;
+    private final Event setChangeEvent;
+    protected final Class<? extends Rest<R>> restclass;
+    protected final Function<R, E> entitycreator;
 
     /**
      * Constructor.
      *
-     * @param name the set name (for reporting)
-     * @param emclass the associated entity manager class
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      */
-    public EntityReferenceSet(String name,  Class<? extends EntityManager> emclass) {
-        this.name = name;
-        setChangeEvent = new Event<>();
-        em = Lookup.getDefault().lookup(emclass);
+    public EntityReferenceSet(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass) {
+        this.restclass = restclass;
+        this.entitycreator = entitycreator;
+        setChangeEvent = new Event();
         childList = new ArrayList<>();
     }
     
@@ -69,18 +68,18 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      * Load the set with all required entity references.
      */
     public void load(){
-        getPrimaryKeySet().stream().forEach((ref) -> {
-            childList.add(new EntityReference<>(name, ref, em));
+        getPrimaryKeySet(ApplicationLookup.getDefault().lookup(restclass)).stream().forEach((ref) -> {
+            childList.add(new EntityReference<>(entitycreator, restclass, ref.getId()));
         });
     }
     
     /**
      * Get the set of primary keys for this entity set.
+     * @param rest The Ret client to access these basic entities
      * @return  the set of primary keys
      */
-    protected List<Integer> getPrimaryKeySet() {
-//        return epp.find();
-        return null;
+    protected List<R> getPrimaryKeySet(Rest<R> rest) {
+        return rest.getAll();
     }
 
     /**
@@ -89,7 +88,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      *
      * @param listener the listener
      */
-    public final void addSetListener(Listener<SetChangeEventParams> listener) {
+    public final void addSetListener(Listener listener) {
         setChangeEvent.addListener(listener);
     }
 
@@ -101,7 +100,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      * @param listener the listener
      * @param mode the listener mode
      */
-    public final void addSetListener(Listener<SetChangeEventParams> listener, ListenerMode mode) {
+    public final void addSetListener(Listener listener, ListenerMode mode) {
         setChangeEvent.addListener(listener, mode);
     }
 
@@ -110,7 +109,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      *
      * @param listener the listener
      */
-    public final void removeSetListener(Listener<SetChangeEventParams> listener) {
+    public final void removeSetListener(Listener listener) {
         setChangeEvent.removeListener(listener);
     }
 
@@ -118,7 +117,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      * Fire all set change listeners.
      */
     protected void fireSetChange() {
-        setChangeEvent.fire(new SetChangeEventParams());
+        setChangeEvent.fire(null);
     }
 
     /**
@@ -160,7 +159,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      * @param e the new entity
      */
     public void add(E e)  {
-        childList.add(new EntityReference<>(name, e, em));
+        childList.add(new EntityReference<>(entitycreator, restclass, e));
         fireSetChange();
     }
 
@@ -171,7 +170,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      * @param e the new entity
      */
     protected final void add(int index, E e)  {
-        childList.add(index, new EntityReference<>(name, e, em));
+        childList.add(index, new EntityReference<>(entitycreator, restclass, e));
         fireSetChange();
     }
 
@@ -183,7 +182,7 @@ public class EntityReferenceSet<E extends Entity, P extends CoreEntity> {
      */
     public boolean remove(E e) {
         int pk = e.getPK();
-        for (EntityReference<E, P> ref : childList) {
+        for (EntityReference<R, E, P> ref : childList) {
             if (ref.getPK() == pk) {
                 if (childList.remove(ref)) {
                     fireSetChange();

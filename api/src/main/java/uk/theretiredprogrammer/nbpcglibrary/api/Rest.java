@@ -26,7 +26,7 @@ import java.util.Map;
  * @param <E> the entity class being transferred
  */
 public interface Rest<E> {
-
+    
     /**
      * Open the Rest Stream.
      *

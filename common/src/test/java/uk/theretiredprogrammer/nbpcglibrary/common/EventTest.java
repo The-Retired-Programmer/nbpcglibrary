@@ -52,20 +52,39 @@ public class EventTest {
     public void tearDown() {
     }
 
-    public class TestListener extends Listener<SimpleEventParams> {
-
-        private final String description;
-
-        public TestListener(String description) {
-            super(description);
-            this.description = description;
-        }
+    public class I_TestListener extends Listener {
 
         @Override
-        public void action(SimpleEventParams p) {
+        public void action(Object p) {
             actionCount++;
-            firedFromList.add(description);
+            firedFromList.add("immediate");
+        }
+    }
+    
+    public class PI_TestListener extends Listener {
 
+        @Override
+        public void action(Object p) {
+            actionCount++;
+            firedFromList.add("priority-immediate");
+        }
+    }
+    
+    public class E_TestListener extends Listener {
+
+        @Override
+        public void action(Object p) {
+            actionCount++;
+            firedFromList.add("eventqueue");
+        }
+    }
+    
+    public class PE_TestListener extends Listener {
+
+        @Override
+        public void action(Object p) {
+            actionCount++;
+            firedFromList.add("priority-eventqueue");
         }
     }
 
@@ -78,10 +97,10 @@ public class EventTest {
     @Test
     public void testFireListener() {
         System.out.println("afire Listener");
-        TestListener i = new TestListener("immediate");
-        TestListener ip = new TestListener("priority-immediate");
-        TestListener e = new TestListener("eventqueue");
-        TestListener ep = new TestListener("priority-eventqueue");
+        Listener i = new I_TestListener();
+        Listener ip = new PI_TestListener();
+        Listener e = new E_TestListener();
+        Listener ep = new PE_TestListener();
         Event event = new Event();
         event.addListener(i, ListenerMode.IMMEDIATE);
         event.addListener(ip, ListenerMode.PRIORITY_IMMEDIATE);
@@ -89,7 +108,7 @@ public class EventTest {
         event.addListener(e, ListenerMode.EVENTQUEUE);
         actionCount = 0;
         firedFromList = new LinkedList<>();
-        event.fire(new SimpleEventParams());
+        event.fire(null);
         assertEquals(2, actionCount);
         assertEquals(2, firedFromList.size());
         assertEquals("priority-immediate", firedFromList.get(0));
@@ -112,9 +131,10 @@ public class EventTest {
      * Test of add/remove Listener method, of class Event.
      */
     @Test
+    @SuppressWarnings("UnusedAssignment")
     public void testAddRemoveListener() {
         System.out.println("add/remove Listener");
-        TestListener l = new TestListener("testlistener");
+        Listener l = new I_TestListener();
         //
         Event event = new Event();
         int c = event.listenerCount();
@@ -136,7 +156,7 @@ public class EventTest {
         assertEquals(0, c);
         assert (!event.hasListener());
         //
-        TestListener l2 = new TestListener("testlistener2");
+        Listener l2 = new I_TestListener();
         event.addListener(l);
         event.addListener(l2);
         c = event.listenerCount();

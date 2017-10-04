@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.common;
 
 import java.util.List;
-import java.util.logging.Level;
 
 /**
  * An Abstract Class used to find a set of values.
@@ -44,8 +43,6 @@ public abstract class FindAction<C> {
      */
     public List<C> find() {
         List<C> res = findValues();
-        LogBuilder.create("nbpcglibrary.common", Level.FINE).addMethodName(this, "find")
-                .addMsg("FindAction is {0} - returns  {1} values", this, res.size()).write();
         return res;
     }
 

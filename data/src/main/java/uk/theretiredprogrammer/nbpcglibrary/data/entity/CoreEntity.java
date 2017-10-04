@@ -23,7 +23,6 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
-import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
 import uk.theretiredprogrammer.nbpcglibrary.common.Rule;
 import uk.theretiredprogrammer.nbpcglibrary.common.Rules;
 import uk.theretiredprogrammer.nbpcglibrary.icons.SpecialIcons;
@@ -33,9 +32,10 @@ import uk.theretiredprogrammer.nbpcglibrary.icons.SpecialIcons;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public abstract class CoreEntity extends Rules implements HasInstanceDescription {
+public abstract class CoreEntity extends Rules {
 
-    private String iconname;
+    // temp until icons are totally moved to Node
+    private final String iconname = "asterisk_orange";
     private final InstanceContent lookupcontent;
     private final Lookup lookup;
 
@@ -44,43 +44,16 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
      * objects
      */
     protected final DateFormat DATETIME_ISO8601;
-    /**
-     * The date format for translating datetime strings in readable format
-     * to/from Date objects
-     */
-    protected final DateFormat DATETIME_READABLE;
-    /**
-     * The date format for translating dateonly string in readable format
-     * to/from Date objects
-     */
-    protected final DateFormat DATEONLY_READABLE;
 
     /**
      * Constructor.
-     *
-     * @param entityname the name of the entity class (for reporting purposes)
-     * @param iconname name of the icon graphic
      */
-    public CoreEntity(String entityname, String iconname) {
-        super();
-        this.iconname = iconname;
+    public CoreEntity() {
         lookupcontent = new InstanceContent();
         lookup = new AbstractLookup(lookupcontent);
         DATETIME_ISO8601 = new SimpleDateFormat("yyyyMMddHHmmss");
         DATETIME_ISO8601.setLenient(false);
-        DATETIME_READABLE = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-        DATETIME_READABLE.setLenient(true);
-        DATEONLY_READABLE = new SimpleDateFormat("dd-MMM-yyyy");
-        DATEONLY_READABLE.setLenient(true);
-    }
-
-    /**
-     * Set the Icon for this entity
-     *
-     * @param iconname the name of the icon (from icon library)
-     */
-    public void setIcon(String iconname) {
-        this.iconname = iconname;
+        
     }
 
     /**
@@ -160,11 +133,4 @@ public abstract class CoreEntity extends Rules implements HasInstanceDescription
      * Restore entity state.
      */
     abstract protected void entityRestoreState();
-
-    /**
-     * get the string which will be used to display the name for the entity
-     *
-     * @return the name string
-     */
-    public abstract String getDisplayName();
 }

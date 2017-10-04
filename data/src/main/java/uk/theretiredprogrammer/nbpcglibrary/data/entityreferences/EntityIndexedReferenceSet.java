@@ -17,28 +17,31 @@ package uk.theretiredprogrammer.nbpcglibrary.data.entityreferences;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
 
 /**
  * Manages the list of Entities - implements a re-orderable entity lists
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <R> the BasicEntity (data transfer) Class
  * @param <E> the Entity Class
  * @param <P> the parent entity
  */
-public class EntityIndexedReferenceSet<E extends Entity, P extends CoreEntity> extends EntityReferenceSet<E, P> {
+public class EntityIndexedReferenceSet<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> extends EntityReferenceSet<R, E, P> {
 
     /**
      * Constructor.
      *
-     * @param name the set name (for reporting)
-     * @param emclass the associated entity manager class
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      */
-    public EntityIndexedReferenceSet(String name, Class<? extends EntityManager> emclass) {
-        super(name, emclass);
+    public EntityIndexedReferenceSet(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass) {
+        super(entitycreator, restclass);
     }
 
     /**
@@ -62,7 +65,7 @@ public class EntityIndexedReferenceSet<E extends Entity, P extends CoreEntity> e
                 permin++;
             }
         }
-        List<EntityReference<E, P>> reordered = new ArrayList<>(clsize);
+        List<EntityReference<R, E, P>> reordered = new ArrayList<>(clsize);
         for (int i = 0; i < clsize; i++) {
             reordered.add(null);
         }

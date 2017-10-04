@@ -26,8 +26,6 @@ import org.openide.explorer.ExplorerUtils;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Node;
 import org.openide.windows.TopComponent;
-import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * Top component which displays an explorer object
@@ -35,7 +33,7 @@ import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
 @RegisterLog("nbpcglibrary.topcomponent")
-public abstract class ExplorerTopComponent extends TopComponent implements ExplorerManager.Provider, HasInstanceDescription {
+public abstract class ExplorerTopComponent extends TopComponent implements ExplorerManager.Provider {
 
     private final ExplorerManager em = new ExplorerManager();
     private final String topComponentName;
@@ -51,7 +49,6 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
     @SuppressWarnings("LeakingThisInConstructor")
     public ExplorerTopComponent(String topComponentName, JScrollPane viewComponent, String name, String hint) {
         this.topComponentName = topComponentName;
-        LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, name, hint);
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -88,13 +85,11 @@ public abstract class ExplorerTopComponent extends TopComponent implements Explo
 
     @Override
     public void componentOpened() {
-        LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentOpened");
         em.setRootContext(getRootContextNode());
     }
 
     @Override
     public void componentClosed() {
-        LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentClosed");
         dropRootContextNode();
         em.setRootContext(Node.EMPTY);
     }

@@ -16,15 +16,15 @@
 package uk.theretiredprogrammer.nbpcglibrary.data.entityreferences;
 
 import java.lang.ref.WeakReference;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
+import java.util.function.Function;
+import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationLookup;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.common.Rule;
 import uk.theretiredprogrammer.nbpcglibrary.common.Event;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
-import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
 import static uk.theretiredprogrammer.nbpcglibrary.common.Event.ListenerMode.IMMEDIATE;
-import uk.theretiredprogrammer.nbpcglibrary.common.SimpleEventParams;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 
 /**
@@ -35,30 +35,31 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * entity can be reloaded if required.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <R> the BasicEntity (data transfer) Class
  * @param <E> The Entity Class
  * @param <P> The Parent Entity Class
  */
-public class EntityReference<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
+public class EntityReference<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity>  {
 
-    private final String name;
     private int pk;
     private int savePK;
     private WeakReference<E> entityreference = null;
-    private final EntityManager<E, P> em;
     private final PrimaryKeyListener pkListener;
-    private Listener<SimpleEventParams> titleListener = null;
+    private Listener titleListener = null;
+    private final Class<? extends Rest<R>> restclass;
+    private final Function<R,E> entitycreator;
 
     /**
      * Constructor.
      *
-     * @param name the name of the entity (for reporting)
-     * @param em the associated Entity Manager
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity 
      */
-    public EntityReference(String name, EntityManager<E, P> em) {
-        this.name = name;
-        this.em = em;
+    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass) {
+        this.restclass = restclass;
         this.pk = 0;
         this.entityreference = null;
+        this.entitycreator = entitycreator;
         pkListener = null;
         saveState();
     }
@@ -66,27 +67,27 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
     /**
      * Constructor.
      *
-     * @param name the name of the entity (for reporting)
-     * @param em the associated Entity Manager
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      * @param listener a listener to receive title change actions
      */
-    public EntityReference(String name, EntityManager<E, P> em, Listener<SimpleEventParams> listener) {
-        this(name, em);
+    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, Listener listener) {
+        this(entitycreator, restclass);
         titleListener = listener;
     }
 
     /**
      * Constructor.
      *
-     * @param name the name of the entity (for reporting)
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      * @param pk the primary key
-     * @param em the associated Entity Manager
      */
-    public EntityReference(String name, int pk, EntityManager<E, P> em) {
-        this.name = name;
-        this.em = em;
+    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, int pk) {
+        this.restclass = restclass;
         this.pk = pk;
         this.entityreference = null;
+        this.entitycreator = entitycreator;
         pkListener = null;
         saveState();
     }
@@ -94,27 +95,27 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
     /**
      * Constructor.
      *
-     * @param name the name of the entity (for reporting)
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      * @param pk the primary key
-     * @param em the associated Entity Manager
      * @param listener a listener to receive title change actions
      */
-    public EntityReference(String name, int pk, EntityManager<E, P> em, Listener<SimpleEventParams> listener) {
-        this(name, pk, em);
+    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, int pk, Listener listener) {
+        this(entitycreator, restclass, pk);
         titleListener = listener;
     }
 
     /**
      * Constructor.
      *
-     * @param name the name of the entity (for reporting)
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      * @param e the entity
-     * @param em the associated Entity Manager
      */
-    public EntityReference(String name, E e, EntityManager<E, P> em) {
-        this.name = name;
-        this.em = em;
-        pkListener = new PrimaryKeyListener(name);
+    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, E e) {
+        this.restclass = restclass;
+        this.entitycreator = entitycreator;
+        pkListener = new PrimaryKeyListener();
         this.pk = e.getPK();
         if (!e.isPersistent()) {
             e.addPrimaryKeyListener(pkListener, IMMEDIATE);
@@ -125,20 +126,15 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
     /**
      * Constructor.
      *
-     * @param name the name of the entity (for reporting)
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      * @param e the entity
-     * @param em the associated Entity Manager
      * @param listener a listener to receive title change actions
      */
-    public EntityReference(String name, E e, EntityManager<E, P> em, Listener<SimpleEventParams> listener) {
-        this(name, e, em);
+    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, E e, Listener listener) {
+        this(entitycreator, restclass, e);
         titleListener = listener;
         e.addTitleListener(listener);
-    }
-
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this, name);
     }
 
     /**
@@ -149,7 +145,6 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      */
     public boolean set() {
         if (pk != 0) {
-            LogBuilder.writeLog("nbpcglibrary.data", this, "set");
             if (titleListener != null) {
                 E old = getNoLoad();
                 if (old != null) {
@@ -163,41 +158,42 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
         return false;
     }
 
-    /**
-     * Set the reference by entity primary key.
-     *
-     * @param pk the primary key
-     * @return true if referenced entity is different (ie primary key has
-     * changed)
-     */
-    public boolean set(int pk) {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "set", pk);
-        if (pk == 0) {
-            return set();
-        }
-        boolean updated = (this.pk == 0 || this.pk != pk);
-        if (updated) {
-            if (titleListener != null) {
-                E old = getNoLoad();
-                if (old != null) {
-                    old.removeTitleListener(titleListener);
-                }
-                this.pk = pk;
-                E e = em.get(pk);
-                this.entityreference = e == null ? null : new WeakReference<>(e);
-                if (titleListener != null) {
-                    if (e != null) {
-                        e.addTitleListener(titleListener);
-                    }
-                    Event.fireSimpleEventParamsListener(titleListener);
-                }
-            } else {
-                this.pk = pk;
-                this.entityreference = null;
-            }
-        }
-        return updated;
-    }
+//    /**
+//     * Set the reference by entity primary key.
+//     *
+//     * @param pk the primary key
+//     * @return true if referenced entity is different (ie primary key has
+//     * changed)
+//     */
+//    public boolean set(int pk) {
+//        if (pk == 0) {
+//            return set();
+//        }
+//        boolean updated = (this.pk == 0 || this.pk != pk);
+//        if (updated) {
+//            if (titleListener != null) {
+//                E old = getNoLoad();
+//                if (old != null) {
+//                    old.removeTitleListener(titleListener);
+//                }
+//                this.pk = pk;
+//                Rest<R> rest = ApplicationLookup.getDefault().lookup(restclass);
+//                R basicentity = rest.get(pk);
+//                E e = em.get(pk);
+//                this.entityreference = e == null ? null : new WeakReference<>(e);
+//                if (titleListener != null) {
+//                    if (e != null) {
+//                        e.addTitleListener(titleListener);
+//                    }
+//                    Event.fireSimpleEventParamsListener(titleListener);
+//                }
+//            } else {
+//                this.pk = pk;
+//                this.entityreference = null;
+//            }
+//        }
+//        return updated;
+//    }
     
     /**
      * Set the reference by entity.
@@ -207,7 +203,6 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
      * changed)
      */
     public boolean set(E e) {
-        LogBuilder.writeLog("nbpcglibrary.data", this, "set", e.instanceDescription());
         int epk = e.getPK();
         boolean updated = (this.pk == 0 || this.pk != epk);
         if (updated) {
@@ -233,15 +228,11 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
         return updated;
     }
 
-    private class PrimaryKeyListener extends Listener<PrimaryKeyChangeEventParams<Integer>> {
-
-        public PrimaryKeyListener(String name) {
-            super(name);
-        }
+    private class PrimaryKeyListener extends Listener {
 
         @Override
-        public void action(PrimaryKeyChangeEventParams<Integer> p) {
-            pk = p.getNewPKey();
+        public void action(Object p) {
+            pk = (int) p;
             saveState();
         }
     }
@@ -261,11 +252,14 @@ public class EntityReference<E extends Entity, P extends CoreEntity> implements 
         if (pk == 0) {
             return null;
         }
-        E e = em.get(pk);
-        this.entityreference = e == null ? null : new WeakReference<>(e);
-        if (e != null) {
-            e.addTitleListener(titleListener);
+        Rest<R> rest = ApplicationLookup.getDefault().lookup(restclass);
+        R baseentity = rest.get(pk);
+        if (baseentity == null){
+            return null;
         }
+        E e = entitycreator.apply(baseentity);
+        this.entityreference = new WeakReference<>(e);
+        e.addTitleListener(titleListener);
         return e;
     }
 

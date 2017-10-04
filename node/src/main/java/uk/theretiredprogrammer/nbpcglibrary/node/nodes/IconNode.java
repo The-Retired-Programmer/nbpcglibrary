@@ -19,9 +19,8 @@ import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
+import java.util.function.Function;
 import javax.imageio.ImageIO;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
 import uk.theretiredprogrammer.nbpcglibrary.node.ImageFileFinder;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 import org.openide.cookies.InstanceCookie;
@@ -29,7 +28,8 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
 
@@ -37,28 +37,29 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
  * Read-Write Icon Node Abstract Class
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <R> the base entity class used in the rest transfer
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
  * @param <F> the Entity Field enum class
  */
-public abstract class IconNode<E extends Entity, P extends CoreEntity, F> extends TreeNode<E, P, F> {
+public abstract class IconNode<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity, F> extends TreeNode<R, E, P, F> {
 
     private final ImageFileFinder<E> imagefilefinder;
-    private final String nodename;
 
     /**
      * Constructor
      *
      * @param nodename the node name
+     * @param entitycreator a creator function for the Entity
      * @param e the entity
      * @param cf the childfactory
-     * @param emclass the entity manager class
+     * @param restclass class of the rest client for this entity
      * @param allowedDataFlavors allowed paste actions
+     * @param iconName the name of the icon (from the Icons set)
      * @param operationsEnabled set for copy , cut and delete enabled
      */
-    public IconNode(String nodename, E e, BasicChildFactory<E, P> cf, Class<? extends EntityManager> emclass, DataFlavor[] allowedDataFlavors, int operationsEnabled) {
-        super(nodename, e, cf, emclass, allowedDataFlavors, operationsEnabled);
-        this.nodename = nodename;
+    public IconNode(String nodename, Function<R,E> entitycreator, E e, BasicChildFactory<R, E, P> cf, Class<? extends Rest<R>> restclass, DataFlavor[] allowedDataFlavors, String iconName, int operationsEnabled) {
+        super(entitycreator, e, cf, restclass, allowedDataFlavors, iconName, operationsEnabled);
         imagefilefinder = getImageFileFinder(nodename);
     }
 
@@ -66,13 +67,14 @@ public abstract class IconNode<E extends Entity, P extends CoreEntity, F> extend
      * Constructor.
      *
      * @param nodename the node name
+     * @param entitycreator a creator function for the Entity
      * @param e the entity
-     * @param emclass the entity manager class
+     * @param restclass class of the rest client for this entity
+     * @param iconName the name of the icon (from the Icons set)
      * @param operationsEnabled set for copy , cut and delete enabled
      */
-    protected IconNode(String nodename, E e, Class<? extends EntityManager> emclass, int operationsEnabled) {
-        super(nodename, e, emclass, operationsEnabled);
-        this.nodename = nodename;
+    protected IconNode(String nodename, Function<R,E> entitycreator, E e, Class<? extends Rest<R>> restclass, String iconName, int operationsEnabled) {
+        super(entitycreator, e, restclass, iconName, operationsEnabled);
         imagefilefinder = getImageFileFinder(nodename);
     }
 
@@ -117,15 +119,11 @@ public abstract class IconNode<E extends Entity, P extends CoreEntity, F> extend
         E entity = getEntity();
         File fi = imagefilefinder.getFile(entity);
         if (fi == null) {
-            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
-                    .addMsg("Nodename is {0} - No image defined", nodename).write();
             return entity.getIconWithError();
         }
         try {
             return entity.checkRules(new StringBuilder()) ? ImageIO.read(fi) : entity.addErrorToIcon(ImageIO.read(fi));
         } catch (IOException ex) {
-            LogBuilder.create("nbpcglibrary.node", Level.WARNING).addMethodName(this, "getIcon")
-                    .addMsg("Nodename is {0} - IOException when reading image", nodename).addExceptionMessage(ex).write();
             return entity.getIconWithError();
         }
     }

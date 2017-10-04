@@ -47,7 +47,6 @@ import javax.json.JsonReader;
 import javax.json.JsonValue;
 import javax.json.JsonWriter;
 import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
@@ -107,7 +106,6 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
 
     @Override
     public E get(int id) {
-        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "get", id);
         try {
             List<E> response = query(buildsql("SELECT * from " + tablename + " WHERE id={P}", id));
             if (response.size() != 1) {
@@ -115,14 +113,12 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
             }
             return response.get(0);
         } catch (SQLException ex) {
-            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "get", id);
             return null;
         }
     }
 
     @Override
     public final List<E> getAll() {
-        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "get");
         String sql = ordercolumn == null
                 ? "SELECT * from " + tablename
                 : "SELECT * from " + tablename + " ORDER BY " + ordercolumn;
@@ -135,7 +131,6 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
     
     @Override
     public List<E> getMany(String filtername, int filtervalue) {
-      LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "get");
         String sql = ordercolumn == null
                 ? buildsql("SELECT * from " + tablename + " where " + filtername + "={P}", filtervalue)
                 : buildsql("SELECT * from " + tablename + " where " + filtername + "={P} ORDER BY " + ordercolumn, filtervalue);
@@ -238,7 +233,6 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
 //    }
     @Override
     public final E create(E entity) {
-        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "insert", entity);
         addTimestampInfo(entity);
         try {
             execute(buildsql("INSERT INTO " + tablename + " ({$KEYLIST}) VALUES ({$VALUELIST})", entity));
@@ -252,10 +246,8 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
             if (updated.size() != 1) {
                 throw new LogicException("Single row expected");
             }
-            LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "insert", updated);
             return updated.get(0);
         } catch (SQLException ex) {
-            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "insert", entity);
             throw new LogicException(ex.getMessage());
         }
     }
@@ -273,7 +265,6 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
 
     @Override
     public final E update(int id, E entity) {
-        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "update", id);
         updateTimestampInfo(entity);
         try {
             execute(buildsql(buildsql("UPDATE " + tablename + " SET {$KEYVALUELIST} WHERE id= {P}", id), entity));
@@ -281,10 +272,8 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
             if (updated.size() != 1) {
                 throw new LogicException("Single row expected");
             }
-            LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "update", updated);
             return updated.get(0);
         } catch (SQLException ex) {
-            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "update", id, entity);
             return null;
         }
     }
@@ -306,12 +295,10 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
 
     @Override
     public final boolean delete(int id) {
-        LogBuilder.writeLog("nbpcglib.localdatabaseaccess", this, "delete", id);
         try {
             execute(buildsql("DELETE from " + tablename + " WHERE id = {P}", id));
             return true;
         } catch (SQLException ex) {
-            LogBuilder.writeExceptionLog("nbpcglib.localdatabaseaccess", ex, this, "delete", id);
             return false;
         }
     }
@@ -340,7 +327,6 @@ public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
                 sql = sql.replace("{" + entry.getKey() + "}", entry.getValue().toString());
             }
         }
-        LogBuilder.writeExitingLog("nbpcglib.localdatabaseaccess", this, "buildsql", sql);
         return sql;
     }
 

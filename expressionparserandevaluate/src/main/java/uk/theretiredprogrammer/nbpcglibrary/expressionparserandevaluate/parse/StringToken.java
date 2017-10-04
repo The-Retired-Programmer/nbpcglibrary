@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parse;
 
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parsetree.ParseTree;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * A String Value Token.
@@ -34,11 +33,6 @@ public class StringToken implements TerminalToken {
      */
     public StringToken(String value) {
         this.value = value;
-    }
-    
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this,"\""+value+"\"");
     }
 
     /**

@@ -15,14 +15,18 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
+import uk.theretiredprogrammer.nbpcglibrary.htmlrest.AandA;
 import java.io.InputStream;
+import java.util.List;
+import java.util.function.Supplier;
 import org.openide.LifecycleManager;
 import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
 import uk.theretiredprogrammer.nbpcglibrary.form.ErrorInformationDialog;
 import org.openide.windows.WindowManager;
+import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationLookup;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
-import uk.theretiredprogrammer.nbpcglibrary.common.SimpleEventParams;
 import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
 
 /**
@@ -35,15 +39,18 @@ public abstract class LifeCycle implements Runnable {
     
     private static final ExitApplication EXITAPPLICATION = new ExitApplication();
     private static boolean authorisationRequired;
+    private static List<Supplier<? extends Rest>> restclasscreators;
 
     /**
      * Constructor.
      *
      * @param in the Application Properties File inputstream
+     * @param restclasscreators list of classes to be used to access data
      * @param authorisationRequired true if authorisation is required when opening this application
      */
-    protected LifeCycle(InputStream in, boolean authorisationRequired) {
+    protected LifeCycle(InputStream in, List<Supplier<? extends Rest>> restclasscreators, boolean authorisationRequired) {
         LifeCycle.authorisationRequired = authorisationRequired;
+        LifeCycle.restclasscreators = restclasscreators;
         try {
             ApplicationProperties.set(in);
         } catch (ApplicationPropertiesException ex) {
@@ -56,16 +63,17 @@ public abstract class LifeCycle implements Runnable {
         if (authorisationRequired) {
             Dialog.showModal(
                     ApplicationProperties.getDefault().get("application.title"),
-                    new LoginPresenter((user,pwd)-> processAuthData(user,pwd)));
+                    new LoginPresenter((user,pwd)-> processAuthData(user,pwd, restclasscreators)));
         }
-        WindowManager.getDefault().setRole(isProblem() ? "PROBLEMS" : isWarning() ? "WARNINGS" : "OPERATIONAL");
     }
     
-    private void processAuthData(String user, String pwd){
+    private void processAuthData(String user, String pwd, List<Supplier<? extends Rest>> restclasscreators){
         AandA.authenticate(
                 ApplicationProperties.getDefault().get("jwt.claims.prefix"),
                 Settings.get("auth.server"),
                 user,pwd);
+        restclasscreators.forEach(creator-> ApplicationLookup.getDefault().add(creator.get()));
+        WindowManager.getDefault().setRole(isProblem() ? "PROBLEMS" : isWarning() ? "WARNINGS" : "OPERATIONAL");
     } 
 
      /**
@@ -138,17 +146,10 @@ public abstract class LifeCycle implements Runnable {
     /**
      * An Listener Class which when fired will close down the application.
      */
-    private static class ExitApplication extends Listener<SimpleEventParams> {
-
-        /**
-         * Constructor.
-         */
-        public ExitApplication() {
-            super("Exit_Application");
-        }
+    private static class ExitApplication extends Listener {
 
         @Override
-        public void action(SimpleEventParams lp) {
+        public void action(Object lp) {
             LifecycleManager.getDefault().exit();
         }
     }

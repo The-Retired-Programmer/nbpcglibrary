@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parse;
 
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parsetree.ParseTree;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * A Boolean Value Token.
@@ -34,11 +33,6 @@ public class BooleanToken implements TerminalToken {
      */
     public BooleanToken(boolean value) {
         this.value = value;
-    }
-    
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this,Boolean.toString(value));
     }
 
     /**

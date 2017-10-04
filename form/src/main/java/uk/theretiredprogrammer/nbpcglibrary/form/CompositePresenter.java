@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * Presenter for a composite object (composed of many vertically stacked
@@ -48,7 +47,6 @@ public class CompositePresenter implements PanePresenter<PanePresenter> {
     @SuppressWarnings("LeakingThisInConstructor")
     public CompositePresenter(String borderTitle) {
         this.view = new CompositeView(borderTitle);
-        LogBuilder.writeConstructorLog("nbpcglibrary.form", this);
     }
 
     @Override

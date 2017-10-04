@@ -15,12 +15,11 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.tokens;
 
-import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
 
 /**
  * The Operator Token Interface
  * 
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public interface Token extends HasInstanceDescription {
+public interface Token {
 }

@@ -22,7 +22,6 @@ import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.tokens.F
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.tokens.OperatorToken;
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.tokens.SOSToken;
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.tokens.Token;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 
 /**
@@ -82,7 +81,6 @@ public class LexicalAnalyser {
                     buffer.append(c);
                 }
                 t = new StringToken(buffer.toString());
-                LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", t);
                 return t;
             case '0':
             case '1':
@@ -107,7 +105,6 @@ public class LexicalAnalyser {
                     throwParseException("bad literal integer - illegal character - should never happen!");
                 }
                 t = new IntegerToken(ival);
-                LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", t);
                 return t;
             case '[':
                 buffer = new StringBuilder();
@@ -126,13 +123,11 @@ public class LexicalAnalyser {
                         || "set".equalsIgnoreCase(special) || "on".equalsIgnoreCase(special)
                         || "OK".equalsIgnoreCase(special)) {
                     t = new BooleanToken(Boolean.TRUE);
-                    LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", t);
                     return t;
                 }
                 if ("false".equalsIgnoreCase(special) || "no".equalsIgnoreCase(special) || "n".equalsIgnoreCase(special)
                         || "unset".equalsIgnoreCase(special) || "off".equalsIgnoreCase(special)) {
                     t = new BooleanToken(Boolean.FALSE);
-                    LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", t);
                     return t;
                 }
                 throwParseException("unknown special literal - " + special);
@@ -153,13 +148,11 @@ public class LexicalAnalyser {
                     name = ParseAndEvaluate.nonExactName(name);
                 }
                 t = new ParameterToken(name);
-                LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", t);
                 return t;
         }
         ptr--;
         for (OperatorToken ot : languagedefinition.getTokens()) {
             if (tokenMatcher(ot)) {
-               LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", ot);
                 ptr += ot.getTokenString().length();
                 return ot;
             }
@@ -180,7 +173,6 @@ public class LexicalAnalyser {
         if (function != null) {
             c = nextNonWSChar();
             if (c == languagedefinition.getFunctionBra()) {
-                LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", function);
                 return function;
             } else {
                 throwParseException("illegal function construct - expected " + languagedefinition.getFunctionBra() + " - found " + c);
@@ -191,7 +183,6 @@ public class LexicalAnalyser {
                 name = ParseAndEvaluate.nonExactName(name);
             }
             t = new ParameterToken(name);
-            LogBuilder.writeExitingLog("nbpcglibrary.expressionparserandevaluate", this, "nextToken", t);
             return t;
         }
 

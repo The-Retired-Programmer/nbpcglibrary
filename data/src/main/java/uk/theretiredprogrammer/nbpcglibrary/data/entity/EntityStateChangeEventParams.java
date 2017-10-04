@@ -15,15 +15,13 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.data.entity;
 
-import uk.theretiredprogrammer.nbpcglibrary.api.EventParams;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * The Parameter Class for a EntityStateChange listener.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public class EntityStateChangeEventParams implements EventParams {
+public class EntityStateChangeEventParams  {
 
     /**
      * Entity State
@@ -131,10 +129,5 @@ public class EntityStateChangeEventParams implements EventParams {
      */
     public EntityState getNewState() {
         return newState;
-    }
-
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this, transition + "[" + oldState + ">" + newState + "]");
     }
 }

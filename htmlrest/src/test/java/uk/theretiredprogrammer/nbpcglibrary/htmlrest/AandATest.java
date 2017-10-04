@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
+package uk.theretiredprogrammer.nbpcglibrary.htmlrest;
 
+import uk.theretiredprogrammer.nbpcglibrary.htmlrest.AandA;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

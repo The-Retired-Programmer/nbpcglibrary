@@ -16,7 +16,9 @@
 package uk.theretiredprogrammer.nbpcglibrary.data.entityreferences;
 
 import java.util.List;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityManager;
+import java.util.function.Function;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 
@@ -25,33 +27,33 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * required.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <R> the BasicEntity (data transfer) Class
  * @param <E> the eEntity Class
  * @param <P> the parent Entity class
  */
-public class EntityReferenceFilterSet<E extends Entity, P extends CoreEntity> extends EntityReferenceSet<E,P> {
+public class EntityReferenceFilterSet<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> extends EntityReferenceSet<R, E,P> {
 
     private final String columnname;
-    private final Object columnvalue;
+    private final int columnvalue;
 
     /**
      * Constructor.
      *
-     * @param name the set name (for reporting)
+     * @param entitycreator a creator function for the Entity
+     * @param restclass class of the rest client for this entity
      * @param columnname the column name for use in selection equality filter
      * @param columnvalue the column value for use in the selection equality
      * filter
-     * @param emclass the associated entity manager class
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public EntityReferenceFilterSet(String name, String columnname, Object columnvalue, Class<? extends EntityManager> emclass) {
-        super(name,emclass);
+    public EntityReferenceFilterSet(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, String columnname, int columnvalue) {
+        super(entitycreator, restclass);
         this.columnvalue = columnvalue;
         this.columnname = columnname;
     }
     
     @Override
-    protected List<Integer> getPrimaryKeySet() {
-//        return epp.find(columnname, columnvalue);
-        return null;
+    protected List<R> getPrimaryKeySet(Rest<R> rest) {
+        return rest.getMany(columnname, columnvalue);
     }
 }

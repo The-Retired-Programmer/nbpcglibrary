@@ -62,15 +62,14 @@ public class ClaimRestTest {
         claim.setValue("valuexxx");
         claim.setUser(1);
         claim = cr.create(claim);
+        int createdId = claim.getId();
         assertNotNull(claim);
         assertEquals(claim.getValue(),"valuexxx");
         // get count of claim record
         List<ClaimEntity> claims2= cr.getAll();
         assertNotNull(claims2);
         assertEquals(2, claims2.size());
-        ClaimEntity c1 = claims2.get(1);
-        int id = c1.getId();
-        boolean delresult = cr.delete(id);
+        boolean delresult = cr.delete(createdId);
         assertEquals(delresult, true);
         // get count of user record
         List<ClaimEntity> claims3= cr.getAll();

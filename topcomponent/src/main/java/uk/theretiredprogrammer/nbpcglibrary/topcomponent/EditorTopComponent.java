@@ -19,37 +19,37 @@ import java.util.Arrays;
 import java.util.List;
 import org.openide.awt.StatusDisplayer;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import uk.theretiredprogrammer.nbpcglibrary.form.PanePresenter;
+import uk.theretiredprogrammer.nbpcglibrary.node.nodes.TreeNode;
 
 /**
  * Editor -  Topcomponent which displays/edits an entity.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
- * @param <E> the class of the entity being edited
+ * @param <N> the class of the node being edited
  */
-public abstract class EditorTopComponent<E extends Entity> extends DisplayTopComponent {
+public abstract class EditorTopComponent<N extends TreeNode> extends DisplayTopComponent {
     private boolean abandon = false;
     private EntityStateChangeListener statechangelistener;
 
     /**
-     * the entity being edited
+     * the node being edited
      */
-    protected final E entity;
+    protected final N node;
 
     /**
      * Constructor
      *
-     * @param entity the entity being edited
+     * @param node the node to be edited
      * @param name the topcomponent name
      * @param hint the topcomponent hint
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public EditorTopComponent(E entity, String name, String hint) {
+    public EditorTopComponent(N node, String name, String hint) {
         super(name, hint);
-        this.entity = entity;
+        this.node = node;
     }
 
     @Override
@@ -96,7 +96,6 @@ public abstract class EditorTopComponent<E extends Entity> extends DisplayTopCom
 
     @Override
     protected void opened() {
-        entity.addStateListener(statechangelistener = new EntityStateChangeListener("TopComponent:" + entity.instanceDescription()));
     }
 
     @Override
@@ -104,15 +103,11 @@ public abstract class EditorTopComponent<E extends Entity> extends DisplayTopCom
         statechangelistener = null;
     }
 
-    private class EntityStateChangeListener extends Listener<EntityStateChangeEventParams> {
-
-        public EntityStateChangeListener(String name) {
-            super(name);
-        }
+    private class EntityStateChangeListener extends Listener {
 
         @Override
-        public void action(EntityStateChangeEventParams p) {
-            if (p.getTransition() == REMOVE) {
+        public void action(Object p) {
+            if ( ((EntityStateChangeEventParams)p).getTransition() == REMOVE) {
                 abandon = true;
                 EditorTopComponent.this.close();
             }

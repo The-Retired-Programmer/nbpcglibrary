@@ -20,7 +20,6 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JToolBar;
 import org.openide.windows.TopComponent;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
 
 /**
  * Topcomponent which can displays a defined swing component
@@ -41,7 +40,6 @@ public abstract class DisplayTopComponent extends TopComponent {
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public DisplayTopComponent(String name, String hint) {
-        LogBuilder.writeConstructorLog("nbpcglibrary.topcomponent", this, name, hint);
         setName(name);
         setToolTipText(hint);
         this.name = name;
@@ -57,7 +55,6 @@ public abstract class DisplayTopComponent extends TopComponent {
 
     @Override
     public void componentOpened() {
-        LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentOpened", name);
         setLayout(new BorderLayout());
         toolbar = new JToolBar("editor toolbar");
         List<ToolbarElement> ltbe = getToolbarElements();
@@ -92,7 +89,6 @@ public abstract class DisplayTopComponent extends TopComponent {
 
     @Override
     public void componentClosed() {
-        LogBuilder.writeLog("nbpcglibrary.topcomponent", this, "componentClosed", name);
         closed();
         remove(displaycomponent);
         remove(toolbar);

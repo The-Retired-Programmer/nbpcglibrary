@@ -21,9 +21,6 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import uk.theretiredprogrammer.nbpcglibrary.common.LogBuilder;
-import uk.theretiredprogrammer.nbpcglibrary.api.HasInstanceDescription;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 
 /**
@@ -43,7 +40,7 @@ import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
  * @param <E> The Entity Class being managed
  * @param <P> The Parent Entity Class
  */
-abstract public class EntityManager<E extends Entity, P extends CoreEntity> implements HasInstanceDescription {
+abstract public class EntityManager<E extends Entity, P extends CoreEntity> {
 
     private static final int MAXLRUCACHE = 10;
 
@@ -88,11 +85,6 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
         transientCache = new HashMap<>();
     }
 
-    @Override
-    public String instanceDescription() {
-        return LogBuilder.instanceDescription(this, name);
-    }
-
     /**
      * Get an Entity. Lookup caches and if not present then create a new entity
      * and load it using data obtained from entity storage.
@@ -105,8 +97,6 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
             freeReleasedEntries();
             E e = lrucache.get(pk);
             if (e != null) {
-                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                        .addMsg("hit on LRUCache for {0}", e.instanceDescription()).write();
                 return e;
             }
             // not in lru cache - now look up the entity in the cache
@@ -115,30 +105,18 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
                 e = ref.get();
                 if (e != null) {
                     lrucache.put(pk, e); // insert object into LRU cache
-                    LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                            .addMsg("hit on Cache (& reinserted into LRU cache) for {0}", e.instanceDescription()).write();
                     return e;
-                } else {
-                    LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                            .addMsg("miss on Cache (SoftReference clear)").write();
                 }
-            } else {
-                LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                        .addMsg("miss on Cache").write();
             }
             e = createNewEntity(pk);
             e.load(pk);
             insertIntoCache(pk, e);
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                    .addMsg("create new Entity {0} (and insert into Cache)", e.instanceDescription()).write();
             return e;
         } else {
             E e = transientCache.get(pk);
             if (e == null) {
                 throw new LogicException("Can't find transient entry in cache");
             }
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "get", pk)
-                    .addMsg("hit on Transient Cache for {0}", e.instanceDescription()).write();
             return e;
         }
     }
@@ -173,8 +151,6 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
         while ((r = (Reference<? extends E>) refqueue.poll()) != null) {
             int pk = r.get().getPK();
             cache.remove(pk);
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "freeReleasedEntries")
-                    .addMsg("Cache Free ({0}) (SoftReference cache)", pk).write();
         }
     }
 
@@ -199,12 +175,8 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
         if (e.isPersistent()) {
             lrucache.remove(pk);
             cache.remove(pk);
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "removeFromCache", e)
-                    .addMsg("Cache Remove {0}", e.instanceDescription()).write();
         } else {
             transientCache.remove(pk);
-            LogBuilder.create("nbpcglibrary.data", Level.FINEST).addMethodName(this, "removeFromCache", e)
-                    .addMsg("Transient Cache Remove {0}", e.instanceDescription()).write();
         }
     }
 
@@ -216,7 +188,6 @@ abstract public class EntityManager<E extends Entity, P extends CoreEntity> impl
     public final synchronized E getNew() {
         E e = createNewEntity();
         int pk = e.getPK();
-        LogBuilder.writeLog("nbpcglibrary.data", this, "getNew", pk);
         transientCache.put(pk, e);
         return e;
     }

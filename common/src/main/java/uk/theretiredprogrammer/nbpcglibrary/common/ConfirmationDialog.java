@@ -15,7 +15,6 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.common;
 
-import java.util.logging.Level;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 
@@ -37,8 +36,6 @@ public class ConfirmationDialog {
         NotifyDescriptor nd = new NotifyDescriptor.Confirmation(message,
                 title, NotifyDescriptor.YES_NO_OPTION);
         boolean res = DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.YES_OPTION;
-        LogBuilder.create("nbpcglibrary.form", Level.FINER).addMethodName(ConfirmationDialog.class, "show", title, message)
-                            .addMsg("responce is {0}", res).write();
         return res;
     }
 }

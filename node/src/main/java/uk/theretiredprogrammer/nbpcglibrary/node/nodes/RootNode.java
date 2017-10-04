@@ -34,9 +34,10 @@ public abstract class RootNode<E extends CoreEntity> extends BasicNode<E> {
      * @param e the entity
      * @param cf the childfactory
      * @param allowedDataFlavors allowed paste actions
+     * @param iconName the name of the icon (from the Icons set)
      */
-    protected RootNode(E e, RootChildFactory<E> cf, DataFlavor[] allowedDataFlavors) {
-        super(cf, allowedDataFlavors);
+    protected RootNode(E e, RootChildFactory<E> cf, DataFlavor[] allowedDataFlavors, String iconName) {
+        super(cf, allowedDataFlavors, iconName);
         this.e = e;
     }
 
@@ -44,9 +45,10 @@ public abstract class RootNode<E extends CoreEntity> extends BasicNode<E> {
      * Constructor.
      *
      * @param e the entity
+     * @param iconName the name of the icon (from the Icons set)
      */
-    protected RootNode(E e) {
-        super();
+    protected RootNode(E e, String iconName) {
+        super(iconName);
         this.e = e;
     }
 

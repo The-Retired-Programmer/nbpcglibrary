@@ -15,8 +15,6 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.common;
 
-import java.util.logging.Level;
-
 /**
  * Defines a rule to be associated with a field.
  *
@@ -47,8 +45,6 @@ public abstract class Rule {
             return true;
         }
         sb.append(failuremessage);
-        LogBuilder.create("nbpcglibrary.common", Level.FINEST).addMethodName(this, "check")
-                .addMsg("Rule failure: {0}", failuremessage).write();
         return false;
     }
 

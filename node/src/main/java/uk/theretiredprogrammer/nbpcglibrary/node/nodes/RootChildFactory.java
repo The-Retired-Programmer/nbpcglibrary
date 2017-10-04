@@ -17,7 +17,6 @@ package uk.theretiredprogrammer.nbpcglibrary.node.nodes;
 
 import java.awt.EventQueue;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
-import org.openide.util.Lookup;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
@@ -42,8 +41,7 @@ public abstract class RootChildFactory<E extends CoreEntity> extends CoreChildFa
     @SuppressWarnings("LeakingThisInConstructor")
     public RootChildFactory(E parentEntity) {
         super(parentEntity);
-        Lookup applkp = ApplicationLookup.getDefault();
-        applkprefreshresult = applkp.lookupResult(InhibitExplorerRefresh.class);
+        applkprefreshresult = ApplicationLookup.getDefault().lookupResult(InhibitExplorerRefresh.class);
         applkprefreshresult.addLookupListener(this);
     }
 
