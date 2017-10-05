@@ -23,6 +23,7 @@ import java.util.function.Function;
 import org.openide.util.datatransfer.ExTransferable;
 import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
+import uk.theretiredprogrammer.nbpcglibrary.common.Event;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
@@ -36,9 +37,8 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entityreferences.EntityReferenc
  * @param <R> the base entity class used in the rest transfer
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
- * @param <F> the Entity Field enum class
  */
-public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity, F> extends BasicNode<E> {
+public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> extends BasicNode<E> {
 
     /**
      * Copy Allowed - for OperationsEnabled
@@ -56,8 +56,8 @@ public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity
     private EntityReference<R, E, P> eref;
     private EntityStateChangeListener stateListener;
     private EntityFieldChangeListener fieldListener;
-    private EntityNameChangeListener nameListener;
     private int operationsEnabled;
+    private final Event titleChangeEvent = new Event();
 
     /**
      * Constructor.
@@ -71,7 +71,7 @@ public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity
      * @param operationsEnabled set for copy , cut and delete enabled
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    protected TreeNode(Function<R,E> entitycreator, E e, BasicChildFactory<R, E, P> cf, Class<? extends Rest<R>> restclass, DataFlavor[] allowedDataFlavors, String iconName, int operationsEnabled) {
+    protected TreeNode(Function<R, E> entitycreator, E e, BasicChildFactory<R, E, P> cf, Class<? extends Rest<R>> restclass, DataFlavor[] allowedDataFlavors, String iconName, int operationsEnabled) {
         super(cf, allowedDataFlavors, iconName);
         commonConstructor(e, entitycreator, restclass, operationsEnabled);
     }
@@ -85,25 +85,42 @@ public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity
      * @param iconName the name of the icon (from the Icons set)
      * @param operationsEnabled set for copy , cut and delete enabled
      */
-    protected TreeNode(Function<R,E> entitycreator, E e, Class<? extends Rest<R>> restclass, String iconName, int operationsEnabled) {
+    protected TreeNode(Function<R, E> entitycreator, E e, Class<? extends Rest<R>> restclass, String iconName, int operationsEnabled) {
         super(iconName);
         commonConstructor(e, entitycreator, restclass, operationsEnabled);
 
     }
 
-    private void commonConstructor(E e, Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, int operationsEnabled) {
+    private void commonConstructor(E e, Function<R, E> entitycreator, Class<? extends Rest<R>> restclass, int operationsEnabled) {
         eref = new EntityReference<>(entitycreator, restclass, e);
         this.operationsEnabled = operationsEnabled;
         e.addStateListener(stateListener = new EntityStateChangeListener());
         e.addFieldListener(fieldListener = new EntityFieldChangeListener());
-        e.addNameListener(nameListener = new EntityNameChangeListener());
     }
 
     @Override
     public E getEntity() {
         return eref.get();
     }
-    
+
+    /**
+     * Add a Title listener.
+     *
+     * @param listener the listener
+     */
+    public final void addTitleListener(Listener listener) {
+        titleChangeEvent.addListener(listener);
+    }
+
+    /**
+     * Remove a Title listener.
+     *
+     * @param listener the listener
+     */
+    public final void removeTitleListener(Listener listener) {
+        titleChangeEvent.removeListener(listener);
+    }
+
     @Override
     public Image getIcon(int type) {
         return getEntity().checkRules(new StringBuilder()) ? super.getIcon(type) : getIconWithError();
@@ -120,7 +137,7 @@ public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity
 
         @Override
         public void action(Object p) {
-            switch ( ((EntityStateChangeEventParams)p).getTransition()) {
+            switch (((EntityStateChangeEventParams) p).getTransition()) {
                 case EDIT:
                     iconChange();
                     nameChange();
@@ -143,7 +160,7 @@ public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity
         E entity = getEntity();
         return (entity.isNew() ? "<font color='#0000FF'><b>" : (entity.isEditing() ? "<b>" : "")) + getDisplayName();
     }
-    
+
     /**
      * Get the key string which will be used in when sorting this entity
      *
@@ -163,17 +180,12 @@ public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity
 
         @Override
         public void action(Object p) {
-            nodeProcessFieldChange((F) p);
+            nodeProcessFieldChange((String) p);
+            // TODO temporary fire name and title change on any field change - later we can be more precise
+            nameChange();
+            titleChangeEvent.fire(null);
             // TODO make decision about the Icon changes (based on changes to error state)
             iconChange(); // temporary - do always (just in case!)
-        }
-    }
-
-    private class EntityNameChangeListener extends Listener {
-
-        @Override
-        public void action(Object p) {
-            nameChange();
         }
     }
 
@@ -261,5 +273,5 @@ public abstract class TreeNode<R extends IdTimestampBaseEntity, E extends Entity
      *
      * @param field the field Id
      */
-    protected abstract void nodeProcessFieldChange(F field);
+    protected abstract void nodeProcessFieldChange(String field);
 }

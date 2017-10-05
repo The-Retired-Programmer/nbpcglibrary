@@ -40,9 +40,8 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
  * @param <R> the base entity class used in the rest transfer
  * @param <E> the Entity Class
  * @param <P> the parent Entity Class
- * @param <F> the Entity Field enum class
  */
-public abstract class IconNode<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity, F> extends TreeNode<R, E, P, F> {
+public abstract class IconNode<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> extends TreeNode<R, E, P> {
 
     private final ImageFileFinder<E> imagefilefinder;
 

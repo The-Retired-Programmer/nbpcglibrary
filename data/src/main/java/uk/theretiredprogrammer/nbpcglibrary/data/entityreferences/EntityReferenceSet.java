@@ -26,6 +26,7 @@ import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationLookup;
 import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.common.Event.ListenerMode;
+import uk.theretiredprogrammer.nbpcglibrary.common.Rules;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 
 /**
@@ -37,7 +38,7 @@ import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
  * @param <E> the Entity Class
  * @param <P> the parent Entity class
  */
-public class EntityReferenceSet<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> {
+public class EntityReferenceSet<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> extends Rules {
 
     /**
      * The list of Entity References
@@ -200,7 +201,7 @@ public class EntityReferenceSet<R extends IdTimestampBaseEntity, E extends Entit
      * @return the rule
      */
     public Rule getMaxRule(int max) {
-        return new MaxRule(max);
+        return new Rules.MaxIntegerRule(() -> count(), max);
     }
 
     /**
@@ -210,36 +211,6 @@ public class EntityReferenceSet<R extends IdTimestampBaseEntity, E extends Entit
      * @return the rule
      */
     public Rule addMinRule(int min) {
-        return new MinRule(min);
-    }
-
-    private class MaxRule extends Rule {
-
-        private final int max;
-
-        public MaxRule(int max) {
-            super("Too many defined");
-            this.max = max;
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            return count() <= max;
-        }
-    }
-
-    private class MinRule extends Rule {
-
-        private final int min;
-
-        public MinRule(int min) {
-            super("Too few defined");
-            this.min = min;
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            return count() >= min;
-        }
+        return new Rules.MinIntegerRule(() -> count(), min);
     }
 }

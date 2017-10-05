@@ -15,10 +15,8 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.form;
 
-import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
-import uk.theretiredprogrammer.nbpcglibrary.common.Rule;
 import uk.theretiredprogrammer.nbpcglibrary.common.Rules;
 
 /**
@@ -30,7 +28,6 @@ import uk.theretiredprogrammer.nbpcglibrary.common.Rules;
 public class BasicFieldModel<T> extends FieldModel<T> {
 
     private T value; // data source
-    private final Rules rules = new Rules();
     private Consumer<T> callbackfunction;
     private boolean isNullSelectionAllowed;
     private List<T> choices;
@@ -103,7 +100,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
 
     @Override
     public boolean test(StringBuilder sb) {
-        return rules.checkRules(sb);
+        return checkRules(sb);
     }
 
     @Override
@@ -122,24 +119,9 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @param min the minimum length of the text
      * @return itself (to enable fluent construction)
      */
-    public BasicFieldModel<T> addMinLengthRule(int min) {
-        rules.addRule(new MinLengthRule(min));
+    public BasicFieldModel<T> addMinStringRule(int min) {
+        addRule(new Rules.MinStringRule(() -> (String) value, min));
         return this;
-    }
-
-    private class MinLengthRule extends Rule {
-
-        private final int min;
-
-        public MinLengthRule(int min) {
-            super("Too short");
-            this.min = min;
-        }
-
-        @Override
-        protected boolean ruleCheck() {
-            return ((String) value).length() >= min;
-        }
     }
 
     /**
@@ -148,24 +130,9 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @param max the minimum length of the text
      * @return itself (to enable fluent construction)
      */
-    public BasicFieldModel<T> addMaxLengthRule(int max) {
-        rules.addRule(new MaxLengthRule(max));
+    public BasicFieldModel<T> addMaxStringRule(int max) {
+        addRule(new Rules.MaxStringRule( () -> (String) value, max));
         return this;
-    }
-
-    private class MaxLengthRule extends Rule {
-
-        private final int max;
-
-        public MaxLengthRule(int max) {
-            super("Too long");
-            this.max = max;
-        }
-
-        @Override
-        protected boolean ruleCheck() {
-            return ((String) value).length() <= max;
-        }
     }
 
     /**
@@ -174,50 +141,20 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @param min the minimum value
      * @return itself (to enable fluent construction)
      */
-    public BasicFieldModel<T> addMinRule(int min) {
-        rules.addRule(new MinRule(min));
+    public BasicFieldModel<T> addMinIntegerRule(int min) {
+        addRule(new Rules.MinIntegerRule(() -> (Integer) value, min));
         return this;
     }
-
-    private class MinRule extends Rule {
-
-        private final int min;
-
-        public MinRule(int min) {
-            super("Too small");
-            this.min = min;
-        }
-
-        @Override
-        protected boolean ruleCheck() {
-            return (Integer) value >= min;
-        }
-    }
-
+    
     /**
      * Add a rule testing the maximum value of number
      *
      * @param max the minimum value
      * @return itself (to enable fluent construction)
      */
-    public BasicFieldModel<T> addMaxRule(int max) {
-        rules.addRule(new MaxRule(max));
+    public BasicFieldModel<T> addMaxIntegerRule(int max) {
+        addRule(new MaxIntegerRule(() -> (Integer) value, max));
         return this;
-    }
-
-    private class MaxRule extends Rule {
-
-        private final int max;
-
-        public MaxRule(int max) {
-            super("Too large");
-            this.max = max;
-        }
-
-        @Override
-        protected boolean ruleCheck() {
-            return (Integer)value <= max;
-        }
     }
 
     /**
@@ -226,20 +163,8 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addFilenameRule() {
-        rules.addRule(new FilenameRule());
+        addRule(new Rules.FilenameRule( ()-> (String) value));
         return this;
-    }
-
-    private class FilenameRule extends Rule {
-
-        public FilenameRule() {
-            super("Not a filename");
-        }
-
-        @Override
-        protected boolean ruleCheck() {
-            return new File((String) value).isFile();
-        }
     }
 
     /**
@@ -248,19 +173,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addFoldernameRule() {
-        rules.addRule(new FoldernameRule());
+        addRule(new Rules.FoldernameRule( ()-> (String) value));
         return this;
-    }
-
-    private class FoldernameRule extends Rule {
-
-        public FoldernameRule() {
-            super("Not a folder");
-        }
-
-        @Override
-        protected boolean ruleCheck() {
-            return new File((String) value).isDirectory();
-        }
     }
 }

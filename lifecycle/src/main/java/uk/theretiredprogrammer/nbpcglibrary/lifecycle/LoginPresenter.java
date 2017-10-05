@@ -17,6 +17,7 @@ package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.function.BiConsumer;
 import uk.theretiredprogrammer.nbpcglibrary.form.BasicFieldModel;
 import uk.theretiredprogrammer.nbpcglibrary.form.FieldPresenter;
@@ -53,11 +54,11 @@ class LoginPresenter extends FormPresenter {
         return Arrays.asList(
                 new FieldPresenter<>("Username",
                         new LabelDecorator("Username", new TextField()),
-                        usernamemodel = new BasicFieldModel<>("").addMinLengthRule(1).addMaxLengthRule(100)
+                        usernamemodel = new BasicFieldModel<>("").addMinStringRule(1).addMaxStringRule(100)
                 ),
                 new FieldPresenter<>(("Password"),
                         new LabelDecorator("Password", new PasswordField()),
-                        passwordmodel = new BasicFieldModel<>("").addMinLengthRule(1).addMaxLengthRule(100))
+                        passwordmodel = new BasicFieldModel<>("").addMinStringRule(1).addMaxStringRule(100))
         );
     }
 

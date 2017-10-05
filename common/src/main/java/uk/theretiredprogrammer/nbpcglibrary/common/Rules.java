@@ -15,8 +15,11 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.common;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Manages a set of rules - usually associated with a field. Allows the rules to
@@ -77,12 +80,126 @@ public class Rules {
     public final boolean checkRulesAtLoad(StringBuilder sb) {
         boolean valid = true;
         for (Rule rule : rules) {
-            if (!(rule instanceof UniqueRule)) {
+            if (!(rule instanceof UniqueStringRule)) {
                 if (!rule.check(sb)) {
                     valid = false;
                 }
             }
         }
         return valid;
+    }
+    
+    //  set of standard rule classes
+    
+    public class MinStringRule extends Rule<String> {
+
+        private final int min;
+        
+        public MinStringRule(Supplier<String> provider, int min) {
+            super(provider, "Too short");
+            this.min = min;
+        }
+        
+        @Override
+        public boolean ruleCheck(Supplier<String> provider) {
+            return provider.get().length() >= min;
+        }
+    }
+    
+    public class MaxStringRule extends Rule<String> {
+
+        private final int max;
+        
+        public MaxStringRule(Supplier<String> provider, int max) {
+            super(provider, "Too long");
+            this.max = max;
+        }
+        
+        @Override
+        public boolean ruleCheck(Supplier<String> provider) {
+            return provider.get().length() <= max;
+        }
+    }
+    
+    public class UniqueStringRule extends Rule<String> {
+        
+        private final Supplier<Stream<String>> itemprovider;
+        
+        public UniqueStringRule(Supplier<String> provider, Supplier<Stream<String>> itemprovider) {
+            super(provider, "Is not unique");
+            this.itemprovider = itemprovider;
+        }
+        
+        @Override
+        public boolean ruleCheck(Supplier<String> provider) {
+            String value = provider.get();
+            return itemprovider.get().noneMatch((s)-> s.equals(value));
+        }
+    }
+    
+    public class MinIntegerRule extends Rule<Integer> {
+
+        private final int min;
+
+        public MinIntegerRule(Supplier<Integer> provider, int min) {
+            super(provider, "Too small");
+            this.min = min;
+        }
+
+        @Override
+        protected boolean ruleCheck(Supplier<Integer> provider) {
+            return provider.get() >= min;
+        }
+    }
+    
+    public class MaxIntegerRule extends Rule<Integer> {
+
+        private final int max;
+
+        public MaxIntegerRule(Supplier<Integer> provider,int max) {
+            super(provider, "Too large");
+            this.max = max;
+        }
+
+        @Override
+        protected boolean ruleCheck(Supplier<Integer> provider) {
+            return provider.get() <= max;
+        }
+    }
+    
+    public class FilenameRule extends Rule<String> {
+
+        public FilenameRule(Supplier<String> provider) {
+            super(provider, "Not a filename");
+        }
+
+        @Override
+        protected boolean ruleCheck(Supplier<String> provider) {
+            return new File(provider.get()).isFile();
+        }
+    }
+        
+    public class FoldernameRule extends Rule<String> {
+
+        public FoldernameRule(Supplier<String> provider) {
+            super(provider, "Not a folder");
+        }
+
+        @Override
+        protected boolean ruleCheck(Supplier<String> provider) {
+            return new File(provider.get()).isDirectory();
+        }
+    }
+    
+    public class DefinedRule extends Rule<Integer> {
+
+        public DefinedRule(Supplier<Integer> provider) {
+            super(provider, "Not defined");
+        }
+
+        @Override
+        public boolean ruleCheck(Supplier<Integer> provider) {
+            return provider.get() != 0;
+        }
     }
 }

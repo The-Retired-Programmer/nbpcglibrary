@@ -15,23 +15,29 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.common;
 
+import java.util.function.Supplier;
+
 /**
  * Defines a rule to be associated with a field.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <T> the class of the object being tested
  */
-public abstract class Rule {
+public abstract class Rule<T> {
 
     private final String failuremessage;
+    private final Supplier<T> provider;
 
     /**
      * Constructor
      *
+     * @param provider the provider of the value
      * @param failuremessage the failure message to be displayed when this rule
      * is broken
      */
-    public Rule(String failuremessage) {
+    public Rule(Supplier<T> provider,String failuremessage) {
         this.failuremessage = failuremessage;
+        this.provider = provider;
     }
 
     /**
@@ -41,7 +47,7 @@ public abstract class Rule {
      * @return true if rule is passing
      */
     public final boolean check(StringBuilder sb) {
-        if (ruleCheck()) {
+        if (ruleCheck(provider)) {
             return true;
         }
         sb.append(failuremessage);
@@ -51,7 +57,8 @@ public abstract class Rule {
     /**
      * Test if the rule is passing.
      *
+     * @param provider  the provider of the value
      * @return true if rule is passing
      */
-    protected abstract boolean ruleCheck();
+    protected abstract boolean ruleCheck(Supplier<T> provider);
 }

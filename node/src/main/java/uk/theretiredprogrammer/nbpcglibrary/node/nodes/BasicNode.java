@@ -67,6 +67,7 @@ public abstract class BasicNode<E extends CoreEntity> extends AbstractNode {
     protected final InstanceContent content;
     private DataFlavor[] allowedDataFlavors;
     private final String iconName;
+    
 
     /**
      * Constructor

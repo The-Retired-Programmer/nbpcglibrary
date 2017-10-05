@@ -50,17 +50,13 @@ import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChange
  * @param <R> the base entity class used in the rest transfer
  * @param <E> the entity class
  * @param <P> the Parent Entity Class
- * @param <F> the entity field types
  */
 @RegisterLog("nbpcglibrary.data")
-public abstract class Entity<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity, F> extends CoreEntity {
+public abstract class Entity<R extends IdTimestampBaseEntity, E extends Entity, P extends CoreEntity> extends CoreEntity {
 
     private final Event stateEvent;
     private final Event fieldEvent;
-    @SuppressWarnings("FieldMayBeFinal") 
-    private Event titleChangeEvent;
-    @SuppressWarnings("FieldMayBeFinal")
-    private Event nameChangeEvent;
+    
     private EntityState state = INIT;
     private final Event primaryKeyChangeEvent;
     private final EntityStateChangeListener entitystatechangelistener;
@@ -76,8 +72,6 @@ public abstract class Entity<R extends IdTimestampBaseEntity, E extends Entity, 
         this.restclass = restclass;
         stateEvent = new Event();
         fieldEvent = new Event();
-        nameChangeEvent = new Event();
-        titleChangeEvent = new Event();
         EntityState oldState = state;
         state = NEW;
         fireStateChange(CREATE, oldState, state);
@@ -174,7 +168,7 @@ public abstract class Entity<R extends IdTimestampBaseEntity, E extends Entity, 
      *
      * @param field the field Id
      */
-    protected final void fireFieldChange(F field) {
+    protected final void fireFieldChange(String field) {
         fieldEvent.fire(field);
     }
 
@@ -194,56 +188,6 @@ public abstract class Entity<R extends IdTimestampBaseEntity, E extends Entity, 
      */
     protected final void fireStateChange(EntityStateChange transition, EntityState oldState, EntityState newState) {
         stateEvent.fire(new EntityStateChangeEventParams(transition, oldState, newState));
-    }
-
-    /**
-     * Add a Name listener.
-     *
-     * @param listener the listener
-     */
-    public final void addNameListener(Listener listener) {
-        nameChangeEvent.addListener(listener);
-    }
-
-    /**
-     * Remove a Name listener.
-     *
-     * @param listener the listener
-     */
-    public final void removeNameListener(Listener listener) {
-        nameChangeEvent.removeListener(listener);
-    }
-
-    /**
-     * Fire Listeners if name changes.
-     */
-    protected void nameListenerFire() {
-        nameChangeEvent.fire(null);
-    }
-
-    /**
-     * Add a Title listener.
-     *
-     * @param listener the listener
-     */
-    public final void addTitleListener(Listener listener) {
-        titleChangeEvent.addListener(listener);
-    }
-
-    /**
-     * Remove a Title listener.
-     *
-     * @param listener the listener
-     */
-    public final void removeTitleListener(Listener listener) {
-        titleChangeEvent.removeListener(listener);
-    }
-
-    /**
-     * Fire Listeners if title changes.
-     */
-    protected void titleListenerFire() {
-        titleChangeEvent.fire(null);
     }
 
     /**
@@ -307,8 +251,6 @@ public abstract class Entity<R extends IdTimestampBaseEntity, E extends Entity, 
             entityRestoreState();
             fireFieldChange();
             fireStateChange(RESET, oldState, state);
-            nameListenerFire();
-            titleListenerFire();
         }
     }
 

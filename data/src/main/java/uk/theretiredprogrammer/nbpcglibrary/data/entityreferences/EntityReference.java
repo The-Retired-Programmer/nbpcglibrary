@@ -22,8 +22,6 @@ import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.Entity;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
-import uk.theretiredprogrammer.nbpcglibrary.common.Rule;
-import uk.theretiredprogrammer.nbpcglibrary.common.Event;
 import static uk.theretiredprogrammer.nbpcglibrary.common.Event.ListenerMode.IMMEDIATE;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.CoreEntity;
 
@@ -97,19 +95,6 @@ public class EntityReference<R extends IdTimestampBaseEntity, E extends Entity, 
      *
      * @param entitycreator a creator function for the Entity
      * @param restclass class of the rest client for this entity
-     * @param pk the primary key
-     * @param listener a listener to receive title change actions
-     */
-    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, int pk, Listener listener) {
-        this(entitycreator, restclass, pk);
-        titleListener = listener;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param entitycreator a creator function for the Entity
-     * @param restclass class of the rest client for this entity
      * @param e the entity
      */
     public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, E e) {
@@ -123,19 +108,6 @@ public class EntityReference<R extends IdTimestampBaseEntity, E extends Entity, 
         saveState();
     }
 
-    /**
-     * Constructor.
-     *
-     * @param entitycreator a creator function for the Entity
-     * @param restclass class of the rest client for this entity
-     * @param e the entity
-     * @param listener a listener to receive title change actions
-     */
-    public EntityReference(Function<R,E> entitycreator, Class<? extends Rest<R>> restclass, E e, Listener listener) {
-        this(entitycreator, restclass, e);
-        titleListener = listener;
-        e.addTitleListener(listener);
-    }
 
     /**
      * Set the reference to "Null" (ie value 0).
@@ -145,56 +117,12 @@ public class EntityReference<R extends IdTimestampBaseEntity, E extends Entity, 
      */
     public boolean set() {
         if (pk != 0) {
-            if (titleListener != null) {
-                E old = getNoLoad();
-                if (old != null) {
-                    old.removeTitleListener(titleListener);
-                    Event.fireSimpleEventParamsListener(titleListener);
-                }
-            }
             pk = 0;
             return true;
         }
         return false;
     }
 
-//    /**
-//     * Set the reference by entity primary key.
-//     *
-//     * @param pk the primary key
-//     * @return true if referenced entity is different (ie primary key has
-//     * changed)
-//     */
-//    public boolean set(int pk) {
-//        if (pk == 0) {
-//            return set();
-//        }
-//        boolean updated = (this.pk == 0 || this.pk != pk);
-//        if (updated) {
-//            if (titleListener != null) {
-//                E old = getNoLoad();
-//                if (old != null) {
-//                    old.removeTitleListener(titleListener);
-//                }
-//                this.pk = pk;
-//                Rest<R> rest = ApplicationLookup.getDefault().lookup(restclass);
-//                R basicentity = rest.get(pk);
-//                E e = em.get(pk);
-//                this.entityreference = e == null ? null : new WeakReference<>(e);
-//                if (titleListener != null) {
-//                    if (e != null) {
-//                        e.addTitleListener(titleListener);
-//                    }
-//                    Event.fireSimpleEventParamsListener(titleListener);
-//                }
-//            } else {
-//                this.pk = pk;
-//                this.entityreference = null;
-//            }
-//        }
-//        return updated;
-//    }
-    
     /**
      * Set the reference by entity.
      *
@@ -206,21 +134,8 @@ public class EntityReference<R extends IdTimestampBaseEntity, E extends Entity, 
         int epk = e.getPK();
         boolean updated = (this.pk == 0 || this.pk != epk);
         if (updated) {
-            if (titleListener != null) {
-                E old = getNoLoad();
-                if (old != null) {
-                    old.removeTitleListener(titleListener);
-                }
                 this.pk = epk;
                 this.entityreference = new WeakReference<>(e);
-                if (titleListener != null) {
-                        e.addTitleListener(titleListener);
-                    Event.fireSimpleEventParamsListener(titleListener);
-                }
-            } else {
-                this.pk = epk;
-                this.entityreference = new WeakReference<>(e);
-            }
             if (!e.isPersistent()){
                  e.addPrimaryKeyListener(pkListener, IMMEDIATE);
             }
@@ -259,7 +174,6 @@ public class EntityReference<R extends IdTimestampBaseEntity, E extends Entity, 
         }
         E e = entitycreator.apply(baseentity);
         this.entityreference = new WeakReference<>(e);
-        e.addTitleListener(titleListener);
         return e;
     }
 
@@ -306,33 +220,8 @@ public class EntityReference<R extends IdTimestampBaseEntity, E extends Entity, 
      */
     public final void restoreState() {
         if (isDirty()) {
-            E dirtyE = get();
-            if (dirtyE != null) {
-                dirtyE.removeTitleListener(titleListener);
-            }
             entityreference = null;
             pk = savePK;
-        }
-    }
-
-    /**
-     * Get a rule to test if this reference is valid.
-     *
-     * @return the rule
-     */
-    public Rule getDefinedRule() {
-        return new DefinedRule();
-    }
-
-    private class DefinedRule extends Rule {
-
-        public DefinedRule() {
-            super("Not defined");
-        }
-
-        @Override
-        public boolean ruleCheck() {
-            return pk != 0;
         }
     }
 }
