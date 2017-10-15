@@ -18,11 +18,11 @@ package uk.theretiredprogrammer.nbpcglibrary.topcomponent;
 import java.util.Arrays;
 import java.util.List;
 import org.openide.awt.StatusDisplayer;
+import org.openide.nodes.Node;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams;
 import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import uk.theretiredprogrammer.nbpcglibrary.form.PanePresenter;
-import uk.theretiredprogrammer.nbpcglibrary.node.nodes.TreeNode;
 
 /**
  * Editor -  Topcomponent which displays/edits an entity.
@@ -30,7 +30,7 @@ import uk.theretiredprogrammer.nbpcglibrary.node.nodes.TreeNode;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  * @param <N> the class of the node being edited
  */
-public abstract class EditorTopComponent<N extends TreeNode> extends DisplayTopComponent {
+public abstract class EditorTopComponent<N extends Node> extends DisplayTopComponent {
     private boolean abandon = false;
     private EntityStateChangeListener statechangelistener;
 
