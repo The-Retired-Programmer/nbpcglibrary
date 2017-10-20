@@ -20,8 +20,8 @@ import java.util.List;
 import org.openide.awt.StatusDisplayer;
 import org.openide.nodes.Node;
 import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
-import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams;
-import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
+//import uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams;
+//import static uk.theretiredprogrammer.nbpcglibrary.data.entity.EntityStateChangeEventParams.EntityStateChange.REMOVE;
 import uk.theretiredprogrammer.nbpcglibrary.form.PanePresenter;
 
 /**
@@ -107,10 +107,10 @@ public abstract class EditorTopComponent<N extends Node> extends DisplayTopCompo
 
         @Override
         public void action(Object p) {
-            if ( ((EntityStateChangeEventParams)p).getTransition() == REMOVE) {
-                abandon = true;
-                EditorTopComponent.this.close();
-            }
+//            if ( ((EntityStateChangeEventParams)p).getTransition() == REMOVE) {
+//                abandon = true;
+//                EditorTopComponent.this.close();
+//            }
         }
     }
 }

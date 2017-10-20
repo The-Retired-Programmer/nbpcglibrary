@@ -25,6 +25,7 @@
         <module>htmlrest</module>
         <module>dbrest</module>
         <module>filerest</module>
+        <module>rules</module>
     </modules>
     
     <url>http://www.theretiredprogrammer.uk/nbpcglibrary</url>

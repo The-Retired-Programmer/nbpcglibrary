@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.common;
+package uk.theretiredprogrammer.nbpcglibrary.rules;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * Defines a rule to be associated with a field.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
+ * @param <E> the base entity type
  * @param <T> the class of the object being tested
  */
-public abstract class Rule<T> {
+public abstract class Rule<E, T> {
 
     private final String failuremessage;
-    private final Supplier<T> provider;
+    private final Function<E, T> provider;
 
     /**
      * Constructor
@@ -35,7 +36,7 @@ public abstract class Rule<T> {
      * @param failuremessage the failure message to be displayed when this rule
      * is broken
      */
-    public Rule(Supplier<T> provider,String failuremessage) {
+    public Rule(Function<E, T> provider, String failuremessage) {
         this.failuremessage = failuremessage;
         this.provider = provider;
     }
@@ -44,10 +45,11 @@ public abstract class Rule<T> {
      * Test if the rule is passing.
      *
      * @param sb the StringBuilder collecting failure messages
+     * @param be the base entity from which the value to test is to be extracted
      * @return true if rule is passing
      */
-    public final boolean check(StringBuilder sb) {
-        if (ruleCheck(provider)) {
+    public final boolean check(StringBuilder sb, E be) {
+        if (ruleCheck(provider, be)) {
             return true;
         }
         sb.append(failuremessage);
@@ -57,8 +59,9 @@ public abstract class Rule<T> {
     /**
      * Test if the rule is passing.
      *
-     * @param provider  the provider of the value
+     * @param provider the provider of the value
+     * @param be the base entity from which the value to test is to be extracted
      * @return true if rule is passing
      */
-    protected abstract boolean ruleCheck(Supplier<T> provider);
+    protected abstract boolean ruleCheck(Function<E, T> provider, E be);
 }

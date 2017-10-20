@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.form;
 
 import java.util.List;
-import uk.theretiredprogrammer.nbpcglibrary.common.Rules;
 
 /**
  * The Field Model API
@@ -24,7 +23,7 @@ import uk.theretiredprogrammer.nbpcglibrary.common.Rules;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  * @param <T> the type of the field value
  */
-public abstract class FieldModel<T> extends Rules {
+public abstract class FieldModel<T> {
 
     /**
      * Set the value in this field model

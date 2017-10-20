@@ -32,6 +32,7 @@ public abstract class IdTimestampBaseEntity {
      * Constructor.
      */
     public IdTimestampBaseEntity() {
+        id = 0;
     }
 
     /**

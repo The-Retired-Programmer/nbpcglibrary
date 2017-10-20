@@ -40,6 +40,11 @@
             <artifactId>data</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
+            <artifactId>rules</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

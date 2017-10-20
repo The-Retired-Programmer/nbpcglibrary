@@ -17,7 +17,13 @@ package uk.theretiredprogrammer.nbpcglibrary.form;
 
 import java.util.List;
 import java.util.function.Consumer;
-import uk.theretiredprogrammer.nbpcglibrary.common.Rules;
+import uk.theretiredprogrammer.nbpcglibrary.rules.FilenameRule;
+import uk.theretiredprogrammer.nbpcglibrary.rules.FoldernameRule;
+import uk.theretiredprogrammer.nbpcglibrary.rules.MaxIntegerRule;
+import uk.theretiredprogrammer.nbpcglibrary.rules.MaxStringRule;
+import uk.theretiredprogrammer.nbpcglibrary.rules.MinIntegerRule;
+import uk.theretiredprogrammer.nbpcglibrary.rules.MinStringRule;
+import uk.theretiredprogrammer.nbpcglibrary.rules.Rules;
 
 /**
  * The Field Model - Basic implementation
@@ -31,6 +37,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
     private Consumer<T> callbackfunction;
     private boolean isNullSelectionAllowed;
     private List<T> choices;
+    private final Rules<T> rules = new Rules<>();
 
     /**
      * Constructor
@@ -100,7 +107,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
 
     @Override
     public boolean test(StringBuilder sb) {
-        return checkRules(sb);
+        return rules.checkRules(sb, value);
     }
 
     @Override
@@ -120,7 +127,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addMinStringRule(int min) {
-        addRule(new Rules.MinStringRule(() -> (String) value, min));
+        rules.addRule(new MinStringRule((v) -> v, min));
         return this;
     }
 
@@ -131,7 +138,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addMaxStringRule(int max) {
-        addRule(new Rules.MaxStringRule( () -> (String) value, max));
+        rules.addRule(new MaxStringRule((v) -> v, max));
         return this;
     }
 
@@ -142,7 +149,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addMinIntegerRule(int min) {
-        addRule(new Rules.MinIntegerRule(() -> (Integer) value, min));
+        rules.addRule(new MinIntegerRule((v) -> v, min));
         return this;
     }
     
@@ -153,7 +160,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addMaxIntegerRule(int max) {
-        addRule(new MaxIntegerRule(() -> (Integer) value, max));
+        rules.addRule(new MaxIntegerRule((v) -> v, max));
         return this;
     }
 
@@ -163,7 +170,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addFilenameRule() {
-        addRule(new Rules.FilenameRule( ()-> (String) value));
+        rules.addRule(new FilenameRule((v)-> v));
         return this;
     }
 
@@ -173,7 +180,7 @@ public class BasicFieldModel<T> extends FieldModel<T> {
      * @return itself (to enable fluent construction)
      */
     public BasicFieldModel<T> addFoldernameRule() {
-        addRule(new Rules.FoldernameRule( ()-> (String) value));
+        rules.addRule(new FoldernameRule((v)-> v));
         return this;
     }
 }
