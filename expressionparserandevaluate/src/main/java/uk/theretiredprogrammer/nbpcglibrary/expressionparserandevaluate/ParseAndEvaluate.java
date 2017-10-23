@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate;
 
 import java.util.Map;
-import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parse.SyntaxAnalyser;
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parsetree.ParseTree;
 import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parsetree.ParseTreeBooleanResult;
@@ -28,7 +27,6 @@ import uk.theretiredprogrammer.nbpcglibrary.expressionparserandevaluate.parsetre
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-@RegisterLog("nbpcglibrary.expressionparserandevaluate")
 public class ParseAndEvaluate {
 
     private final LanguageDefinition languagedefinition;

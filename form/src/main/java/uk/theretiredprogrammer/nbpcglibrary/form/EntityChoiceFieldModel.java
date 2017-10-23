@@ -16,7 +16,6 @@
 package uk.theretiredprogrammer.nbpcglibrary.form;
 
 import java.io.IOException;
-import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 
 /**
  * The Choice Field Model - basic implementation
@@ -32,7 +31,7 @@ public abstract class EntityChoiceFieldModel<T> extends EntityFieldModel<T> {
      * @param listener the listener
      * @throws IOException if problems
      */
-    public void addCollectionListeners(Listener listener) throws IOException {
+    public void addCollectionListeners(Runnable listener) throws IOException {
     }
 
     /**
@@ -42,6 +41,6 @@ public abstract class EntityChoiceFieldModel<T> extends EntityFieldModel<T> {
      * @param listener the listener
      * @throws IOException if problems
      */
-    public void removeCollectionListeners(Listener listener) throws IOException {
+    public void removeCollectionListeners(Runnable listener) throws IOException {
     }
 }

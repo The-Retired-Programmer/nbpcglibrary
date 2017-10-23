@@ -19,9 +19,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
-import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
-import uk.theretiredprogrammer.nbpcglibrary.common.Event;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -34,7 +31,7 @@ import org.openide.NotifyDescriptor;
 public class ErrorInformationDialog {
 
     private final DialogDescriptor dd;
-    private final Event dialogDone = new Event();
+    private final Runnable dialogDone;
     private static ErrorInformationDialog instance;
 
     /**
@@ -44,12 +41,12 @@ public class ErrorInformationDialog {
      * @param message the dialog message
      * @param l a listener which will be fired when the dialog is closed
      */
-    public static void show(String title, String message, Listener l) {
+    public static void show(String title, String message, Runnable l) {
         instance = new ErrorInformationDialog(title, message, l);
     }
 
-    private ErrorInformationDialog(String title, String message, Listener l) {
-        dialogDone.addListener(l);
+    private ErrorInformationDialog(String title, String message, Runnable l) {
+        dialogDone = l;
         dd = new DialogDescriptor(
                 message,
                 title,
@@ -70,7 +67,7 @@ public class ErrorInformationDialog {
         @Override
         public void actionPerformed(ActionEvent ae) {
             dd.setClosingOptions(null); // and allow closing
-            dialogDone.fire(null);
+            dialogDone.run();
             instance = null;
         }
     }
@@ -82,7 +79,7 @@ public class ErrorInformationDialog {
             if (pce.getPropertyName().equals(DialogDescriptor.PROP_VALUE)
                     && pce.getNewValue() == DialogDescriptor.CLOSED_OPTION) {
                 dd.setClosingOptions(null); // and allow closing
-                dialogDone.fire(null);
+                dialogDone.run();
                 instance = null;
             }
         }

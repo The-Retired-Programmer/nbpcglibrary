@@ -39,7 +39,7 @@ import javax.json.JsonValue;
 import javax.json.JsonWriter;
 import javax.json.stream.JsonParsingException;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
-import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
+import uk.theretiredprogrammer.nbpcglibrary.api.Settings;
 import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 
 /**

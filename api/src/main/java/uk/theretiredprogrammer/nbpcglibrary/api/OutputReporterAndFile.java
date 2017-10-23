@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package uk.theretiredprogrammer.nbpcglibrary.common;
+package uk.theretiredprogrammer.nbpcglibrary.api;
 
+import uk.theretiredprogrammer.nbpcglibrary.api.OutputReporter;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;

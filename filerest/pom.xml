@@ -26,16 +26,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <artifactId>data</artifactId>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>

@@ -29,7 +29,7 @@ import java.util.Properties;
 class ApplicationProperties {
 
     private static ApplicationProperties instance;
-    private Properties properties = new Properties();
+    private final Properties properties = new Properties();
 
     /**
      * Setup a new Applications Properties Instance.
@@ -39,7 +39,7 @@ class ApplicationProperties {
      * @return the application properties instance
      * @throws ApplicationPropertiesException if problems reading/parse properties
      */
-    static ApplicationProperties set(InputStream in) throws ApplicationPropertiesException {
+    static ApplicationProperties set(InputStream in) throws IOException {
         return instance = new ApplicationProperties(in);
     }
 
@@ -52,12 +52,8 @@ class ApplicationProperties {
         return instance;
     }
 
-    private ApplicationProperties(InputStream in) throws ApplicationPropertiesException {
-        try {
-            properties.load(in);
-        } catch (IOException ex) {
-            throw new ApplicationPropertiesException(ex);
-        }
+    private ApplicationProperties(InputStream in) throws IOException {
+        properties.load(in);
     }
 
     /**

@@ -18,7 +18,6 @@ package uk.theretiredprogrammer.nbpcglibrary.form;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
 
 /**
  * Presenter for a composite object (composed of many vertically stacked
@@ -26,7 +25,6 @@ import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-@RegisterLog("nbpcglibrary.form")
 public class CompositePresenter implements PanePresenter<PanePresenter> {
 
     private List<PanePresenter> childpresenters;

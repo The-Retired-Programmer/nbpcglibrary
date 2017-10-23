@@ -31,16 +31,6 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <artifactId>common</artifactId>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <artifactId>form</artifactId>
             <groupId>uk.theretiredprogrammer.nbpcglibrary</groupId>
             <version>${project.version}</version>
@@ -63,6 +53,11 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-dialogs</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
     </dependencies>

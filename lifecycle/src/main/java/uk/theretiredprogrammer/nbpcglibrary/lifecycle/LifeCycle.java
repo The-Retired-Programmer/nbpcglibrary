@@ -15,18 +15,17 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
+import java.io.IOException;
 import uk.theretiredprogrammer.nbpcglibrary.htmlrest.AandA;
 import java.io.InputStream;
 import java.util.List;
 import java.util.function.Supplier;
 import org.openide.LifecycleManager;
-import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
 import uk.theretiredprogrammer.nbpcglibrary.form.ErrorInformationDialog;
 import org.openide.windows.WindowManager;
 import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationLookup;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
-import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
-import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
+import uk.theretiredprogrammer.nbpcglibrary.api.Settings;
 import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
 
 /**
@@ -34,7 +33,6 @@ import uk.theretiredprogrammer.nbpcglibrary.form.Dialog;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-@RegisterLog("nbpcglibrary.lifecycle")
 public abstract class LifeCycle implements Runnable {
     
     private static final ExitApplication EXITAPPLICATION = new ExitApplication();
@@ -53,7 +51,7 @@ public abstract class LifeCycle implements Runnable {
         LifeCycle.restclasscreators = restclasscreators;
         try {
             ApplicationProperties.set(in);
-        } catch (ApplicationPropertiesException ex) {
+        } catch (IOException ex) {
             stop(ex);
         }
     }
@@ -144,12 +142,12 @@ public abstract class LifeCycle implements Runnable {
     }
 
     /**
-     * An Listener Class which when fired will close down the application.
+     *  Close down the application.
      */
-    private static class ExitApplication extends Listener {
+    private static class ExitApplication implements Runnable {
 
         @Override
-        public void action(Object lp) {
+        public void run() {
             LifecycleManager.getDefault().exit();
         }
     }

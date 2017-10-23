@@ -46,19 +46,17 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
 import javax.json.JsonValue;
 import javax.json.JsonWriter;
-import uk.theretiredprogrammer.nbpcglibrary.annotations.RegisterLog;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
-import uk.theretiredprogrammer.nbpcglibrary.common.Settings;
+import uk.theretiredprogrammer.nbpcglibrary.api.Settings;
 import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
 
 /**
- * EntityPersistenceProvider Class for access localSQL databases
+ * DBRest Class for access  to localSQL databases
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  * @param <E> the Entity class being processed
  */
-@RegisterLog("nbpcglib.localdatabaseaccess")
 public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
 
     private String tablename;

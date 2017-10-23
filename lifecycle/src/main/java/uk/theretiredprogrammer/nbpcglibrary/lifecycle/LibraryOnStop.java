@@ -17,7 +17,6 @@ package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
 import java.util.concurrent.Callable;
 import org.netbeans.api.actions.Savable;
-import uk.theretiredprogrammer.nbpcglibrary.common.ConfirmationDialog;
 import org.openide.modules.OnStop;
 
 /**

@@ -21,8 +21,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
-import uk.theretiredprogrammer.nbpcglibrary.common.Event;
-import uk.theretiredprogrammer.nbpcglibrary.common.Listener;
 
 /**
  * the Dialog Class. Dialogs are constructed with one or more panels.
@@ -35,7 +33,7 @@ public class Dialog {
     private final DialogDescriptor dd;
     private final PanePresenter presenter;
     private final String title;
-    private final Event cancellationEvent;
+    private final Runnable cancellationEvent;
 
     /**
      * Display the dialog.
@@ -46,7 +44,7 @@ public class Dialog {
     public static void show(String title, PanePresenter presenter) {
         instance = new Dialog(title, presenter, false, null);
     }
-    
+
     /**
      * Display the modal dialog.
      *
@@ -62,20 +60,19 @@ public class Dialog {
      *
      * @param title the dialog title
      * @param presenter the presenter used to create the body of the dialog
-     * @param onCancellation listener for dialog completion
+     * @param onCancellation action to be run on cancellation
      */
-    public static void showModal(String title, PanePresenter presenter, Listener onCancellation) {
+    public static void showModal(String title, PanePresenter presenter, Runnable onCancellation) {
         instance = new Dialog(title, presenter, true, onCancellation);
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private Dialog(String title, PanePresenter presenter, boolean isModal, Listener onCancellation) {
+    private Dialog(String title, PanePresenter presenter, boolean isModal, Runnable onCancellation) {
         this.presenter = presenter;
         presenter.enableView();
         PaneView view = (PaneView) this.presenter.getView();
         this.title = title;
-        cancellationEvent = new Event();
-        cancellationEvent.addListener(onCancellation);
+        cancellationEvent = onCancellation;
         dd = new DialogDescriptor(
                 view,
                 title,
@@ -120,6 +117,6 @@ public class Dialog {
     private void formCancel() {
         dd.setClosingOptions(null); // and allow closing
         instance = null;
-        cancellationEvent.fire(null);
+        cancellationEvent.run();
     }
 }
