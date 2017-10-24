@@ -41,9 +41,10 @@ public class ClaimEntity extends IdTimestampBaseEntity {
 
     /**
      * Constructor - ClaimEntity.
+     * @param from the entity to copy from
      */
     public ClaimEntity(ClaimEntity from) {
-        super(from);
+        super.copy(from);
         claimkey = from.claimkey;
         value = from.value;
         user = from.user;

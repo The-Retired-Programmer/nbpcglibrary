@@ -36,10 +36,11 @@ public abstract class IdTimestampBaseEntity {
     }
 
     /**
-     * Constructor.
+     * Copy all value from the given entity
+     * 
      * @param from the entity to copy from
      */
-    public IdTimestampBaseEntity(IdTimestampBaseEntity from) {
+    public final void copy(IdTimestampBaseEntity from) {
         id = from.id;
         createdby = from.createdby;
         createdon = from.createdon;
