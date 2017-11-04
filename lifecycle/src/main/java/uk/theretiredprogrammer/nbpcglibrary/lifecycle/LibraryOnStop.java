@@ -28,7 +28,7 @@ import org.openide.modules.OnStop;
 @OnStop
 public class LibraryOnStop implements Callable<Boolean> {
     
-    private static boolean enableSavable = false;
+    private static boolean enableSavable = true;
 
     @Override
     public Boolean call() {

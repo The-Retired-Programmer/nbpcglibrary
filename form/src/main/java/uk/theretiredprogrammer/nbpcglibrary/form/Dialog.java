@@ -51,8 +51,9 @@ public class Dialog {
      * @param title the dialog title
      * @param presenter the presenter used to create the body of the dialog
      */
+    @SuppressWarnings("empty-statement")
     public static void showModal(String title, PanePresenter presenter) {
-        instance = new Dialog(title, presenter, true, null);
+        instance = new Dialog(title, presenter, true, () -> {;});
     }
 
     /**

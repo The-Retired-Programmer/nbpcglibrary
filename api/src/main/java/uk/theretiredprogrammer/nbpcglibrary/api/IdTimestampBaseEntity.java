@@ -22,17 +22,34 @@ package uk.theretiredprogrammer.nbpcglibrary.api;
  */
 public abstract class IdTimestampBaseEntity {
     
+    public static final int NEWSTATE = 0;
+    public static final int COPYNEWSTATE = -1;
     private Integer id;
     private String createdby;
     private String createdon;
     private String updatedby;
     private String updatedon;
+    
 
     /**
      * Constructor.
      */
     public IdTimestampBaseEntity() {
         id = 0;
+    }
+    
+    /**
+     * Copy all value from the given entity
+     * 
+     * @param state the state for this entity
+     * @param from the entity to copy from
+     */
+    public final void copy(int state, IdTimestampBaseEntity from) {
+        id = state;
+        createdby = from.createdby;
+        createdon = from.createdon;
+        updatedby = from.updatedby;
+        updatedon = from.updatedon;
     }
 
     /**
