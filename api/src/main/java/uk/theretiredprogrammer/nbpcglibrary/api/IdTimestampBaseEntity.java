@@ -22,49 +22,62 @@ package uk.theretiredprogrammer.nbpcglibrary.api;
  */
 public abstract class IdTimestampBaseEntity {
     
-    public static final int NEWSTATE = 0;
-    public static final int COPYNEWSTATE = -1;
     private Integer id;
     private String createdby;
     private String createdon;
     private String updatedby;
     private String updatedon;
     
-
+    private boolean dirty = false;
+    
     /**
      * Constructor.
      */
     public IdTimestampBaseEntity() {
-        id = 0;
+        id = 0;  // not persistent
     }
     
     /**
      * Copy all value from the given entity
      * 
-     * @param state the state for this entity
+     * @param dirtystate the dirty state for this entity
      * @param from the entity to copy from
      */
-    public final void copy(int state, IdTimestampBaseEntity from) {
-        id = state;
-        createdby = from.createdby;
-        createdon = from.createdon;
-        updatedby = from.updatedby;
-        updatedon = from.updatedon;
-    }
-
-    /**
-     * Copy all value from the given entity
-     * 
-     * @param from the entity to copy from
-     */
-    public final void copy(IdTimestampBaseEntity from) {
+    public final void copy(boolean dirtystate, IdTimestampBaseEntity from) {
         id = from.id;
         createdby = from.createdby;
         createdon = from.createdon;
         updatedby = from.updatedby;
         updatedon = from.updatedon;
+        dirty = dirtystate;
     }
-
+    
+    /**
+     * Test if this entity is persistent (ie has existed in persistent storage.
+     *
+     * @return true if the entity is persistent
+     */
+    public boolean isPersistent() {
+        return getId() > 0;
+    }
+    
+    /**
+     * Set Dirty state.  Marks entity as needing saving.
+     * @param dirtystate the required dirty state
+     */
+    public final void dirty(boolean dirtystate) {
+        dirty = dirtystate;
+    }
+    
+    /**
+     * Get Dirty state.
+     * 
+     * @return the dirty state
+     */
+    public final boolean dirty() {
+        return dirty;
+    }
+    
     /**
      * Get the id.
      *
@@ -162,6 +175,6 @@ public abstract class IdTimestampBaseEntity {
      * @return true if this entity has field set to defined value
      */
     public boolean isMatch(String fieldname, int fieldvalue) {
-        return false; // default action - overriide if method is fully supported by base entity
+        return false; // default action - override if method is fully supported by base entity
     }
 }
