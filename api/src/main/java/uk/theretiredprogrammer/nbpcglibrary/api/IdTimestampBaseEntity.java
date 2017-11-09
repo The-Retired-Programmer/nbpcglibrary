@@ -57,7 +57,7 @@ public abstract class IdTimestampBaseEntity {
      *
      * @return true if the entity is persistent
      */
-    public boolean isPersistent() {
+    public boolean persistent() {
         return getId() > 0;
     }
     

@@ -11,16 +11,13 @@
     
     <modules>
         <module>api</module>
+        <module>rules</module>
         <module>form</module>
         <module>icons</module>
-        <module>email</module>
-        <module>expressionparserandevaluate</module>
         <module>lifecycle</module>
-        <module>simpleexpressionlanguage</module>
         <module>htmlrest</module>
         <module>dbrest</module>
         <module>filerest</module>
-        <module>rules</module>
     </modules>
     
     <url>http://www.theretiredprogrammer.uk/nbpcglibrary</url>
