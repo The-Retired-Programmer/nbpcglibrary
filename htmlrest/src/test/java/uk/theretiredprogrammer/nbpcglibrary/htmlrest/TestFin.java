@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 richard linsdale
+ * Copyright 2017 richard.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,37 +15,76 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.htmlrest;
 
-import io.jsonwebtoken.Jwts;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.junit.Test;
 
 /**
  *
- * @author richard linsdale (richard @ theretiredprogrammer.uk)
+ * @author richard
  */
-public class AandA {
+public class TestFin {
+    
+    /**
+     * Test of Fin provider db entries .
+     */
+    @Test
+    public void finProviderGetAll() {
+        System.out.println("Fin Provider GetAll");
+        String url = "http://localhost:8080";
+        String u = "richard@rlinsdale.uk";
+        String p = "password";
+        assert (authenticate(url, u, p));
+        List<ProviderEntity> res = providerGetAll(url, jwtoken);
+        assert(res != null && 14 == res.size());
+    }
 
     private static final Client CLIENT = ClientBuilder.newClient();
     private static String jwtoken;
-    private static Map<String, Object> appclaims;
     private static int lastAuthStatus = 0;
 
-    public static boolean authenticate(String appkey, String url, String u, String p) {
-        return authenticate(appkey, url, new AuthData(u, p));
+    private List<ProviderEntity> providerGetAll(String url, String auth) {
+        if (auth != null) {
+            if (url == null) {
+                lastAuthStatus = 600; // private status = bad url
+                return null;
+            }
+            try {
+                // check the Token
+                Response response = CLIENT
+                        .target(url + "/fin/providers/")
+                        .request(MediaType.APPLICATION_JSON_TYPE)
+                        .header("authorization", "bearer " + auth)
+                        .get();
+                lastAuthStatus = response.getStatus();
+                if (lastAuthStatus == 200) {
+                    return response.readEntity(new GenericType<List<ProviderEntity>>() {
+                    });
+                } else {
+                    return null;
+                }
+            } catch (ProcessingException ex) {
+                return null;
+            }
+        }
+        return null;
     }
 
-    private static boolean authenticate(String appkey, String url, AuthData authdata) {
+    public static boolean authenticate(String url, String u, String p) {
+        return authenticate(url, new AuthData(u, p));
+    }
+
+    private static boolean authenticate(String url, AuthData authdata) {
         if (url == null) {
             lastAuthStatus = 600; // private status = bad url
             return false;
         }
-        int appkeyl = appkey.length();
         try {
             Response response = CLIENT
                     .target(url + "/auth/auth")
@@ -57,48 +96,11 @@ public class AandA {
                 return false;
             }
             jwtoken = response.readEntity(String.class);
-            // now check the Token
-            response = CLIENT
-                    .target(url + "/auth/auth")
-                    .request(MediaType.TEXT_PLAIN_TYPE)
-                    .header("authorization", "bearer " + jwtoken)
-                    .get();
-            lastAuthStatus = response.getStatus();
-            if (lastAuthStatus != 200) {
-                jwtoken = null;
-                return false;
-            }
-            //parse the unsigned token to extract claims
-            appclaims = Jwts.parser()
-                    .parseClaimsJwt(jwtoken.substring(0, jwtoken.lastIndexOf('.') + 1))
-                    .getBody()
-                    .entrySet().stream()
-                    .filter(e -> e.getKey().startsWith(appkey))
-                    .collect(Collectors.toMap(e -> e.getKey().substring(appkeyl), e -> e.getValue()));
-            if (appclaims.size() > 0 ) {
-                return true;
-            } else {
-                lastAuthStatus = 602; // private code - not authorised
-                return false;
-            }
+            return true;
         } catch (ProcessingException ex) {
             lastAuthStatus = 601; // private code - invalid format
             return false;
         }
-    }
-    
-    public static int getLastAuthStatus() {
-        return lastAuthStatus;
-    }
-
-    public static String getAuthority(String appkey) {
-        return appclaims == null
-                ? null
-                : (String) appclaims.get(appkey);
-    }
-    
-    public static String getToken() {
-        return jwtoken;
     }
 
     private static class AuthData {
