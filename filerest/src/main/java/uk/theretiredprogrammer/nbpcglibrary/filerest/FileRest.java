@@ -40,7 +40,7 @@ import javax.json.JsonWriter;
 import javax.json.stream.JsonParsingException;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.api.Settings;
-import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestamp;
 
 /**
  * EntityPersistenceProvider Class for access local Json File based persistent
@@ -49,7 +49,7 @@ import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  * @param <E> the base Entity class being managed
  */
-public class FileRest<E extends IdTimestampBaseEntity> implements Rest<E> {
+public class FileRest<E extends IdTimestamp> implements Rest<E> {
 
     private String name;
     private int nextid;

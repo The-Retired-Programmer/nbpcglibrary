@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 richard linsdale
+ * Copyright 2017-2018 richard linsdale
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ public class AandA {
     private static String jwtoken;
     private static Map<String, Object> appclaims;
     private static int lastAuthStatus = 0;
+    private static String lastAuthMessage;
 
     public static boolean authenticate(String appkey, String url, String u, String p) {
         return authenticate(appkey, url, new AuthData(u, p));
@@ -54,6 +55,7 @@ public class AandA {
                     .post(Entity.json(authdata), Response.class);
             lastAuthStatus = response.getStatus();
             if (lastAuthStatus != 201) {
+                lastAuthMessage = response.readEntity(String.class);
                 return false;
             }
             jwtoken = response.readEntity(String.class);
@@ -64,6 +66,7 @@ public class AandA {
                     .header("authorization", "bearer " + jwtoken)
                     .get();
             lastAuthStatus = response.getStatus();
+            lastAuthMessage = response.readEntity(String.class);
             if (lastAuthStatus != 200) {
                 jwtoken = null;
                 return false;
@@ -89,6 +92,10 @@ public class AandA {
     
     public static int getLastAuthStatus() {
         return lastAuthStatus;
+    }
+    
+    public static String getLastAuthMessage() {
+        return lastAuthMessage;
     }
 
     public static String getAuthority(String appkey) {

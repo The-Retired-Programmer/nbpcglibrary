@@ -27,7 +27,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import uk.theretiredprogrammer.nbpcglibrary.api.BasicEntityCache;
-import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestamp;
 
 /**
  * The class implementing the core functions of the Rest interface for
@@ -36,7 +36,7 @@ import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
  * @author richard linsdale (richard @ theretiredprogrammer.uk)
  * @param <E> the entity class being transferred
  */
-public class HTMLRest<E extends IdTimestampBaseEntity> implements Rest<E> {
+public class HTMLRest<E extends IdTimestamp> implements Rest<E> {
 
     private final Client client = ClientBuilder.newClient();
     private final Class<E> responseEntityClass;

@@ -21,6 +21,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
+import uk.theretiredprogrammer.nbpcglibrary.htmlrest.AandA;
 
 /**
  *
@@ -86,6 +87,9 @@ public final class ProblemWarningTC extends TopComponent {
                     default:
                         sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authconnect"));
                 }
+                sb.append("<p>message was: ");
+                sb.append(AandA.getLastAuthMessage());
+                sb.append("</p>");
             }
             if (!LifeCycle.areSettingsSaved()) {
                 sb.append("<br/><hr>");

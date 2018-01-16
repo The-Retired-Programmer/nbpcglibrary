@@ -49,7 +49,7 @@ import javax.json.JsonWriter;
 import uk.theretiredprogrammer.nbpcglibrary.api.LogicException;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import uk.theretiredprogrammer.nbpcglibrary.api.Settings;
-import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestamp;
 
 /**
  * DBRest Class for access  to localSQL databases
@@ -57,7 +57,7 @@ import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  * @param <E> the Entity class being processed
  */
-public class DBRest<E extends IdTimestampBaseEntity> implements Rest<E> {
+public class DBRest<E extends IdTimestamp> implements Rest<E> {
 
     private String tablename;
     private String ordercolumn;

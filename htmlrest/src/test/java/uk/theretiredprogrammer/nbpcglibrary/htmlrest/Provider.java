@@ -19,7 +19,7 @@ package uk.theretiredprogrammer.nbpcglibrary.htmlrest;
  *
  * @author richard
  */
-public class ProviderEntity {
+public class Provider {
 
     private String shortname;
     private String description;
@@ -31,14 +31,14 @@ public class ProviderEntity {
     private String updatedby;
     private String updatedon;
 
-    public ProviderEntity() {
+    public Provider() {
     }
 
-    public ProviderEntity(Integer id) {
+    public Provider(Integer id) {
         this.id = id;
     }
 
-    public ProviderEntity(Integer id, String shortname, boolean allowpandl, boolean allowbs, String createdby, String createdon, String updatedby, String updatedon) {
+    public Provider(Integer id, String shortname, boolean allowpandl, boolean allowbs, String createdby, String createdon, String updatedby, String updatedon) {
         this.id = id;
         this.shortname = shortname;
         this.allowpandl = allowpandl;

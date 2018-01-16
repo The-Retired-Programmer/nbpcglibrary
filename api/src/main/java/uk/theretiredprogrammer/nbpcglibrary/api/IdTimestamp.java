@@ -20,7 +20,7 @@ package uk.theretiredprogrammer.nbpcglibrary.api;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public abstract class IdTimestampBaseEntity {
+public abstract class IdTimestamp {
     
     private Integer id;
     private String createdby;
@@ -33,7 +33,7 @@ public abstract class IdTimestampBaseEntity {
     /**
      * Constructor.
      */
-    public IdTimestampBaseEntity() {
+    public IdTimestamp() {
         id = 0;  // not persistent
     }
     
@@ -43,7 +43,7 @@ public abstract class IdTimestampBaseEntity {
      * @param dirtystate the dirty state for this entity
      * @param from the entity to copy from
      */
-    public final void copy(boolean dirtystate, IdTimestampBaseEntity from) {
+    public final void copy(boolean dirtystate, IdTimestamp from) {
         id = from.id;
         createdby = from.createdby;
         createdon = from.createdon;

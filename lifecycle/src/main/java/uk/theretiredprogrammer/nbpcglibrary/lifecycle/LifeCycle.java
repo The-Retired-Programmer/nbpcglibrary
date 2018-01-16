@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Richard Linsdale.
+ * Copyright 2015-2018 Richard Linsdale.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,9 @@ public abstract class LifeCycle implements Runnable {
                 ApplicationProperties.getDefault().get("jwt.claims.prefix"),
                 Settings.get("auth.server"),
                 user,pwd);
-        restclasscreators.forEach(creator-> ApplicationLookup.getDefault().add(creator.get()));
+        if (restclasscreators != null ) {
+            restclasscreators.forEach(creator-> ApplicationLookup.getDefault().add(creator.get()));
+        }
         WindowManager.getDefault().setRole(isProblem() ? "PROBLEMS" : isWarning() ? "WARNINGS" : "OPERATIONAL");
     } 
 
@@ -81,7 +83,8 @@ public abstract class LifeCycle implements Runnable {
      * @return true if the Setting appear to be initialised 
      */
     static boolean areSettingsSaved() {
-        return Settings.get(ApplicationProperties.getDefault().get("jwt.claims.prefix")+"settings.saved") != null;
+        String prefix = ApplicationProperties.getDefault().get("jwt.claims.prefix");
+        return Settings.get(prefix+"settings.saved") != null;
     }
     
     /**

@@ -35,7 +35,7 @@ import java.util.Map;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  * @param <E> The Basic Entity Class being managed
  */
-public class BasicEntityCache<E extends IdTimestampBaseEntity> {
+public class BasicEntityCache<E extends IdTimestamp> {
 
     private static final int MAXLRUCACHE = 10;
 

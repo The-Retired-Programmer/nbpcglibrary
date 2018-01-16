@@ -41,7 +41,7 @@ public class TestFin {
         String u = "richard@rlinsdale.uk";
         String p = "password";
         assert (authenticate(url, u, p));
-        List<ProviderEntity> res = providerGetAll(url, jwtoken);
+        List<Provider> res = providerGetAll(url, jwtoken);
         assert(res != null && 14 == res.size());
     }
 
@@ -49,7 +49,7 @@ public class TestFin {
     private static String jwtoken;
     private static int lastAuthStatus = 0;
 
-    private List<ProviderEntity> providerGetAll(String url, String auth) {
+    private List<Provider> providerGetAll(String url, String auth) {
         if (auth != null) {
             if (url == null) {
                 lastAuthStatus = 600; // private status = bad url
@@ -64,7 +64,7 @@ public class TestFin {
                         .get();
                 lastAuthStatus = response.getStatus();
                 if (lastAuthStatus == 200) {
-                    return response.readEntity(new GenericType<List<ProviderEntity>>() {
+                    return response.readEntity(new GenericType<List<Provider>>() {
                     });
                 } else {
                     return null;

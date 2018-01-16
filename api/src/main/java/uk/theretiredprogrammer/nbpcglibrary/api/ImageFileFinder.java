@@ -23,7 +23,7 @@ import java.io.File;
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  * @param <E> The base entity class
  */
-public interface ImageFileFinder<E extends IdTimestampBaseEntity> {
+public interface ImageFileFinder<E extends IdTimestamp> {
 
     /**
      * Get the image associated with this entity.

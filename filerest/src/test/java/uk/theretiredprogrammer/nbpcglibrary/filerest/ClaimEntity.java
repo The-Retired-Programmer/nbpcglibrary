@@ -15,7 +15,7 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.filerest;
 
-import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
+import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestamp;
 
 /**
  * The Claim BaseEntity.
@@ -26,7 +26,7 @@ import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestampBaseEntity;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-public class ClaimEntity extends IdTimestampBaseEntity {
+public class ClaimEntity extends IdTimestamp {
     
     private String claimkey;
     private String value;
