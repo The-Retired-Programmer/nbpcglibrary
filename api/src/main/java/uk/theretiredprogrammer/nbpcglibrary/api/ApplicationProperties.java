@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Richard Linsdale.
+ * Copyright 2015-2018 Richard Linsdale.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
+package uk.theretiredprogrammer.nbpcglibrary.api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import java.util.Properties;
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
-class ApplicationProperties {
+public class ApplicationProperties {
 
     private static ApplicationProperties instance;
     private final Properties properties = new Properties();
@@ -37,9 +37,9 @@ class ApplicationProperties {
      * @param in the input stream from which the application properties are to
      * be read
      * @return the application properties instance
-     * @throws ApplicationPropertiesException if problems reading/parse properties
+     * @throws java.io.IOException if problems
      */
-    static ApplicationProperties set(InputStream in) throws IOException {
+    public static ApplicationProperties set(InputStream in) throws IOException {
         return instance = new ApplicationProperties(in);
     }
 
@@ -48,7 +48,7 @@ class ApplicationProperties {
      *
      * @return the application properties instance
      */
-    static ApplicationProperties getDefault() {
+    public static ApplicationProperties getDefault() {
         return instance;
     }
 
@@ -63,7 +63,7 @@ class ApplicationProperties {
      * @return the property value (or and empty string if the property name has
      * not been defined)
      */
-    String get(String name) {
+    public String get(String name) {
         return get(name, "");
     }
 
@@ -75,7 +75,7 @@ class ApplicationProperties {
      * defined
      * @return the property value
      */
-    String get(String name, String missing) {
+    public String get(String name, String missing) {
         return properties.getProperty(name, missing);
     }
 }

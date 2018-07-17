@@ -15,6 +15,7 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
 
+import uk.theretiredprogrammer.nbpcglibrary.api.ApplicationProperties;
 import org.openide.windows.OnShowing;
 import org.openide.windows.WindowManager;
 

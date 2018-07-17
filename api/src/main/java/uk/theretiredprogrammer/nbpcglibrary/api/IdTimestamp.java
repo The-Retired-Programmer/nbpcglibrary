@@ -15,31 +15,34 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.api;
 
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+
 /**
  * The IdTimestampBaseEntity.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
 public abstract class IdTimestamp {
-    
+
     private Integer id;
     private String createdby;
     private String createdon;
     private String updatedby;
     private String updatedon;
-    
+
     private boolean dirty = false;
-    
+
     /**
      * Constructor.
      */
     public IdTimestamp() {
         id = 0;  // not persistent
     }
-    
+
     /**
      * Copy all value from the given entity
-     * 
+     *
      * @param dirtystate the dirty state for this entity
      * @param from the entity to copy from
      */
@@ -51,7 +54,7 @@ public abstract class IdTimestamp {
         updatedon = from.updatedon;
         dirty = dirtystate;
     }
-    
+
     /**
      * Test if this entity is persistent (ie has existed in persistent storage.
      *
@@ -60,24 +63,25 @@ public abstract class IdTimestamp {
     public boolean persistent() {
         return getId() > 0;
     }
-    
+
     /**
-     * Set Dirty state.  Marks entity as needing saving.
+     * Set Dirty state. Marks entity as needing saving.
+     *
      * @param dirtystate the required dirty state
      */
     public final void dirty(boolean dirtystate) {
         dirty = dirtystate;
     }
-    
+
     /**
      * Get Dirty state.
-     * 
+     *
      * @return the dirty state
      */
     public final boolean dirty() {
         return dirty;
     }
-    
+
     /**
      * Get the id.
      *
@@ -167,9 +171,32 @@ public abstract class IdTimestamp {
     public final void setUpdatedon(String updatedon) {
         this.updatedon = updatedon;
     }
+
+    protected final void insertIdTimestamp(JsonObject jobj) {
+        id = jobj.getInt("id");
+        createdby = jobj.getString("createdby");
+        createdon = jobj.getString("createdon");
+        updatedby = jobj.getString("updatedby");
+        updatedon = jobj.getString("updatedon");
+    }
+
+    public String toJson() {
+        return toJsonObject().toString();
+    }
     
+    public abstract JsonObject toJsonObject();
+
+    protected final void addIdTimestamp(JsonObjectBuilder job) {
+        job.add("id", id)
+                .add("createdby", createdby)
+                .add("createdon", createdon)
+                .add("updatedby", updatedby)
+                .add("updatedon", updatedon);
+    }
+
     /**
-     *  Test if required field has the required value
+     * Test if required field has the required value
+     *
      * @param fieldname the name of the field being tested
      * @param fieldvalue the value to be matched in that field
      * @return true if this entity has field set to defined value

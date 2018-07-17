@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 Richard Linsdale.
+ * Copyright 2014-2018 Richard Linsdale.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
+package uk.theretiredprogrammer.nbpcglibrary.api;
 
 import java.util.concurrent.Callable;
 import org.netbeans.api.actions.Savable;
 import org.openide.modules.OnStop;
 
 /**
- * The Standard On Stop action - tests if forms have error, and dialogs with
+ * The Savables tracking (and the @OnStop Application control) - tests if forms have error, and dialogs with
  * user to check if close is to continue.
  *
  * @author Richard Linsdale (richard at theretiredprogrammer.uk)
  */
 @OnStop
-public class LibraryOnStop implements Callable<Boolean> {
+public class SavableTracking implements Callable<Boolean> {
     
     private static boolean enableSavable = true;
 

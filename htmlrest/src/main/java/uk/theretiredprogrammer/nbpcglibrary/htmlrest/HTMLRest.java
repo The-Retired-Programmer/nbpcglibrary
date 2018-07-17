@@ -19,11 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.theretiredprogrammer.nbpcglibrary.api.Rest;
 import java.util.Map;
+import java.util.function.Function;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
+//import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import uk.theretiredprogrammer.nbpcglibrary.api.BasicEntityCache;
@@ -39,25 +40,25 @@ import uk.theretiredprogrammer.nbpcglibrary.api.IdTimestamp;
 public class HTMLRest<E extends IdTimestamp> implements Rest<E> {
 
     private final Client client = ClientBuilder.newClient();
-    private final Class<E> responseEntityClass;
     private final String jwtoken;
     private final String locationroot;
     private final BasicEntityCache<E> cache;
-    private final GenericType<List<E>> genericType;
+    //private final GenericType<List<E>> genericType;
+    //
+    private final Function<String,E> entityCreator;
 
     /**
      * Constructor
      *
      * @param locationroot the root section of the location uri
      * @param genericType a GenerticType required when creating List of Objects
-     * @param responseEntityClass the class of the entity being transferred
-     * (same as generic E)
+     * @param entityCreator the entry creator function
      * @param jwtoken the authorisation token for the authenticated user
      */
-    public HTMLRest(String locationroot, GenericType<List<E>> genericType, Class<E> responseEntityClass, String jwtoken) {
+    public HTMLRest(String locationroot, /* GenericType<List<E>> genericType, */ Function<String,E> entityCreator, String jwtoken) {
         this.locationroot = locationroot;
-        this.genericType = genericType;
-        this.responseEntityClass = responseEntityClass;
+        this.entityCreator = entityCreator;
+        //this.genericType = genericType;
         this.jwtoken = jwtoken;
         cache = new BasicEntityCache<>();
     }
@@ -85,7 +86,8 @@ public class HTMLRest<E extends IdTimestamp> implements Rest<E> {
                     .header("authorization", "bearer " + jwtoken)
                     .get();
             if (response.getStatus() == 200) {
-                e = response.readEntity(responseEntityClass);
+                String json = response.readEntity(String.class);
+                e = entityCreator.apply(json);
                 cache.insert(e);
                 return e;
             } else {
@@ -105,9 +107,10 @@ public class HTMLRest<E extends IdTimestamp> implements Rest<E> {
                     .header("authorization", "bearer " + jwtoken)
                     .get();
             if (response.getStatus() == 200) {
-                List<E> el = response.readEntity(genericType);
-                el.forEach((e) -> cache.insert(e));
-                return el;
+                String json = response.readEntity(String.class);
+                //List<E> el = response.readEntity(genericType);
+                //el.forEach((e) -> cache.insert(e));
+                return new ArrayList<>();
             } else {
                 return new ArrayList<>();
             }
@@ -125,9 +128,10 @@ public class HTMLRest<E extends IdTimestamp> implements Rest<E> {
                     .header("authorization", "bearer " + jwtoken)
                     .get();
             if (response.getStatus() == 200) {
-                List<E> el = response.readEntity(genericType);
-                el.forEach((e) -> cache.insert(e));
-                return el;
+                String json = response.readEntity(String.class);
+                //List<E> el = response.readEntity(genericType);
+                //el.forEach((e) -> cache.insert(e));
+                return new ArrayList<>();
             } else {
                 return new ArrayList<>();
             }
@@ -144,11 +148,12 @@ public class HTMLRest<E extends IdTimestamp> implements Rest<E> {
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .header("Content-Type", "application/json")
                     .header("authorization", "bearer " + jwtoken)
-                    .post(Entity.json(entity), Response.class);
+                    .post(Entity.entity(entity.toJson(),MediaType.APPLICATION_JSON), Response.class);
             if (response.getStatus() == 201) {
-                E e = response.readEntity(responseEntityClass);
-                cache.insert(e);
-                return e;
+                String json = response.readEntity(String.class);
+                entity = entityCreator.apply(json);
+                cache.insert(entity);
+                return entity;
             } else {
                 return null;
             }
@@ -165,11 +170,12 @@ public class HTMLRest<E extends IdTimestamp> implements Rest<E> {
                     .request(MediaType.APPLICATION_JSON_TYPE)
                     .header("Content-Type", "application/json")
                     .header("authorization", "bearer " + jwtoken)
-                    .put(Entity.json(entity), Response.class);
+                    .put(Entity.entity(entity.toJson(),MediaType.APPLICATION_JSON), Response.class);
             if (response.getStatus() == 200) {
-                E e = response.readEntity(responseEntityClass);
-                cache.insert(e);
-                return e;
+                String json = response.readEntity(String.class);
+                entity = entityCreator.apply(json);
+                cache.insert(entity);
+                return entity;
             } else {
                 return null;
             }

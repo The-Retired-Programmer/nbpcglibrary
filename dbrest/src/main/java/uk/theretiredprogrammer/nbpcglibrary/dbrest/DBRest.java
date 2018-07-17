@@ -277,7 +277,7 @@ public class DBRest<E extends IdTimestamp> implements Rest<E> {
     }
 
     private void updateTimestampInfo(E entity) {
-        String user = Settings.get("Usercode", "????");
+        String user = Settings.get("Usercode", "user");
         SimpleDateFormat datetime_ISO8601 = new SimpleDateFormat("yyyyMMddHHmmss");
         datetime_ISO8601.setLenient(false);
         String when = datetime_ISO8601.format(new Date());
@@ -288,7 +288,7 @@ public class DBRest<E extends IdTimestamp> implements Rest<E> {
     @Override
     public E patch(int id, Map<String, Object> updates) {
         // temporary until javaee8
-        throw new RuntimeException("Patch not implemented over HTML Rest");
+        throw new RuntimeException("Patch not implemented over DB Rest");
     }
 
     @Override

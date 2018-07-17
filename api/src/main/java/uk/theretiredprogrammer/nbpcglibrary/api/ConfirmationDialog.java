@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
+package uk.theretiredprogrammer.nbpcglibrary.api;
 
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;

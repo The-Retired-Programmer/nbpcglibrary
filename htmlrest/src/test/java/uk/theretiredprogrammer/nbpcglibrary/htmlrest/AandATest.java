@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 richard.
+ * Copyright 2017-2018 richard.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,7 @@
  */
 package uk.theretiredprogrammer.nbpcglibrary.htmlrest;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -38,11 +32,12 @@ public class AandATest {
     @Test
     public void testAuthenticate() {
         System.out.println("authenticate");
-        String appkey = "trp.bk.";
+        String appkey = "acm.role";
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        assert(AandA.authenticate(appkey, url, u, p));
+        AandA auth = new AandA(url, appkey);
+        assert(auth.authenticate(u, p));
     }
     
     /**
@@ -51,11 +46,12 @@ public class AandATest {
     @Test
     public void testAuthenticateFail() {
         System.out.println("authenticate fail");
-        String appkey = "trp.bk.";
+        String appkey = "acm.role";
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "wordpass";
-        assert(!AandA.authenticate(appkey, url, u, p));
+        AandA auth = new AandA(url, appkey);
+        assert(!auth.authenticate(u, p));
     }
     
      /**
@@ -64,11 +60,12 @@ public class AandATest {
     @Test
     public void testAuthenticateAuthoriseFailure() {
         System.out.println("authenticate - authorise failure");
-        String appkey = "trp.xxx.";
+        String appkey = "acm.xxx";
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        assert(!AandA.authenticate(appkey, url, u, p));
+        AandA auth = new AandA(url, appkey);
+        assert(!auth.authenticate(u, p));
     }
     
      /**
@@ -77,11 +74,12 @@ public class AandATest {
     @Test
     public void testAuthenticateConnectionFailure() {
         System.out.println("authenticate - connection failure");
-        String appkey = "trp.bk.";
+        String appkey = "acm.role";
         String url = "http://localhost:9090";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        assert(!AandA.authenticate(appkey, url, u, p));
+        AandA auth = new AandA(url, appkey);
+        assert(!auth.authenticate(u, p));
     }
     
      /**
@@ -90,90 +88,27 @@ public class AandATest {
     @Test
     public void testAuthenticateURLUndefined() {
         System.out.println("authenticate - url undefined");
-        String appkey = "trp.bk.";
+        String appkey = "acm.role";
         String url = null;
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        assert(!AandA.authenticate(appkey, url, u, p));
+        AandA auth = new AandA(url, appkey);
+        assert(!auth.authenticate(u, p));
     }
 
     /**
      * Test of getStringClaim method, of class AandA.
      */
     @Test
-    public void testGetAuthorityMissing() {
-        System.out.println("getAuthorityMissing");
-        String appkey = "trp.bk.";
+    public void testGetRole() {
+        System.out.println("getRole");
+        String appkey = "acm.role";
         String url = "http://localhost:8080";
         String u = "richard@rlinsdale.uk";
         String p = "password";
-        assert(AandA.authenticate(appkey, url, u, p));
-        assertNull(AandA.getAuthority("undefinedkey"));
+        AandA auth = new AandA(url, appkey);
+        assert(auth.authenticate(u, p));
+        assert(auth.getRole().equals("admin"));
     }
     
-    /**
-     * Test of getStringClaim method, of class AandA.
-     */
-    @Test
-    public void testGetAuthority() {
-        System.out.println("getAuthority");
-        String appkey = "trp.bk.";
-        String url = "http://localhost:8080";
-        String u = "richard@rlinsdale.uk";
-        String p = "password";
-        assert(AandA.authenticate(appkey, url, u, p));
-        assertEquals("admin", AandA.getAuthority("client"));
-    }
-    
-    // extra test for the auth verification - testing here cos it is really part of the remote authorisation/verification function set
-    
-     /**
-     * Test of authTest method, calling rest service .
-     */
-    @Test
-    public void testAuthTest() {
-        System.out.println("authTest");
-        String appkey = "trp.bk.";
-        String reqkey = "trp.rest.fin.provider";
-        String content = "r";
-        String url = "http://localhost:8080";
-        String u = "richard@rlinsdale.uk";
-        String p = "password";
-        assert(AandA.authenticate(appkey, url, u, p));
-        String token = AandA.getToken();
-        boolean res = authTest(url, token, reqkey, content);
-        assert(res);
-        assertEquals("rl",moniker);
-    }
-    
-    private static final Client CLIENT = ClientBuilder.newClient();
-    private static int lastAuthStatus = 0;
-    private static String moniker;
-
-    private boolean authTest(String url, String auth, String claim, String contains) {
-        if (auth != null ) {
-            if (url == null) {
-                lastAuthStatus = 600; // private status = bad url
-                return false;
-            }
-            try {
-                // check the Token
-                Response response = CLIENT
-                        .target(url + "/auth/auth/"+claim+"/"+contains)
-                        .request(MediaType.TEXT_PLAIN_TYPE)
-                        .header("authorization", "bearer "+auth)
-                        .get();
-                lastAuthStatus = response.getStatus();
-                if (lastAuthStatus == 200) {
-                    moniker = response.readEntity(String.class);
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (ProcessingException ex) {
-                return false;
-            }
-        }
-    return false;
-    }
 }

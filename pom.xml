@@ -15,6 +15,7 @@
         <module>form</module>
         <module>icons</module>
         <module>lifecycle</module>
+        <module>authlifecycle</module>
         <module>htmlrest</module>
         <module>dbrest</module>
         <module>filerest</module>

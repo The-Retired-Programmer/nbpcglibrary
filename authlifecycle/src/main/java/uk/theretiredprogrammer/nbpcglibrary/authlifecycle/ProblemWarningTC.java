@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.theretiredprogrammer.nbpcglibrary.lifecycle;
+package uk.theretiredprogrammer.nbpcglibrary.authlifecycle;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -21,7 +21,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
-import uk.theretiredprogrammer.nbpcglibrary.htmlrest.AandA;
 
 /**
  *
@@ -60,20 +59,20 @@ public final class ProblemWarningTC extends TopComponent {
     }
 
     private String getTabname() {
-        return LifeCycle.isProblem() ? "Application Startup Problems"
-                : LifeCycle.isWarning() ? "Application Startup Warnings" : "????";
+        return AuthLifeCycle.isProblem() ? "Application Startup Problems"
+                : AuthLifeCycle.isWarning() ? "Application Startup Warnings" : "????";
     }
 
     private String assemblecontent() {
         StringBuilder sb = new StringBuilder();
-        if (LifeCycle.isProblem() || LifeCycle.isWarning()) {
+        if (AuthLifeCycle.isProblem() || AuthLifeCycle.isWarning()) {
             sb.append("<html>");
-            sb.append(LifeCycle.isProblem()
+            sb.append(AuthLifeCycle.isProblem()
                     ? NbBundle.getMessage(ProblemWarningTC.class, "problem_heading")
                     : NbBundle.getMessage(ProblemWarningTC.class, "warning_heading"));
-            if (LifeCycle.isAuthorisationProblem()) {
+            if (AuthLifeCycle.isAuthorisationProblem()) {
                 sb.append("<br/><hr>");
-                switch (LifeCycle.authenticationResult()) {
+                switch (AuthLifeCycle.authenticationResult()) {
                     case 401:
                     case 601:
                         sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authen"));
@@ -88,10 +87,10 @@ public final class ProblemWarningTC extends TopComponent {
                         sb.append(NbBundle.getMessage(ProblemWarningTC.class, "problem_authconnect"));
                 }
                 sb.append("<p>message was: ");
-                sb.append(AandA.getLastAuthMessage());
+                sb.append(AuthLifeCycle.authenticationMessage());
                 sb.append("</p>");
             }
-            if (!LifeCycle.areSettingsSaved()) {
+            if (!AuthLifeCycle.areSettingsSaved()) {
                 sb.append("<br/><hr>");
                 sb.append(NbBundle.getMessage(ProblemWarningTC.class, "warning_settings"));
             }
